@@ -4,15 +4,29 @@ import Shell from '../layouts/Shell.astro';
 import Stickie from '../components/stickie.astro';
 // content
 import { getCollection } from 'astro:content';
-const entry = await getCollection('1st');
+const pmcf = await getCollection('1st');
+const who = await getCollection('2nd');
 ---
 <Shell title="This is the title prop">
-	<div title="This is from the index">
+	<div title="PMCF-XYZ">
 		{
-			entry.map(async (post) => {
+			pmcf.map(async (post) => {
 				const { Content } = await post.render()
 				return (
-				<Stickie>
+				<Stickie class="stickie">
+					<!--<h2>{post.data.title}</h2>-->
+					<Content/>
+				</Stickie>
+				)
+			})
+		}
+	</div>
+	<div title="Who">
+		{
+			who.map(async (post) => {
+				const { Content } = await post.render()
+				return (
+				<Stickie class="stickie">
 					<h2>{post.data.title}</h2>
 					<Content/>
 				</Stickie>

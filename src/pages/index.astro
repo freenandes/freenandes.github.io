@@ -1,22 +1,23 @@
 ---
-// templates
+// components
 import Shell from '../layouts/Shell.astro';
+import Stickie from '../components/stickie.astro';
 // content
 import { getCollection } from 'astro:content';
 const entry = await getCollection('1st');
-// props
-const { title } = Astro.props;
 ---
-<Shell>
-<div title={title}>
-	{
-        entry.map(async (post) => {
-          const { Content } = await post.render()
-          return (
-            <h2>{post.data.title}</h2>
-            <Content/>
-          )
-        })
-    }
-</div>
+<Shell title="This is the title prop">
+	<div title="This is from the index">
+		{
+			entry.map(async (post) => {
+				const { Content } = await post.render()
+				return (
+				<Stickie>
+					<h2>{post.data.title}</h2>
+					<Content/>
+				</Stickie>
+				)
+			})
+		}
+	</div>
 </Shell>

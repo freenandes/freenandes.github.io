@@ -4,34 +4,41 @@ import Shell from '../layouts/Shell.astro';
 import Stickie from '../components/stickie.astro';
 // content
 import { getCollection } from 'astro:content';
-const pmcf = await getCollection('1st');
-const who = await getCollection('2nd');
+const firstSection = await getCollection('base');
+const secondSection = await getCollection('who');
 ---
 <Shell title="This is the title prop">
-	<div title="PMCF-XYZ">
+	<header>
+		<nav></nav>
+	</header>
+	<section>
+		<header>
+			<h1>PMCF.XYZ</h1>
+		</header>
 		{
-			pmcf.map(async (post) => {
+			firstSection.map(async (post) => {
 				const { Content } = await post.render()
 				return (
 				<Stickie class="stickie">
-					<h2>{post.data.title}</h2>
-					<Content/>
+					<Content />
 				</Stickie>
 				)
 			})
 		}
-	</div>
-	<div title="Who">
+	</section>
+	<section>
+		<header>
+			<h2>Who</h2>
+		</header>
 		{
-			who.map(async (post) => {
+			secondSection.map(async (post) => {
 				const { Content } = await post.render()
 				return (
 				<Stickie class="stickie">
-					<h2>{post.data.title}</h2>
-					<Content/>
+					<Content />
 				</Stickie>
 				)
 			})
 		}
-	</div>
+	</section>
 </Shell>

@@ -5,4 +5,4 @@ title: "Test"
 
 This is my first content to test things out.
 
-![A starry night sky...](../../assets/images/starry.jpg)
+![description of the image](../../assets/images/starry.jpg "title for the image")

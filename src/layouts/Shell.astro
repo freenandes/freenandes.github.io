@@ -10,8 +10,24 @@ const { title } = Astro.props
 	<title>{ title }</title>
 </head>
 <body>
-    <div title="This is from the Shell template">
-        <slot />
-    </div>
+    <slot />
 </body>
 </html>
+<style is:global>
+@font-face {
+	font-family: "LexendDeca";
+	src: url("/fonts/LexendDeca.woff2") format("woff2 supports variations"), url("/fonts/LexendDeca.woff2") format("woff2-variations");
+	font-weight: 100 1000;
+	font-display: swap;
+}
+@font-face {
+	font-family: "LexendPeta";
+	src: url("/fonts/LexendPeta.woff2") format("woff2 supports variations"), url("/fonts/LexendPeta.woff2") format("woff2-variations");
+	font-weight: 100 1000;
+	font-display: swap;
+}
+html {
+	font-family: "LexendDeca", system-ui, sans-serif;
+	font-size: 16px;
+}
+</style>

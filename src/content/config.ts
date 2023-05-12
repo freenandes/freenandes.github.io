@@ -16,4 +16,14 @@ export const collections = {
       title: z.string(),
     }),
   }),
+  'why': defineCollection({
+    schema: z.object({
+      title: z.string(),
+    }),
+  }),
+  'see': defineCollection({
+    schema: z.object({
+      title: z.string(),
+    }),
+  }),
 };

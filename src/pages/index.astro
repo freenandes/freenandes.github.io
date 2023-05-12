@@ -6,39 +6,62 @@ import Stickie from '../components/stickie.astro';
 import { getCollection } from 'astro:content';
 const firstSection = await getCollection('base');
 const secondSection = await getCollection('who');
+const thirdSection = await getCollection('why');
+const fourthSection = await getCollection('see');
 ---
-<Shell title="This is the title prop">
-	<header>
-		<nav></nav>
-	</header>
-	<section>
-		<header>
+<Shell title="My website" description="This is my website description">
+	<main>
+		<section>
 			<h1>PMCF.XYZ</h1>
-		</header>
-		{
-			firstSection.map(async (post) => {
-				const { Content } = await post.render()
-				return (
-				<Stickie class="stickie">
-					<Content />
-				</Stickie>
-				)
-			})
-		}
-	</section>
-	<section>
-		<header>
+			{
+				firstSection.map(async (post) => {
+					const { Content } = await post.render()
+					return (
+					<Stickie>
+						<Content />
+					</Stickie>
+					)
+				})
+			}
+		</section>
+		<section>
 			<h2>Who</h2>
-		</header>
-		{
-			secondSection.map(async (post) => {
-				const { Content } = await post.render()
-				return (
-				<Stickie class="stickie">
-					<Content />
-				</Stickie>
-				)
-			})
-		}
-	</section>
+			{
+				secondSection.map(async (post) => {
+					const { Content } = await post.render()
+					return (
+					<Stickie>
+						<Content />
+					</Stickie>
+					)
+				})
+			}
+		</section>
+		<section>
+			<h2>Why</h2>
+			{
+				thirdSection.map(async (post) => {
+					const { Content } = await post.render()
+					return (
+					<Stickie>
+						<Content />
+					</Stickie>
+					)
+				})
+			}
+		</section>
+		<section>
+			<h2>See</h2>
+			{
+				fourthSection.map(async (post) => {
+					const { Content } = await post.render()
+					return (
+					<Stickie>
+						<Content />
+					</Stickie>
+					)
+				})
+			}
+		</section>
+	</main>
 </Shell>

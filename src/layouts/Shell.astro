@@ -1,12 +1,13 @@
 ---
-const { title } = Astro.props
+const { title, description } = Astro.props
 ---
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
 	<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-	<meta name="viewport" content="width=device-width" />
-	<meta name="generator" content={Astro.generator} />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="generator" content={ Astro.generator } />
+	<meta name="description" content={ description }>
 	<title>{ title }</title>
 </head>
 <body>
@@ -26,8 +27,148 @@ const { title } = Astro.props
 	font-weight: 100 1000;
 	font-display: swap;
 }
+:root {
+	--paper: #F8F8F7;
+	--charcoal: #313549;
+	--accent: rgba(55, 0, 254, 0.8);
+	--black-light: rgba(0, 0, 0, 0.1);
+	--black-medium: rgba(0, 0, 0, 0.5);
+	--black-strong: rgba(0, 0, 0, 0.8);
+	--stickie-yellow: #FFDF80;
+	--stickie-blue: #B3ECFF;
+	--stickie-green: #D0F28C;
+	--stickie-pink: #FFCCD5;
+}
 html {
 	font-family: "LexendDeca", system-ui, sans-serif;
 	font-size: 16px;
+	font-weight: 350;
+	color: var(--charcoal);
+	background-color: var(--paper);
+	background-image: radial-gradient(var(--black-light) 0.0625em, transparent 0.0625em);
+    background-size: 2em 2em;
+	background-position: 0 0.1875em;
+}
+:focus {
+	outline: 0.1875rem dashed var(--accent);
+	outline-offset: 0.0625rem;
+	border-radius: 0.03125rem;
+}
+body, h1, h2, h3, h4, p, ul {
+	margin: 0;
+}
+h1, h2 {
+	font-weight: 650;
+	font-size: 2.5em;
+	line-height: 87.5%;
+	letter-spacing: -0.03125em;
+	text-transform: uppercase;
+	overflow-wrap: break-word;
+}
+h1, h2, p {
+    hyphens: auto;
+}
+h3 {
+	font-weight: 550;
+	font-size: 1.25em;
+	line-height: 125%;
+}
+h4 {
+	font-family: "LexendPeta";
+	font-weight: 750;
+	font-size: 0.75em;
+	line-height: 125%;
+	text-transform: uppercase;
+	margin-bottom: 0.25em;
+}
+p {
+	font-size: 1em;
+	line-height: 150%;
+}
+ul {
+	padding-left: 1.5em;
+}
+a, a:visited {
+	color: inherit;
+	font-weight: 450;
+	overflow-wrap: break-word;
+}
+a:hover {
+	color: var(--black-medium);
+}
+a:active {
+	color: var(--accent);
+}
+main {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	gap: 0;
+	padding: 0;
+}
+section {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 1em;
+	padding: 4em;
+}
+section:not(:first-child) article:not(:last-child) {
+	margin-bottom: 2em;
+}
+section:nth-child(2) article > * {
+    background-color: var(--stickie-blue);
+}
+section:nth-child(3) article > * {
+    background-color: var(--stickie-green);
+}
+section:nth-child(4) article > * {
+    background-color: var(--stickie-pink);
+}
+.tags ul {
+	list-style-type: none;
+	display: flex;
+	flex-flow: row wrap;
+	align-items: flex-start;
+	gap: 0.5em;
+	padding: 0.5em 0;
+}
+.tags li {
+	padding: 0.25em 0.5em;
+	background-color: var(--black-light);
+	border-radius: 0.125em;
 }
 </style>
+<script is:global>
+// Email
+const emlParser = (encoded) => {
+	let
+	decEml   = '' ,
+	keyInHex = encoded.substr (0, 2) ,
+	key      = parseInt (keyInHex, 16)
+	for (let n = 2;
+			n < encoded.length;
+			n += 2
+	) {
+		let
+		charInHex = encoded.substr (n, 2) ,
+		char      = parseInt (charInHex, 16) ,
+		output    = char ^ key
+		decEml += String.fromCharCode (output)
+	}
+	return decEml
+}
+function emlDecoder() {
+	const
+	eml =
+	document.getElementsByClassName("eml")
+	for (let i = 0; i < eml.length; i++) {
+	let
+	elEml = eml[i] ,
+	encoded = elEml.dataset.encoded,
+	decoded = emlParser(encoded)
+	elEml.textContent = decoded
+	elEml.href = 'mailto:' + decoded
+	}
+} emlDecoder()
+</script>

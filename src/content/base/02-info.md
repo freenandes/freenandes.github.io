@@ -15,4 +15,8 @@ Product Designer
 
 Lisbon, Portugal
 
+#### Curriculum
+
+<a href="https://linkedin.com/in/pmcfernandes" target="_blank">linkedin.com/in/pmcfernandes</a>
+
 </div>

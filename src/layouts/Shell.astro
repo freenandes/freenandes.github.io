@@ -10,7 +10,7 @@ const { title, description } = Astro.props
 	<meta name="description" content={ description }>
 	<title>{ title }</title>
 </head>
-<body>
+<body id="scene">
     <slot />
 </body>
 </html>
@@ -45,14 +45,6 @@ html {
 	font-weight: 350;
 	color: var(--charcoal);
 	background-color: var(--paper);
-	background-image: radial-gradient(var(--black-light) 0.0625em, transparent 0.0625em);
-    background-size: 2em 2em;
-	background-position: 0 0.1875em;
-}
-:focus {
-	outline: 0.1875rem dashed var(--accent);
-	outline-offset: 0.0625rem;
-	border-radius: 0.03125rem;
 }
 body, h1, h2, h3, h4, p, ul {
 	margin: 0;
@@ -60,7 +52,7 @@ body, h1, h2, h3, h4, p, ul {
 h1, h2 {
 	font-weight: 650;
 	font-size: 2.5em;
-	line-height: 87.5%;
+	line-height: 80%;
 	letter-spacing: -0.03125em;
 	text-transform: uppercase;
 	overflow-wrap: break-word;
@@ -71,15 +63,14 @@ h1, h2, p {
 h3 {
 	font-weight: 550;
 	font-size: 1.25em;
-	line-height: 125%;
+	line-height: 120%;
 }
 h4 {
 	font-family: "LexendPeta";
 	font-weight: 750;
 	font-size: 0.75em;
-	line-height: 125%;
+	line-height: 133%;
 	text-transform: uppercase;
-	margin-bottom: 0.25em;
 }
 p {
 	font-size: 1em;
@@ -99,12 +90,21 @@ a:hover {
 a:active {
 	color: var(--accent);
 }
+a:focus {
+	outline: 0.1875rem dashed var(--accent);
+	outline-offset: 0.0625rem;
+	border-radius: 0.03125rem;
+}
 main {
 	display: flex;
 	flex-direction: row;
 	align-items: flex-start;
 	gap: 0;
 	padding: 0;
+	/* background pattern */
+	background-image: radial-gradient(var(--black-light) 0.0625em, transparent 0.0625em);
+	background-size: 2em 2em;
+	background-position: 0 0;
 }
 section {
 	display: flex;
@@ -134,41 +134,9 @@ section:nth-child(4) article > * {
 	padding: 0.5em 0;
 }
 .tags li {
-	padding: 0.25em 0.5em;
+	padding: 0.125em 0.375em;
 	background-color: var(--black-light);
 	border-radius: 0.125em;
 }
 </style>
-<script is:global>
-// Email
-const emlParser = (encoded) => {
-	let
-	decEml   = '' ,
-	keyInHex = encoded.substr (0, 2) ,
-	key      = parseInt (keyInHex, 16)
-	for (let n = 2;
-			n < encoded.length;
-			n += 2
-	) {
-		let
-		charInHex = encoded.substr (n, 2) ,
-		char      = parseInt (charInHex, 16) ,
-		output    = char ^ key
-		decEml += String.fromCharCode (output)
-	}
-	return decEml
-}
-function emlDecoder() {
-	const
-	eml =
-	document.getElementsByClassName("eml")
-	for (let i = 0; i < eml.length; i++) {
-	let
-	elEml = eml[i] ,
-	encoded = elEml.dataset.encoded,
-	decoded = emlParser(encoded)
-	elEml.textContent = decoded
-	elEml.href = 'mailto:' + decoded
-	}
-} emlDecoder()
-</script>
+<script is:global></script>

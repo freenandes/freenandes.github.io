@@ -15,5 +15,9 @@ title: "Preferred tools"
 - Maze
 - Airtable
 - Dovetail
+- GPT4
+- Concepts
+- Procreate
+- Affinity Designer
 
 </div>

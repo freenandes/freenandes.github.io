@@ -10,8 +10,11 @@ const { title, description } = Astro.props
 	<meta name="description" content={ description }>
 	<title>{ title }</title>
 </head>
-<body id="scene">
-    <slot />
+<body>
+	<main id="scene">
+		<slot />
+	</main>
+	<div class="grid"></div>
 </body>
 </html>
 <style is:global>
@@ -45,6 +48,12 @@ html {
 	font-weight: 350;
 	color: var(--charcoal);
 	background-color: var(--paper);
+}
+body {
+	width: fit-content;
+}
+html, body {
+	overflow: hidden;
 }
 body, h1, h2, h3, h4, p, ul {
 	margin: 0;
@@ -139,4 +148,31 @@ section:nth-child(4) article > * {
 	border-radius: 0.125em;
 }
 </style>
-<script is:global></script>
+<script>
+// Panzoom
+import panzoom from 'panzoom';
+const element = document.getElementById('scene') as HTMLElement;
+let isShiftKeyPressed = false;
+document.addEventListener('keydown', (e) => {
+	if (e.shiftKey) {
+		isShiftKeyPressed = true;
+		document.documentElement.style.cursor = 'grab';
+	}
+});
+document.addEventListener('keyup', (e) => {
+	if (!e.shiftKey) {
+		isShiftKeyPressed = false;
+		document.documentElement.style.cursor = 'default';
+	}
+});
+panzoom(element, {
+	beforeMouseDown: function (e: MouseEvent) {
+		const shouldIgnore = !isShiftKeyPressed;
+		return shouldIgnore;
+	},
+	maxZoom: 2,
+	minZoom: 0.25,
+	bounds: true,
+	boundsPadding: 0.25,
+});
+</script>

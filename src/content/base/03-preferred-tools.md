@@ -1,7 +1,7 @@
 ---
 title: "Preferred tools"
 ---
-<div class="tags">
+<div tags>
 
 #### Favorite tools
 

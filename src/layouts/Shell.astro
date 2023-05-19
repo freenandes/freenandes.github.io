@@ -1,7 +1,7 @@
 ---
-const { title, description } = Astro.props
+const { title, description, customClass } = Astro.props
 ---
-<html lang="en">
+<html lang="en" class={ customClass }>
 <head>
 	<meta charset="utf-8" />
 	<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -11,10 +11,7 @@ const { title, description } = Astro.props
 	<title>{ title }</title>
 </head>
 <body>
-	<main id="scene">
-		<slot />
-	</main>
-	<div class="grid"></div>
+	<slot />
 </body>
 </html>
 <style is:global>
@@ -33,21 +30,34 @@ const { title, description } = Astro.props
 :root {
 	--paper: #F8F8F7;
 	--charcoal: #313549;
-	--accent: rgba(55, 0, 254, 0.8);
+	--klein-oklch: oklch(52% 0.28 270);
+	--klein: #3844ff;
+	--accent: var(--klein-oklch, var(--klein));
 	--black-light: rgba(0, 0, 0, 0.1);
 	--black-medium: rgba(0, 0, 0, 0.5);
 	--black-strong: rgba(0, 0, 0, 0.8);
-	--stickie-yellow: #FFDF80;
-	--stickie-blue: #B3ECFF;
-	--stickie-green: #D0F28C;
-	--stickie-pink: #FFCCD5;
+	--white: #fff;
+	--yellow-oklch: oklch(92% 0.13 92);
+	--yellow: #ffe38c;
+	--stickie-yellow: var(--yellow-oklch, var(--yellow));
+	--stickie-blue: #aef2ff;
+	--stickie-green: #d0f580;
+	--pink-oklch: oklch(92% 0.05 8);
+	--pink: #ffdadf;
+	--stickie-pink: var(--pink-oklch, var(--pink));
+	--stickie-shadow: rgba(0, 0, 0, 0.1) 0 0.25rem 0.25rem -0.125rem, rgba(0, 0, 0, 0.06) 0 0.125rem 0.125rem -0.0625rem;
+	--contour: 0.03125rem solid rgba(0, 0, 0, 0.025);
 }
 html {
 	font-family: "LexendDeca", system-ui, sans-serif;
 	font-size: 16px;
 	font-weight: 350;
+	line-height: 150%;
 	color: var(--charcoal);
 	background-color: var(--paper);
+}
+html.index :not(a):not(input):not(textarea):not(button) {
+	cursor: grab;
 }
 body {
 	width: fit-content;
@@ -90,8 +100,9 @@ ul {
 }
 a, a:visited {
 	color: inherit;
-	font-weight: 450;
+	font-weight: 350;
 	overflow-wrap: break-word;
+	border-radius: 0.03125rem;
 }
 a:hover {
 	color: var(--black-medium);
@@ -99,27 +110,30 @@ a:hover {
 a:active {
 	color: var(--accent);
 }
-a:focus {
+a:focus-visible {
 	outline: 0.1875rem dashed var(--accent);
 	outline-offset: 0.0625rem;
-	border-radius: 0.03125rem;
+}
+button:focus-visible {
+	outline: 0.1875rem dashed var(--accent);
+	outline-offset: 0.0625rem;
 }
 main {
 	display: flex;
 	flex-direction: row;
 	align-items: flex-start;
-	gap: 0;
+	gap: 4em;
 	padding: 0;
-	/* background pattern */
 	background-image: radial-gradient(var(--black-light) 0.0625em, transparent 0.0625em);
 	background-size: 2em 2em;
 	background-position: 0 0;
+	padding: 4em;
 }
 section {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	gap: 1em;
+	gap: 2em;
 	padding: 4em;
 }
 section:not(:first-child) article:not(:last-child) {
@@ -134,45 +148,23 @@ section:nth-child(3) article > * {
 section:nth-child(4) article > * {
     background-color: var(--stickie-pink);
 }
-.tags ul {
-	list-style-type: none;
-	display: flex;
-	flex-flow: row wrap;
-	align-items: flex-start;
-	gap: 0.5em;
-	padding: 0.5em 0;
-}
-.tags li {
-	padding: 0.125em 0.375em;
-	background-color: var(--black-light);
-	border-radius: 0.125em;
-}
 </style>
 <script>
 // Panzoom
 import panzoom from 'panzoom';
-const element = document.getElementById('scene') as HTMLElement;
-let isShiftKeyPressed = false;
-document.addEventListener('keydown', (e) => {
-	if (e.shiftKey) {
-		isShiftKeyPressed = true;
-		document.documentElement.style.cursor = 'grab';
-	}
+const canvas = document.getElementById('canvas') as HTMLElement;
+const pz = panzoom(canvas, {
+	maxZoom: 4,
+	minZoom: 0.125,
+	zoomDoubleClickSpeed: 1,
 });
-document.addEventListener('keyup', (e) => {
-	if (!e.shiftKey) {
-		isShiftKeyPressed = false;
-		document.documentElement.style.cursor = 'default';
-	}
-});
-panzoom(element, {
-	beforeMouseDown: function (e: MouseEvent) {
-		const shouldIgnore = !isShiftKeyPressed;
-		return shouldIgnore;
-	},
-	maxZoom: 2,
-	minZoom: 0.25,
-	bounds: true,
-	boundsPadding: 0.25,
+const inputElements = document.querySelectorAll('input, textarea');
+inputElements.forEach((input) => {
+	input.addEventListener('focus', () => {
+		pz.pause();
+	});
+	input.addEventListener('blur', () => {
+		pz.resume();
+	});
 });
 </script>

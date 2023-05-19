@@ -1,0 +1,82 @@
+<article>
+    <form action="https://formspree.io/f/mnqyrkwr" method="POST" accept-charset="UTF-8">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email here" required>
+        <label for="message">Message</label>
+        <textarea id="message" name="message" placeholder="Share your thoughts here" required></textarea>
+        <input type="hidden" name="_gotcha">
+        <button type="submit">Send message</button>
+    </form>
+</article>
+<style>
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+form * {
+    font-family: "LexendDeca", system-ui, sans-serif;
+	font-size: 16px;
+    box-sizing: border-box;
+}
+label {
+	font-family: "LexendPeta";
+	font-weight: 750;
+	font-size: 0.75em;
+	line-height: 133%;
+	text-transform: uppercase;
+}
+input, textarea {
+    width: 100%;
+	font-weight: 350;
+	line-height: 150%;
+	color: var(--black-strong);
+    background-color: var(--black-light);
+    padding: 0.125em 0.25em;
+    border: 0.125rem solid var(--black-light);
+    border-radius: 0.1875rem;
+    margin-bottom: 0.5em;
+}
+textarea {
+    flex-grow: 1;
+    resize: vertical;
+}
+input::placeholder, textarea::placeholder {
+    color: var(--black-medium);
+}
+input:not(:placeholder-shown), textarea:not(:placeholder-shown) {
+    border-color: transparent;
+    background-color: var(--white);
+}
+input:hover, textarea:hover {
+    border: 0.125rem solid var(--black-medium);
+}
+input:focus, textarea:focus {
+    outline: none;
+    border: 0.125rem solid var(--black-strong);
+    box-shadow: none;
+}
+button {
+    font-size: 0.8em;
+	font-weight: 475;
+	line-height: 125%;
+    text-transform: uppercase;
+    letter-spacing: 0.0625em;
+	color: var(--paper);
+    background-color: var(--accent);
+    border: none;
+    border-radius: 0.1875rem;
+    padding: 0.5em 1em 0.75em;
+    box-shadow: var(--black-medium) 0 -0.25em 0 inset;
+    min-height: 2rem;
+}
+button:hover {
+    padding: 0.625em 1em 0.625em;
+    box-shadow: var(--black-medium) 0 0 0 inset;
+}
+button:active {
+    padding: 0.75em 1em 0.5em;
+    box-shadow: var(--black-medium) 0 0.25em 0 inset;
+}
+</style>

@@ -26,4 +26,9 @@ export const collections = {
       title: z.string(),
     }),
   }),
+  'extra': defineCollection({
+    schema: z.object({
+      title: z.string(),
+    }),
+  }),
 };

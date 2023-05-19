@@ -1,10 +1,17 @@
 ---
 title: "Welcome"
 ---
-<div>
+<div tags>
 
 Welcome! I’m Pedro, and this is my website. It’s where I show myself to the world as a designer.
 
-Browse around by panning and zooming.
+To pan around, simply
+
+- Click & Drag
+
+To zoom in or zoom out, try
+
+- Scroll Up/Down
+- Keys +/-
 
 </div>

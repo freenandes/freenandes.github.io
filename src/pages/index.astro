@@ -2,6 +2,7 @@
 // components
 import Shell from '../layouts/Shell.astro';
 import Stickie from '../components/stickie.astro';
+import Contact from '../components/contact.astro';
 // content
 import { getCollection } from 'astro:content';
 const firstSection = await getCollection('base');
@@ -9,57 +10,60 @@ const secondSection = await getCollection('who');
 const thirdSection = await getCollection('why');
 const fourthSection = await getCollection('see');
 ---
-<Shell title="My website" description="This is my website description">
-	<section>
-		<h1>PMCF.XYZ</h1>
-		{
-			firstSection.map(async (post) => {
-				const { Content } = await post.render()
-				return (
-				<Stickie>
-					<Content />
-				</Stickie>
-				)
-			})
-		}
-	</section>
-	<section>
-		<h2>Who</h2>
-		{
-			secondSection.map(async (post) => {
-				const { Content } = await post.render()
-				return (
-				<Stickie>
-					<Content />
-				</Stickie>
-				)
-			})
-		}
-	</section>
-	<section>
-		<h2>Why</h2>
-		{
-			thirdSection.map(async (post) => {
-				const { Content } = await post.render()
-				return (
-				<Stickie>
-					<Content />
-				</Stickie>
-				)
-			})
-		}
-	</section>
-	<section>
-		<h2>See</h2>
-		{
-			fourthSection.map(async (post) => {
-				const { Content } = await post.render()
-				return (
-				<Stickie>
-					<Content />
-				</Stickie>
-				)
-			})
-		}
-	</section>
+<Shell title="My website" description="This is my website description" customClass="index">
+	<main id="canvas">
+		<section>
+			<h1>PMCF.XYZ</h1>
+			{
+				firstSection.map(async (post) => {
+					const { Content } = await post.render()
+					return (
+					<Stickie>
+						<Content />
+					</Stickie>
+					)
+				})
+			}
+			<Contact></Contact>
+		</section>
+		<section>
+			<h2>Who</h2>
+			{
+				secondSection.map(async (post) => {
+					const { Content } = await post.render()
+					return (
+					<Stickie>
+						<Content />
+					</Stickie>
+					)
+				})
+			}
+		</section>
+		<section>
+			<h2>Why</h2>
+			{
+				thirdSection.map(async (post) => {
+					const { Content } = await post.render()
+					return (
+					<Stickie>
+						<Content />
+					</Stickie>
+					)
+				})
+			}
+		</section>
+		<section>
+			<h2>See</h2>
+			{
+				fourthSection.map(async (post) => {
+					const { Content } = await post.render()
+					return (
+					<Stickie>
+						<Content />
+					</Stickie>
+					)
+				})
+			}
+		</section>
+	</main>
 </Shell>

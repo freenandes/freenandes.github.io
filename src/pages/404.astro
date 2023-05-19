@@ -1,0 +1,30 @@
+---
+import Shell from '../layouts/Shell.astro';
+import Stickie from '../components/stickie.astro';
+import { getEntryBySlug } from 'astro:content';
+const entry = await getEntryBySlug('extra', '404');
+const { Content } = await entry.render();
+---
+<Shell title="My website" description="This is my website description" customClass="404">
+    <section>
+        <h1>PMCF.XYZ</h1>
+        <Stickie>
+            <Content />
+        </Stickie>
+    </section>
+</Shell>
+<style>
+body {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: radial-gradient(var(--black-light) 0.0625em, transparent 0.0625em);
+	background-size: 2em 2em;
+	background-position: center center;
+}
+section {
+    padding: 2em 1em;
+}
+</style>

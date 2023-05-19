@@ -30,17 +30,17 @@ const { title, description, customClass } = Astro.props
 :root {
 	--paper: #F8F8F7;
 	--charcoal: #313549;
-	--klein-oklch: oklch(52% 0.28 270);
-	--klein: #3844ff;
-	--accent: var(--klein-oklch, var(--klein));
+	--purple-oklch: oklch(55% 0.28 287);
+	--purple: #733bff;
+	--accent: var(--purple-oklch, var(--purple));
 	--black-light: rgba(0, 0, 0, 0.1);
-	--black-medium: rgba(0, 0, 0, 0.5);
+	--black-medium: rgba(0, 0, 0, 0.3);
 	--black-strong: rgba(0, 0, 0, 0.8);
 	--white: #fff;
 	--yellow-oklch: oklch(92% 0.13 92);
 	--yellow: #ffe38c;
 	--stickie-yellow: var(--yellow-oklch, var(--yellow));
-	--stickie-blue: #aef2ff;
+	--stickie-blue: #bbeeff;
 	--stickie-green: #d0f580;
 	--pink-oklch: oklch(92% 0.05 8);
 	--pink: #ffdadf;
@@ -166,5 +166,16 @@ inputElements.forEach((input) => {
 	input.addEventListener('blur', () => {
 		pz.resume();
 	});
+	input.addEventListener('touchstart', (event) => {
+		event.stopPropagation();
+	});
+});
+document.addEventListener('touchstart', (event) => {
+	const isInputFocused = Array.from(inputElements).some((input) =>
+		input.contains(event.target as Node)
+	);
+	if (!isInputFocused) {
+		pz.resume();
+	}
 });
 </script>

@@ -158,7 +158,7 @@ const pz = panzoom(canvas, {
 	minZoom: 0.125,
 	zoomDoubleClickSpeed: 1,
 });
-const inputElements = document.querySelectorAll('input, textarea');
+const inputElements = document.querySelectorAll('input, textarea, button');
 inputElements.forEach((input) => {
 	input.addEventListener('focus', () => {
 		pz.pause();

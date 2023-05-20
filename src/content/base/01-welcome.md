@@ -7,11 +7,11 @@ Welcome! I’m Pedro, and this is my website. It’s where I show myself to the 
 
 To pan around, simply
 
-- Click & Drag
+- Click/Tap & Drag
 
 To zoom in or zoom out, try
 
-- Scroll Up/Down
-- Keys +/-
+- Scrolling Up/Down
+- Keyboard Keys +/-
 
 </div>

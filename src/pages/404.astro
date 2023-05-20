@@ -5,7 +5,7 @@ import { getEntryBySlug } from 'astro:content';
 const entry = await getEntryBySlug('extra', '404');
 const { Content } = await entry.render();
 ---
-<Shell title="My website" description="This is my website description" customClass="404">
+<Shell title="404 — Page not found" description="The page you are looking for cannot be found, sorry. Please check the URL for typos or go to the main page." customClass="404">
     <section>
         <h1>PMCF.XYZ</h1>
         <Stickie>

@@ -148,17 +148,28 @@ section:nth-child(3) article > * {
 section:nth-child(4) article > * {
     background-color: var(--stickie-pink);
 }
+small {
+	font-size: 0.75em;
+	font-weight: 375;
+	line-height: 133%;
+	color: var(--black-medium);
+	padding: 0 1rem;
+}
+small a:hover {
+	color: var(--black-strong);
+}
 </style>
 <script>
 // Panzoom
 import panzoom from 'panzoom';
 const canvas = document.getElementById('canvas') as HTMLElement;
+const inputElements = document.querySelectorAll('input, textarea, button, a');
 const pz = panzoom(canvas, {
 	maxZoom: 4,
 	minZoom: 0.125,
 	zoomDoubleClickSpeed: 1,
 });
-const inputElements = document.querySelectorAll('input, textarea, button');
+pz.zoomAbs(32, 32, 0.75);
 inputElements.forEach((input) => {
 	input.addEventListener('focus', () => {
 		pz.pause();

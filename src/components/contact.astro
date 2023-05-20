@@ -1,10 +1,9 @@
 <article>
     <form action="https://formspree.io/f/mnqyrkwr" method="POST" accept-charset="UTF-8">
         <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="Enter your email here" required autocomplete="on">
+        <input type="email" id="email" name="email" placeholder="Enter your email" maxlength="200" required autocomplete="on">
         <label for="message">Message</label>
-        <textarea id="message" name="message" placeholder="Share your thoughts here" required></textarea>
-        <input type="hidden" name="_gotcha">
+        <textarea id="message" name="message" placeholder="Share your thoughts here" maxlength="2000" required></textarea>
         <button type="submit">Send message</button>
     </form>
 </article>
@@ -50,11 +49,11 @@ input:not(:placeholder-shown), textarea:not(:placeholder-shown) {
     background-color: var(--white);
 }
 input:hover, textarea:hover {
-    border: 0.125rem solid var(--black-medium);
+    border-color: var(--black-medium);
 }
 input:focus, textarea:focus {
     outline: none;
-    border: 0.125rem solid var(--black-strong);
+    border-color: var(--black-strong);
     box-shadow: none;
 }
 button {

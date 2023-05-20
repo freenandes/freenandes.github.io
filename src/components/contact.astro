@@ -4,7 +4,7 @@
         <input type="email" id="email" name="email" placeholder="Enter your email" maxlength="200" required autocomplete="on">
         <label for="message">Message</label>
         <textarea id="message" name="message" placeholder="Share your thoughts here" maxlength="2000" required></textarea>
-        <button type="submit">Send message</button>
+        <button type="submit" tabindex="0">Send message</button>
     </form>
 </article>
 <style>
@@ -31,7 +31,7 @@ input, textarea {
 	font-weight: 350;
 	line-height: 150%;
 	color: var(--black-strong);
-    background-color: var(--black-light);
+    background-color: transparent;
     padding: 0.125em 0.25em;
     border: 0.125rem solid var(--black-light);
     border-radius: 0.1875rem;
@@ -63,7 +63,7 @@ button {
     text-transform: uppercase;
     letter-spacing: 0.0625em;
 	color: var(--charcoal);
-    background-color: var(--paper);
+    background-color: var(--white);
     border: none;
     border-radius: 0.1875rem;
     padding: 0.5em 0.75em 0.75em;

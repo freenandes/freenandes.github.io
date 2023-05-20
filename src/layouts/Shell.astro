@@ -33,10 +33,9 @@ const { title, description, customClass } = Astro.props
 	--accent: #733bff;
 	--black-light: rgba(0, 0, 0, 0.1);
 	--black-fade: rgba(0, 0, 0, 0.2);
-	--black-medium: rgba(0, 0, 0, 0.6);
+	--black-medium: rgba(0, 0, 0, 0.5);
 	--black-strong: rgba(0, 0, 0, 0.8);
 	--white: #fff;
-	--white-medium: rgba(255, 255, 255, 0.4);
 	--stickie-yellow: #ffe38c;
 	--stickie-blue: #bbeeff;
 	--stickie-green: #d0f580;
@@ -96,7 +95,6 @@ ul {
 }
 a, a:visited {
 	color: inherit;
-	font-weight: 350;
 	overflow-wrap: break-word;
 	border-radius: 0.03125rem;
 }
@@ -106,13 +104,13 @@ a:hover {
 a:active {
 	color: var(--accent);
 }
-a:focus-visible {
-	outline: 0.1875rem dashed var(--accent);
-	outline-offset: 0.0625rem;
+a:focus {
+	outline: 0.1875rem solid var(--black-strong);
+	outline-offset: 0.125rem;
 }
-button:focus-visible {
-	outline: 0.1875rem dashed var(--accent);
-	outline-offset: 0.0625rem;
+button:focus {
+	outline: 0.1875rem solid var(--black-strong);
+	outline-offset: 0.125rem;
 }
 main {
 	display: flex;

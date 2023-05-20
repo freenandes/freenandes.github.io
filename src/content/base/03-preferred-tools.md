@@ -5,6 +5,7 @@ title: "Preferred tools"
 
 #### Favorite tools
 
+- Pen & Paper
 - HTML
 - CSS
 - Markdown

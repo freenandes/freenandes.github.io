@@ -17,17 +17,16 @@ article > * {
     aspect-ratio: 1 / 1;
     box-shadow: var(--stickie-shadow);
     outline: var(--contour);
-} 
-article > * > p:not(:has(+ ul)) {
-    margin-bottom: 1rem;
 }
-article > * > p:has(+ ul) {
+article > * > p + p,
+article > * > p + h4,
+article > * > ul + p {
     margin-top: 1rem;
 }
 article > * > p:last-child {
     margin-bottom: 0 !important;
 }
-article > p:has(img) {
+article p {
     position: relative;
     overflow: hidden;
 }
@@ -51,8 +50,8 @@ article img {
 }
 [tags] li {
 	line-height: 125%;
-    padding: 0.125em 0.375em;
-	background-color: var(--black-light);
+    padding: 0.125em 0.25em;
+	background-color: var(--white-medium);
 	border-radius: 0.125em;
 	white-space: nowrap;
 }

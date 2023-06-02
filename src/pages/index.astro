@@ -20,7 +20,7 @@ const { Content } = await welcome.render();
 			<button id="info" class="dark">Info</button>
 		</div>
 	</div>
-	<div>
+	<div class="whiteboard">
 		<main id="canvas">
 			<section>
 				<h1>PMCF.XYZ</h1>
@@ -91,7 +91,13 @@ html.index :not(a):not(input):not(textarea):not(button) {
 	cursor: grab;
 }
 body {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+}
+.whiteboard {
 	width: fit-content;
+	height: fit-content;
 }
 main {
 	box-sizing: border-box;
@@ -100,10 +106,10 @@ main {
 	align-items: flex-start;
 	gap: 16em;
 	padding: 0;
-	background-image: radial-gradient(var(--black-light) 0.0625em, transparent 0.0625em);
 	background-size: 1em 1em;
 	background-position: 0 0;
 	padding: 16em;
+	background-image: radial-gradient(var(--black-light) 0.0625em, transparent 0.0625em);
 }
 main > section:first-of-type {
 	gap: 1em;

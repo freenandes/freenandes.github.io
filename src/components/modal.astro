@@ -11,7 +11,6 @@ const { title, openID, uiMode } = Astro.props;
         </header>
         <div class="content">
             <slot />
-            <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sunt libero commodi similique debitis ex non fuga facere! Omnis assumenda autem perspiciatis culpa, sapiente libero eos deserunt est voluptatibus totam id! Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius sit, non nesciunt hic deserunt fuga voluptatum impedit quo itaque eveniet omnis illo cupiditate accusantium molestias praesentium id optio distinctio! Eos. Lorem ipsum dolor sit, amet consectetur adipisicing elit. At exercitationem, doloremque dolorem ea beatae vero, rem deleniti impedit repudiandae amet, incidunt dolore necessitatibus molestiae deserunt tempore ex in expedita aperiam. Lorem ipsum dolor sit amet consectetur adipisicing elit. Ea velit quia excepturi repudiandae debitis animi corrupti vero, explicabo assumenda tempore molestiae repellat beatae dignissimos culpa odio dolor. Voluptatem, debitis laborum? Lorem ipsum dolor sit amet consectetur adipisicing elit. Consectetur in obcaecati provident cum aliquid fugit eum et distinctio officia atque voluptas, consequuntur sunt accusantium animi fugiat dolore iste nam porro.</p>
         </div>
     </div>
 </div>
@@ -59,7 +58,7 @@ header > :first-child {
 .content {
     box-sizing: border-box;
     padding: 0 1.5rem 1.5rem;
-    /* overflow-y: auto; */
+    overflow-y: auto;
     max-height: calc(100vh - 11rem);
 }
 #modal :global(p + p), #modal :global(p + h4), #modal :global(ul + p) {

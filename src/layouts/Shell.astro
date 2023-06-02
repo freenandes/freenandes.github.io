@@ -254,10 +254,8 @@ if (canvas) {
 		maxZoom: 4,
 		minZoom: 0.125,
 		zoomDoubleClickSpeed: 1,
-		bounds: true,
-		boundsPadding: 0.125,
 	});
-  	pz.zoomAbs(-128, -128, 0.5);
+  	pz.zoomAbs(0, 0, 0.5);
 // Handling interactables
 	inputElements.forEach((input) => {
 		input.addEventListener('focus', () => pz.pause());

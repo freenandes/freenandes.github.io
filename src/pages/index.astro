@@ -87,13 +87,14 @@ const { Content } = await welcome.render();
 	</Modal>
 </Shell>
 <style>
-body {
-	width: fit-content;
-}
 html.index :not(a):not(input):not(textarea):not(button) {
 	cursor: grab;
 }
+body {
+	width: fit-content;
+}
 main {
+	box-sizing: border-box;
 	display: flex;
 	flex-direction: row;
 	align-items: flex-start;

@@ -1,16 +1,19 @@
 ---
-const { title, description, customClass } = Astro.props
+const { title, description, customClass } = Astro.props;
 ---
 <html lang="en" class={ customClass }>
 <head>
-	<meta charset="utf-8" />
+	<title>{ title }</title>
 	<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="generator" content={ Astro.generator } />
 	<meta name="description" content={ description }>
-	<title>{ title }</title>
 </head>
 <body>
+	<div class="preloader">
+		<div class="anim"></div>
+	</div>
 	<slot />
 </body>
 </html>
@@ -28,20 +31,28 @@ const { title, description, customClass } = Astro.props
 	font-display: swap;
 }
 :root {
+	/* Colors */
 	--paper: #F8F8F7;
-	--charcoal: #313549;
-	--accent: #733bff;
-	--black-light: rgba(0, 0, 0, 0.1);
+	--paper-fade: rgba(248, 248, 247, 0.5);
+	--charcoal: #242630;
+	--black-light: rgba(0, 0, 0, 0.07);
 	--black-fade: rgba(0, 0, 0, 0.2);
-	--black-medium: rgba(0, 0, 0, 0.5);
+	--black-medium: rgba(0, 0, 0, 0.4);
 	--black-strong: rgba(0, 0, 0, 0.8);
-	--white: #fff;
+	--white-light: rgba(255, 255, 255, 0.12);
 	--stickie-yellow: #ffe38c;
 	--stickie-blue: #bbeeff;
 	--stickie-green: #d0f580;
 	--stickie-pink: #ffdadf;
-	--stickie-shadow: rgba(0, 0, 0, 0.1) 0 0.25rem 0.25rem -0.125rem, rgba(0, 0, 0, 0.06) 0 0.125rem 0.125rem -0.0625rem;
-	--contour: 0.03125rem solid rgba(0, 0, 0, 0.025);
+	/* Form */
+	--sa: 0.03125rem;
+	--sb: 0.0625rem;
+	--sc: 0.1875rem;
+	--sd: 0.3125rem;
+	--se: 0.5rem;
+	--sf: 0.8125rem;
+	--shadow-a: var(--black-fade) 0 0.125rem 0 0;
+	--shadow-b: var(--black-light) 0 0.5rem 0 0;
 }
 html {
 	font-family: "LexendDeca", system-ui, sans-serif;
@@ -50,12 +61,6 @@ html {
 	line-height: 150%;
 	color: var(--charcoal);
 	background-color: var(--paper);
-}
-html.index :not(a):not(input):not(textarea):not(button) {
-	cursor: grab;
-}
-body {
-	width: fit-content;
 }
 html, body {
 	overflow: hidden;
@@ -76,8 +81,8 @@ h1, h2, p {
 }
 h3 {
 	font-weight: 550;
-	font-size: 1.375em;
-	line-height: 120%;
+	font-size: 1.5em;
+	line-height: 133%;
 }
 h4 {
 	font-family: "LexendPeta";
@@ -96,7 +101,7 @@ ul {
 a, a:visited {
 	color: inherit;
 	overflow-wrap: break-word;
-	border-radius: 0.03125rem;
+	border-radius: var(--sa);
 }
 a:hover {
 	color: var(--black-medium);
@@ -105,82 +110,202 @@ a:active {
 	color: var(--accent);
 }
 a:focus {
-	outline: 0.1875rem solid var(--black-strong);
-	outline-offset: 0.125rem;
+	outline: 0.125rem solid var(--black-strong);
+	outline-offset: 0.0625rem;
 }
-button:focus {
-	outline: 0.1875rem solid var(--black-strong);
-	outline-offset: 0.125rem;
+small {
+	font-size: 0.75em;
+	font-weight: 375;
+	line-height: 133%;
 }
-main {
+small a:hover {
+	color: var(--black-strong);
+}
+.preloader {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: var(--paper);
 	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
-	gap: 4em;
-	padding: 0;
-	background-image: radial-gradient(var(--black-light) 0.0625em, transparent 0.0625em);
-	background-size: 2em 2em;
-	background-position: 0 0;
-	padding: 4em;
+	justify-content: center;
+	align-items: center;
+	z-index: 8;
+	gap: 2em;
+	opacity: 1;
+  	transition: opacity 1s;
+	pointer-events: none;
+}
+.preloader.hidden {
+	opacity: 0;
+}
+.anim {
+	display: inline-block;
+	width: 2em;
+	height: 2em;
+	border: 0.25rem solid var(--charcoal);
+	border-top-color: transparent;
+	border-radius: 50%;
+	animation: spin 1s infinite linear;
+}
+@keyframes spin {
+	to { transform: rotate(360deg); }
 }
 section {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
 	gap: 2em;
-	padding: 4em;
 }
-section:not(:first-child) article:not(:last-child) {
-	margin-bottom: 2em;
+.conceal > :not(#modal) {
+    pointer-events: none;
 }
-section:nth-child(2) article > * {
-    background-color: var(--stickie-blue);
+.button-3d {
+    height: 2rem;
+    display: flex;
+    align-items: flex-end;
 }
-section:nth-child(3) article > * {
-    background-color: var(--stickie-green);
+button {
+	font-family: "LexendDeca", system-ui, sans-serif;
+    font-size: 0.8em;
+	font-weight: 550;
+	line-height: 125%;
+    text-transform: uppercase;
+    letter-spacing: 0.0625em;
+	color: var(--charcoal);
+    background-color: var(--paper);
+    border: none;
+    border-radius: var(--sc);
+    padding: 0.5em 0.75em 0.75em;
+    cursor: pointer;
+    transition: padding 0.1s ease-out, box-shadow 0.1s ease-out;
+    box-shadow: var(--black-fade) 0 -0.25em 0 inset;
 }
-section:nth-child(4) article > * {
-    background-color: var(--stickie-pink);
+button:hover {
+    padding: 0.5em 0.75em 0.5em;
+    box-shadow: var(--black-fade) 0 0 0 inset;
 }
-small {
-	font-size: 0.75em;
-	font-weight: 375;
-	line-height: 133%;
-	color: var(--black-medium);
-	padding: 0 1rem;
+button:active {
+    padding: 0.75em 0.75em 0.25em;
+    box-shadow: var(--black-medium) 0 0.25em 0 inset;
 }
-small a:hover {
-	color: var(--black-strong);
+button:focus {
+	outline: 0.125rem solid var(--black-strong);
+	outline-offset: 0.125rem;
+}
+@media (max-width: 480px) {
+	.button-3d {
+		height: 2.5rem;
+	}
+	button {
+		font-size: 1em;
+	}
+	#canvas .button-3d {
+		height: 2rem;
+	}
+	#canvas button {
+		font-size: 0.8em;
+	}
+}
+[tags] ul {
+	list-style-type: none;
+	display: flex;
+	flex-flow: row wrap;
+	align-items: flex-start;
+	gap: 0.5em;
+	padding: 0.5em 0 0;
+}
+[tags] li {
+    font-weight: 375;
+	line-height: 125%;
+    padding: 0.125em 0.25em;
+	background-color: var(--black-light);
+	border-radius: var(--sc);
+	white-space: nowrap;
+}
+/* Dark mode */
+.dark, #modal.dark .dialog {
+	color: var(--paper);
+	background-color: var(--charcoal);
+}
+button.dark {
+	background-color: #4a4c58;
+	--black-fade: var(--black-medium);
+	--black-medium: var(--black-strong);
+}
+#modal.dark button:focus {
+    outline-color: var(--paper);
+}
+.dark [tags] li {
+	background-color: var(--white-light);
 }
 </style>
 <script>
-// Panzoom
+// panzoom
 import panzoom from 'panzoom';
+// Definitions
 const canvas = document.getElementById('canvas') as HTMLElement;
 const inputElements = document.querySelectorAll('input, textarea, button, a');
-const pz = panzoom(canvas, {
-	maxZoom: 4,
-	minZoom: 0.125,
-	zoomDoubleClickSpeed: 1,
-});
-pz.zoomAbs(-48, -48, 0.5);
-inputElements.forEach((input) => {
-	input.addEventListener('focus', () => {
-		pz.pause();
+const closeButton = document.getElementById('closeModal');
+if (canvas) {
+// Panzoom options
+	const pz = panzoom(canvas, {
+		maxZoom: 4,
+		minZoom: 0.125,
+		zoomDoubleClickSpeed: 1,
+		bounds: true,
+		boundsPadding: 0.125,
 	});
-	input.addEventListener('blur', () => {
-		pz.resume();
+  	pz.zoomAbs(-128, -128, 0.5);
+// Handling interactables
+	inputElements.forEach((input) => {
+		input.addEventListener('focus', () => pz.pause());
+		input.addEventListener('blur', () => pz.resume());
+		input.addEventListener('touchstart', (event) => event.stopPropagation());
 	});
-	input.addEventListener('touchstart', (event) => {
-		event.stopPropagation();
+// Improving interactables via touch
+	document.addEventListener('touchstart', (event) => {
+		const isInputFocused = Array.from(inputElements).some((input) =>
+			input.contains(event.target as Node)
+		);
+		if (!isInputFocused) {
+			pz.resume();
+		}
 	});
-});
-document.addEventListener('touchstart', (event) => {
-	const isInputFocused = Array.from(inputElements).some((input) =>
-		input.contains(event.target as Node)
-	);
-	if (!isInputFocused) {
-		pz.resume();
+// Resume panzoom when modal is closed
+	if (closeButton) {
+		closeButton.addEventListener('click', () => pz.resume());
 	}
+// Resume panzoom on Escape key press
+	document.addEventListener('keydown', (event) => {
+		if (event.key === 'Escape') {
+			pz.resume();
+		}
+	});
+}
+// Load up
+window.addEventListener('load', function () {
+	setTimeout(function () {
+// Preloader
+		const overlay = document.querySelector('.preloader');
+		overlay?.classList.add('hidden');
+// Image captions
+		const articleElements = document.querySelectorAll('article');
+		articleElements.forEach((article) => {
+		const img = article.querySelector('img');
+		if (img) {
+			const title = img.getAttribute('title');
+			if (title) {
+// Creating the caption elements
+				const titleElement = document.createElement('small');
+				titleElement.textContent = title;
+				img.insertAdjacentElement('afterend', titleElement);
+			}
+		}
+		});
+// Timeout for preloader and captions
+	}, 500);
 });
+history.scrollRestoration = 'manual';
 </script>

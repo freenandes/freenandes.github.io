@@ -3,68 +3,133 @@
 import Shell from '../layouts/Shell.astro';
 import Stickie from '../components/stickie.astro';
 import Contact from '../components/contact.astro';
+import Modal from '../components/modal.astro';
 // content
 import { getCollection } from 'astro:content';
 const firstSection = await getCollection('base');
 const secondSection = await getCollection('who');
 const thirdSection = await getCollection('why');
 const fourthSection = await getCollection('see');
+import { getEntryBySlug } from 'astro:content';
+const welcome = await getEntryBySlug('base', '01-welcome');
+const { Content } = await welcome.render();
 ---
 <Shell title="My website" description="This is my website description" customClass="index">
-	<main id="canvas">
-		<section>
-			<h1>PMCF.XYZ</h1>
-			{
-				firstSection.map(async (post) => {
-					const { Content } = await post.render()
-					return (
-					<Stickie>
-						<Content />
-					</Stickie>
-					)
-				})
-			}
-			<Contact></Contact>
-			<small>Designed and built by me, using <a href="https://astro.build/" title="Astro's website" target="_blank">Astro</a> and <a href="https://www.lexend.com/" title="Lexend's website" target="_blank">Lexend</a>. Copyright &copy; 2023 Pedro Fernandes</small>
-		</section>
-		<section>
-			<h2>Who</h2>
-			{
-				secondSection.map(async (post) => {
-					const { Content } = await post.render()
-					return (
-					<Stickie>
-						<Content />
-					</Stickie>
-					)
-				})
-			}
-		</section>
-		<section>
-			<h2>Why</h2>
-			{
-				thirdSection.map(async (post) => {
-					const { Content } = await post.render()
-					return (
-					<Stickie>
-						<Content />
-					</Stickie>
-					)
-				})
-			}
-		</section>
-		<section>
-			<h2>See</h2>
-			{
-				fourthSection.map(async (post) => {
-					const { Content } = await post.render()
-					return (
-					<Stickie>
-						<Content />
-					</Stickie>
-					)
-				})
-			}
-		</section>
-	</main>
+	<div class="controls">
+		<div class="button-3d">
+			<button id="info" class="dark">Info</button>
+		</div>
+	</div>
+	<div>
+		<main id="canvas">
+			<section>
+				<h1>PMCF.XYZ</h1>
+				{
+					firstSection.map(async (post) => {
+						const { Content } = await post.render()
+						return (
+						<Stickie>
+							<Content />
+						</Stickie>
+						)
+					})
+				}
+				<Contact></Contact>
+				<small>
+					Designed and assembled by me, using <a href="https://astro.build/" title="Astro's website" target="_blank">Astro</a>, <a href="https://www.lexend.com/" title="Lexend's website" target="_blank">Lexend</a> and <a href="https://github.com/anvaka/panzoom" title="panzoom library at GitHub" target="_blank">panzoom</a>.<br>
+					<br>
+					Copyright &copy; 2023 Pedro MC Fernandes.
+				</small>
+			</section>
+			<section>
+				<h2>X Who?</h2>
+				{
+					secondSection.map(async (post) => {
+						const { Content } = await post.render()
+						return (
+						<Stickie>
+							<Content />
+						</Stickie>
+						)
+					})
+				}
+			</section>
+			<section>
+				<h2>Why</h2>
+				{
+					thirdSection.map(async (post) => {
+						const { Content } = await post.render()
+						return (
+						<Stickie>
+							<Content />
+						</Stickie>
+						)
+					})
+				}
+			</section>
+			<section>
+				<h2>See</h2>
+				{
+					fourthSection.map(async (post) => {
+						const { Content } = await post.render()
+						return (
+						<Stickie>
+							<Content />
+						</Stickie>
+						)
+					})
+				}
+			</section>
+		</main>
+	</div>
+	<Modal title="Info" openID="info" uiMode="dark">
+		<Content />
+	</Modal>
 </Shell>
+<style>
+body {
+	width: fit-content;
+}
+html.index :not(a):not(input):not(textarea):not(button) {
+	cursor: grab;
+}
+main {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	gap: 16em;
+	padding: 0;
+	background-image: radial-gradient(var(--black-light) 0.0625em, transparent 0.0625em);
+	background-size: 1em 1em;
+	background-position: 0 0;
+	padding: 16em;
+}
+main > section:first-of-type {
+	gap: 1em;
+}
+main > section:first-of-type > :first-child {
+	margin-bottom: 1rem;
+}
+main > section:first-of-type > :last-child {
+	margin-top: 1rem;
+	color: var(--black-medium);
+}
+section:not(:first-child) :global(article:not(:last-child)) {
+	margin-bottom: 2em;
+}
+section:nth-child(2) :global(article > *) {
+    background-color: var(--stickie-blue);
+}
+section:nth-child(3) :global(article > *) {
+    background-color: var(--stickie-green);
+}
+section:nth-child(4) :global(article > *) {
+    background-color: var(--stickie-pink);
+}
+.controls {
+	position: fixed;
+	right: 1em;
+	bottom: 1em;
+	z-index: 2;
+}
+</style>

@@ -4,7 +4,9 @@
         <input type="email" id="email" name="email" placeholder="Enter your email" maxlength="200" required autocomplete="on">
         <label for="message">Message</label>
         <textarea id="message" name="message" placeholder="Share your thoughts here" maxlength="2000" required></textarea>
-        <button type="submit" tabindex="0">Send message</button>
+        <div class="button-3d">
+            <button type="submit">Send message</button>
+        </div>
     </form>
 </article>
 <style>
@@ -14,11 +16,6 @@ form {
     align-items: flex-start;
     gap: 0.5rem;
 }
-form * {
-    font-family: "LexendDeca", system-ui, sans-serif;
-	font-size: 16px;
-    box-sizing: border-box;
-}
 label {
 	font-family: "LexendPeta";
 	font-weight: 750;
@@ -27,14 +24,17 @@ label {
 	text-transform: uppercase;
 }
 input, textarea {
+    font-family: "LexendDeca", system-ui, sans-serif;
+	font-size: 16px;
+    box-sizing: border-box;
     width: 100%;
 	font-weight: 350;
 	line-height: 150%;
 	color: var(--black-strong);
     background-color: transparent;
     padding: 0.125em 0.25em;
-    border: 0.125rem solid var(--black-light);
-    border-radius: 0.1875rem;
+    border: 0.125rem solid var(--black-fade);
+    border-radius: var(--sc);
     margin-bottom: 0.5em;
 }
 textarea {
@@ -46,7 +46,7 @@ input::placeholder, textarea::placeholder {
 }
 input:not(:placeholder-shown), textarea:not(:placeholder-shown) {
     border-color: transparent;
-    background-color: var(--white);
+    background-color: var(--paper);
 }
 input:hover, textarea:hover {
     border-color: var(--black-medium);
@@ -55,28 +55,5 @@ input:focus, textarea:focus {
     outline: none;
     border-color: var(--black-strong);
     box-shadow: none;
-}
-button {
-    font-size: 0.8em;
-	font-weight: 575;
-	line-height: 125%;
-    text-transform: uppercase;
-    letter-spacing: 0.0625em;
-	color: var(--charcoal);
-    background-color: var(--white);
-    border: none;
-    border-radius: 0.1875rem;
-    padding: 0.5em 0.75em 0.75em;
-    box-shadow: var(--black-fade) 0 -0.25em 0 inset;
-    min-height: 2rem;
-    cursor: pointer;
-}
-button:hover {
-    padding: 0.625em 0.75em 0.625em;
-    box-shadow: var(--black-fade) 0 0 0 inset;
-}
-button:active {
-    padding: 0.75em 0.75em 0.5em;
-    box-shadow: var(--black-fade) 0 0.25em 0 inset;
 }
 </style>

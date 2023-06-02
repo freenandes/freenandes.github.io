@@ -2,8 +2,8 @@
 import Shell from '../layouts/Shell.astro';
 import Stickie from '../components/stickie.astro';
 import { getEntryBySlug } from 'astro:content';
-const entry = await getEntryBySlug('extra', '404');
-const { Content } = await entry.render();
+const notFound = await getEntryBySlug('extra', '404');
+const { Content } = await notFound.render();
 ---
 <Shell title="404 — Page not found" description="The page you are looking for cannot be found, sorry. Please check the URL for typos or go to the main page." customClass="404">
     <section>

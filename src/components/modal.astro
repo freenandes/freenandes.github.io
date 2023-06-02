@@ -1,0 +1,150 @@
+---
+const { title, openID, uiMode } = Astro.props;
+---
+<div id="modal" role="dialog" aria-modal="true" class={ uiMode }>
+    <div class="dialog">
+        <header>
+            <h3>{ title }</h3>
+            <div class="button-3d">
+                <button id="closeModal" class="dark">Esc</button>
+            </div>
+        </header>
+        <div class="content">
+            <slot />
+            <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sunt libero commodi similique debitis ex non fuga facere! Omnis assumenda autem perspiciatis culpa, sapiente libero eos deserunt est voluptatibus totam id! Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius sit, non nesciunt hic deserunt fuga voluptatum impedit quo itaque eveniet omnis illo cupiditate accusantium molestias praesentium id optio distinctio! Eos. Lorem ipsum dolor sit, amet consectetur adipisicing elit. At exercitationem, doloremque dolorem ea beatae vero, rem deleniti impedit repudiandae amet, incidunt dolore necessitatibus molestiae deserunt tempore ex in expedita aperiam. Lorem ipsum dolor sit amet consectetur adipisicing elit. Ea velit quia excepturi repudiandae debitis animi corrupti vero, explicabo assumenda tempore molestiae repellat beatae dignissimos culpa odio dolor. Voluptatem, debitis laborum? Lorem ipsum dolor sit amet consectetur adipisicing elit. Consectetur in obcaecati provident cum aliquid fugit eum et distinctio officia atque voluptas, consequuntur sunt accusantium animi fugiat dolore iste nam porro.</p>
+        </div>
+    </div>
+</div>
+<style>
+#modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 4;
+    overflow: hidden;
+    background-color: var(--paper-fade);
+    backdrop-filter: blur(0.25rem);
+    opacity: 0;
+    transition: opacity 0.1s linear;
+    pointer-events: none;
+}
+#modal.active {
+    opacity: 1;
+    transition: opacity 0.2s linear;
+    pointer-events: auto;
+}
+.dialog {
+    box-sizing: border-box;
+    position: fixed;
+    max-height: calc(100vh - 6rem);
+    background-color: var(--paper);
+    box-shadow: var(--shadow-b);
+    opacity: 0;
+}
+.active .dialog {
+    opacity: 1;
+}
+header {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+}
+header > :first-child {
+    flex: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.0625em;
+}
+.content {
+    box-sizing: border-box;
+    padding: 0 1.5rem 1.5rem;
+    /* overflow-y: auto; */
+    max-height: calc(100vh - 11rem);
+}
+#modal :global(p + p), #modal :global(p + h4), #modal :global(ul + p) {
+    margin-top: 1rem;
+}
+@media (max-width: 480px) {
+    .dialog {
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        border-radius: var(--se) var(--se) 0 0;
+        transform: translate(0, 100%);
+        transition: transform 0.1s ease-in, opacity 0.1s linear;
+    }
+    .active .dialog {
+        transform: translate(0, 0);
+        transition: transform 0.2s ease-out, opacity 0.1s linear;
+    }
+}
+@media (min-width: 481px) {
+    .dialog {
+        top: 50%;
+        left: 50%;
+        width: 24rem;
+        max-width: 100%;
+        border-radius: var(--se);
+        transform: translate(-50%, 100%) scale(0.8);
+        transition: transform 0.1s ease-in, opacity 0.1s linear;
+    }
+    .active .dialog {
+        transform: translate(-50%, -50%) scale(1);
+        transition: transform 0.2s ease-out, opacity 0.1s linear;
+    }
+}
+</style>
+<script define:vars={{ openID }}>
+// Define variables
+const modal = document.getElementById('modal');
+const openButton = document.getElementById(openID);
+const closeButton = document.getElementById('closeModal');
+const modalContent = document.querySelector('#modal .dialog');
+const modalParent = modal.parentNode;
+const focusElements = Array.from(modal.querySelectorAll('input, button, textarea, select, a[href]'));
+const [firstFocus, lastFocus] = [focusElements[0], focusElements[focusElements.length - 1]];
+// Trap focus
+function trapFocus(event) {
+    if (event.key === 'Tab' || event.keyCode === 9) {
+        if (event.shiftKey) {
+            if (document.activeElement === firstFocus) {
+                event.preventDefault();
+                lastFocus.focus();
+            }
+        } else {
+            if (document.activeElement === lastFocus) {
+                event.preventDefault();
+                firstFocus.focus();
+            }
+        }
+    }
+}
+// Event listeners
+function openModal() {
+    modal.classList.add('active');
+    modalParent.classList.add('conceal');
+    openButton.blur();
+    modalContent.addEventListener('keydown', trapFocus);
+    setTimeout(() => {
+        firstFocus.focus();
+    }, 0);
+}
+function closeModal() {
+    modal.classList.remove('active');
+    modalParent.classList.remove('conceal');
+    modalContent.removeEventListener('keydown', trapFocus);
+}
+openButton.addEventListener('click', openModal);
+closeButton.addEventListener('click', closeModal);
+modal.addEventListener('click', (event) => {
+    if (event.target === modal) {
+        closeModal();
+    }
+});
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        closeModal();
+    }
+});
+</script>

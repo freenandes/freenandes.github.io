@@ -1,5 +1,7 @@
 ---
 const { title, openID, uiMode } = Astro.props;
+import { Content as Welcome } from '../content/base/01-welcome.md';
+import { Content as Info } from '../content/extra/info.md';
 ---
 <div id="modal" role="dialog" aria-modal="true" class={ uiMode }>
     <div class="dialog">
@@ -10,6 +12,8 @@ const { title, openID, uiMode } = Astro.props;
             </div>
         </header>
         <div class="content">
+            <Welcome />
+            <Info />
             <slot />
         </div>
     </div>
@@ -18,9 +22,9 @@ const { title, openID, uiMode } = Astro.props;
 #modal {
     position: fixed;
     top: 0;
-    width: 100vw;
-    height: 100vh;
-    height: 100dvh;
+    right: 0;
+    bottom: 0;
+    left: 0;
     z-index: 4;
     background-color: var(--paper-fade);
     backdrop-filter: blur(0.25rem);
@@ -34,14 +38,16 @@ const { title, openID, uiMode } = Astro.props;
 }
 .dialog {
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
     position: fixed;
     top: 50%;
     left: 50%;
     width: 24rem;
     max-width: 100%;
-    max-height: calc(100vh - 5rem);
-    max-height: calc(100dvh - 5rem);
-    transform: translate3d(-50%, 100%, 0);
+    max-height: 90vh;
+    max-height: 90dvh;
+    transform: translate(-50%, 100%);
     border-radius: var(--se);
     background-color: var(--paper);
     box-shadow: var(--shadow-b);
@@ -50,7 +56,7 @@ const { title, openID, uiMode } = Astro.props;
 }
 .active .dialog {
     opacity: 1;
-    transform: translate3d(-50%, -50%, 0);
+    transform: translate(-50%, -50%);
 }
 header {
     display: flex;
@@ -64,25 +70,26 @@ header > :first-child {
 }
 .content {
     box-sizing: border-box;
-    max-height: calc(100vh - 10rem);
-    max-height: calc(100dvh - 10rem);
     padding: 0 1.5rem 1.5rem;
     overflow-y: auto;
 }
 #modal :global(p + p), #modal :global(p + h4), #modal :global(ul + p), #modal :global([tags] + *) {
     margin-top: 1rem;
 }
+:global(.conceal > :not(#modal)) {
+    pointer-events: none;
+}
 @media (max-width: 480px) {
     .dialog {
         top: auto;
         bottom: 0;
         width: 100%;
-        max-height: calc(100vh - 6rem);
-        max-height: calc(100dvh - 6rem);
+        max-height: 80vh;
+        max-height: 80dvh;
         border-radius: var(--se) var(--se) 0 0;
     }
     .active .dialog {
-        transform: translate3d(-50%, 0, 0);
+        transform: translate(-50%, 0);
     }
     .content {
         padding-bottom: 3rem;
@@ -92,29 +99,29 @@ header > :first-child {
     .dialog {
         top: auto;
         bottom: 0;
-        max-height: calc(100vh - 0.5rem);
-        max-height: calc(100dvh - 0.5rem);
+        max-height: 90vh;
+        max-height: 90dvh;
         border-radius: var(--se) var(--se) 0 0;
     }
     .active .dialog {
-        transform: translate3d(-50%, 0, 0);
-    }
-    .content {
-        max-height: calc(100vh - 6rem);
-        max-height: calc(100dvh - 6rem);
+        transform: translate(-50%, 0);
     }
 }
 </style>
 <script define:vars={{ openID }}>
-// Define variables
-const modal = document.getElementById('modal');
+
+// Elements
 const openButton = document.getElementById(openID);
-const closeButton = document.getElementById('closeModal');
+const modal = document.getElementById('modal');
 const modalContent = document.querySelector('#modal .dialog');
 const modalParent = modal.parentNode;
+const closeButton = document.getElementById('closeModal');
 const focusElements = Array.from(modal.querySelectorAll('input, button, textarea, select, a[href]'));
 const [firstFocus, lastFocus] = [focusElements[0], focusElements[focusElements.length - 1]];
-// Trap focus
+
+// Functions
+
+// Trap Focus
 function trapFocus(event) {
     if (event.key === 'Tab' || event.keyCode === 9) {
         if (event.shiftKey) {
@@ -130,28 +137,48 @@ function trapFocus(event) {
         }
     }
 }
-// Event listeners
+
+// Open Modal
 function openModal() {
     modal.classList.add('active');
     modalParent.classList.add('conceal');
-    openButton.blur();
     modalContent.addEventListener('keydown', trapFocus);
     setTimeout(() => {
         firstFocus.focus();
     }, 0);
 }
+
+// Close Modal
 function closeModal() {
     modal.classList.remove('active');
     modalParent.classList.remove('conceal');
     modalContent.removeEventListener('keydown', trapFocus);
+    openButton.focus();
 }
+
+// Initialization
+
+// Opening
 openButton.addEventListener('click', openModal);
+
+// Closing with Button
 closeButton.addEventListener('click', closeModal);
+closeButton.addEventListener('blur', (event) => {
+    if (modal.classList.contains('active')) {
+        event.preventDefault();
+        firstFocus.focus();
+    }
+});
+
+// Closing on outside click
 modal.addEventListener('click', (event) => {
     if (event.target === modal) {
+        event.preventDefault();
         closeModal();
     }
 });
+
+// Closing on Escape key
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
         closeModal();

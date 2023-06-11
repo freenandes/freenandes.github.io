@@ -3,14 +3,14 @@ title: "Welcome"
 ---
 <div tags>
 
-Welcome! I’m Pedro, and this is my website, where I show myself as a designer. Thank you for visiting!
+Welcome! I’m Pedro, and this is my website, where I show myself as a product designer.
 
-Pan around, simply
+To pan around, try  
 
-- Tap & Drag
+- Tap + Drag
 
-To zoom in or zoom out, try
+To zoom in and out
 
-- Scrolling Up/Down
+- Scroll / Pinch
 
 </div>

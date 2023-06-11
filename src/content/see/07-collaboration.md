@@ -1,10 +1,10 @@
 ---
 title: "Collaboration"
 ---
-### How do you collaborate with cross-functional teams during the design process?
+### How do you collaborate with cross-functional teams?
 
-It’s natural for designers to be more cross-functional. I usually reach Customer Success, Customer Service teammates, Community Managers, Marketing, Engineering Services, and others. When I do that, I typically absorb information about the customers and understand product use.
+I think communication is key, so I try to get to know everyone first and explain what I do as a product designer. Also, I try to set up open and inclusive communication channels, so they can receive updates or provide feedback or new intel about users and customers.
 
-We can start with a kickoff call to introduce ourselves, and then a Miro board and a Slack channel will keep the connection. Colleagues love to see a product taking shape, and that motivates them. Also, they can circle that back to customers, who often see new features with good eyes.
+This is important when a design team is new in the company or when a new initiative starts. Having documentation ready for this is also very important, so I try to condense all of the above into it and have a documented working process.
 
-With engineers and PMs, the story is similar. We collaborate in Miro and Slack for brainstorming and syncing. And we also gather around something like a one-pager where we centralize all information and links.
+I also think involving the team and hosting collaborative sessions is essential. This can help them feel more included in the process, more motivated, and start seeing the value of generating user-centered designs more clearly.

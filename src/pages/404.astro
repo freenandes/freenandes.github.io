@@ -1,15 +1,18 @@
 ---
+const title = "404 — Page not found";
+const description = "The page you are looking for cannot be found, sorry. Please check the URL for typos or go to the main page.";
+const customClass = "404";
 import Shell from '../layouts/Shell.astro';
 import Stickie from '../components/stickie.astro';
-import { getEntryBySlug } from 'astro:content';
-const notFound = await getEntryBySlug('extra', '404');
-const { Content } = await notFound.render();
+import { Content as NotFound } from '../content/extra/404.md';
 ---
-<Shell title="404 — Page not found" description="The page you are looking for cannot be found, sorry. Please check the URL for typos or go to the main page." customClass="404">
+<Shell title={ title } description={ description } customClass={ customClass }>
     <section>
         <h1>PMCF.XYZ</h1>
         <Stickie>
-            <Content />
+            <div>
+                <NotFound />
+            </div>
         </Stickie>
     </section>
 </Shell>

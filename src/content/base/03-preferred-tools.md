@@ -13,12 +13,12 @@ title: "Preferred Tools"
 - Figma
 - FigJam
 - Miro
+- ChatGPT
 - Maze
-- Airtable
 - Dovetail
-- GPT4
-- Concepts
 - Procreate
+- Airtable
 - Affinity Designer
+- Concepts app
 
 </div>

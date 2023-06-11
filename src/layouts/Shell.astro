@@ -53,6 +53,8 @@ const { title, description, customClass } = Astro.props;
 	--sf: 0.8125rem;
 	--shadow-a: var(--black-fade) 0 0.125rem 0 0;
 	--shadow-b: var(--black-light) 0 0.5rem 0 0;
+	/* Whiteboard grid control */
+	--maxcol-06: 107em;
 }
 html {
 	font-family: "LexendDeca", system-ui, sans-serif;
@@ -70,13 +72,13 @@ body, h1, h2, h3, h4, p, ul {
 }
 h1, h2 {
 	font-weight: 650;
-	font-size: 2.5em;
-	line-height: 80%;
+	font-size: 3em;
+	line-height: 83%;
 	letter-spacing: -0.03125em;
 	text-transform: uppercase;
 	overflow-wrap: break-word;
 }
-h1, h2, p {
+h1, h2, p, li {
     hyphens: auto;
 }
 h3 {
@@ -157,15 +159,26 @@ section {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	gap: 2em;
-}
-.conceal > :not(#modal) {
-    pointer-events: none;
+	gap: 1em;
+	width: max-content;
 }
 .button-3d {
     height: 2rem;
     display: flex;
     align-items: flex-end;
+}
+.button-3d.group button {
+	min-width: 2.5em;
+}
+.button-3d.group button:nth-child(1n+2) {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+	border-left: 0.5px solid var(--black-medium);
+}
+.button-3d.group button:nth-last-child(1n+2) {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+	border-right: 0.5px solid var(--black-medium);
 }
 button {
 	font-family: "LexendDeca", system-ui, sans-serif;
@@ -194,20 +207,7 @@ button:active {
 button:focus {
 	outline: 0.125rem solid var(--black-strong);
 	outline-offset: 0.125rem;
-}
-@media (max-width: 480px) {
-	.button-3d {
-		height: 2.5rem;
-	}
-	button {
-		font-size: 1em;
-	}
-	#canvas .button-3d {
-		height: 2rem;
-	}
-	#canvas button {
-		font-size: 0.8em;
-	}
+	z-index: 1;
 }
 [tags] ul {
 	list-style-type: none;
@@ -217,13 +217,29 @@ button:focus {
 	gap: 0.5em;
 	padding: 0.5em 0 0;
 }
-[tags] li {
+[tags] li, code {
     font-weight: 375;
 	line-height: 125%;
     padding: 0.125em 0.25em;
 	background-color: var(--black-light);
 	border-radius: var(--sc);
 	white-space: nowrap;
+}
+code {
+	font-family: "LexendDeca", system-ui, sans-serif;
+	display: inline-block;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+.footnote {
+	color: var(--black-medium);
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+.footnote * {
+	font-size: inherit;
+	line-height: inherit;
 }
 /* Dark mode */
 .dark, #modal.dark .dialog {
@@ -235,76 +251,149 @@ button.dark {
 	--black-fade: var(--black-medium);
 	--black-medium: var(--black-strong);
 }
-#modal.dark button:focus {
+.dark button:focus {
     outline-color: var(--paper);
 }
-.dark [tags] li {
+.dark li, .dark code {
 	background-color: var(--white-light);
+}
+@media (max-width: 480px) {
+	.button-3d {
+		height: 2.5rem;
+	}
+	button {
+		font-size: 1em;
+	}
+	.whiteboard .button-3d {
+		height: 2rem;
+	}
+	.whiteboard button {
+		font-size: 0.8em;
+	}
 }
 </style>
 <script>
-// panzoom
-import panzoom from 'panzoom';
-// Definitions
+// Imports
+import panzoom, { PanZoom } from 'panzoom';
+
+// Elements
 const canvas = document.getElementById('canvas') as HTMLElement;
-const inputElements = document.querySelectorAll('input, textarea, button, a');
+const inputElements = document.querySelectorAll('input, textarea, button, select, a[href]');
+const zoomInButton = document.getElementById('zoomIn');
+const zoomOutButton = document.getElementById('zoomOut');
+const modal = document.getElementById('modal');
 const closeButton = document.getElementById('closeModal');
-if (canvas) {
-// Panzoom options
-	const pz = panzoom(canvas, {
-		maxZoom: 4,
-		minZoom: 0.125,
-		zoomDoubleClickSpeed: 1,
-	});
-  	pz.zoomAbs(0, 0, 0.5);
-// Handling interactables
-	inputElements.forEach((input) => {
-		input.addEventListener('focus', () => pz.pause());
-		input.addEventListener('blur', () => pz.resume());
-		input.addEventListener('touchstart', (event) => event.stopPropagation());
-	});
-// Improving interactables via touch
-	document.addEventListener('touchstart', (event) => {
-		const isInputFocused = Array.from(inputElements).some((input) =>
-			input.contains(event.target as Node)
-		);
-		if (!isInputFocused) {
-			pz.resume();
-		}
-	});
-// Resume panzoom when modal is closed
-	if (closeButton) {
-		closeButton.addEventListener('click', () => pz.resume());
-	}
-// Resume panzoom on Escape key press
-	document.addEventListener('keydown', (event) => {
-		if (event.key === 'Escape') {
-			pz.resume();
-		}
-	});
+
+// Functions
+
+// Zooming
+function zoom(pz: PanZoom, isZoomIn: boolean) {
+	const scaleFactor = isZoomIn ? 1.1 : 0.9;
+	const {width, height} = canvas.getBoundingClientRect();
+	const currentTransform = pz.getTransform();
+	const x = (width / 2 - currentTransform.x) / currentTransform.scale;
+	const y = (height / 2 - currentTransform.y) / currentTransform.scale;
+	const newZoom = currentTransform.scale * scaleFactor;
+	pz.zoomAbs(x, y, newZoom);
 }
-// Load up
-window.addEventListener('load', function () {
+
+// Handle inputs when Modal
+function handleInputs(input: HTMLElement, pz: PanZoom, modal: HTMLElement | null) {
+	const focusHandler = () => {
+		pz.pause();
+	};
+	input.addEventListener('focus', focusHandler);
+	const blurHandler = () => {
+		if (modal && !modal.classList.contains('active')) {
+			pz.resume();
+		}
+	};
+	input.addEventListener('blur', blurHandler);
+	const touchstartHandler = (event: Event) => event.stopPropagation();
+	input.addEventListener('touchstart', touchstartHandler);
+
+	// Remove the listeners
+	return () => {
+		input.removeEventListener('focus', focusHandler);
+		input.removeEventListener('blur', blurHandler);
+		input.removeEventListener('touchstart', touchstartHandler);
+	};
+}
+
+// Create panzoom
+function initPanzoom() {
+	if (canvas) {
+
+		// Options
+		const pz = panzoom(canvas, {
+			maxZoom: 4.5,
+			minZoom: 0.2,
+			initialX: 0,
+			initialY: 0,
+			initialZoom: 0.5,
+		});
+
+		// Zoom keys
+		zoomInButton?.addEventListener('click', () => zoom(pz, true));
+		zoomOutButton?.addEventListener('click', () => zoom(pz, false));
+
+		// Handling interactables
+		inputElements.forEach((input) => handleInputs(input as HTMLElement, pz, modal));
+
+		// Resume panzoom when modal is closed
+		closeButton?.addEventListener('click', () => pz.resume());
+
+		// Resume panzoom on Escape key press
+		document.addEventListener('keydown', (event) => {
+			if (event.key === 'Escape') {
+				pz.resume();
+			}
+		});
+		
+		// Resume panzoom on touch event outside of interactive elements
+		document.addEventListener('touchstart', (event) => {
+			const isInputFocused = Array.from(inputElements).some((input) =>
+				input.contains(event.target as Node)
+			);
+			if (!isInputFocused) {
+				pz.resume();
+			}
+		});
+	}
+}
+
+// Initialization
+window.addEventListener('load', function() {
+
+	// Start panzoom
+	initPanzoom();
+
+	// Wait for page load
 	setTimeout(function () {
-// Preloader
+		
+		// Preloader
 		const overlay = document.querySelector('.preloader');
 		overlay?.classList.add('hidden');
-// Image captions
-		const articleElements = document.querySelectorAll('article');
+
+		// Image captions
+		const articleElements = document.querySelectorAll('article > p');
 		articleElements.forEach((article) => {
 		const img = article.querySelector('img');
 		if (img) {
 			const title = img.getAttribute('title');
 			if (title) {
-// Creating the caption elements
+
+				// Creating the caption elements
 				const titleElement = document.createElement('small');
 				titleElement.textContent = title;
 				img.insertAdjacentElement('afterend', titleElement);
 			}
 		}
 		});
-// Timeout for preloader and captions
+	// Timeout for preloader and captions
 	}, 500);
 });
+
+// Instruct browser to not store scroll position
 history.scrollRestoration = 'manual';
 </script>

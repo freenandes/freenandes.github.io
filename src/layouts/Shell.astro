@@ -281,8 +281,16 @@ const canvas = document.getElementById('canvas') as HTMLElement;
 const inputElements = document.querySelectorAll('input, textarea, button, select, a[href]');
 const zoomInButton = document.getElementById('zoomIn');
 const zoomOutButton = document.getElementById('zoomOut');
+const resetNavButton = document.getElementById('resetNav');
 const modal = document.getElementById('modal');
 const closeButton = document.getElementById('closeModal');
+const pzSet = {
+	x: 0,
+	y: 0,
+	z: 0.5,
+	maxZ: 4.5,
+	minZ: 0.1,
+};
 
 // Functions
 
@@ -326,16 +334,23 @@ function initPanzoom() {
 
 		// Options
 		const pz = panzoom(canvas, {
-			maxZoom: 4.5,
-			minZoom: 0.2,
-			initialX: 0,
-			initialY: 0,
-			initialZoom: 0.5,
+			initialX: pzSet.x,
+			initialY: pzSet.y,
+			initialZoom: pzSet.z,
+			maxZoom: pzSet.maxZ,
+			minZoom: pzSet.minZ,
+			// zoomDoubleClickSpeed: 1,
 		});
 
 		// Zoom keys
 		zoomInButton?.addEventListener('click', () => zoom(pz, true));
 		zoomOutButton?.addEventListener('click', () => zoom(pz, false));
+
+		// Reset navigation
+		resetNavButton?.addEventListener('click', function() {
+			pz.moveTo(pzSet.x, pzSet.y);
+  			pz.zoomAbs(pzSet.x, pzSet.y, pzSet.z);
+		});
 
 		// Handling interactables
 		inputElements.forEach((input) => handleInputs(input as HTMLElement, pz, modal));

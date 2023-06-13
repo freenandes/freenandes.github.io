@@ -1,5 +1,5 @@
 ---
-title: "Preferred Tools"
+title: "Favorite Tools"
 ---
 <div tags>
 
@@ -16,9 +16,8 @@ title: "Preferred Tools"
 - ChatGPT
 - Maze
 - Dovetail
-- Procreate
+- Obsidian
 - Airtable
-- Affinity Designer
 - Concepts app
 
 </div>

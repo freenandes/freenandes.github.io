@@ -39,6 +39,7 @@ const { title, description, customClass } = Astro.props;
 	--black-fade: rgba(0, 0, 0, 0.2);
 	--black-medium: rgba(0, 0, 0, 0.4);
 	--black-strong: rgba(0, 0, 0, 0.8);
+	--white: white;
 	--white-light: rgba(255, 255, 255, 0.12);
 	--stickie-yellow: #ffe38c;
 	--stickie-blue: #bbeeff;
@@ -54,7 +55,12 @@ const { title, description, customClass } = Astro.props;
 	--shadow-a: var(--black-fade) 0 0.125rem 0 0;
 	--shadow-b: var(--black-light) 0 0.5rem 0 0;
 	/* Whiteboard grid control */
-	--maxcol-06: 107em;
+	--maxcol-01: 17em;
+	--maxcol-02: calc(var(--maxcol-01) * 2 + 1em);
+	--maxcol-03: calc(var(--maxcol-01) * 3 + 2em);
+	--maxcol-04: calc(var(--maxcol-01) * 4 + 3em);
+	--maxcol-05: calc(var(--maxcol-01) * 5 + 4em);
+	--maxcol-06: calc(var(--maxcol-01) * 6 + 5em);
 }
 html {
 	font-family: "LexendDeca", system-ui, sans-serif;
@@ -241,6 +247,29 @@ code {
 	font-size: inherit;
 	line-height: inherit;
 }
+[video] {
+    position: relative;
+	cursor: pointer;
+}
+[video]::after {
+    content: "▶";
+    position: absolute;
+    font-size: 4rem;
+	display: none;
+	justify-content: center;
+	align-items: center;
+	color: var(--white);
+	background-color: var(--black-medium);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+	border-radius: var(--sd);
+	pointer-events: none;
+}
+[video].paused::after {
+    display: flex;
+}
 /* Dark mode */
 .dark, #modal.dark .dialog {
 	color: var(--paper);
@@ -382,6 +411,22 @@ window.addEventListener('load', function() {
 
 	// Start panzoom
 	initPanzoom();
+
+	// Video control
+    const videos = document.querySelectorAll('video');
+	videos.forEach((video) => {
+		video.addEventListener('click', function() {
+			if(video.parentElement) {
+				if (video.paused) {
+					video.play();
+					video.parentElement.classList.remove('paused');
+				} else {
+					video.pause();
+					video.parentElement.classList.add('paused');
+				}
+			}
+		});
+	});
 
 	// Wait for page load
 	setTimeout(function () {

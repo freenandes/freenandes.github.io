@@ -33,7 +33,8 @@ article > * > p:last-child {
 article > p {
     position: relative;
 }
-article img {
+article img,
+article video {
     position: absolute;
     top: 0;
     left: 0;
@@ -42,7 +43,8 @@ article img {
     object-fit: cover;
     border-radius: var(--sd);
 }
-article img + small {
+article img + small,
+article video + small {
     font-size: 0.625em;
     position: absolute;
     bottom: 0;
@@ -55,8 +57,11 @@ article img + small {
     color: var(--paper);
     background: linear-gradient(to top, var(--black-strong) calc(100% - 8rem), transparent calc(100% - var(--sd)));
     transition: opacity 1s ease-in-out;
+    z-index: 1;
+    pointer-events: none;
 }
-article img:hover + small, article img + small:hover {
+article img:hover + small,
+article video:hover + small {
     opacity: 0;
 }
 article > hr {
@@ -71,6 +76,14 @@ article > hr {
 article > hr + * {
     margin-left: 18rem;
 }
+/* Content design */
+#see-07 {
+    width: var(--maxcol-04);
+}
+#see-05 {
+    width: var(--maxcol-05);
+}
+#see-08,
 #see-09 {
     width: var(--maxcol-06);
 }

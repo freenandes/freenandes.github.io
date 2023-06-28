@@ -3,22 +3,22 @@ title: "Inclusivity"
 ---
 ### How do you design for inclusivity?
 
-To me, it's about including as many people as possible in enjoying life, regardless of their abilities, disabilities, or diverse needs. The best I can do is to be mindful of their experiences and infuse inclusive design principles into my work.
+My goal is to ensure that everyone can enjoy life, regardless of their abilities, disabilities, or unique needs. The best I can do is to be mindful of their experiences and infuse inclusive design principles into my work.
 
-When doing user research, I try to engage with individuals with different cultural backgrounds and varying ages and include underrepresented groups to make a more balanced assessment.
+During user research, I make it a point to engage with individuals from diverse cultural backgrounds and age groups, while also including underrepresented groups to ensure a fair and balanced assessment.
 
-One thing here I think I need to improve is collaborating with experts in accessibility and inclusivity to gain insights and feedback on my designs. And I also need to educate myself more, infuse this knowledge into my process, and share it with the team.
+One thing here I think I need to improve is collaborating with experts in accessibility and inclusivity to get insights and feedback on my designs. And I also need to educate myself more, infuse this knowledge into my process, and share it with the team.
 
-![Diagram of web pages with arrows establishing user flow relations between them](../../assets/images/diagram-design.png "I often start with diagrammatic designs to drive a linear content reading — it doesn't mean the visual outcome has to be linear.")
+![A diagram depicting the interconnectivity of web pages through arrows, showcasing the user flow.](../../assets/images/diagram-design.png "I often start with diagrams for a more linear experience — it doesn't mean the outcome has to be visually linear.")
 
-![Stickers with UI concepts organized in a grid to form relationships between them](../../assets/images/object-oriented.png "An object-oriented approach also helps me simplify content and architecture.")
+![Post-its with concepts organized into a grid to form relationships and logical clusters of information.](../../assets/images/object-oriented.png "I find that utilizing an object-oriented approach simplifies the information I present to users.")
 
 ---
 
-I follow established guidelines like WCAG to ensure my designs meet accessibility standards. I consider color contrast, keyboard navigation, screen reader compatibility, and assistive technology support.
+I follow established guidelines like WCAG to ensure my designs meet accessibility standards. I mostly consider how hierarchy and color are perceived, how effective the keyboard is on the app and overall compatibility with assistive technologies.
 
-![Color contrast plugin performing a check on the text of a variant from a task status component](../../assets/images/contrast-check.png "Where possible, I anticipate UI design compatibility with WCAG 3.")
+![Color contrast Figma plugin performing a check on the text of a task status component.](../../assets/images/contrast-check.png "Where possible, I anticipate UI design compatibility with WCAG 3.")
 
-![Web app design, framed in a browser, with a color blindness simulation on it](../../assets/images/color-blindness.png "I always run a color blindness simulation on new designs to ensure hierarchy is still decipherable.")
+![Web app design, framed in a browser, with a color blindness simulation filter on top of it.](../../assets/images/color-blindness.png "I always run a color blindness simulation on new designs to ensure hierarchy is still decipherable.")
 
-![A list of five different stages of focus interaction of a search field, composed of interactive sub-components](../../assets/images/keyboard-interaction.png "Revision of the search field focus sequence for a project where inclusion was essential.")
+![A list of five different stages of focus interaction of a search field component, which is composed of interactive sub-components that are highlighted on each stage.](../../assets/images/keyboard-interaction.png "Documentation of the search field focus sequence for a project where inclusion was essential.")

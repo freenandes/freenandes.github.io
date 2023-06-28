@@ -25,3 +25,4 @@ However, I prefer solid, more complete user testing to extract more data and mat
 
 When an idea grows, I seek to fine-tune it with usability and multi-variant tests. Whatever technique we adopt, the direction is doing so to meet the users' and customers' needs and expectations, and we need to validate that compatibility before committing to code complex solutions.
 
+- This test went well and the branches are working fine!

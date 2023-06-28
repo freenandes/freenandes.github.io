@@ -24,5 +24,3 @@ However, I prefer solid, more complete user testing to extract more data and mat
 ![A row of 4 digital product cards featuring a t-shirt on sale, with annotations on the side identifying their version and amount of users assigned to each](../../assets/images/multi-variant-test.png "When doubts arise, I do multi-variant tests to catch any clear loser to discard and focus on other solutions.")
 
 When an idea grows, I seek to fine-tune it with usability and multi-variant tests. Whatever technique we adopt, the direction is doing so to meet the users' and customers' needs and expectations, and we need to validate that compatibility before committing to code complex solutions.
-
-- This test went well and the branches are working fine!

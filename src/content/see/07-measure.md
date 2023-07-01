@@ -15,10 +15,10 @@ Interviews and surveys with users and customers are also vital for me to get the
 
 I value design and aim to obtain pertinent metrics to evaluate its impact. This may include KPIs such as conversion rates, user engagement, and revenue. Benchmarks can also provide valuable insights into our standing compared to others and measure our transformation through design.
 
-Having a well-documented or transparent iterative approach to the design process is also important so everyone can see the mutation of a solution. This way, everyone can understand the value and the effort put into the operation.
+Having a well-documented or transparent iterative approach to the design process is also essential so everyone can see the mutation of a solution. This way, everyone can understand the value and the effort put into the operation.
 
-![Screenshot of a competitor website represented as a good example with a description of what makes it a good practice.](../../assets/images/benchmarking.png "Benchmarking is a powerful way to evaluate a product. I like using Baymard for a faster eCommerce benchmarking.")
+![Screenshot of a competitor's website with an annotation of why it is a good practice.](../../assets/images/benchmarking.png "Benchmarking is a powerful way to evaluate a product. I like using Baymard for faster eCommerce benchmarking.")
 
-![Two graphs side by side showing product performance data between Desktop (left) and Mobile versions.](../../assets/images/data-analysis.png "I always go back to our data to source key metrics for design efforts. With a before and an after we can evaluate design efficacy.")
+![Two graphs show product performance data between Desktop (left) and Mobile versions.](../../assets/images/data-analysis.png "I always go back to our data to source key metrics for design efforts. With a before and an after, we can evaluate design efficacy.")
 
-![A matrix of a lot of designs with minimal changes and variation for comparison.](../../assets/images/iterative-design.png "It's laborious to produce a matrix of design variations but helps the team to compare, weed out what doesn't work and focus onto the right direction.")
+![A matrix of many designs with minimal changes and variation for comparison.](../../assets/images/iterative-design.png "It's laborious to produce a matrix of design variations, but it helps the team to compare, weed out what doesn't work, and focus on the right direction.")

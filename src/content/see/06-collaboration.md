@@ -19,6 +19,6 @@ Involving the team and hosting collaborative sessions is also helpful. It's a mo
 
 ---
 
-![Documentation snippet detailing how to contribute to the design process.](../../assets/images/doc-contribute.png "I always make sure to provide easily understandable information to our colleagues, so they can easily reach us and contribute.")
+![Documentation snippet detailing how to contribute to the design process.](../../assets/images/doc-contribute.png "I always provide easily understandable information to our colleagues, so they can easily reach us and contribute.")
 
-![Whiteboard screenshots to illustrate the collaboration trail left from a workshop session.](../../assets/images/workshop.png "I advocate in participating in a workshop or any other type of collaborative session to gather different expertises to the table on solving a users' problem.")
+![Whiteboard screenshots illustrate the collaboration trail left from a workshop session.](../../assets/images/workshop.png "I advocate participating in a workshop or any other collaborative session to gather different expertise on solving users' problems.")

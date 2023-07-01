@@ -61,6 +61,7 @@ const { title, description, customClass } = Astro.props;
 	--maxcol-04: calc(var(--maxcol-01) * 4 + 3em);
 	--maxcol-05: calc(var(--maxcol-01) * 5 + 4em);
 	--maxcol-06: calc(var(--maxcol-01) * 6 + 5em);
+	--maxcol-07: calc(var(--maxcol-01) * 7 + 6em);
 }
 html {
 	font-family: "LexendDeca", system-ui, sans-serif;
@@ -269,6 +270,9 @@ code {
 }
 [video].paused::after {
     display: flex;
+}
+abbr[title] {
+	cursor: help;
 }
 /* Dark mode */
 .dark, #modal.dark .dialog {

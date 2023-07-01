@@ -10,9 +10,9 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^2.5.7",
+    "astro": "^2.7.2",
     "autoprefixer": "^10.4.14",
-    "konva": "^9.1.0",
-    "panzoom": "^9.4.3"
+    "panzoom": "^9.4.3",
+    "typescript": "^5.1.6"
   }
 }

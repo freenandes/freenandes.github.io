@@ -31,14 +31,14 @@ import { Content as Footer } from '../content/extra/footer.md';
 <Shell title={ title } description={ description } customClass={ customClass }>
 	<div class="controls">
 		<div class="button-3d">
-			<button id="info" class="dark">Info</button>
+			<button id="info" class="dark" data-title="About this website">Info</button>
 		</div>
 		<div class="button-3d group">
-			<button id="zoomOut" class="dark">-</button>
-			<button id="zoomIn" class="dark">+</button>
+			<button id="zoomOut" class="dark" data-title="Zoom out">-</button>
+			<button id="zoomIn" class="dark" data-title="Zoom in">+</button>
 		</div>
 		<div class="button-3d">
-			<button id="resetNav" class="dark">[]</button>
+			<button id="resetNav" class="dark" data-title="Reset to initial position">[]</button>
 		</div>
 	</div>
 	<div id="canvas" class="whiteboard">
@@ -134,18 +134,32 @@ main {
 	display: flex;
 	flex-direction: row;
 	align-items: flex-start;
-	gap: 24em;
+	gap: 7em;
 	width: fit-content;
-	padding: 24em;
+	padding: 16em;
 	background-size: 1em 1em;
 	background-position: 0 0;
 	background-image: radial-gradient(var(--black-light) 0.0625em, transparent 0.0625em);
 }
 .title {
-	margin-bottom: 1.5rem;
+	margin-bottom: 3.5rem;
+}
+section {
+	padding: 5em 7em 7em;
+	border-radius: var(--sf);
+	background-color: var(--yellow-fade);
+}
+section#who {
+	background-color: var(--blue-fade);
+}
+section#why {
+	background-color: var(--green-fade);
+}
+section#wat {
+	background-color: var(--pink-fade);
 }
 section:not(#pmcf-xyz) :global(article:not(:last-child)) {
-	margin-bottom: 5em;
+	margin-bottom: 8em;
 }
 section:nth-child(2) :global(article > *) {
     background-color: var(--stickie-blue);
@@ -158,8 +172,11 @@ section:nth-child(4) :global(article > *) {
 }
 .controls {
 	display: flex;
+	flex-wrap: wrap-reverse;
+	justify-content: flex-end;
 	gap: 0.5em;
 	position: fixed;
+	max-width: calc(100vw - 2em);
 	right: 1em;
 	bottom: 1em;
 	z-index: 2;
@@ -167,9 +184,16 @@ section:nth-child(4) :global(article > *) {
 .footnote {
 	margin-top: 1rem;
 }
-
 /* Content design */
-#pmcf-xyz {
+section#pmcf-xyz {
 	max-width: var(--maxcol-01);
+}
+@media (max-width: 480px) {
+	.controls {
+		flex-wrap: wrap;
+		justify-content: flex-start;
+		right: auto;
+		left: 1em;
+	}
 }
 </style>

@@ -9,4 +9,7 @@ I explain why we use it, so everyone can be on the lookout for changes or genera
 
 I also collect the data points on a whiteboard. I map this information and connect it to the designs to invite everyone to participate and iterate. This approach requires a well-organized board to help colleagues to navigate and understand what's there and correlate data and solutions.
 
-![description of the image](../../assets/images/starry.jpg "title for the image")
+
+- interviews with experts (Marcos, Michael)
+- product design documentation
+- whiteboard format?

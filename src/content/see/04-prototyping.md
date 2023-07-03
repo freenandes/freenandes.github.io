@@ -20,7 +20,7 @@ Code prototypes are more accurate, however. Implementing them can take longer, b
 While getting these prototype artifacts out, I usually set up collaborative sessions within the team or with some internal guerilla tests. This way, I can gather diversified views on the materialization of the solution.
 
 <div video>
-    <video width="1250" height="1250" autoplay loop muted>
+    <video width="1250" height="1250" autoplay loop muted playsinline>
         <source src="/videos/stay-mobile.mp4" type="video/mp4">
         Your browser does not support video...
     </video>

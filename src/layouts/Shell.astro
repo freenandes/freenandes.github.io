@@ -35,6 +35,7 @@ const { title, description, customClass } = Astro.props;
 	--paper: #F8F8F7;
 	--paper-fade: rgba(248, 248, 247, 0.5);
 	--charcoal: #242630;
+	--charcoal-fade: #4a4c58;
 	--black-light: rgba(0, 0, 0, 0.07);
 	--black-fade: rgba(0, 0, 0, 0.2);
 	--black-medium: rgba(0, 0, 0, 0.4);
@@ -42,9 +43,13 @@ const { title, description, customClass } = Astro.props;
 	--white: white;
 	--white-light: rgba(255, 255, 255, 0.12);
 	--stickie-yellow: #ffe38c;
+	--yellow-fade: rgba(255, 227, 140, 0.25);
 	--stickie-blue: #bbeeff;
+	--blue-fade: rgba(187, 238, 255, 0.25);
 	--stickie-green: #d0f580;
+	--green-fade: rgba(208, 245, 128, 0.25);
 	--stickie-pink: #ffdadf;
+	--pink-fade: rgba(255, 218, 223, 0.25);
 	/* Form */
 	--sa: 0.03125rem;
 	--sb: 0.0625rem;
@@ -119,7 +124,7 @@ a:active {
 	color: var(--accent);
 }
 a:focus {
-	outline: 0.125rem solid var(--black-strong);
+	outline: 0.125rem dashed var(--black-strong);
 	outline-offset: 0.0625rem;
 }
 small {
@@ -212,7 +217,7 @@ button:active {
     box-shadow: var(--black-medium) 0 0.25em 0 inset;
 }
 button:focus {
-	outline: 0.125rem solid var(--black-strong);
+	outline: 0.125rem dashed var(--black-strong);
 	outline-offset: 0.125rem;
 	z-index: 1;
 }
@@ -271,8 +276,25 @@ code {
 [video].paused::after {
     display: flex;
 }
-abbr[title] {
+abbr[data-title] {
 	cursor: help;
+	border-bottom: 0.125em dashed var(--black-medium);
+}
+/* Tippy */
+.tippy-box {
+	font-size: 0.75em;
+	font-weight: 375;
+	line-height: 133%;
+	padding: 0.25em 0.5em;
+	color: var(--white);
+  	background-color: var(--charcoal-fade);
+	border-radius: var(--sc);
+}
+.tippy-content {
+	padding: 0.25em;
+}
+.tippy-arrow {
+	color: var(--charcoal-fade);
 }
 /* Dark mode */
 .dark, #modal.dark .dialog {
@@ -280,7 +302,7 @@ abbr[title] {
 	background-color: var(--charcoal);
 }
 button.dark {
-	background-color: #4a4c58;
+	background-color: var(--charcoal-fade);
 	--black-fade: var(--black-medium);
 	--black-medium: var(--black-strong);
 }
@@ -308,6 +330,8 @@ button.dark {
 <script>
 // Imports
 import panzoom, { PanZoom } from 'panzoom';
+import tippy, { Props } from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
 
 // Elements
 const canvas = document.getElementById('canvas') as HTMLElement;
@@ -412,6 +436,14 @@ function initPanzoom() {
 
 // Initialization
 window.addEventListener('load', function() {
+
+	// Tippy
+	const titles = Array.from(document.querySelectorAll<HTMLElement>('[data-title]'));
+	titles.forEach((el) => {
+		tippy(el, {
+			content: el.getAttribute('data-title') || '',
+		} as Partial<Props>);
+	});
 
 	// Start panzoom
 	initPanzoom();

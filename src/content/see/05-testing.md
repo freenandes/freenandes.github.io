@@ -10,7 +10,7 @@ We can also get paid users to test information architecture with tree testing an
 ![Montage of presentation bits describing a guerilla testing's participants pool, the script flow, and one of the insights captured from that test.](../../assets/images/guerilla.png "Preparing an internal guerilla test is one of the best ways for us, as a team, to detect and get a shared view of users' problems.")
 
 <div video>
-    <video width="1250" height="1250" autoplay loop muted>
+    <video width="1250" height="1250" autoplay loop muted playsinline>
         <source src="/videos/swipe-card.mp4" type="video/mp4">
         Your browser does not support video...
     </video>

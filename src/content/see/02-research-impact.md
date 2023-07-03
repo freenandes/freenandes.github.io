@@ -9,6 +9,4 @@ I can identify pain points and usability issues more quickly and understand wher
 
 It also helps me validate initial assumptions, weed out personal bias, and get to test with real users. This interaction is precious and eye-opening. Allows me to refine and optimize the designs and get solid foundations for a better user experience.
 
-![description of the image](../../assets/images/flow.jpg "title for the image")
-
-![description of the image](../../assets/images/journey.jpg "title for the image")
+- user insights

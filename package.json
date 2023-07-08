@@ -10,7 +10,7 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^2.7.2",
+    "astro": "^2.7.4",
     "autoprefixer": "^10.4.14",
     "panzoom": "^9.4.3",
     "tippy.js": "^6.3.7",

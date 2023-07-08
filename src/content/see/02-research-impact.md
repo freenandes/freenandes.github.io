@@ -3,10 +3,10 @@ title: "Research Impact"
 ---
 ### Have you found user research to provide a positive impact?
 
-Absolutely! User research has been essential to me! I gain valuable insights, empathize more with users and better understand their problems and needs, allowing me to create user-centered designs.
+User research has been essential! I gain valuable insights, empathize with users, and understand their problems and needs, allowing me to create user-centered designs.
 
-I can identify pain points and usability issues more quickly and understand where the opportunities are. By interpreting the findings effectively, we can all make more informed design decisions and iterate before a more confident implementation.
+I can identify pain points, usability issues, and innovation opportunities. Interpreting the findings allows us to make more informed decisions and iterate confidently. We can reduce risk, increase the likelihood of success and provide a competitive advantage to the company.
 
-It also helps me validate initial assumptions, weed out personal bias, and get to test with real users. This interaction is precious and eye-opening. Allows me to refine and optimize the designs and get solid foundations for a better user experience.
+![A row of visual benchmarking of 3 different filtering panels of e-commerce, and below a presentation snippet of a user testing with a 2.4 rating out of 5 and user quotes.](../../assets/images/research.png "Visual benchmarking and user testing are two critical ways to help me shape a good product and promote adoption.")
 
-- user insights
+It also helps me validate initial assumptions, weed out personal bias, be more inclusive, and get to test with real users. It's eye-opening. It allows me to refine and optimize designs, build a solid user experience, and drive satisfaction.

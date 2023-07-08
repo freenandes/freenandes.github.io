@@ -406,12 +406,12 @@ function initPanzoom() {
 			if (mainElement) {
 				let newSize;
 				let newDotSize;
-				if (scale >= 4) {
+				if (scale >= 2) {
 					newSize = 8;
-					newDotSize = 0.03125;
-				} else if (scale >= 2) {
+					newDotSize = 0.046875;
+				} else if (scale >= 1) {
 					newSize = 16;
-					newDotSize = 0.0625;
+					newDotSize = 0.078125;
 				} else if (scale >= 0.5) {
 					newSize = 32;
 					newDotSize = 0.125;

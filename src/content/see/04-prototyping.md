@@ -27,7 +27,7 @@ While getting these prototype artifacts out, I usually set up collaborative sess
     <small>A high-fidelity prototype lets us get more precise data from tests with external users and enables a smoother front-end delivery.</small>
 </div>
 
-![Collection of mockups arranged in a grid format, comprising web app screenshots framed in desktop computer screens and smartphone devices.](../../assets/images/mockups.png "We can also evaluate an app's appearance, consistency, and branding effectiveness by examining realistic renderings from afar, by comparing screens, and having a more controlled and holistic view of the whole.")
+![Collection of mockups arranged in a grid format, comprising web app screenshots framed in desktop computer screens and smartphone devices.](../../assets/images/mockups.png "We can also evaluate an app's appearance, consistency, and branding effectiveness by examining realistic renderings from afar, comparing screens, and having a more controlled and holistic view of the whole.")
 
 Iterating involves incorporating collected decisions into a new version of the designs and then having mechanisms to share that again with the team quickly. We can use that new version even for subsequent rounds of testing or, if we're already confident, directly to implementation handoff.
 

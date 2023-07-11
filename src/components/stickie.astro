@@ -57,7 +57,7 @@ article video + small {
     color: var(--paper);
     background: linear-gradient(to top, var(--black-strong) calc(100% - 8rem), transparent calc(100% - var(--sd)));
     transition: opacity 1s ease-in-out;
-    z-index: 1;
+    z-index: var(--l-overlay);
     pointer-events: none;
 }
 article img:hover + small,
@@ -77,14 +77,23 @@ article > hr + * {
     margin-left: 18rem;
 }
 /* Content design */
-#see-07 {
+#who-01,
+#who-02,
+#wat-06 {
     width: var(--maxcol-04);
 }
-#see-05 {
+#why-01,
+#wat-01,
+#wat-03,
+#wat-05 {
     width: var(--maxcol-05);
 }
-#see-08,
-#see-09 {
+#why-06,
+#wat-07,
+#wat-08 {
     width: var(--maxcol-06);
+}
+#wat-04 {
+    width: var(--maxcol-07);
 }
 </style>

@@ -10,9 +10,11 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^2.5.7",
+    "@jsplumb/browser-ui": "^6.2.9",
+    "astro": "^2.8.0",
     "autoprefixer": "^10.4.14",
-    "konva": "^9.1.0",
-    "panzoom": "^9.4.3"
+    "panzoom": "^9.4.3",
+    "tippy.js": "^6.3.7",
+    "typescript": "^5.1.6"
   }
 }

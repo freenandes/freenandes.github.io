@@ -5,9 +5,9 @@ const description = "This is my beautiful website description";
 const customClass = "index";
 const sections = [
 	{ title: 'PMCF.XYZ', normTitle: 'pmcf-xyz' },
-	{ title: 'Esse', normTitle: 'esse' },
+	{ title: 'X', normTitle: 'who' },
 	{ title: 'Why', normTitle: 'why' },
-	{ title: 'See', normTitle: 'see' },
+	{ title: 'See', normTitle: 'wat' },
 ];
 
 // Components
@@ -31,19 +31,21 @@ import { Content as Footer } from '../content/extra/footer.md';
 <Shell title={ title } description={ description } customClass={ customClass }>
 	<div class="controls">
 		<div class="button-3d">
-			<button id="info" class="dark">Info</button>
+			<button id="info" class="dark" data-title="About this website">Info</button>
 		</div>
 		<div class="button-3d group">
-			<button id="zoomOut" class="dark">-</button>
-			<button id="zoomIn" class="dark">+</button>
+			<button id="zoomOut" class="dark" data-title="Zoom out">-</button>
+			<button id="zoomIn" class="dark" data-title="Zoom in">+</button>
 		</div>
 		<div class="button-3d">
-			<button id="resetNav" class="dark">[]</button>
+			<button id="resetNav" class="dark" data-title="Reset to initial position">[]</button>
 		</div>
 	</div>
 	<div id="canvas" class="whiteboard">
+		<div id="plumbing"></div>
 		<main>
 			<section id={sections[0].normTitle}>
+				<aside id="note-start">Start Here!</aside>
 				<h1 class="title">{sections[0].title}</h1>
 				{
 					firstSection.map(async (post) => {
@@ -55,12 +57,14 @@ import { Content as Footer } from '../content/extra/footer.md';
 						)
 					})
 				}
+				<aside id="note-contact">Get in touch</aside>
 				<Contact />
 				<small class="footnote">
 					<Footer />
 				</small>
 			</section>
 			<section id={sections[1].normTitle}>
+				<aside id="note-who">Pedro Who?!</aside>
 				<h2 class="title">{sections[1].title}</h2>
 				{
 					secondSection.map(async (post) => {
@@ -134,18 +138,42 @@ main {
 	display: flex;
 	flex-direction: row;
 	align-items: flex-start;
-	gap: 24em;
+	gap: 7em;
 	width: fit-content;
-	padding: 24em;
-	background-size: 1em 1em;
+	padding: 16em;
+	/*background-size: 1em 1em;*/
 	background-position: 0 0;
-	background-image: radial-gradient(var(--black-light) 0.0625em, transparent 0.0625em);
+	/*background-image: radial-gradient(var(--black-light) 0.0625em, transparent 0.0625em);*/
 }
 .title {
-	margin-bottom: 1.5rem;
+	box-sizing: border-box;
+	display: block;
+	width: 100%;
+	padding: 1.25rem;
+	margin-bottom: 3rem;
+	border-radius: var(--sd);
+	color: var(--paper);
+	background-color: var(--charcoal);
+}
+#pmcf-xyz .title {
+	text-align: center;
+}
+section {
+	padding: 5em 7em 7em;
+	border-radius: var(--sf);
+	background-color: var(--yellow-fade);
+}
+section#who {
+	background-color: var(--blue-fade);
+}
+section#why {
+	background-color: var(--green-fade);
+}
+section#wat {
+	background-color: var(--pink-fade);
 }
 section:not(#pmcf-xyz) :global(article:not(:last-child)) {
-	margin-bottom: 5em;
+	margin-bottom: 8em;
 }
 section:nth-child(2) :global(article > *) {
     background-color: var(--stickie-blue);
@@ -158,18 +186,52 @@ section:nth-child(4) :global(article > *) {
 }
 .controls {
 	display: flex;
+	flex-wrap: wrap-reverse;
+	justify-content: flex-end;
 	gap: 0.5em;
 	position: fixed;
+	max-width: calc(100vw - 2em);
 	right: 1em;
 	bottom: 1em;
-	z-index: 2;
+	z-index: var(--l-float);
 }
 .footnote {
 	margin-top: 1rem;
 }
-
+/* Annotations */
+aside[id] {
+	font-size: 4em;
+	position: absolute;
+	text-align: center;
+}
+aside#note-start {
+	top: 12rem;
+	left: 6rem;
+	width: 14rem;
+	transform: rotate(350deg);
+}
+aside#note-contact {
+	top: 86rem;
+	left: 42rem;
+	width: 16rem;
+	transform: rotate(10deg);
+}
+aside#note-who {
+	top: 3rem;
+	left: 56rem;
+	width: 12rem;
+	transform: rotate(310deg);
+}
 /* Content design */
-#pmcf-xyz {
+section#pmcf-xyz {
 	max-width: var(--maxcol-01);
+}
+@media (max-width: 480px) {
+	.controls {
+		flex-wrap: wrap;
+		justify-content: flex-start;
+		right: auto;
+		left: 1em;
+	}
 }
 </style>

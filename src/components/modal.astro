@@ -8,7 +8,7 @@ import { Content as Info } from '../content/extra/info.md';
         <header>
             <h3>{ title }</h3>
             <div class="button-3d">
-                <button id="closeModal" class="dark">Esc</button>
+                <button id="closeModal" class="dark" title="Hit escape to close">Esc</button>
             </div>
         </header>
         <div class="content">
@@ -25,7 +25,7 @@ import { Content as Info } from '../content/extra/info.md';
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 4;
+    z-index: var(--l-modality);
     background-color: var(--paper-fade);
     backdrop-filter: blur(0.25rem);
     opacity: 0;

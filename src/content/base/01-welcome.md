@@ -1,7 +1,7 @@
 ---
 title: "Welcome"
 ---
-<div tags>
+<div id="note-welcome" tags>
 
 Welcome! I’m Pedro, and this is my website, where I show myself as a product designer.
 

@@ -30,11 +30,19 @@ const { title, description, customClass } = Astro.props;
 	font-weight: 100 1000;
 	font-display: swap;
 }
+@font-face {
+	font-family: "Whiteboard";
+	src: url("/fonts/whiteboardbeta.woff2") format("woff2"), url("/fonts/whiteboardbeta.woff2") format("woff2");
+	font-weight: 400;
+	font-display: swap;
+	font-variant-ligatures: common-ligatures;
+}
 :root {
 	/* Colors */
 	--paper: #F8F8F7;
 	--paper-fade: rgba(248, 248, 247, 0.5);
 	--charcoal: #242630;
+	--charcoal-fade: #4a4c58;
 	--black-light: rgba(0, 0, 0, 0.07);
 	--black-fade: rgba(0, 0, 0, 0.2);
 	--black-medium: rgba(0, 0, 0, 0.4);
@@ -42,9 +50,13 @@ const { title, description, customClass } = Astro.props;
 	--white: white;
 	--white-light: rgba(255, 255, 255, 0.12);
 	--stickie-yellow: #ffe38c;
+	--yellow-fade: rgba(255, 227, 140, 0.25);
 	--stickie-blue: #bbeeff;
+	--blue-fade: rgba(187, 238, 255, 0.25);
 	--stickie-green: #d0f580;
+	--green-fade: rgba(208, 245, 128, 0.25);
 	--stickie-pink: #ffdadf;
+	--pink-fade: rgba(255, 218, 223, 0.25);
 	/* Form */
 	--sa: 0.03125rem;
 	--sb: 0.0625rem;
@@ -61,6 +73,13 @@ const { title, description, customClass } = Astro.props;
 	--maxcol-04: calc(var(--maxcol-01) * 4 + 3em);
 	--maxcol-05: calc(var(--maxcol-01) * 5 + 4em);
 	--maxcol-06: calc(var(--maxcol-01) * 6 + 5em);
+	--maxcol-07: calc(var(--maxcol-01) * 7 + 6em);
+	/* Layering system */
+	--l-overlay: 1;
+	--l-overlap: 2;
+	--l-float: 4;
+	--l-modality: 8;
+	--l-system: 16;
 }
 html {
 	font-family: "LexendDeca", system-ui, sans-serif;
@@ -118,7 +137,7 @@ a:active {
 	color: var(--accent);
 }
 a:focus {
-	outline: 0.125rem solid var(--black-strong);
+	outline: 0.125rem dashed var(--black-strong);
 	outline-offset: 0.0625rem;
 }
 small {
@@ -140,7 +159,7 @@ small a:hover {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	z-index: 8;
+	z-index: var(--l-system);
 	gap: 2em;
 	opacity: 1;
   	transition: opacity 1s;
@@ -211,9 +230,9 @@ button:active {
     box-shadow: var(--black-medium) 0 0.25em 0 inset;
 }
 button:focus {
-	outline: 0.125rem solid var(--black-strong);
+	outline: 0.125rem dashed var(--black-strong);
 	outline-offset: 0.125rem;
-	z-index: 1;
+	z-index: var(--l-overlay);
 }
 [tags] ul {
 	list-style-type: none;
@@ -270,13 +289,56 @@ code {
 [video].paused::after {
     display: flex;
 }
+abbr[data-title] {
+	cursor: help;
+	border-bottom: 0.125em dashed var(--black-medium);
+}
+/* Tippy */
+.tippy-box {
+	font-size: 0.75em;
+	font-weight: 375;
+	line-height: 133%;
+	padding: 0.25em 0.5em;
+	color: var(--white);
+  	background-color: var(--charcoal-fade);
+	border-radius: var(--sc);
+}
+.tippy-content {
+	padding: 0.25em;
+}
+.tippy-arrow {
+	color: var(--charcoal-fade);
+}
+/* jsPlumb */
+#plumbing {
+	position: relative;
+	z-index: var(--l-overlap);
+}
+#plumbing path {
+	stroke: var(--charcoal);
+	stroke-width: 6;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+#plumbing svg {
+	fill: var(--charcoal);
+	overflow: visible;
+	display: block;
+}
+/* Annotations */
+aside {
+	font-family: "Whiteboard", sans-serif;
+	font-size: 2em;
+	line-height: 137.5%;
+	word-spacing: -0.25em;
+}
 /* Dark mode */
 .dark, #modal.dark .dialog {
 	color: var(--paper);
 	background-color: var(--charcoal);
 }
 button.dark {
-	background-color: #4a4c58;
+	background-color: var(--charcoal-fade);
 	--black-fade: var(--black-medium);
 	--black-medium: var(--black-strong);
 }
@@ -302,8 +364,68 @@ button.dark {
 }
 </style>
 <script>
+// JSplumb
+import { newInstance, BezierConnector } from "@jsplumb/browser-ui";
+document.addEventListener("DOMContentLoaded", function() {
+    const plumbingElement = document.getElementById('plumbing');
+    if(plumbingElement) {
+        const plumbing = newInstance({
+            container: plumbingElement
+        });
+        // Arrow Type
+        plumbing.registerConnectionType("Arrow", {
+            connector: {
+                type: BezierConnector.type,
+                options: {
+                    curviness: 250,
+                },
+            },
+            endpoint: "Blank",
+			overlays: [{
+				type:"Arrow",
+				options: {
+					width: 24,
+					length: 32,
+					location: 1,
+					foldback: 0.001,
+				},
+            }],
+        });
+        // Connections
+        plumbing.connect({
+            source: document.getElementById('note-start')!,
+            target: document.getElementById('note-welcome')!,
+			anchor: [
+				[ 0.6, 1, 1, 0, 0, 8 ],
+				[ 0, 0.1, -1, 0, -16, 0 ]
+			],
+            type: "Arrow",
+        });
+		plumbing.connect({
+            source: document.getElementById('note-contact')!,
+            target: document.getElementById('note-form')!,
+			anchor: [
+				[ 0.5, 1, 0, 1, 0, 16 ],
+				[ 1, 0.5, 1, 0, 16, 0 ]
+			],
+            type: "Arrow",
+        });
+		plumbing.connect({
+            source: document.getElementById('note-who')!,
+            target: document.getElementById('who-01')!,
+			anchor: [
+				[ 0, 1, 0, 1, 16, 0 ],
+				[ 0, 0.1, -1, 0, -24, 0 ]
+			],
+            type: "Arrow",
+        });
+    }
+});
+
 // Imports
 import panzoom, { PanZoom } from 'panzoom';
+import tippy, { Props } from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
 
 // Elements
 const canvas = document.getElementById('canvas') as HTMLElement;
@@ -320,8 +442,6 @@ const pzSet = {
 	maxZ: 4.5,
 	minZ: 0.1,
 };
-
-// Functions
 
 // Zooming
 function zoom(pz: PanZoom, isZoomIn: boolean) {
@@ -371,6 +491,32 @@ function initPanzoom() {
 			// zoomDoubleClickSpeed: 1,
 		});
 
+		// Dynamic grid
+		pz.on('transform', function() {
+			const { scale } = pz.getTransform();
+			const mainElement = document.querySelector('main');
+			if (mainElement) {
+				let newSize;
+				let newDotSize;
+				if (scale >= 2) {
+					newSize = 8;
+					newDotSize = 0.046875;
+				} else if (scale >= 1) {
+					newSize = 16;
+					newDotSize = 0.078125;
+				} else if (scale >= 0.5) {
+					newSize = 32;
+					newDotSize = 0.125;
+				} else {
+					newSize = 0; // No grid
+					newDotSize = 0; // No dot
+				}
+				mainElement.style.backgroundSize = `${newSize}px ${newSize}px`;
+				mainElement.style.backgroundImage = `radial-gradient(var(--black-light) ${newDotSize}em, transparent ${newDotSize}em)`;
+			}
+		});
+
+
 		// Zoom keys
 		zoomInButton?.addEventListener('click', () => zoom(pz, true));
 		zoomOutButton?.addEventListener('click', () => zoom(pz, false));
@@ -409,14 +555,23 @@ function initPanzoom() {
 // Initialization
 window.addEventListener('load', function() {
 
+	// Tippy
+	const titles = Array.from(document.querySelectorAll<HTMLElement>('[data-title]'));
+	titles.forEach((el) => {
+		tippy(el, {
+			content: el.getAttribute('data-title') || '',
+			touch: 'hold',
+		} as Partial<Props>);
+	});
+
 	// Start panzoom
 	initPanzoom();
 
 	// Video control
-    const videos = document.querySelectorAll('video');
+	const videos = document.querySelectorAll('video');
 	videos.forEach((video) => {
-		video.addEventListener('click', function() {
-			if(video.parentElement) {
+		const togglePlayPause = () => {
+			if (video.parentElement) {
 				if (video.paused) {
 					video.play();
 					video.parentElement.classList.remove('paused');
@@ -425,7 +580,10 @@ window.addEventListener('load', function() {
 					video.parentElement.classList.add('paused');
 				}
 			}
-		});
+		};
+		// Listen for both 'click' and 'touchend' events
+		video.addEventListener('click', togglePlayPause);
+		video.addEventListener('touchend', togglePlayPause);
 	});
 
 	// Wait for page load
@@ -435,7 +593,7 @@ window.addEventListener('load', function() {
 		const overlay = document.querySelector('.preloader');
 		overlay?.classList.add('hidden');
 
-		// Image captions
+		// Media captions
 		const articleElements = document.querySelectorAll('article > p');
 		articleElements.forEach((article) => {
 		const img = article.querySelector('img');
@@ -450,6 +608,43 @@ window.addEventListener('load', function() {
 			}
 		}
 		});
+
+		// Media captions & Touch
+		document.body.addEventListener('touchstart', function(event) {
+			const mediaElements = document.querySelectorAll('article > p > img, article div[video] > video');
+			const isMediaElement = Array.from(mediaElements).some((mediaElement) =>
+				mediaElement.isEqualNode(event.target as Node)
+			);
+
+			if (!isMediaElement) {
+				mediaElements.forEach((mediaElement) => {
+					let smallElement: HTMLElement | null = null;
+					if (mediaElement.parentElement?.getAttribute('video')) {
+						smallElement = mediaElement.parentElement.nextElementSibling as HTMLElement;
+					} else {
+						smallElement = mediaElement.nextElementSibling as HTMLElement;
+					}
+					if (smallElement && smallElement.tagName.toLowerCase() === 'small') {
+						smallElement.style.opacity = '1';
+					}
+				});
+			} else {
+				let smallElement: HTMLElement | null = null;
+				const targetElement = event.target as HTMLElement;
+				const targetParentElement = targetElement.parentElement;
+				if (targetElement && targetParentElement) {
+					if (targetParentElement.getAttribute('video')) {
+						smallElement = targetParentElement.nextElementSibling as HTMLElement;
+					} else {
+						smallElement = targetElement.nextElementSibling as HTMLElement;
+					}
+					if (smallElement && smallElement.tagName.toLowerCase() === 'small') {
+						smallElement.style.opacity = '0';
+					}
+				}
+			}
+		});
+
 	// Timeout for preloader and captions
 	}, 500);
 });

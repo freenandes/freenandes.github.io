@@ -57,7 +57,7 @@ article video + small {
     color: var(--paper);
     background: linear-gradient(to top, var(--black-strong) calc(100% - 8rem), transparent calc(100% - var(--sd)));
     transition: opacity 1s ease-in-out;
-    z-index: 1;
+    z-index: var(--l-overlay);
     pointer-events: none;
 }
 article img:hover + small,
@@ -77,6 +77,8 @@ article > hr + * {
     margin-left: 18rem;
 }
 /* Content design */
+#who-01,
+#who-02,
 #wat-06 {
     width: var(--maxcol-04);
 }

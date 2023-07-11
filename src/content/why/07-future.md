@@ -3,8 +3,8 @@ title: "Future Aspirations"
 ---
 ### Where do you want to go from here?
 
-I see myself continuing to do the good with my design powers. Learn to share. I also want to help build a better world.
+I see myself continuing to do good with my design skills. Learn to share, and collaborate better, more effectively. I want to help build a better world where creativity powers innovation.
 
-A world where we have a better relationship with technology. One where everyone is invited and doesn't feel excluded. One where everyone can enjoy, enhance and grow their abilities, and feel motivated to co-create a better world with me.
+A world where we have a better relationship with technology. One where everyone is invited and doesn't feel excluded. One everyone can enjoy, enhance and grow their abilities and feel motivated to co-create.
 
-In the future, I would like to be more involved with improving creativity and creation processes. Be more involved in improving operations, facilitate design within teams, and I want to design products that people love to use.
+I want to be involved in improving creative processes. I want to improve operations, empower a design culture within product teams, and to design products people love using.

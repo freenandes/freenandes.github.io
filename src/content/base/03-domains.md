@@ -5,16 +5,15 @@ title: "Domains"
 
 #### Domains
 
-- DesignOps
+- <abbr data-title="Design Operations">DesignOps</abbr>
 - <abbr data-title="User Experience Research">UXR</abbr>
-- <abbr data-title="Object-oriented User Experience Design">OOUXD</abbr>
+- <abbr data-title="User Experience Design">UXD</abbr>
 - <abbr data-title="Information Architecture">IA</abbr>
-- Creative Problem-solving
 - <abbr data-title="User Interface Design">UID</abbr>
-- <abbr data-title="Interaction Design">IxD</abbr>
+- User/Usability Testing
 - Design Systems
-- <abbr data-title="Front-end Development">FE Dev.</abbr>
-- Usability Testing
+- <abbr data-title="Front-End Web Development">FE Dev.</abbr>
+- Creative Problem-solving
 - Visual Design
 - Illustration
 

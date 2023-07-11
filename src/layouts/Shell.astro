@@ -30,6 +30,13 @@ const { title, description, customClass } = Astro.props;
 	font-weight: 100 1000;
 	font-display: swap;
 }
+@font-face {
+	font-family: "Whiteboard";
+	src: url("/fonts/whiteboardbeta.woff2") format("woff2"), url("/fonts/whiteboardbeta.woff2") format("woff2");
+	font-weight: 400;
+	font-display: swap;
+	font-variant-ligatures: common-ligatures;
+}
 :root {
 	/* Colors */
 	--paper: #F8F8F7;
@@ -67,6 +74,12 @@ const { title, description, customClass } = Astro.props;
 	--maxcol-05: calc(var(--maxcol-01) * 5 + 4em);
 	--maxcol-06: calc(var(--maxcol-01) * 6 + 5em);
 	--maxcol-07: calc(var(--maxcol-01) * 7 + 6em);
+	/* Layering system */
+	--l-overlay: 1;
+	--l-overlap: 2;
+	--l-float: 4;
+	--l-modality: 8;
+	--l-system: 16;
 }
 html {
 	font-family: "LexendDeca", system-ui, sans-serif;
@@ -146,7 +159,7 @@ small a:hover {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	z-index: 8;
+	z-index: var(--l-system);
 	gap: 2em;
 	opacity: 1;
   	transition: opacity 1s;
@@ -219,7 +232,7 @@ button:active {
 button:focus {
 	outline: 0.125rem dashed var(--black-strong);
 	outline-offset: 0.125rem;
-	z-index: 1;
+	z-index: var(--l-overlay);
 }
 [tags] ul {
 	list-style-type: none;
@@ -296,6 +309,29 @@ abbr[data-title] {
 .tippy-arrow {
 	color: var(--charcoal-fade);
 }
+/* jsPlumb */
+#plumbing {
+	position: relative;
+	z-index: var(--l-overlap);
+}
+#plumbing path {
+	stroke: var(--charcoal);
+	stroke-width: 6;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+#plumbing svg {
+	fill: var(--charcoal);
+	overflow: visible;
+	display: block;
+}
+/* Annotations */
+aside {
+	font-family: "Whiteboard", sans-serif;
+	font-size: 2em;
+	line-height: 137.5%;
+	word-spacing: -0.25em;
+}
 /* Dark mode */
 .dark, #modal.dark .dialog {
 	color: var(--paper);
@@ -328,6 +364,64 @@ button.dark {
 }
 </style>
 <script>
+// JSplumb
+import { newInstance, BezierConnector } from "@jsplumb/browser-ui";
+document.addEventListener("DOMContentLoaded", function() {
+    const plumbingElement = document.getElementById('plumbing');
+    if(plumbingElement) {
+        const plumbing = newInstance({
+            container: plumbingElement
+        });
+        // Arrow Type
+        plumbing.registerConnectionType("Arrow", {
+            connector: {
+                type: BezierConnector.type,
+                options: {
+                    curviness: 250,
+                },
+            },
+            endpoint: "Blank",
+			overlays: [{
+				type:"Arrow",
+				options: {
+					width: 24,
+					length: 32,
+					location: 1,
+					foldback: 0.001,
+				},
+            }],
+        });
+        // Connections
+        plumbing.connect({
+            source: document.getElementById('note-start')!,
+            target: document.getElementById('note-welcome')!,
+			anchor: [
+				[ 0.6, 1, 1, 0, 0, 8 ],
+				[ 0, 0.1, -1, 0, -16, 0 ]
+			],
+            type: "Arrow",
+        });
+		plumbing.connect({
+            source: document.getElementById('note-contact')!,
+            target: document.getElementById('note-form')!,
+			anchor: [
+				[ 0.5, 1, 0, 1, 0, 16 ],
+				[ 1, 0.5, 1, 0, 16, 0 ]
+			],
+            type: "Arrow",
+        });
+		plumbing.connect({
+            source: document.getElementById('note-who')!,
+            target: document.getElementById('who-01')!,
+			anchor: [
+				[ 0, 1, 0, 1, 16, 0 ],
+				[ 0, 0.1, -1, 0, -24, 0 ]
+			],
+            type: "Arrow",
+        });
+    }
+});
+
 // Imports
 import panzoom, { PanZoom } from 'panzoom';
 import tippy, { Props } from 'tippy.js';
@@ -348,8 +442,6 @@ const pzSet = {
 	maxZ: 4.5,
 	minZ: 0.1,
 };
-
-// Functions
 
 // Zooming
 function zoom(pz: PanZoom, isZoomIn: boolean) {

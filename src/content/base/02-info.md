@@ -3,11 +3,11 @@ title: "Info"
 ---
 <div>
 
-#### Name
+## Name
 
 Pedro MC Fernandes
 
-#### Role
+### Role
 
 Product Designer
 

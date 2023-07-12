@@ -92,7 +92,7 @@ html {
 html, body {
 	overflow: hidden;
 }
-body, h1, h2, h3, h4, p, ul {
+body, h1, h2, h3, h4, h5, p, ul {
 	margin: 0;
 }
 h1, h2 {
@@ -111,7 +111,7 @@ h3 {
 	font-size: 1.5em;
 	line-height: 133%;
 }
-h4 {
+h4, h5 {
 	font-family: "LexendPeta";
 	font-weight: 750;
 	font-size: 0.75em;
@@ -332,6 +332,9 @@ aside {
 	line-height: 137.5%;
 	word-spacing: -0.25em;
 }
+aside[id*="note"] {
+	z-index: var(--l-overlap);
+}
 /* Dark mode */
 .dark, #modal.dark .dialog {
 	color: var(--paper);
@@ -396,8 +399,8 @@ document.addEventListener("DOMContentLoaded", function() {
             source: document.getElementById('note-start')!,
             target: document.getElementById('note-welcome')!,
 			anchor: [
-				[ 0.6, 1, 1, 0, 0, 8 ],
-				[ 0, 0.1, -1, 0, -16, 0 ]
+				[ 0.5, 1, 1, 0, 0, 8 ],
+				[ 0, 0.2, -1, 0, -16, 0 ]
 			],
             type: "Arrow",
         });
@@ -405,7 +408,7 @@ document.addEventListener("DOMContentLoaded", function() {
             source: document.getElementById('note-contact')!,
             target: document.getElementById('note-form')!,
 			anchor: [
-				[ 0.5, 1, 0, 1, 0, 16 ],
+				[ 1, 1, 1, 0, -24, 0 ],
 				[ 1, 0.5, 1, 0, 16, 0 ]
 			],
             type: "Arrow",
@@ -414,8 +417,26 @@ document.addEventListener("DOMContentLoaded", function() {
             source: document.getElementById('note-who')!,
             target: document.getElementById('who-01')!,
 			anchor: [
-				[ 0, 1, 0, 1, 16, 0 ],
-				[ 0, 0.1, -1, 0, -24, 0 ]
+				[ 0, 0.9, -1, 0 ],
+				[ 0, 0, 0, 0, 0, -16 ]
+			],
+            type: "Arrow",
+        });
+		plumbing.connect({
+            source: document.getElementById('note-why')!,
+            target: document.getElementById('why-01')!,
+			anchor: [
+				[ 0.67, 0.3, 1, 0 ],
+				[ 0, 0.3, -1, 0, 16, 0 ]
+			],
+            type: "Arrow",
+        });
+		plumbing.connect({
+            source: document.getElementById('note-see')!,
+            target: document.getElementById('wat-01')!,
+			anchor: [
+				[ 1, 0.9, 1, 0, 0, 0 ],
+				[ 0, 0, -1, 0, -64, -96 ]
 			],
             type: "Arrow",
         });

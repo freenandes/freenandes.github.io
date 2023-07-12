@@ -3,7 +3,7 @@ title: "Who"
 ---
 ### What can you tell about yourself?
 
-My name is Pedro MC Fernandes. I can start by saying I’m an arts person. I enjoy digging that scene, getting inspired, doing random stuff on sketchbooks, exploring, being creative.
+My name is Pedro MC Fernandes. I can start by saying I’m a creative person, and I love the art world. I enjoy digging that scene, getting inspired, doing random stuff on sketchbooks, exploring, being creative.
 
 I currently work as a product designer in tech. I have a lot of design experience in several industries, more recently with digital products.
 

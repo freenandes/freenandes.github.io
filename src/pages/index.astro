@@ -5,7 +5,7 @@ const description = "Hi 👋 This is my website. It's where I show myself as a P
 const customClass = "index";
 const sections = [
 	{ title: 'PMCF.XYZ', normTitle: 'pmcf-xyz' },
-	{ title: 'X', normTitle: 'who' },
+	{ title: 'Who', normTitle: 'who' },
 	{ title: 'Why', normTitle: 'why' },
 	{ title: 'See', normTitle: 'wat' },
 ];
@@ -34,11 +34,30 @@ import { Content as Footer } from '../content/extra/footer.md';
 			<button id="info" class="dark" data-title="About this website">Info</button>
 		</div>
 		<div class="button-3d group">
-			<button id="zoomOut" class="dark" data-title="Zoom out">-</button>
-			<button id="zoomIn" class="dark" data-title="Zoom in">+</button>
+			<button id="zoomOut" class="icon dark" data-title="Zoom out">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+					<title>Minus sign</title>
+					<path d="M2 8L14 8" stroke="black" stroke-width="3" stroke-linecap="round"/>
+				</svg>
+			</button>
+			<button id="zoomIn" class="icon dark" data-title="Zoom in">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+					<title>Plus sign</title>
+					<path d="M2 8L14 8" stroke="black" stroke-width="3" stroke-linecap="round"/>
+					<path d="M8 14L8 2" stroke="black" stroke-width="3" stroke-linecap="round"/>
+				</svg>
+			</button>
 		</div>
 		<div class="button-3d">
-			<button id="resetNav" class="dark" data-title="Reset to initial position">[]</button>
+			<button id="resetNav" class="icon dark" data-title="Reset to initial position">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+					<title>Star sign</title>
+					<path d="M2 8L14 8" stroke="black" stroke-width="3" stroke-linecap="round"/>
+					<path d="M14 14L2 2" stroke="black" stroke-width="3" stroke-linecap="round"/>
+					<path d="M14 2L2 14" stroke="black" stroke-width="3" stroke-linecap="round"/>
+					<path d="M8 14L8 2" stroke="black" stroke-width="3" stroke-linecap="round"/>
+				</svg>
+			</button>
 		</div>
 	</div>
 	<div id="canvas" class="whiteboard">
@@ -47,7 +66,9 @@ import { Content as Footer } from '../content/extra/footer.md';
 			<!-- I N T R O -->
 			<section id={sections[0].normTitle}>
 				<aside id="note-start">Start Here!</aside>
-				<h1 class="title">{sections[0].title}</h1>
+				<h1 class="title">
+					<img src="/artwork/pmcf-xyz.svg" alt={sections[0].title} width="355" height="40"/>
+				</h1>
 				{
 					firstSection.map(async (post) => {
 						const { Content } = await post.render()
@@ -58,16 +79,18 @@ import { Content as Footer } from '../content/extra/footer.md';
 						)
 					})
 				}
-				<aside id="note-contact">Get in touch</aside>
 				<Contact />
 				<small class="footnote">
 					<Footer />
 				</small>
+				<aside id="note-contact">Contact me here</aside>
 			</section>
 			<!-- W H O -->
 			<section id={sections[1].normTitle}>
 				<aside id="note-who">Pedro Who?!</aside>
-				<h2 class="title">{sections[1].title}</h2>
+				<h2 class="title">
+					<img src="/artwork/x.svg" alt={sections[1].title} width="40" height="40"/>
+				</h2>
 				{
 					secondSection.map(async (post) => {
 						const { Content } = await post.render();
@@ -84,7 +107,9 @@ import { Content as Footer } from '../content/extra/footer.md';
 			<!-- W H Y -->
 			<section id={sections[2].normTitle}>
 				<aside id="note-why">A whole career, going steady</aside>
-				<h2 class="title">{sections[2].title}</h2>
+				<h2 class="title">
+					<img src="/artwork/y.svg" alt={sections[2].title} width="40" height="40"/>
+				</h2>
 				{
 					thirdSection.map(async (post) => {
 						const { Content } = await post.render();
@@ -101,7 +126,9 @@ import { Content as Footer } from '../content/extra/footer.md';
 			<!-- S E E -->
 			<section id={sections[3].normTitle}>
 				<aside id="note-see">Sneak peek at how I've been working</aside>
-				<h2 class="title">{sections[3].title}</h2>
+				<h2 class="title">
+					<img src="/artwork/z.svg" alt={sections[3].title} width="40" height="40"/>
+				</h2>
 				{
 					fourthSection.map(async (post) => {
 						const { Content } = await post.render();
@@ -121,9 +148,6 @@ import { Content as Footer } from '../content/extra/footer.md';
 	<Modal title="Info" openID="info" uiMode="dark" />
 </Shell>
 <style>
-html.index :not(a):not(input):not(textarea):not(button) {
-	cursor: grab;
-}
 body {
 	position: fixed;
 	width: 100vw;
@@ -147,23 +171,25 @@ main {
 	align-items: flex-start;
 	gap: 7em;
 	width: fit-content;
-	padding: 16em;
-	/*background-size: 1em 1em;*/
+	padding: 12em;
 	background-position: 0 0;
+	/*background-size: 1em 1em;*/
 	/*background-image: radial-gradient(var(--black-light) 0.0625em, transparent 0.0625em);*/
 }
 .title {
 	box-sizing: border-box;
 	display: block;
+	line-height: 2rem;
 	width: 100%;
-	padding: 1.25rem;
-	margin-bottom: 3rem;
-	border-radius: var(--sd);
+	padding: 1.5rem 2rem;
+	margin-bottom: 3.5rem;
+	border-radius: var(--sf);
 	color: var(--paper);
 	background-color: var(--charcoal);
+	box-shadow: var(--shadow-b);
 }
-#pmcf-xyz .title {
-	text-align: center;
+.title svg {
+	display: block;
 }
 :global(#pmcf-xyz h2), :global(#pmcf-xyz h3) {
 	font-family: "LexendPeta";
@@ -209,9 +235,6 @@ section:nth-child(4) :global(article > *) {
 	bottom: 1em;
 	z-index: var(--l-float);
 }
-.footnote {
-	margin-top: 1rem;
-}
 /* Annotations */
 aside[id] {
 	font-size: 4em;
@@ -219,44 +242,46 @@ aside[id] {
 	text-align: center;
 }
 aside#note-start {
-	top: 12rem;
-	left: 6rem;
+	top: 10rem;
+	left: 2rem;
 	width: 14rem;
 	transform: rotate(350deg);
 }
 aside#note-contact {
-	top: 86rem;
-	left: 42rem;
-	width: 16rem;
+	top: 92rem;
+	left: 28rem;
+	width: 18rem;
 	transform: rotate(10deg);
 }
 aside#note-who {
-	top: 3rem;
-	left: 56rem;
+	top: 1rem;
+	left: 70rem;
 	width: 12rem;
 	transform: rotate(340deg);
 }
 aside#note-why {
-	top: 48rem;
-	left: 136rem;
+	top: 46rem;
+	left: 150rem;
 	width: 36rem;
 	transform: rotate(280deg);
 }
 aside#note-see {
-	top: 1rem;
-	left: 248rem;
+	top: 0;
+	left: 266rem;
 	width: 42rem;
 	transform: rotate(5deg);
 }
 aside#note-end {
-	top: 240rem;
-	left: 410rem;
+	top: 280rem;
+	left: 420rem;
 	width: 42rem;
 	transform: rotate(300deg);
 }
 /* Content design */
 section#pmcf-xyz {
-	max-width: var(--maxcol-01);
+	flex-direction: row;
+	flex-wrap: wrap;
+	max-width: var(--maxcol-02);
 }
 /* Media queries */
 @media (max-width: 480px) {
@@ -265,10 +290,6 @@ section#pmcf-xyz {
 		justify-content: flex-start;
 		right: auto;
 		left: 1em;
-		gap: 1em;
-	}
-	.controls button {
-		border-radius: 0.234375em;
 	}
 }
 </style>

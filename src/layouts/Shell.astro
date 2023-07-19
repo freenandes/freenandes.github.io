@@ -105,7 +105,7 @@ html {
 html, body {
 	overflow: hidden;
 }
-html.index :not(a):not(input):not(textarea):not(button):not(button *):not(abbr[data-title]):not(img:hover):not([video]):not(video) {
+html.index :not(a):not(input):not(textarea):not(button):not(button *):not(abbr[aria-label]):not(img:hover):not([video]):not(video) {
 	cursor: url(/artwork/grab.svg) 12 12, grab;
 }
 p, h1, h2, h3, h4, h5, h6, ul, ol, li, input, textarea {
@@ -209,6 +209,7 @@ small a:hover {
 	to { transform: rotate(360deg); }
 }
 section {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
@@ -329,7 +330,7 @@ code {
 [video].paused::after {
     display: flex;
 }
-abbr[data-title] {
+abbr[aria-label] {
 	cursor: url(/artwork/help.svg) 12 12, help;
 	border-bottom: 0.125em dashed var(--black-medium);
 }
@@ -597,7 +598,7 @@ function initPanzoom() {
 		inputElements.forEach((input) => handleInputs(input as HTMLElement, pz, modal));
 
 		// Zoom in when an image is clicked
-		const images = document.querySelectorAll('img');
+		const images = document.querySelectorAll('article img');
 		images.forEach((img) => {
 			img.addEventListener('click', function(event) {
 				event.stopPropagation();
@@ -635,10 +636,10 @@ function initPanzoom() {
 window.addEventListener('load', function() {
 
 	// Tippy
-	const titles = Array.from(document.querySelectorAll<HTMLElement>('[data-title]'));
+	const titles = Array.from(document.querySelectorAll<HTMLElement>(':not(section)[aria-label]'));
 	titles.forEach((el) => {
 		tippy(el, {
-			content: el.getAttribute('data-title') || '',
+			content: el.getAttribute('aria-label') || '',
 			touch: 'hold',
 		} as Partial<Props>);
 	});
@@ -722,6 +723,12 @@ window.addEventListener('load', function() {
 					}
 				}
 			}
+		});
+
+		// Hide jsPlumb debris from screen readers
+		let elements = document.querySelectorAll("#plumbing svg");
+			elements.forEach(element => {
+			element.setAttribute("aria-hidden", "true");
 		});
 
 	// Timeout for preloader and captions

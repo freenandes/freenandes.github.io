@@ -31,16 +31,16 @@ import { Content as Footer } from '../content/extra/footer.md';
 <Shell title={ title } description={ description } customClass={ customClass }>
 	<div class="controls">
 		<div class="button-3d">
-			<button id="info" class="dark" data-title="About this website">Info</button>
+			<button id="info" class="dark" aria-label="About this website">Info</button>
 		</div>
 		<div class="button-3d group">
-			<button id="zoomOut" class="icon dark" data-title="Zoom out">
+			<button id="zoomOut" class="icon dark" aria-label="Zoom out">
 				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
 					<title>Minus sign</title>
 					<path d="M2 8L14 8" stroke="black" stroke-width="3" stroke-linecap="round"/>
 				</svg>
 			</button>
-			<button id="zoomIn" class="icon dark" data-title="Zoom in">
+			<button id="zoomIn" class="icon dark" aria-label="Zoom in">
 				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
 					<title>Plus sign</title>
 					<path d="M2 8L14 8" stroke="black" stroke-width="3" stroke-linecap="round"/>
@@ -49,7 +49,7 @@ import { Content as Footer } from '../content/extra/footer.md';
 			</button>
 		</div>
 		<div class="button-3d">
-			<button id="resetNav" class="icon dark" data-title="Reset to initial position">
+			<button id="resetNav" class="icon dark" aria-label="Reset to initial position">
 				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
 					<title>Star sign</title>
 					<path d="M2 8L14 8" stroke="black" stroke-width="3" stroke-linecap="round"/>
@@ -61,10 +61,10 @@ import { Content as Footer } from '../content/extra/footer.md';
 		</div>
 	</div>
 	<div id="canvas" class="whiteboard">
-		<div id="plumbing"></div>
+		<div id="plumbing" aria-hidden="true"></div>
 		<main>
 			<!-- I N T R O -->
-			<section id={sections[0].normTitle}>
+			<section id={sections[0].normTitle} aria-label={sections[0].title}>
 				<aside id="note-start">Start Here!</aside>
 				<h1 class="title">
 					<img src="/artwork/pmcf-xyz.svg" alt={sections[0].title} width="355" height="40"/>
@@ -86,7 +86,7 @@ import { Content as Footer } from '../content/extra/footer.md';
 				<aside id="note-contact">Contact me here</aside>
 			</section>
 			<!-- W H O -->
-			<section id={sections[1].normTitle}>
+			<section id={sections[1].normTitle} aria-label={sections[1].title}>
 				<aside id="note-who">Pedro Who?!</aside>
 				<h2 class="title">
 					<img src="/artwork/x.svg" alt={sections[1].title} width="40" height="40"/>
@@ -105,7 +105,7 @@ import { Content as Footer } from '../content/extra/footer.md';
 				}
 			</section>
 			<!-- W H Y -->
-			<section id={sections[2].normTitle}>
+			<section id={sections[2].normTitle} aria-label={sections[2].title}>
 				<aside id="note-why">A whole career, going steady</aside>
 				<h2 class="title">
 					<img src="/artwork/y.svg" alt={sections[2].title} width="40" height="40"/>
@@ -124,7 +124,7 @@ import { Content as Footer } from '../content/extra/footer.md';
 				}
 			</section>
 			<!-- S E E -->
-			<section id={sections[3].normTitle}>
+			<section id={sections[3].normTitle} aria-label={sections[3].title}>
 				<aside id="note-see">Sneak peek at how I've been working</aside>
 				<h2 class="title">
 					<img src="/artwork/z.svg" alt={sections[3].title} width="40" height="40"/>
@@ -141,8 +141,8 @@ import { Content as Footer } from '../content/extra/footer.md';
 						)
 					})
 				}
+				<aside id="note-end">Thank you for watching ♥</aside>
 			</section>
-			<aside id="note-end">Thank you for watching ♥</aside>
 		</main>
 	</div>
 	<Modal title="Info" openID="info" uiMode="dark" />
@@ -242,38 +242,38 @@ aside[id] {
 	text-align: center;
 }
 aside#note-start {
-	top: 10rem;
-	left: 2rem;
+	top: -2rem;
+	left: -10rem;
 	width: 14rem;
 	transform: rotate(350deg);
 }
 aside#note-contact {
-	top: 92rem;
-	left: 28rem;
+	bottom: -12rem;
+	left: 20rem;
 	width: 18rem;
 	transform: rotate(10deg);
 }
 aside#note-who {
-	top: 1rem;
-	left: 70rem;
+	top: -6rem;
+	left: 2rem;
 	width: 12rem;
 	transform: rotate(340deg);
 }
 aside#note-why {
-	top: 46rem;
-	left: 150rem;
+	top: 36rem;
+	left: -24rem;
 	width: 36rem;
 	transform: rotate(280deg);
 }
 aside#note-see {
-	top: 0;
-	left: 266rem;
+	top: -12rem;
+	left: -40rem;
 	width: 42rem;
 	transform: rotate(5deg);
 }
 aside#note-end {
-	top: 280rem;
-	left: 420rem;
+	top: 260rem;
+	right: -20rem;
 	width: 42rem;
 	transform: rotate(300deg);
 }

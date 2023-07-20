@@ -4,9 +4,9 @@
 <path d="M12 19C12 21 13 22 15 22" stroke="white" stroke-width="4" stroke-linecap="round"/>
 <path d="M12 5C12 3 11 2 9 2" stroke="white" stroke-width="4" stroke-linecap="round"/>
 <path d="M12 19C12 21 11 22 9 22" stroke="white" stroke-width="4" stroke-linecap="round"/>
-<path d="M12 19V5" stroke="#111111" stroke-width="2" stroke-linecap="round"/>
-<path d="M12 5C12 3 13 2 15 2" stroke="#111111" stroke-width="2" stroke-linecap="round"/>
-<path d="M12 19C12 21 13 22 15 22" stroke="#111111" stroke-width="2" stroke-linecap="round"/>
-<path d="M12 5C12 3 11 2 9 2" stroke="#111111" stroke-width="2" stroke-linecap="round"/>
-<path d="M12 19C12 21 11 22 9 22" stroke="#111111" stroke-width="2" stroke-linecap="round"/>
+<path d="M12 19V5" stroke="#242630" stroke-width="2" stroke-linecap="round"/>
+<path d="M12 5C12 3 13 2 15 2" stroke="#242630" stroke-width="2" stroke-linecap="round"/>
+<path d="M12 19C12 21 13 22 15 22" stroke="#242630" stroke-width="2" stroke-linecap="round"/>
+<path d="M12 5C12 3 11 2 9 2" stroke="#242630" stroke-width="2" stroke-linecap="round"/>
+<path d="M12 19C12 21 11 22 9 22" stroke="#242630" stroke-width="2" stroke-linecap="round"/>
 </svg>

@@ -2,8 +2,8 @@
 <defs>
     <style>
         path {
-            stroke: #F8F8F7;
-            stroke-width: 3;
+            stroke: #242630;
+            stroke-width: 4;
             stroke-linecap: round;
         }
     </style>

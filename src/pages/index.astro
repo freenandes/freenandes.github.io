@@ -5,9 +5,9 @@ const description = "Hi 👋 This is my website. It's where I show myself as a P
 const customClass = "index";
 const sections = [
 	{ title: 'PMCF.XYZ', normTitle: 'pmcf-xyz' },
-	{ title: 'Who', normTitle: 'who' },
-	{ title: 'Why', normTitle: 'why' },
-	{ title: 'See', normTitle: 'wat' },
+	{ title: 'About me', normTitle: 'who' },
+	{ title: 'Why Design', normTitle: 'why' },
+	{ title: 'How I Work', normTitle: 'wat' },
 ];
 
 // Components
@@ -64,7 +64,7 @@ import { Content as Footer } from '../content/extra/footer.md';
 		<div id="plumbing" aria-hidden="true"></div>
 		<main>
 			<!-- I N T R O -->
-			<section id={sections[0].normTitle} aria-label={sections[0].title}>
+			<section id={sections[0].normTitle}>
 				<aside id="note-start">Start Here!</aside>
 				<h1 class="title">
 					<img src="/artwork/pmcf-xyz.svg" alt={sections[0].title} width="355" height="40"/>
@@ -86,10 +86,11 @@ import { Content as Footer } from '../content/extra/footer.md';
 				<aside id="note-contact">Contact me here</aside>
 			</section>
 			<!-- W H O -->
-			<section id={sections[1].normTitle} aria-label={sections[1].title}>
+			<section id={sections[1].normTitle}>
 				<aside id="note-who">Pedro Who?!</aside>
-				<h2 class="title">
-					<img src="/artwork/x.svg" alt={sections[1].title} width="40" height="40"/>
+				<h2 class="title" aria-label={sections[1].title}>
+					<img class="badge" src="/artwork/x.svg" alt="The letter X, as in an unknown variable" width="40" height="40"/>
+					{sections[1].title}
 				</h2>
 				{
 					secondSection.map(async (post) => {
@@ -103,12 +104,14 @@ import { Content as Footer } from '../content/extra/footer.md';
 						)
 					})
 				}
+				<aside id="note-anxiety">As if I'm not an anxious person...</aside>
 			</section>
 			<!-- W H Y -->
-			<section id={sections[2].normTitle} aria-label={sections[2].title}>
+			<section id={sections[2].normTitle}>
 				<aside id="note-why">A whole career, going steady</aside>
-				<h2 class="title">
-					<img src="/artwork/y.svg" alt={sections[2].title} width="40" height="40"/>
+				<h2 class="title" aria-label={sections[2].title}>
+					<img class="badge" src="/artwork/y.svg" alt="The letter Y, as a homophone for Why" width="40" height="40"/>
+					{sections[2].title}
 				</h2>
 				{
 					thirdSection.map(async (post) => {
@@ -122,12 +125,15 @@ import { Content as Footer } from '../content/extra/footer.md';
 						)
 					})
 				}
+				<aside id="note-challenges">Design is defiant. Every day there's overcoming</aside>
+				<aside id="note-open">I want to help design a world that's more open, accessible</aside>
 			</section>
 			<!-- S E E -->
-			<section id={sections[3].normTitle} aria-label={sections[3].title}>
+			<section id={sections[3].normTitle}>
 				<aside id="note-see">Sneak peek at how I've been working</aside>
-				<h2 class="title">
-					<img src="/artwork/z.svg" alt={sections[3].title} width="40" height="40"/>
+				<h2 class="title" aria-label={sections[2].title}>
+					<img class="badge" src="/artwork/z.svg" alt="The letter Z, as a homophone pun for See" width="40" height="40"/>
+					{sections[3].title}
 				</h2>
 				{
 					fourthSection.map(async (post) => {
@@ -178,18 +184,30 @@ main {
 }
 .title {
 	box-sizing: border-box;
-	display: block;
-	line-height: 2rem;
+	display: flex;
+	align-items: center;
+	gap: 1.5rem;
 	width: 100%;
 	padding: 1.5rem 2rem;
 	margin-bottom: 3.5rem;
 	border-radius: var(--sf);
 	color: var(--paper);
 	background-color: var(--charcoal);
-	box-shadow: var(--shadow-b);
+	box-shadow: var(--shadow-a);
 }
 .title svg {
 	display: block;
+}
+h1.title img {
+	padding: 0.5rem;
+}
+img.badge {
+	overflow: visible;
+	width: 2rem;
+	height: 2rem;
+	padding: 0.75rem;
+	border-radius: 100%;
+	background: var(--paper);
 }
 :global(#pmcf-xyz h2), :global(#pmcf-xyz h3) {
 	font-family: "LexendPeta";
@@ -276,6 +294,24 @@ aside#note-end {
 	right: -20rem;
 	width: 42rem;
 	transform: rotate(300deg);
+}
+aside#note-anxiety {
+	top: 144rem;
+	right: 18rem;
+	width: 42rem;
+	transform: rotate(355deg);
+}
+aside#note-challenges {
+	top: 92rem;
+	right: 4rem;
+	width: 48rem;
+	transform: rotate(340deg);
+}
+aside#note-open {
+	bottom: -10rem;
+	left: 24rem;
+	width: 48rem;
+	transform: rotate(10deg);
 }
 /* Content design */
 section#pmcf-xyz {

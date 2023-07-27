@@ -89,7 +89,7 @@ import { Content as Footer } from '../content/extra/footer.md';
 			<section id={sections[1].normTitle}>
 				<aside id="note-who">Pedro Who?!</aside>
 				<h2 class="title" aria-label={sections[1].title}>
-					<img class="badge" src="/artwork/x.svg" alt="The letter X, as in an unknown variable" width="40" height="40"/>
+					<span class="badge"><img src="/artwork/x.svg" alt="The letter X, as in an unknown variable" width="40" height="40"/></span>
 					{sections[1].title}
 				</h2>
 				{
@@ -110,7 +110,7 @@ import { Content as Footer } from '../content/extra/footer.md';
 			<section id={sections[2].normTitle}>
 				<aside id="note-why">A whole career, going steady</aside>
 				<h2 class="title" aria-label={sections[2].title}>
-					<img class="badge" src="/artwork/y.svg" alt="The letter Y, as a homophone for Why" width="40" height="40"/>
+					<span class="badge"><img src="/artwork/y.svg" alt="The letter Y, as a homophone for Why" width="40" height="40"/></span>
 					{sections[2].title}
 				</h2>
 				{
@@ -132,7 +132,7 @@ import { Content as Footer } from '../content/extra/footer.md';
 			<section id={sections[3].normTitle}>
 				<aside id="note-see">Sneak peek at how I've been working</aside>
 				<h2 class="title" aria-label={sections[2].title}>
-					<img class="badge" src="/artwork/z.svg" alt="The letter Z, as a homophone pun for See" width="40" height="40"/>
+					<span class="badge"><img src="/artwork/z.svg" alt="The letter Z, as a homophone pun for See" width="40" height="40"/></span>
 					{sections[3].title}
 				</h2>
 				{
@@ -201,13 +201,18 @@ main {
 h1.title img {
 	padding: 0.5rem;
 }
-img.badge {
-	overflow: visible;
+.badge {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 3.5rem;
+	height: 3.5rem;
+	border-radius: 50%;
+	background: var(--paper);
+}
+.badge img {
 	width: 2rem;
 	height: 2rem;
-	padding: 0.75rem;
-	border-radius: 100%;
-	background: var(--paper);
 }
 :global(#pmcf-xyz h2), :global(#pmcf-xyz h3) {
 	font-family: "LexendPeta";

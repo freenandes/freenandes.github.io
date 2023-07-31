@@ -65,7 +65,7 @@ import { Content as Footer } from '../content/extra/footer.md';
 		<main>
 			<!-- I N T R O -->
 			<section id={sections[0].normTitle}>
-				<aside id="note-start">Start Here!</aside>
+				<aside id="note-start" aria-labelledby={sections[0].normTitle}>Start Here!</aside>
 				<h1 class="title">
 					<img src="/artwork/pmcf-xyz.svg" alt={sections[0].title} width="355" height="40"/>
 				</h1>
@@ -83,12 +83,12 @@ import { Content as Footer } from '../content/extra/footer.md';
 				<small class="footnote">
 					<Footer />
 				</small>
-				<aside id="note-contact">Contact me here</aside>
+				<aside id="note-contact" aria-labelledby="note-form">Contact me here</aside>
 			</section>
 			<!-- W H O -->
 			<section id={sections[1].normTitle}>
-				<aside id="note-who">Pedro Who?!</aside>
-				<h2 class="title" aria-label={sections[1].title}>
+				<aside id="note-who" aria-labelledby={sections[1].normTitle}>Pedro Who?!</aside>
+				<h2 class="title">
 					<span class="badge"><img src="/artwork/x.svg" alt="The letter X, as in an unknown variable" width="40" height="40"/></span>
 					{sections[1].title}
 				</h2>
@@ -104,12 +104,12 @@ import { Content as Footer } from '../content/extra/footer.md';
 						)
 					})
 				}
-				<aside id="note-anxiety">As if I'm not an anxious person...</aside>
+				<aside id="note-anxiety" aria-labelledby="how-do-you-grow-and-plan-the-future">As if I'm not an anxious person...</aside>
 			</section>
 			<!-- W H Y -->
 			<section id={sections[2].normTitle}>
-				<aside id="note-why">A whole career, going steady</aside>
-				<h2 class="title" aria-label={sections[2].title}>
+				<aside id="note-why" aria-labelledby={sections[2].normTitle}>A whole career, going steady</aside>
+				<h2 class="title">
 					<span class="badge"><img src="/artwork/y.svg" alt="The letter Y, as a homophone for Why" width="40" height="40"/></span>
 					{sections[2].title}
 				</h2>
@@ -125,13 +125,15 @@ import { Content as Footer } from '../content/extra/footer.md';
 						)
 					})
 				}
-				<aside id="note-challenges">Design is defiant. Every day there's overcoming</aside>
-				<aside id="note-open">I want to help design a world that's more open, accessible</aside>
+				<aside id="note-challenges" aria-labelledby="what-are-some-of-the-biggest-challenges-youve-faced">Design is defiant. Every day there's overcoming</aside>
+				<aside id="note-open" aria-labelledby="where-do-you-want-to-go-from-here">I want to help design a world that's more open, accessible</aside>
+				<img class="sticker" src="/artwork/deal-with-it.svg" alt="Comics-style drawing of a bust of a person with sunglasses on, smirking, acting cool." width="512" height="512" aria-describedby="what-do-you-consider-to-be-your-greatest-strengths"/>
+				<img class="sticker" src="/artwork/creativity.svg" alt="Comics-style drawing of a hand with fingertips that resemble graphite pencils, and it's drawing, with almost all fingers, on the floor as if it were a piece of paper." width="512" height="512" aria-describedby="where-do-you-want-to-go-from-here"/>
 			</section>
 			<!-- S E E -->
 			<section id={sections[3].normTitle}>
-				<aside id="note-see">Sneak peek at how I've been working</aside>
-				<h2 class="title" aria-label={sections[2].title}>
+				<aside id="note-see" aria-labelledby={sections[3].normTitle}>Sneak peek at how I've been working</aside>
+				<h2 class="title">
 					<span class="badge"><img src="/artwork/z.svg" alt="The letter Z, as a homophone pun for See" width="40" height="40"/></span>
 					{sections[3].title}
 				</h2>
@@ -147,6 +149,11 @@ import { Content as Footer } from '../content/extra/footer.md';
 						)
 					})
 				}
+				<img class="sticker" src="/artwork/research.svg" alt="The bust of a long-haired person, drawn in comic books style, with their hands holding a pair of binoculars in front of the face. The viewer can see their eyes on the binocular lens." width="512" height="512" aria-describedby="how-do-you-approach-the-research-phase"/>
+				<img class="sticker" src="/artwork/collaboration.svg" alt="Comics-style drawing two futuristic digital screens are floating and facing each other. Out of each is coming out a hand. The left screen's hand is building the other screen like a puzzle. The opposite hand finishes painting the other screen as if it were incomplete and made of paint." width="512" height="512" aria-describedby="how-do-you-balance-user-needs-and-business-goals"/>
+				<img class="sticker" src="/artwork/experimentation.svg" alt="Comics-style drawing of the bust of a dog, salivating, looks at a floating smartphone vibrating and ringing as an allusion to the Pavlovian experimentation methods." width="512" height="512" aria-describedby="what-do-you-use-for-prototyping-and-how-do-you-iterate"/>
+				<img class="sticker" src="/artwork/satisfaction.svg" alt="Comics-style drawing of six hands, doing the thumbs up gesture, displayed as a circle around a star." width="512" height="512" aria-describedby="how-do-you-measure-success"/>
+				<img class="sticker" src="/artwork/inclusivity.svg" alt="Four faces profiles gathered round to share a comics-style balloon as they're all in unison and equally sharing the same idea." width="512" height="512" aria-describedby="how-do-you-design-for-inclusivity"/>
 				<aside id="note-end">Thank you for watching ♥</aside>
 			</section>
 		</main>
@@ -316,6 +323,48 @@ aside#note-open {
 	bottom: -10rem;
 	left: 24rem;
 	width: 48rem;
+	transform: rotate(10deg);
+}
+/* Sticker */
+.sticker {
+	position: absolute;
+	width: auto;
+	height: 14rem;
+	z-index: var(--l-overlap);
+}
+.sticker[src*="deal-with-it"] {
+	top: 213.5rem;
+	left: 30rem;
+	transform: rotate(10deg);
+}
+.sticker[src*="creativity"] {
+	top: 242rem;
+	left: 4rem;
+	transform: rotate(0);
+}
+.sticker[src*="research"] {
+	top: 28rem;
+	left: -2rem;
+	transform: rotate(0);
+}
+.sticker[src*="collaboration"] {
+	top: 88rem;
+	left: 94rem;
+	transform: rotate(350deg);
+}
+.sticker[src*="experimentation"] {
+	top: 142rem;
+	left: 10rem;
+	transform: rotate(0);
+}
+.sticker[src*="satisfaction"] {
+	top: 312rem;
+	left: 48rem;
+	transform: rotate(320deg);
+}
+.sticker[src*="inclusivity"] {
+	top: 334rem;
+	left: -4rem;
 	transform: rotate(10deg);
 }
 /* Content design */

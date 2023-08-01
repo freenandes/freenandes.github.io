@@ -105,6 +105,9 @@ import { Content as Footer } from '../content/extra/footer.md';
 					})
 				}
 				<aside id="note-anxiety" aria-labelledby="how-do-you-grow-and-plan-the-future">As if I'm not an anxious person...</aside>
+				<img class="sticker" src="/artwork/peace.svg" alt="Drawing of a hand doing the peace gesture (v-shaped) drawn in a comic-book style." width="512" height="512" aria-describedby="what-values-guide-you"/>
+				<img class="sticker" src="/artwork/growth.svg" alt="A pair of rubber gloves, drawn in a comic-book style, tapping the dirt at the base of a plant as if they're gardening and taking care of the plant's growth." width="512" height="512" aria-describedby="how-do-you-grow-and-plan-the-future"/>
+				<img class="sticker" src="/artwork/death.svg" alt="Comic-book style drawing of the Death. A skull with a black cape that looks like a flying ghost and that is holding a scythe." width="512" height="512" aria-describedby="whats-your-favorite-book"/>
 			</section>
 			<!-- W H Y -->
 			<section id={sections[2].normTitle}>
@@ -127,6 +130,8 @@ import { Content as Footer } from '../content/extra/footer.md';
 				}
 				<aside id="note-challenges" aria-labelledby="what-are-some-of-the-biggest-challenges-youve-faced">Design is defiant. Every day there's overcoming</aside>
 				<aside id="note-open" aria-labelledby="where-do-you-want-to-go-from-here">I want to help design a world that's more open, accessible</aside>
+				<img class="sticker" src="/artwork/challenge.svg" alt="Drawing, in comic-book style, of a hand trying to insert a cube in a box that has a rounded hole. The cube is clearly oversized for the hole." width="512" height="512" aria-describedby="what-are-some-of-the-biggest-challenges-youve-faced"/>
+				<img class="sticker" src="/artwork/improv.svg" alt="Comics-style drawing of a jazz, trumpet player. It's just the bust, hands and the trumpet. The player is wearing a suit and has the eys closed as if playing with their soul into the instrument." width="512" height="512" aria-describedby="how-do-you-approach-the-design-process"/>
 				<img class="sticker" src="/artwork/deal-with-it.svg" alt="Comics-style drawing of a bust of a person with sunglasses on, smirking, acting cool." width="512" height="512" aria-describedby="what-do-you-consider-to-be-your-greatest-strengths"/>
 				<img class="sticker" src="/artwork/creativity.svg" alt="Comics-style drawing of a hand with fingertips that resemble graphite pencils, and it's drawing, with almost all fingers, on the floor as if it were a piece of paper." width="512" height="512" aria-describedby="where-do-you-want-to-go-from-here"/>
 			</section>
@@ -331,6 +336,31 @@ aside#note-open {
 	width: auto;
 	height: 14rem;
 	z-index: var(--l-overlap);
+}
+.sticker[src*="peace"] {
+	top: 113rem;
+	left: 55rem;
+	transform: rotate(30deg);
+}
+.sticker[src*="growth"] {
+	top: 140rem;
+	left: -4rem;
+	transform: rotate(0);
+}
+.sticker[src*="death"] {
+	top: 168rem;
+	left: 66rem;
+	transform: rotate(0);
+}
+.sticker[src*="challenge"] {
+	top: 80rem;
+	left: 84rem;
+	transform: rotate(0);
+}
+.sticker[src*="improv"] {
+	top: 122rem;
+	left: 14rem;
+	transform: rotate(10deg);
 }
 .sticker[src*="deal-with-it"] {
 	top: 213.5rem;

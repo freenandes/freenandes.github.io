@@ -19,6 +19,18 @@ article > * {
     aspect-ratio: 1 / 1;
     box-shadow: var(--shadow-a);
 }
+@supports not (aspect-ratio: 1 / 1) {
+    article > *:not(form)::before {
+        float: left;
+        padding-top: 100%;
+        content: "";
+    }
+    article > *:not(form)::after {
+        display: block;
+        content: "";
+        clear: both;
+    }
+}
 article > ul {
     padding-left: 2em;
 }

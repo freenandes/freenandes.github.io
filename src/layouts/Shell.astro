@@ -22,13 +22,6 @@ const { title, description, customClass } = Astro.props;
 	<div class="preloader">
 		<img class="anim" src="/preloader.gif" width="512" height="512"/>
 	</div>
-	<header>
-		<div class="button-3d">
-			<button id="resetNav" class="dark" aria-label="Return to initial position">
-				<img src="/artwork/pmcf-xyz.svg" alt="" width="355" height="40"/>
-			</button>
-		</div>
-	</header>
 	<slot />
 </body>
 </html>
@@ -287,6 +280,7 @@ button img {
 	display: block;
 	width: auto;
 	height: 1.25em;
+	padding: 0.125em;
 }
 [tags] ul {
 	list-style-type: none;
@@ -532,7 +526,7 @@ const pzSet = {
 	x: 0,
 	y: 0,
 	z: 0.6,
-	maxZ: 4,
+	maxZ: 5,
 	minZ: 0.2,
 };
 

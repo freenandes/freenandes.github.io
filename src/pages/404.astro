@@ -1,5 +1,5 @@
 ---
-const title = "404 — Page not found";
+const title = "Page not found";
 const description = "The page you are looking for cannot be found, sorry. Please check the URL for typos or go to the main page.";
 const customClass = "404";
 import Shell from '../layouts/Shell.astro';
@@ -8,7 +8,7 @@ import { Content as NotFound } from '../content/extra/404.md';
 ---
 <Shell title={ title } description={ description } customClass={ customClass }>
     <section>
-        <h1>PMCF.XYZ</h1>
+        <h1 class="title">{ title }</h1>
         <Stickie>
             <div>
                 <NotFound />
@@ -24,11 +24,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-image: radial-gradient(var(--black-light) 0.0625em, transparent 0.0625em);
+    background-image: radial-gradient(var(--black-light) 0.125em, transparent 0.125em);
 	background-size: 2em 2em;
 	background-position: center center;
 }
 section {
+    width: min-content;
     padding: 2em 1em;
 }
 </style>

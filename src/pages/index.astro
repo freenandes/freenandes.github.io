@@ -29,6 +29,13 @@ const fourthSection = await getCollection('see');
 import { Content as Footer } from '../content/extra/footer.md';
 ---
 <Shell title={ title } description={ description } customClass={ customClass }>
+	<header>
+		<div class="button-3d">
+			<button id="resetNav" class="dark" aria-label="Return to home">
+				<img src="/artwork/pmcf-xyz.svg" alt="" width="355" height="40"/>
+			</button>
+		</div>
+	</header>
 	<nav class="controls">
 		<div class="button-3d">
 			<button id="info" class="dark" aria-label="About this website">Info</button>
@@ -48,17 +55,6 @@ import { Content as Footer } from '../content/extra/footer.md';
 				</svg>
 			</button>
 		</div>
-		<!-- <div class="button-3d">
-			<button id="resetNav" class="icon dark" aria-label="Reset to initial position">
-				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-					<title>Star sign</title>
-					<path d="M2 8L14 8" stroke="black" stroke-width="3" stroke-linecap="round"/>
-					<path d="M14 14L2 2" stroke="black" stroke-width="3" stroke-linecap="round"/>
-					<path d="M14 2L2 14" stroke="black" stroke-width="3" stroke-linecap="round"/>
-					<path d="M8 14L8 2" stroke="black" stroke-width="3" stroke-linecap="round"/>
-				</svg>
-			</button>
-		</div> -->
 	</nav>
 	<div id="canvas" class="whiteboard">
 		<div id="plumbing" aria-hidden="true"></div>
@@ -77,7 +73,6 @@ import { Content as Footer } from '../content/extra/footer.md';
 						</svg>
 					</span>
 					{sections[0].title}
-					<!-- <img src="/artwork/pmcf-xyz.svg" alt={sections[0].title} width="355" height="40"/> -->
 				</h1>
 				{
 					firstSection.map(async (post) => {

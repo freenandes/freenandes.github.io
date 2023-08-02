@@ -2,12 +2,12 @@
 <defs>
     <style>
         path {
-            stroke: #F8F8F7;
-            stroke-width: 3;
+            stroke: #fff;
+            stroke-width: 2.8;
             stroke-linecap: round;
         }
         .y {
-            stroke: #ffe38c;
+            stroke: #f2c60f;
         }
     </style>
 </defs>

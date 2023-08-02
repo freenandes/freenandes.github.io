@@ -4,7 +4,7 @@ const title = "Pedro MC Fernandes, Product Designer";
 const description = "Hi 👋 This is my website. It's where I show myself as a Product Designer. If you need one, get in touch so we can start talking. Have a nice one!";
 const customClass = "index";
 const sections = [
-	{ title: 'PMCF.XYZ', normTitle: 'pmcf-xyz' },
+	{ title: 'Profile', normTitle: 'pmcf-xyz' },
 	{ title: 'About me', normTitle: 'who' },
 	{ title: 'Why Design', normTitle: 'why' },
 	{ title: 'How I Work', normTitle: 'wat' },
@@ -67,7 +67,17 @@ import { Content as Footer } from '../content/extra/footer.md';
 			<section id={sections[0].normTitle}>
 				<aside id="note-start" aria-labelledby={sections[0].normTitle}>Start Here!</aside>
 				<h1 class="title">
-					<img src="/artwork/pmcf-xyz.svg" alt={sections[0].title} width="355" height="40"/>
+					<span class="badge">
+						<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 16 16" fill="none">
+							<title>Star sign</title>
+							<path d="M2 8L14 8" stroke="black" stroke-width="3" stroke-linecap="round"/>
+							<path d="M14 14L2 2" stroke="black" stroke-width="3" stroke-linecap="round"/>
+							<path d="M14 2L2 14" stroke="black" stroke-width="3" stroke-linecap="round"/>
+							<path d="M8 14L8 2" stroke="black" stroke-width="3" stroke-linecap="round"/>
+						</svg>
+					</span>
+					{sections[0].title}
+					<!-- <img src="/artwork/pmcf-xyz.svg" alt={sections[0].title} width="355" height="40"/> -->
 				</h1>
 				{
 					firstSection.map(async (post) => {
@@ -222,9 +232,12 @@ h1.title img {
 	border-radius: 50%;
 	background: var(--paper);
 }
-.badge img {
+.badge > * {
 	width: 2rem;
 	height: 2rem;
+}
+.badge path {
+	stroke: var(--charcoal);
 }
 :global(#pmcf-xyz h2), :global(#pmcf-xyz h3) {
 	font-family: "LexendPeta";

@@ -29,7 +29,7 @@ const fourthSection = await getCollection('see');
 import { Content as Footer } from '../content/extra/footer.md';
 ---
 <Shell title={ title } description={ description } customClass={ customClass }>
-	<div class="controls">
+	<nav class="controls">
 		<div class="button-3d">
 			<button id="info" class="dark" aria-label="About this website">Info</button>
 		</div>
@@ -48,7 +48,7 @@ import { Content as Footer } from '../content/extra/footer.md';
 				</svg>
 			</button>
 		</div>
-		<div class="button-3d">
+		<!-- <div class="button-3d">
 			<button id="resetNav" class="icon dark" aria-label="Reset to initial position">
 				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
 					<title>Star sign</title>
@@ -58,8 +58,8 @@ import { Content as Footer } from '../content/extra/footer.md';
 					<path d="M8 14L8 2" stroke="black" stroke-width="3" stroke-linecap="round"/>
 				</svg>
 			</button>
-		</div>
-	</div>
+		</div> -->
+	</nav>
 	<div id="canvas" class="whiteboard">
 		<div id="plumbing" aria-hidden="true"></div>
 		<main>

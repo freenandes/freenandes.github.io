@@ -16,11 +16,19 @@ const { title, description, customClass } = Astro.props;
 	<meta name="generator" content={ Astro.generator } />
 	<meta name="description" content={ description }>
 	<meta property="og:image" content="/meta.png" />
+	<script data-respect-dnt data-no-cookie async src="https://cdn.splitbee.io/sb.js"></script>
 </head>
 <body>
 	<div class="preloader">
-		<div class="anim"></div>
+		<img class="anim" src="/preloader.gif" width="512" height="512"/>
 	</div>
+	<header>
+		<div class="button-3d">
+			<button id="resetNav" class="dark" aria-label="Return to initial position">
+				<img src="/artwork/pmcf-xyz.svg" alt="" width="355" height="40"/>
+			</button>
+		</div>
+	</header>
 	<slot />
 </body>
 </html>
@@ -197,16 +205,18 @@ small a:hover {
 	opacity: 0;
 }
 .anim {
-	display: inline-block;
+	display: block;
 	width: 2em;
 	height: 2em;
-	border: 0.25rem solid var(--charcoal);
-	border-top-color: transparent;
-	border-radius: 50%;
-	animation: spin 1s infinite linear;
 }
-@keyframes spin {
-	to { transform: rotate(360deg); }
+body > header {
+	display: flex;
+	gap: 0.5em;
+	position: fixed;
+	max-width: calc(100vw - 2em);
+	top: 1em;
+	left: 1em;
+	z-index: var(--l-float);
 }
 section {
 	position: relative;
@@ -271,6 +281,11 @@ button.icon svg {
 }
 button.icon svg path {
 	stroke: currentColor;
+}
+button img {
+	display: block;
+	width: auto;
+	height: 1.25rem;
 }
 [tags] ul {
 	list-style-type: none;
@@ -515,9 +530,9 @@ const closeButton = document.getElementById('closeModal');
 const pzSet = {
 	x: 0,
 	y: 0,
-	z: 0.5,
-	maxZ: 4.5,
-	minZ: 0.1,
+	z: 0.6,
+	maxZ: 4,
+	minZ: 0.2,
 };
 
 // Zooming

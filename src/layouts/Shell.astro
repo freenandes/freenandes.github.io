@@ -81,12 +81,12 @@ const { title, description, customClass } = Astro.props;
 	--shadow-b: var(--black-light) 0 0.5rem 0 0;
 	/* Whiteboard grid control */
 	--maxcol-01: 17em;
-	--maxcol-02: calc(var(--maxcol-01) * 2 + 1em);
-	--maxcol-03: calc(var(--maxcol-01) * 3 + 2em);
-	--maxcol-04: calc(var(--maxcol-01) * 4 + 3em);
-	--maxcol-05: calc(var(--maxcol-01) * 5 + 4em);
-	--maxcol-06: calc(var(--maxcol-01) * 6 + 5em);
-	--maxcol-07: calc(var(--maxcol-01) * 7 + 6em);
+	--maxcol-02: calc(var(--maxcol-01) * 2 + 2em);
+	--maxcol-03: calc(var(--maxcol-01) * 3 + 3em);
+	--maxcol-04: calc(var(--maxcol-01) * 4 + 4em);
+	--maxcol-05: calc(var(--maxcol-01) * 5 + 5em);
+	--maxcol-06: calc(var(--maxcol-01) * 6 + 6em);
+	--maxcol-07: calc(var(--maxcol-01) * 7 + 7em);
 	/* Layering system */
 	--l-overlay: 1;
 	--l-overlap: 2;
@@ -189,7 +189,6 @@ small a:hover {
 	justify-content: center;
 	align-items: center;
 	z-index: var(--l-system);
-	gap: 2em;
 	opacity: 1;
   	transition: opacity 1s;
 	pointer-events: none;
@@ -204,7 +203,6 @@ small a:hover {
 }
 body > header {
 	display: flex;
-	gap: 0.5em;
 	position: fixed;
 	max-width: calc(100vw - 2em);
 	top: 1em;
@@ -216,7 +214,6 @@ section {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	gap: 1em;
 	width: max-content;
 }
 .button-3d {
@@ -287,8 +284,8 @@ button img {
 	display: flex;
 	flex-flow: row wrap;
 	align-items: flex-start;
-	gap: 0.5em;
 	padding: 0.5em 0 0;
+	margin-right: -0.5em;
 }
 [tags] li, code {
     font-weight: 375;
@@ -297,6 +294,9 @@ button img {
 	background-color: var(--black-light);
 	border-radius: var(--sc);
 	white-space: nowrap;
+}
+[tags] li {
+	margin: 0 0.5em 0.5em 0;
 }
 code {
 	font-family: "LexendDeca", system-ui, sans-serif;
@@ -308,7 +308,6 @@ code {
 	color: var(--black-medium);
 	display: flex;
 	flex-direction: column;
-	gap: 1rem;
 	box-sizing: border-box;
     width: 17rem;
     padding: 1rem;

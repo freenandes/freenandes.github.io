@@ -14,7 +14,6 @@ form {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.5rem;
 }
 label {
 	font-family: "LexendPeta";
@@ -22,6 +21,9 @@ label {
 	font-size: 0.75em;
 	line-height: 133%;
 	text-transform: uppercase;
+}
+form label {
+    margin-bottom: 0.5rem;
 }
 input, textarea {
     font-family: "LexendDeca", system-ui, sans-serif;
@@ -35,7 +37,7 @@ input, textarea {
     padding: 0.125em 0.25em;
     border: 0.125rem solid var(--black-fade);
     border-radius: var(--sc);
-    margin-bottom: 0.5em;
+    margin-bottom: 1em;
 }
 textarea {
     flex-grow: 1;

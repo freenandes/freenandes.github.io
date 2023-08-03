@@ -192,25 +192,29 @@ main {
 	display: flex;
 	flex-direction: row;
 	align-items: flex-start;
-	gap: 7em;
 	width: fit-content;
 	padding: 12em;
 	background-position: 0 0;
 	/*background-size: 1em 1em;*/
 	/*background-image: radial-gradient(var(--black-light) 0.0625em, transparent 0.0625em);*/
 }
+main section:not(:last-of-type) {
+	margin-right: 7em;
+}
 .title {
 	box-sizing: border-box;
 	display: flex;
 	align-items: center;
-	gap: 1.5rem;
 	width: 100%;
 	padding: 1.5rem 2rem;
-	margin-bottom: 3.5rem;
+	margin: 0 1rem 4.5rem 0;
 	border-radius: var(--sf);
 	color: var(--paper);
 	background-color: var(--charcoal);
 	box-shadow: var(--shadow-a);
+}
+.title .badge {
+	margin-right: 1.5rem;
 }
 .title svg {
 	display: block;
@@ -242,7 +246,7 @@ h1.title img {
 	text-transform: uppercase;
 }
 section {
-	padding: 7em;
+	padding: 7em 6em 7em 7em;
 	border-radius: var(--sf);
 	background-color: var(--yellow-fade);
 }
@@ -255,7 +259,7 @@ section#why {
 section#wat {
 	background-color: var(--pink-fade);
 }
-section:not(#pmcf-xyz) :global(article:not(:last-child)) {
+section:not(#pmcf-xyz) :global(article:not(:last-of-type)) {
 	margin-bottom: 8em;
 }
 section:nth-child(2) :global(article > *) {
@@ -271,12 +275,14 @@ section:nth-child(4) :global(article > *) {
 	display: flex;
 	flex-wrap: wrap-reverse;
 	justify-content: flex-end;
-	gap: 0.5em;
 	position: fixed;
 	max-width: calc(100vw - 2em);
 	right: 1em;
 	bottom: 1em;
 	z-index: var(--l-float);
+}
+.controls > *:not(:last-child) {
+	margin-right: 0.5em;
 }
 /* Annotations */
 aside[id] {
@@ -321,7 +327,7 @@ aside#note-end {
 	transform: rotate(300deg);
 }
 aside#note-anxiety {
-	top: 144rem;
+	top: 141rem;
 	right: 18rem;
 	width: 42rem;
 	transform: rotate(355deg);
@@ -333,7 +339,7 @@ aside#note-challenges {
 	transform: rotate(340deg);
 }
 aside#note-open {
-	bottom: -10rem;
+	bottom: -17rem;
 	left: 24rem;
 	width: 48rem;
 	transform: rotate(10deg);
@@ -346,7 +352,7 @@ aside#note-open {
 	z-index: var(--l-overlap);
 }
 .sticker[src*="peace"] {
-	top: 113rem;
+	top: 114rem;
 	left: 55rem;
 	transform: rotate(30deg);
 }
@@ -356,8 +362,8 @@ aside#note-open {
 	transform: rotate(0);
 }
 .sticker[src*="death"] {
-	top: 168rem;
-	left: 66rem;
+	top: 169rem;
+	left: 63rem;
 	transform: rotate(0);
 }
 .sticker[src*="challenge"] {
@@ -366,17 +372,17 @@ aside#note-open {
 	transform: rotate(0);
 }
 .sticker[src*="improv"] {
-	top: 122rem;
+	top: 124rem;
 	left: 14rem;
 	transform: rotate(10deg);
 }
 .sticker[src*="deal-with-it"] {
-	top: 190rem;
-	left: 11rem;
+	top: 199rem;
+	left: 9rem;
 	transform: rotate(10deg);
 }
 .sticker[src*="creativity"] {
-	top: 240rem;
+	top: 241rem;
 	left: 45rem;
 	transform: rotate(0);
 }
@@ -386,7 +392,7 @@ aside#note-open {
 	transform: rotate(0);
 }
 .sticker[src*="collaboration"] {
-	top: 88rem;
+	top: 83rem;
 	left: 94rem;
 	transform: rotate(350deg);
 }
@@ -396,12 +402,12 @@ aside#note-open {
 	transform: rotate(0);
 }
 .sticker[src*="satisfaction"] {
-	top: 274rem;
+	top: 272rem;
 	left: 92rem;
 	transform: rotate(320deg);
 }
 .sticker[src*="inclusivity"] {
-	top: 336rem;
+	top: 333rem;
 	left: -4rem;
 	transform: rotate(10deg);
 }
@@ -410,6 +416,9 @@ section#pmcf-xyz {
 	flex-direction: row;
 	flex-wrap: wrap;
 	max-width: var(--maxcol-02);
+}
+section#pmcf-xyz > :global(article:nth-child(2n+2)) {
+	margin-right: 0;
 }
 /* Media queries */
 @media (max-width: 480px) {

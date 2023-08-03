@@ -20,7 +20,7 @@ const { title, description, customClass } = Astro.props;
 </head>
 <body>
 	<div class="preloader">
-		<img class="anim" src="/preloader.gif" width="512" height="512"/>
+		<img class="anim" src="/preloader.gif" width="512" height="512" alt="Loading animation"/>
 	</div>
 	<slot />
 </body>
@@ -243,6 +243,7 @@ button {
     border: none;
     border-radius: var(--sc);
     padding: 0.5em 0.75em 0.75em;
+	margin: 0;
     transition: padding 0.1s ease-out, box-shadow 0.1s ease-out;
     box-shadow: var(--black-fade) 0 -0.25em 0 inset;
 }
@@ -452,10 +453,10 @@ document.addEventListener("DOMContentLoaded", function() {
         // Connections
         plumbing.connect({
             source: document.getElementById('note-start')!,
-            target: document.getElementById('note-welcome')!,
+            target: document.getElementById('pmcf-xyz')!,
 			anchor: [
 				[ 0.5, 1, 1, 0, 0, 8 ],
-				[ 0, 0.2, -1, 0, -16, 0 ]
+				[ 0, 0.25, -1, 0, 72, 0 ]
 			],
             type: "Arrow",
         });

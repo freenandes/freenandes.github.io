@@ -1,7 +1,7 @@
 ---
 title: "Life-work balance"
 ---
-### How do you balance personal and professional?
+### How do you balance personal and professional life?
 
 It isn't easy to separate. It's always the same person, right? There are no illusions here; work is necessary today. I tend to become too enthralled with ideas. The excitement of getting into a new idea pulls me in very quickly.
 

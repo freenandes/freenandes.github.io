@@ -1,3 +1,6 @@
+---
+title: "Pedro MC Fernandes CV"
+---
 # Pedro MC Fernandes
 
 ## Product Designer

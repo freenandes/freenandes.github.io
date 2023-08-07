@@ -1,0 +1,46 @@
+---
+const title = "Pedro MC Fernandes CV";
+const description = "Hi 👋 This is my CV. It's where I show my career as a Product Designer. If you need one, get in touch so we can start talking. Have a nice one!";
+const customClass = "vitae";
+import Shell from '../layouts/Shell.astro';
+import { Content as Curriculum } from '../content/extra/curriculum.md';
+---
+<Shell title={ title } description={ description } customClass={ customClass }>
+    <div class="print">
+        <Curriculum />
+    </div>
+</Shell>
+<style>
+body {
+    max-width: 48em;
+    padding: 2em;
+    margin: 0 auto;
+}
+.print > :global(*):not(:last-child):not(h3):not(small) {
+    margin-bottom: 1rem;
+}
+:global(small) {
+    display: inline-block;
+    color: var(--black-medium);
+    margin-bottom: 0.5em;
+}
+@media (max-width: 480px) {
+    body {
+        font-size: 0.875em;
+        padding: 1em;
+    }
+}
+@media print {
+    :global([tags] li) {
+        background: none;
+        padding: 0;
+        margin: 0 0.5em 0.5em 0;
+    }
+    :global([tags] li:not(:last-child)::after) {
+        content: ",";
+    }
+    :global(abbr[aria-label]) {
+        border: none;
+    }
+}
+</style>

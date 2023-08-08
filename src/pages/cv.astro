@@ -7,22 +7,85 @@ import { Content as Curriculum } from '../content/extra/curriculum.md';
 ---
 <Shell title={ title } description={ description } customClass={ customClass }>
     <div class="print">
+        <nav>
+            <div class="button-3d">
+                <button type="button" class="dark" onclick="window.location.href = '/';" aria-label="Back to the home page">&larr; Back</button>
+            </div>
+            <div class="button-3d">
+                <button type="button" class="dark" onclick="window.print()">Print page</button>
+            </div>
+        </nav>
         <Curriculum />
     </div>
 </Shell>
 <style>
+@font-face {
+	font-family: "LexendDeca";
+	src:
+		url("/fonts/LexendDeca.woff2") format("woff2 supports variations"),
+		url("/fonts/LexendDeca.woff2") format("woff2-variations");
+	font-weight: 100 1000;
+	font-display: swap;
+}
+@font-face {
+	font-family: "LexendPeta";
+	src:
+		url("/fonts/LexendPeta.woff2") format("woff2 supports variations"),
+		url("/fonts/LexendPeta.woff2") format("woff2-variations");
+	font-weight: 100 1000;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Whiteboard";
+	/* src: url("/fonts/whiteboardbeta.otf") format("opentype"); */
+	src: url("/fonts/whiteboardbeta.woff2") format("woff2");
+	font-weight: 400;
+	font-display: swap;
+	font-variant-ligatures: common-ligatures;
+}
 body {
-    max-width: 48em;
+    font-family: "LexendDeca", system-ui, sans-serif;
+    width: 100%;
+    max-width: 36em;
     padding: 2em;
     margin: 0 auto;
 }
-.print > :global(*):not(:last-child):not(h3):not(small) {
-    margin-bottom: 1rem;
+.print {
+    position: relative;
+}
+:global(h1) {
+    margin-bottom: 0.25em;
+}
+:global(h2) {
+    margin-bottom: 0;
+}
+:global(p) {
+    margin-bottom: 0.875em;
 }
 :global(small) {
     display: inline-block;
     color: var(--black-medium);
-    margin-bottom: 0.5em;
+    margin-bottom: 0.75em;
+}
+button {
+    font-size: 0.625em;
+}
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+nav > .button-3d {
+    height: 1.5625em;
+    margin: 0 0.5em 0.5em 0;
+}
+:global(img) {
+    float: left;
+    width: 4em;
+    height: 4em;
+    margin-top: 0.5em;
+    margin-right: 1.5em;
+    border-radius: var(--sd);
 }
 @media (max-width: 480px) {
     body {
@@ -31,16 +94,16 @@ body {
     }
 }
 @media print {
-    :global([tags] li) {
-        background: none;
+    body {
+        font-size: 0.875em;
+        max-width: none;
         padding: 0;
-        margin: 0 0.5em 0.5em 0;
     }
-    :global([tags] li:not(:last-child)::after) {
-        content: ",";
+    :global(a) {
+        text-decoration: none;
     }
-    :global(abbr[aria-label]) {
-        border: none;
+    .button-3d {
+        display: none;
     }
 }
 </style>

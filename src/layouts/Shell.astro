@@ -103,9 +103,6 @@ html {
 	background-color: var(--paper);
 	cursor: url(/artwork/default.svg) 7 1, auto;
 }
-html, body {
-	overflow: hidden;
-}
 html.index :not(a):not(input):not(textarea):not(button):not(button *):not(abbr[aria-label]):not(img:hover):not([video]):not(video) {
 	cursor: url(/artwork/grab.svg) 12 12, grab;
 }
@@ -217,7 +214,7 @@ section {
 	width: max-content;
 }
 .button-3d {
-    height: 2rem;
+    height: 1.875em;
     display: flex;
     align-items: flex-end;
 }
@@ -233,7 +230,7 @@ section {
 }
 button {
 	font-family: "LexendDeca", system-ui, sans-serif;
-    font-size: 0.8em;
+    font-size: 0.75em;
 	font-weight: 550;
 	line-height: 125%;
     text-transform: uppercase;
@@ -405,7 +402,7 @@ button.dark {
 }
 @media (max-width: 480px) {
 	.button-3d {
-		height: 2.5rem;
+		height: 2.5em;
 	}
 	button,
 	button.icon {
@@ -415,10 +412,10 @@ button.dark {
 		padding: 0.25rem;
 	}
 	.whiteboard .button-3d {
-		height: 2rem;
+		height: 2em;
 	}
 	.whiteboard button {
-		font-size: 0.8em;
+		font-size: 0.75em;
 	}
 }
 </style>

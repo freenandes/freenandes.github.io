@@ -62,18 +62,7 @@ import { Content as Footer } from '../content/extra/footer.md';
 			<!-- I N T R O -->
 			<section id={sections[0].normTitle}>
 				<aside id="note-start" aria-labelledby={sections[0].normTitle}>Start Here!</aside>
-				<h1 class="title">
-					<!-- <span class="badge">
-						<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 16 16" fill="none">
-							<title>Star sign</title>
-							<path d="M2 8L14 8" stroke="black" stroke-width="3" stroke-linecap="round"/>
-							<path d="M14 14L2 2" stroke="black" stroke-width="3" stroke-linecap="round"/>
-							<path d="M14 2L2 14" stroke="black" stroke-width="3" stroke-linecap="round"/>
-							<path d="M8 14L8 2" stroke="black" stroke-width="3" stroke-linecap="round"/>
-						</svg>
-					</span> -->
-					{sections[0].title}
-				</h1>
+				<h1 class="title">{sections[0].title}</h1>
 				{
 					firstSection.map(async (post) => {
 						const { Content } = await post.render()
@@ -89,14 +78,14 @@ import { Content as Footer } from '../content/extra/footer.md';
 					<Footer />
 				</small>
 				<aside id="note-contact" aria-labelledby="note-form">Contact me here</aside>
+				<div id="pedroPort">
+					<img src="src/assets/images/pmcf.jpg" width="512" height="512" alt="Portrait of the website's author, Pedro MC Fernandes"/>
+				</div>
 			</section>
 			<!-- W H O -->
 			<section id={sections[1].normTitle}>
 				<aside id="note-who" aria-labelledby={sections[1].normTitle}>Pedro Who?!</aside>
-				<h2 class="title">
-					<!-- <span class="badge"><img src="/artwork/x.svg" alt="The letter X, as in an unknown variable" width="40" height="40"/></span> -->
-					{sections[1].title}
-				</h2>
+				<h2 class="title">{sections[1].title}</h2>
 				{
 					secondSection.map(async (post) => {
 						const { Content } = await post.render();
@@ -117,10 +106,7 @@ import { Content as Footer } from '../content/extra/footer.md';
 			<!-- W H Y -->
 			<section id={sections[2].normTitle}>
 				<aside id="note-why" aria-labelledby={sections[2].normTitle}>A whole career, going steady</aside>
-				<h2 class="title">
-					<!-- <span class="badge"><img src="/artwork/y.svg" alt="The letter Y, as a homophone for Why" width="40" height="40"/></span> -->
-					{sections[2].title}
-				</h2>
+				<h2 class="title">{sections[2].title}</h2>
 				{
 					thirdSection.map(async (post) => {
 						const { Content } = await post.render();
@@ -143,10 +129,7 @@ import { Content as Footer } from '../content/extra/footer.md';
 			<!-- S E E -->
 			<section id={sections[3].normTitle}>
 				<aside id="note-see" aria-labelledby={sections[3].normTitle}>Sneak peek at how I've been working</aside>
-				<h2 class="title">
-					<!-- <span class="badge"><img src="/artwork/z.svg" alt="The letter Z, as a homophone pun for See" width="40" height="40"/></span> -->
-					{sections[3].title}
-				</h2>
+				<h2 class="title">{sections[3].title}</h2>
 				{
 					fourthSection.map(async (post) => {
 						const { Content } = await post.render();
@@ -171,6 +154,9 @@ import { Content as Footer } from '../content/extra/footer.md';
 	<Modal title="Info" openID="info" uiMode="dark" />
 </Shell>
 <style>
+html, body {
+	overflow: hidden;
+}
 body {
 	position: fixed;
 	width: 100vw;
@@ -410,6 +396,22 @@ aside#note-open {
 	top: 333rem;
 	left: -4rem;
 	transform: rotate(10deg);
+}
+#pedroPort {
+	position: absolute;
+	top: 15rem;
+	left: 39rem;
+	width: 8em;
+	height: 8em;
+	overflow: hidden;
+	border-radius: var(--sf);
+	transform: rotate(355deg);
+	box-shadow: var(--black-fade) -0.0625rem 0.25rem 0 0;
+}
+#pedroPort img {
+	width: 100%;
+    height: 100%;
+	object-fit: cover;
 }
 /* Content design */
 section#pmcf-xyz {

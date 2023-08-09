@@ -9,10 +9,10 @@ import { Content as Curriculum } from '../content/extra/curriculum.md';
     <div class="print">
         <nav>
             <div class="button-3d">
-                <button type="button" class="dark" onclick="window.location.href = '/';" aria-label="Back to the home page">&larr; Back</button>
+                <button type="button" onclick="window.location.href = '/';" aria-label="Back to the home page">&larr; Back</button>
             </div>
             <div class="button-3d">
-                <button type="button" class="dark" onclick="window.print()">Print page</button>
+                <button type="button" onclick="window.print()">Print page</button>
             </div>
         </nav>
         <Curriculum />
@@ -43,10 +43,14 @@ import { Content as Curriculum } from '../content/extra/curriculum.md';
 	font-display: swap;
 	font-variant-ligatures: common-ligatures;
 }
+html {
+    background-color: var(--white);
+}
 body {
+    box-sizing: border-box;
     font-family: "LexendDeca", system-ui, sans-serif;
     width: 100%;
-    max-width: 36em;
+    max-width: 44em;
     padding: 2em;
     margin: 0 auto;
 }
@@ -69,6 +73,7 @@ body {
 }
 button {
     font-size: 0.625em;
+    background-color: #eeeeed;
 }
 nav {
     display: flex;
@@ -84,13 +89,16 @@ nav > .button-3d {
     width: 4em;
     height: 4em;
     margin-top: 0.5em;
-    margin-right: 1.5em;
+    margin-right: 1em;
     border-radius: var(--sd);
 }
 @media (max-width: 480px) {
     body {
         font-size: 0.875em;
         padding: 1em;
+    }
+    .button-3d {
+        font-size: 1.375em;
     }
 }
 @media print {

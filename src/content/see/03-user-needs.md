@@ -18,3 +18,5 @@ In my view, it's essential to build that working group. People that understand t
 ![Documentation snippet listing some hypotheses on the table a team is working on to solve the problems.](../../assets/images/collab-02.png "I try to converge all bits of documentation in an easily digestible and presentation-friendly in case we want to onboard more collaborators on the team and explain what we're trying to do.")
 
 This process is crucial because I don't believe in generic business goals that come out of thin air. For a successful user-centered product, at least a good foundation of user research is needed to inform and break down those goals into something more tangible.
+
+![Screenshot of part of a diagram that describes the ideal user flow until they get to the product's value, the "wow" factor.](../../assets/images/optimal-path.png "Finding how easy and cost-effective an optimal user journey can be, is an excellent way to get business buy-in into building a user-centered product that will bring return via user satisfaction. It's a win-win.")

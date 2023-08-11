@@ -71,24 +71,23 @@ body {
     color: var(--black-medium);
     margin-bottom: 0.75em;
 }
-button {
-    font-size: 0.625em;
-    background-color: #eeeeed;
-}
 nav {
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: 1rem;
+    margin-bottom: 1em;
 }
-nav > .button-3d {
-    height: 1.5625em;
+.button-3d {
+    font-size: 0.8em;
     margin: 0 0.5em 0.5em 0;
+}
+button {
+    background-color: var(--toast);
 }
 :global(img) {
     float: left;
     width: 4em;
     height: 4em;
-    margin-top: 0.5em;
+    margin-top: 0.375em;
     margin-right: 1em;
     border-radius: var(--sd);
 }
@@ -98,7 +97,7 @@ nav > .button-3d {
         padding: 1em;
     }
     .button-3d {
-        font-size: 1.375em;
+        font-size: 1.2em;
     }
 }
 @media print {
@@ -110,7 +109,7 @@ nav > .button-3d {
     :global(a) {
         text-decoration: none;
     }
-    .button-3d {
+    nav {
         display: none;
     }
 }

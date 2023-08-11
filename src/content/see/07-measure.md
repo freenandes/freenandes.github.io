@@ -11,6 +11,8 @@ Interviews and surveys with users and customers are also vital for me to get the
 
 ![Listing of insights collected from user interviews categorized by sentiment.](../../assets/images/interview-nuggets.png "I think the categorization of the interview nuggets is important for the team. Allows a fast analysis of users' feelings and needs.")
 
+![A preview snippet of a whiteboard with a summary of the project that will be exposed for feedback collection. It has the project's: objectives, users' profiles, the problems, the value, how we measure success, and the stage we're in.](../../assets/images/project-context.png "I like to cross-collaborate on the metrics, expose them, ask for feedback, put the team on the same page, and then share success.")
+
 ---
 
 I value design and aim to obtain pertinent metrics to evaluate its impact. This may include KPIs such as conversion rates, user engagement, and revenue. Benchmarks can also provide valuable insights into our standing compared to others and measure our transformation through design.

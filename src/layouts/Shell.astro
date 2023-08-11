@@ -52,6 +52,7 @@ const { title, description, customClass } = Astro.props;
 }
 :root {
 	/* Colors */
+	--toast: #eeeeed;
 	--paper: #F8F8F7;
 	--paper-fade: rgba(248, 248, 247, 0.5);
 	--charcoal: #242630;
@@ -214,6 +215,7 @@ section {
 	width: max-content;
 }
 .button-3d {
+	font-size: 1.2em;
     height: 1.875em;
     display: flex;
     align-items: flex-end;
@@ -403,10 +405,10 @@ button.dark {
 }
 @media (max-width: 480px) {
 	.button-3d {
-		font-size: 1.25em;
+		font-size: 1.4em;
 	}
 	.whiteboard .button-3d {
-		font-size: 1em;
+		font-size: 1.2em;
 	}
 }
 </style>

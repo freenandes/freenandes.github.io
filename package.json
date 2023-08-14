@@ -16,5 +16,8 @@
     "panzoom": "^9.4.3",
     "tippy.js": "^6.3.7",
     "typescript": "^5.1.6"
+  },
+  "devDependencies": {
+    "mark.js": "^8.11.1"
   }
 }

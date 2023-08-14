@@ -71,6 +71,7 @@ const { title, description, customClass } = Astro.props;
 	--green-fade: rgba(208, 245, 128, 0.25);
 	--stickie-pink: #ffdadf;
 	--pink-fade: rgba(255, 218, 223, 0.25);
+	--hilite: #6a61dd;
 	/* Form */
 	--sa: 0.03125rem;
 	--sb: 0.0625rem;
@@ -94,6 +95,15 @@ const { title, description, customClass } = Astro.props;
 	--l-float: 4;
 	--l-modality: 8;
 	--l-system: 16;
+}
+@keyframes blink {
+	0%, 90% {
+		color: var(--paper);
+	}
+	91% {
+		--hilite: transparent;
+		color: inherit;
+	}
 }
 html {
 	font-family: "LexendDeca", system-ui, sans-serif;
@@ -201,11 +211,17 @@ small a:hover {
 }
 body > header {
 	display: flex;
+	align-items: flex-start;
 	position: fixed;
-	max-width: calc(100vw - 2em);
 	top: 1em;
 	left: 1em;
+	width: 100%;
+	max-width: calc(100vw - 1.5em);
 	z-index: var(--l-float);
+}
+body > header > * {
+	margin-right: 0.5rem;
+	margin-bottom: 0.5rem;
 }
 section {
 	position: relative;
@@ -273,13 +289,64 @@ button.icon svg {
 button.icon svg path {
 	stroke: currentColor;
 }
-button img {
+#resetNav svg {
 	box-sizing: border-box;
-	display: block;
 	width: auto;
 	height: 1.25em;
 	padding: 0.125em;
 }
+#logoFull {
+	display: block;
+}
+#logoFull path {
+	fill: var(--white);
+}
+#logoFull path.star {
+	fill: #f2c60f;
+}
+#logoShort {
+	display: none;
+}
+#logoShort path.star {
+	fill: var(--white);
+}
+input, textarea {
+    font-family: "LexendDeca", system-ui, sans-serif;
+	font-size: 1em;
+    box-sizing: border-box;
+	font-weight: 350;
+	line-height: 150%;
+	color: var(--black-strong);
+    background-color: transparent;
+    padding: 0.125em 0.25em;
+    border: 0.125rem solid var(--black-fade);
+    border-radius: var(--sc);
+}
+textarea {
+    flex-grow: 1;
+    resize: vertical;
+}
+input::placeholder, textarea::placeholder {
+    color: var(--black-medium);
+}
+input:not([type="search"]):not(:placeholder-shown), textarea:not(:placeholder-shown) {
+    border-color: transparent;
+}
+input:not(:placeholder-shown), textarea:not(:placeholder-shown) {
+    background-color: var(--paper);
+}
+input:hover, textarea:hover {
+    border-color: var(--black-medium);
+}
+input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--black-strong);
+    box-shadow: none;
+}
+input[type="search"] {
+	text-overflow: ellipsis;
+}
+/* Tags */
 [tags] ul {
 	list-style-type: none;
 	display: flex;
@@ -343,6 +410,12 @@ code {
 abbr[aria-label] {
 	cursor: url(/artwork/help.svg) 12 12, help;
 	border-bottom: 0.125em dashed var(--black-medium);
+}
+mark {
+	border-radius: var(--sb);
+	background-color: var(--hilite);
+	box-shadow: 0.125em 0 0 0 var(--hilite), -0.125em 0 0 0 var(--hilite);
+	animation: blink 2s steps(1, end) infinite;
 }
 /* Tippy */
 .tippy-box {
@@ -409,6 +482,12 @@ button.dark {
 	}
 	.whiteboard .button-3d {
 		font-size: 1.2em;
+	}
+	#logoFull {
+		display: none;
+	}
+	#logoShort {
+		display: block;
 	}
 }
 </style>
@@ -503,6 +582,7 @@ document.addEventListener("DOMContentLoaded", function() {
 import panzoom, { PanZoom } from 'panzoom';
 import tippy, { Props } from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
+import Mark from 'mark.js';
 
 // Elements
 const canvas = document.getElementById('canvas') as HTMLElement;
@@ -641,6 +721,36 @@ function initPanzoom() {
 		});
 	}
 }
+
+
+
+
+
+
+function highlightText() {
+	const searchTerm = (document.getElementById('highlighter') as HTMLInputElement).value.trim();
+
+	// Define the elements you want to search within; you can modify the selector as needed
+	const elementsToSearch = document.querySelectorAll('article'); // Adjust as needed
+
+	// Instantiate the Mark object
+	const markInstance = new Mark(elementsToSearch);
+
+	// First, unmark previous marks
+	markInstance.unmark();
+
+	// Then, if the search term has at least 2 characters, mark the new search term
+	if (searchTerm.length >= 2) {
+		markInstance.mark(searchTerm, { separateWordSearch: false });
+	}
+}
+document.getElementById('highlighter')?.addEventListener('input', highlightText);
+
+
+
+
+
+
 
 // Initialization
 window.addEventListener('load', function() {

@@ -411,10 +411,16 @@ abbr[aria-label] {
 	cursor: url(/artwork/help.svg) 12 12, help;
 	border-bottom: 0.125em dashed var(--black-medium);
 }
+::selection {
+	color: var(--white);
+}
+::selection,
 mark {
 	border-radius: var(--sb);
 	background-color: var(--hilite);
 	box-shadow: 0.125em 0 0 0 var(--hilite), -0.125em 0 0 0 var(--hilite);
+}
+mark {
 	animation: blink 2s steps(1, end) infinite;
 }
 /* Tippy */

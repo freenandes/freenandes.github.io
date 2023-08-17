@@ -71,7 +71,8 @@ const { title, description, customClass } = Astro.props;
 	--green-fade: rgba(208, 245, 128, 0.25);
 	--stickie-pink: #ffdadf;
 	--pink-fade: rgba(255, 218, 223, 0.25);
-	--hilite: #6a61dd;
+	--purple: #6a61dd;
+	--hilite: var(--purple);
 	/* Form */
 	--sa: 0.03125rem;
 	--sb: 0.0625rem;
@@ -101,7 +102,7 @@ const { title, description, customClass } = Astro.props;
 		color: var(--paper);
 	}
 	91% {
-		--hilite: transparent;
+		background-color: transparent;
 		color: inherit;
 	}
 }
@@ -418,9 +419,9 @@ abbr[aria-label] {
 mark {
 	border-radius: var(--sb);
 	background-color: var(--hilite);
-	box-shadow: 0.125em 0 0 0 var(--hilite), -0.125em 0 0 0 var(--hilite);
 }
 mark {
+	/* box-shadow: 0.125em 0 0 0 var(--hilite), -0.125em 0 0 0 var(--hilite); */
 	animation: blink 2s steps(1, end) infinite;
 }
 /* Tippy */
@@ -446,7 +447,7 @@ mark {
 }
 #plumbing path {
 	stroke: var(--charcoal);
-	stroke-width: 7;
+	stroke-width: 6;
 	stroke-linecap: round;
 	stroke-linejoin: round;
 }

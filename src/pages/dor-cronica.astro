@@ -1,0 +1,106 @@
+---
+const title = "Dor Crónica";
+const description = "Short stories about living as a coward. A webzine by Pedro MC Fernandes.";
+const customClass = "dor-cronica";
+const metaImage = "/meta.png";
+import Shell from '../layouts/Shell.astro';
+import WebzineCard from '../components/webzineCard.astro';
+const allZines = await Astro.glob('../pages/dor-cronica/*.md');
+---
+<Shell title={ title } description={ description } customClass={ customClass } metaImage={ metaImage }>
+    <div id="webzineList">
+        <h1>{ title }</h1>
+        <ul>
+            {
+                allZines.sort((a, b) => new Date(b.frontmatter.pubDate).getTime() - new Date(a.frontmatter.pubDate).getTime())
+                    .map((post) =>
+                        <WebzineCard url={post.url} title={post.frontmatter.title} cover={post.frontmatter.image.url} coverAlt={post.frontmatter.image.alt} coverTheme={post.frontmatter.coverTheme}/>
+                    ) 
+            }
+        </ul>
+    </div>
+</Shell>
+<style is:global>
+#webzineList {
+    box-sizing: border-box;
+    text-align: center;
+    width: 100%;
+    max-width: 40em;
+    padding: 1.5em 1em 1em;
+    margin: 0 auto;
+}
+#webzineList > h1 {
+    margin-bottom: 0.5em;
+}
+#webzineList > ul {
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0 -0.5em;
+    cursor: var(--cursor-default);
+}
+.webzineCard,
+.webzineCard.dark {
+    position: relative;
+    aspect-ratio: 4 / 1;
+    margin: 0 0.5em 1em;
+    background-color: initial;
+    cursor: var(--cursor-default);
+}
+.webzineCard a {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--se);
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--charcoal);
+    transition: all 200ms ease-out;
+}
+.webzineCard.dark a {
+    color: var(--paper);
+}
+.webzineCard a:hover {
+    color: var(--paper);
+    background-color: var(--black-strong);
+}
+.webzineCard h2 {
+    font-size: 1.5em;
+    cursor: inherit;
+    transition: font-size 500ms linear, opacity 500ms linear;
+}
+.webzineCard a.visible h2 {
+    font-size: 8em;
+    opacity: 0;
+}
+.webzineCard img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+@supports not (aspect-ratio: 4 / 1) {
+    [slide]::before {
+        float: left;
+        padding-top: calc((4 / 1) * 100%);
+        content: "";
+    }
+    [slide]::after {
+        display: block;
+        content: "";
+        clear: both;
+    }
+}
+@media (max-width: 640px) {
+    #webzineList > ul > li {
+        max-width: none;
+    }
+}
+</style>

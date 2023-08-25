@@ -2,11 +2,12 @@
 const title = "Page not found";
 const description = "The page you are looking for cannot be found, sorry. Please check the URL for typos or go to the main page.";
 const customClass = "404";
+const metaImage = "/meta.png";
 import Shell from '../layouts/Shell.astro';
 import Stickie from '../components/stickie.astro';
 import { Content as NotFound } from '../content/extra/404.md';
 ---
-<Shell title={ title } description={ description } customClass={ customClass }>
+<Shell title={ title } description={ description } customClass={ customClass } metaImage={ metaImage }>
     <section>
         <h1 class="title">{ title }</h1>
         <Stickie>

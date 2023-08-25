@@ -1,0 +1,9 @@
+---
+const { title, url, cover, coverAlt, coverTheme = 'dark' } = Astro.props;
+---
+<li class={ `webzineCard ${coverTheme}` }>
+    <a href={ url } class="delayed">
+        <h2>{ title }</h2>
+        <img src={ cover } alt={ coverAlt } width="1024" height="1024"/>
+    </a>
+</li>

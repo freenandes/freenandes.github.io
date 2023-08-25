@@ -1,0 +1,325 @@
+---
+import Shell from '../layouts/Shell.astro';
+const { frontmatter } = Astro.props;
+const urlBlocks = frontmatter.url.split('/');
+urlBlocks.pop();
+const parentFolder = urlBlocks.join('/');
+function formatDate(isoDateString: string): string {
+    const date = new Date(isoDateString);
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+}
+const formattedPubDate = formatDate(frontmatter.pubDate);
+---
+<Shell title={ frontmatter.title } description={ frontmatter.description } author={ frontmatter.author } customClass={ frontmatter.customClass } metaImage={ frontmatter.image.url }></Shell>
+    <div id="webzineView">
+        <header>
+            <a href={ parentFolder } class="delayed">Back to list</a>
+        </header>
+        <main>
+            <button class="nav" id="prev" aria-label="Previous slide">←</button>
+            <button class="nav" id="next" aria-label="Next slide">→</button>
+            <div id="reel" lang="en" aria-live="assertive">
+                <slot />
+            </div>
+        </main>
+        <footer>
+            <button id="langToggle" class="delayed" aria-label="Change story language">Read in Portuguese</button>
+            <small>Created by Pedro MC Fernandes in { formattedPubDate }</small>
+        </footer>
+    </div>
+</Shell>
+<style is:global>
+/* Global Styles */
+@font-face {
+	font-family: "Park";
+	src:
+		url("/fonts/NationalPark-VariableVF.woff2") format("woff2 supports variations"),
+		url("/fonts/NationalPark-VariableVF.woff2") format("woff2-variations");
+	font-weight: 275 800;
+	font-display: swap;
+}
+html[class*="wz-"] body {
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+#webzineView {
+    box-sizing: border-box;
+    width: calc(100vh - 5.5em);
+    min-width: 35em;
+    max-width: 60em;
+    padding: 1em 1em 0;
+    margin: 0 auto;
+}
+
+/* Header & Footer */
+header,
+footer {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+header > *,
+footer > * {
+    margin: 0 0.5rem 1rem;
+}
+header a,
+header a:visited,
+button,
+footer small {
+    font-size: 0.75em;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: var(--sf);
+    color: transparent;
+    background-color: var(--black-light);
+}
+header a,
+header a:visited,
+button {
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.0625em;
+    padding: 0 1em;
+    transition: none;
+    box-shadow: none;
+}
+footer button,
+footer button:hover,
+footer small {
+    line-height: 150%;
+    text-align: center;
+    padding: 0.25em 1em;
+}
+footer small {
+    font-weight: 425;
+}
+
+/* Buttons */
+button:hover,
+button:active {
+    padding: 0 0.75em;
+    box-shadow: none;
+}
+header a.visible,
+button.visible,
+button.visible:hover {
+    color: inherit;
+}
+button.nav {
+    position: absolute;
+    font-size: 2em;
+    font-weight: 325;
+    line-height: 100%;
+    text-align: center;
+    width: 1.5em;
+    padding: 0.25em;
+    border-radius: var(--sz);
+}
+button.nav:hover,
+footer small:hover,
+button:hover {
+    color: var(--black-medium);
+}
+button.nav#prev,
+button.nav#next {
+    top: 50%;
+    margin-top: -0.75em;
+}
+button.nav#prev {
+    left: -2em;
+}
+button.nav#next {
+    right: -2em;
+}
+
+/* Reel & Slides */
+main {
+    position: relative;
+    margin-bottom: 1em;
+}
+#reel {
+    position: relative;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+}
+[slide] {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    box-sizing: border-box;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--sf);
+    overflow: hidden;
+}
+[slide]:not(:last-child) {
+    margin-right: 1em;
+}
+[slide] > * {
+    position: absolute;
+}
+[slide] > p:first-child,
+[slide] img {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: var(--cursor-default);
+}
+[slide="cover"] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url("/src/pages/dor-cronica/drive/cover.svg");
+    background-repeat: repeat;
+    background-position: center;
+    background-size: 160%;
+}
+[slide="cover"] h1 {
+    text-align: center;
+    hyphens: none;
+    margin: 0 0.5em;
+}
+blockquote {
+    font-family: "Park", "LexendDeca", system-ui, Arial, sans-serif;
+    font-size: 1.5em;
+    font-weight: 575;
+    text-transform: uppercase;
+    letter-spacing: 0.03125em;
+    right: 1rem;
+    bottom: 1rem;
+    left: 1rem;
+    padding: 0.75em 1em;
+    margin: 0;
+    border-radius: var(--sc);
+    background-color: var(--paper);
+}
+blockquote p {
+    hyphens: none;
+    text-align: center;
+}
+blockquote > *:not(:last-child) {
+    margin-bottom: 0.5em;
+}
+
+/* Language Toggle */
+#reel[lang="en"] [slide="cover"] > h1:nth-of-type(2),
+#reel[lang="en"] [slide] > blockquote:nth-of-type(2) {
+    display: none;
+}
+#reel[lang="pt"] [slide="cover"] > h1:nth-of-type(1),
+#reel[lang="pt"] [slide] > blockquote:nth-of-type(1) {
+    display: none;
+}
+
+@supports not (aspect-ratio: 1 / 1) {
+    [slide]::before {
+        float: left;
+        padding-top: 100%;
+        content: "";
+    }
+    [slide]::after {
+        display: block;
+        content: "";
+        clear: both;
+    }
+}
+@media (max-width: 960px) {
+    button.nav {
+        display: none;
+    }
+    blockquote {
+        font-size: 2.75vw;
+    }
+}
+@media (max-width: 640px) {
+    #webzineView {
+        width: 100%;
+        min-width: 100%;
+    }
+    footer {
+        flex-direction: column;
+        align-items: center;
+    }
+    [slide] {
+        aspect-ratio: 3 / 4;
+    }
+    @supports not (aspect-ratio: 3 / 4) {
+        [slide]::before {
+            float: left;
+            padding-top: calc((4 / 3) * 100%);
+            content: "";
+        }
+        [slide]::after {
+            display: block;
+            content: "";
+            clear: both;
+        }
+    }
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Delayed buttons/links
+    const DELAY = 400;
+    const clickableElements = document.querySelectorAll<HTMLAnchorElement | HTMLButtonElement>('a.delayed, #langToggle');
+    clickableElements.forEach(element => {
+        element.addEventListener('click', function(e) {
+            e.preventDefault();
+            element.classList.add('visible');
+            setTimeout(() => {
+                element.classList.remove('visible');
+                if (element instanceof HTMLAnchorElement) {
+                    window.location.href = element.href;
+                } else if (element.id === 'langToggle') {
+                    const langAttribute = reel ? reel.getAttribute('lang') : null;
+                    if (langAttribute === 'en') {
+                        reel?.setAttribute('lang', 'pt');
+                        element.textContent = 'Read in English';
+                    } else {
+                        reel?.setAttribute('lang', 'en');
+                        element.textContent = 'Read in Portuguese';
+                    }
+                }
+            }, DELAY);
+        });
+    });
+
+    // Next/prev buttons on slideshow
+    const reel = document.getElementById('reel');
+    const nextButton = document.getElementById('next');
+    const prevButton = document.getElementById('prev');
+    const slides = document.querySelectorAll('[slide]');
+    if (!reel || !nextButton || !prevButton || !slides.length || !(slides[0] instanceof HTMLElement)) return;
+    const slideWidth = slides[0].offsetWidth;
+    nextButton.addEventListener('click', function() {
+        const isLastSlide = reel.scrollLeft >= (reel.scrollWidth - reel.clientWidth - 1);
+        if (isLastSlide) {
+            reel.scrollLeft = 0;
+        } else {
+            reel.scrollBy({
+                left: slideWidth,
+                behavior: 'smooth'
+            });
+        }
+    });
+    prevButton.addEventListener('click', function() {
+        if (reel.scrollLeft === 0) {
+            reel.scrollLeft = reel.scrollWidth - reel.clientWidth;
+        } else {
+            reel.scrollBy({
+                left: -slideWidth,
+                behavior: 'smooth'
+            });
+        }
+    });
+});
+</script>

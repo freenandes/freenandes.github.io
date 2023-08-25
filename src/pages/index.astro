@@ -3,6 +3,7 @@
 const title = "Pedro MC Fernandes, Product Designer";
 const description = "Hi 👋 This is my website. It's where I show myself as a Product Designer. If you need one, get in touch so we can start talking. Have a nice one!";
 const customClass = "index";
+const metaImage = "/meta.png";
 const sections = [
 	{ title: 'Profile', normTitle: 'pmcf-xyz' },
 	{ title: 'About me', normTitle: 'who' },
@@ -30,9 +31,9 @@ import { Content as Footer } from '../content/extra/footer.md';
 
 	// Images
 import { Image } from 'astro:assets';
-import pedroPort from "../assets/images/pmcf.jpg";
+import pedroPort from "../assets/pmcf.jpg";
 ---
-<Shell title={ title } description={ description } customClass={ customClass }>
+<Shell title={ title } description={ description } customClass={ customClass } metaImage={ metaImage }>
 	<header>
 		<div class="button-3d">
 			<button type="button" id="resetNav" class="dark" aria-label="Return to initial area">
@@ -182,6 +183,20 @@ body {
 	height: 100vh;
 	height: 100dvh;
 }
+body > header {
+	display: flex;
+	align-items: flex-start;
+	position: fixed;
+	top: 1em;
+	left: 1em;
+	width: 100%;
+	max-width: calc(100vw - 1.5em);
+	z-index: var(--l-float);
+}
+body > header > * {
+	margin-right: 0.5rem;
+	margin-bottom: 0.5rem;
+}
 .whiteboard {
 	position: absolute;
 	top: 0;
@@ -206,8 +221,19 @@ main {
 main section:not(:last-of-type) {
 	margin-right: 7em;
 }
+
+/* Whiteboard headings */
 .title {
 	box-sizing: border-box;
+	font-size: 7em;
+	font-weight: 675;
+	width: 100%;
+	margin-bottom: 4rem;
+}
+/* Alternative boxed-layout headings */
+/* .title {
+	box-sizing: border-box;
+	line-height: 83%;
 	display: flex;
 	align-items: center;
 	width: 100%;
@@ -242,16 +268,18 @@ h1.title img {
 }
 .badge path {
 	stroke: var(--charcoal);
-}
+} */
+
+/* Continuation */
 :global(#pmcf-xyz h2), :global(#pmcf-xyz h3) {
-	font-family: "LexendPeta";
+	font-family: "LexendPeta", system-ui, Arial, sans-serif;
 	font-weight: 750;
 	font-size: 0.75em;
 	line-height: 133%;
 	text-transform: uppercase;
 }
 section {
-	padding: 7em 6em 7em 7em;
+	padding: 6em 6em 6em 7em;
 	border-radius: var(--sf);
 	background-color: var(--yellow-fade);
 }
@@ -291,13 +319,16 @@ section:nth-child(4) :global(article > *) {
 	margin-bottom: 0.5rem;
 }
 #highlighter {
-	flex: 0 1 16rem;
+	flex: 0 1 16em;
 	width: 100%;
 	min-height: 2.25em;
 }
 #highlighter:hover {
 	background-color: var(--paper);
 	border-color: inherit;
+}
+p img:hover {
+	cursor: url(/artwork/eye.svg) 12 12, auto;
 }
 /* Annotations */
 aside[id] {
@@ -442,6 +473,7 @@ aside#note-open {
     height: 100%;
 	object-fit: cover;
 }
+
 /* Content design */
 section#pmcf-xyz {
 	flex-direction: row;
@@ -451,7 +483,13 @@ section#pmcf-xyz {
 section#pmcf-xyz > :global(article) {
 	margin: 0 1em 1em 0;
 }
+
 /* Media queries */
+@media (min-width: 1440px) {
+	#highlighter {
+		font-size: 1.3333em;
+	}
+}
 @media (max-width: 480px) {
 	.controls {
 		flex-wrap: wrap;

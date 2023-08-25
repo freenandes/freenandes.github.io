@@ -1,7 +1,8 @@
 ---
-const { title, description, customClass } = Astro.props;
+const { title, description, author = "Pedro MC Fernandes", customClass, metaImage, lang = "en" } = Astro.props;
 ---
-<html lang="en" class={ customClass }>
+<!DOCTYPE html>
+<html lang={ lang } class={ customClass }>
 <head>
 	<title>{ title }</title>
 	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -15,7 +16,8 @@ const { title, description, customClass } = Astro.props;
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="generator" content={ Astro.generator } />
 	<meta name="description" content={ description }>
-	<meta property="og:image" content="/meta.png" />
+	<meta name="author" content={ author }>
+	<meta property="og:image" content={ metaImage } />
 	<script data-respect-dnt data-no-cookie async src="https://cdn.splitbee.io/sb.js"></script>
 </head>
 <body>
@@ -44,7 +46,6 @@ const { title, description, customClass } = Astro.props;
 }
 @font-face {
 	font-family: "Whiteboard";
-	/* src: url("/fonts/whiteboardbeta.otf") format("opentype"); */
 	src: url("/fonts/whiteboardbeta.woff2") format("woff2");
 	font-weight: 400;
 	font-display: swap;
@@ -80,6 +81,8 @@ const { title, description, customClass } = Astro.props;
 	--sd: 0.3125rem;
 	--se: 0.5rem;
 	--sf: 0.8125rem;
+	--sg: 1.3125rem;
+	--sz: 10em;
 	--shadow-a: var(--black-fade) 0 0.125rem 0 0;
 	--shadow-b: var(--black-light) 0 0.5rem 0 0;
 	/* Whiteboard grid control */
@@ -96,6 +99,8 @@ const { title, description, customClass } = Astro.props;
 	--l-float: 4;
 	--l-modality: 8;
 	--l-system: 16;
+	/* GUI */
+	--cursor-default: url(/artwork/default.svg) 7 1, auto;
 }
 @keyframes blink {
 	0%, 90% {
@@ -107,13 +112,13 @@ const { title, description, customClass } = Astro.props;
 	}
 }
 html {
-	font-family: "LexendDeca", system-ui, sans-serif;
+	font-family: "LexendDeca", system-ui, Arial, sans-serif;
 	font-size: 16px;
 	font-weight: 350;
 	line-height: 150%;
 	color: var(--charcoal);
 	background-color: var(--paper);
-	cursor: url(/artwork/default.svg) 7 1, auto;
+	cursor: var(--cursor-default);
 }
 html.index :not(a):not(input):not(textarea):not(button):not(button *):not(abbr[aria-label]):not(img:hover):not([video]):not(video) {
 	cursor: url(/artwork/grab.svg) 12 12, grab;
@@ -124,16 +129,13 @@ p, h1, h2, h3, h4, h5, h6, ul, ol, li, input, textarea {
 a:link, button, input[type="submit"], input[type="button"], input[type="reset"], select, [video] {
 	cursor: url(/artwork/pointer.svg) 7 4, pointer;
 }
-p img:hover {
-	cursor: url(/artwork/eye.svg) 12 12, auto;
-}
 body, h1, h2, h3, h4, h5, p, ul {
 	margin: 0;
 }
 h1, h2 {
 	font-weight: 550;
 	font-size: 3em;
-	line-height: 83%;
+	line-height: 100%;
 	letter-spacing: -0.03125em;
 	text-transform: uppercase;
 	overflow-wrap: break-word;
@@ -147,7 +149,7 @@ h3 {
 	line-height: 133%;
 }
 h4, h5 {
-	font-family: "LexendPeta";
+	font-family: "LexendPeta", system-ui, Arial, sans-serif;
 	font-weight: 750;
 	font-size: 0.75em;
 	line-height: 133%;
@@ -199,30 +201,21 @@ small a:hover {
 	align-items: center;
 	z-index: var(--l-system);
 	opacity: 1;
-  	transition: opacity 1s;
 	pointer-events: none;
-}
-.preloader.hidden {
-	opacity: 0;
+	transition: opacity 600ms ease-out;
 }
 .anim {
 	display: block;
 	width: 2em;
 	height: 2em;
+	opacity: 0;
+	transition: opacity 200ms ease-in 400ms;
 }
-body > header {
-	display: flex;
-	align-items: flex-start;
-	position: fixed;
-	top: 1em;
-	left: 1em;
-	width: 100%;
-	max-width: calc(100vw - 1.5em);
-	z-index: var(--l-float);
+.preloader.hidden {
+	opacity: 0;
 }
-body > header > * {
-	margin-right: 0.5rem;
-	margin-bottom: 0.5rem;
+.preloader.hidden .anim {
+	opacity: 1;
 }
 section {
 	position: relative;
@@ -248,7 +241,7 @@ section {
 	border-right: 0.5px solid var(--black-medium);
 }
 button {
-	font-family: "LexendDeca", system-ui, sans-serif;
+	font-family: "LexendDeca", system-ui, Arial, sans-serif;
     font-size: 0.75em;
 	font-weight: 550;
 	line-height: 125%;
@@ -260,7 +253,8 @@ button {
     border-radius: var(--sc);
     padding: 0.5em 0.75em 0.75em;
 	margin: 0;
-    transition: padding 0.1s ease-out, box-shadow 0.1s ease-out;
+	transition: all 0.1s ease-out;
+    /* transition: padding 0.1s ease-out, box-shadow 0.1s ease-out; */
     box-shadow: var(--black-fade) 0 -0.25em 0 inset;
 }
 button:hover {
@@ -312,7 +306,7 @@ button.icon svg path {
 	fill: var(--white);
 }
 input, textarea {
-    font-family: "LexendDeca", system-ui, sans-serif;
+    font-family: "LexendDeca", system-ui, Arial, sans-serif;
 	font-size: 1em;
     box-sizing: border-box;
 	font-weight: 350;
@@ -368,7 +362,7 @@ input[type="search"] {
 	margin: 0 0.5em 0.5em 0;
 }
 code {
-	font-family: "LexendDeca", system-ui, sans-serif;
+	font-family: "LexendDeca", system-ui, Arial, sans-serif;
 	display: inline-block;
 	padding-top: 0;
 	padding-bottom: 0;
@@ -483,12 +477,14 @@ button.dark {
 .dark li, .dark code {
 	background-color: var(--white-light);
 }
-@media (max-width: 480px) {
-	.button-3d {
-		font-size: 1.4em;
+@media (min-width: 1440px) {
+	body > *:not(.whiteboard) .button-3d {
+		font-size: 1.6em;
 	}
-	.whiteboard .button-3d {
-		font-size: 1.2em;
+}
+@media (max-width: 480px) {
+	body > *:not(.whiteboard) .button-3d {
+		font-size: 1.4em;
 	}
 	#logoFull {
 		display: none;
@@ -859,7 +855,7 @@ window.addEventListener('load', function() {
 		});
 
 	// Timeout for preloader and captions
-	}, 500);
+	}, 250);
 });
 
 // Instruct browser to not store scroll position

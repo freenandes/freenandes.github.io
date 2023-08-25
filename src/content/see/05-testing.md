@@ -7,7 +7,7 @@ If we want to go fast, I go with internal testing. Valuable input can be obtaine
 
 We can also get paid users to test information architecture with tree testing and card sorting and quickly test interfaces with wireframes and fast, rough prototypes. This will help validate assumptions I may come up with and shape the final solution.
 
-![Montage of presentation bits describing a guerilla testing's participants pool, the script flow, and one of the insights captured from that test.](../../assets/guerilla.png "Preparing an internal guerilla test is one of the best ways for us, as a team, to detect and get a shared view of users' problems.")
+![Montage of presentation bits describing a guerilla testing's participants pool, the script flow, and one of the insights captured from that test.](../../assets/whiteboard/guerilla.png "Preparing an internal guerilla test is one of the best ways for us, as a team, to detect and get a shared view of users' problems.")
 
 <div video>
     <video width="1250" height="1250" autoplay loop muted playsinline>
@@ -21,8 +21,8 @@ We can also get paid users to test information architecture with tree testing an
 
 However, I prefer solid, more complete user testing to extract more data and mature ideas properly. The best would be to pick customers to improve the product through interviews or meticulously screened users to test features or whole products.
 
-![A row of 4 digital product cards featuring a t-shirt on sale, with annotations on the side identifying their version and amount of users assigned to each](../../assets/multi-variant-test.png "When doubts arise, I do multi-variant tests to catch any clear loser to discard and focus on other solutions.")
+![A row of 4 digital product cards featuring a t-shirt on sale, with annotations on the side identifying their version and amount of users assigned to each](../../assets/whiteboard/multi-variant-test.png "When doubts arise, I do multi-variant tests to catch any clear loser to discard and focus on other solutions.")
 
 When an idea grows, I seek to fine-tune it with usability and multi-variant tests. Whatever technique we adopt, the direction is doing so to meet the users' and customers' needs and expectations, and we need to validate that compatibility before committing to code complex solutions.
 
-![A snippet screenshot from the documentation page that has a summary of the user test results and a video frame that you can play to have a guided overview of the results and the insights gathered.](../../assets/test-results.png "Gathering the results in an easy-to-digest format is one of the best ways to involve the team. I usually do this via video but look to summarize for a quicker scanning of the results.")
+![A snippet screenshot from the documentation page that has a summary of the user test results and a video frame that you can play to have a guided overview of the results and the insights gathered.](../../assets/whiteboard/test-results.png "Gathering the results in an easy-to-digest format is one of the best ways to involve the team. I usually do this via video but look to summarize for a quicker scanning of the results.")

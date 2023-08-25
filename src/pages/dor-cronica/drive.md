@@ -1,12 +1,9 @@
 ---
 layout: ../../layouts/WebzineView.astro
-customClass: 'wz-drive'
 title: 'Drive'
+id: 'drive'
 description: 'This is my first story.'
 author: 'Pedro MC Fernandes'
-image:
-    url: '/src/pages/dor-cronica/drive/cover.svg'
-    alt: 'Cover'
 pubDate: 2023-07-09
 coverTheme: 'light'
 ---
@@ -18,7 +15,7 @@ coverTheme: 'light'
 
 </div><div slide>
 
-![This is an image](./drive/webzi.svg)
+![This is an image](../../assets/dor-cronica/drive/webzi.svg)
 
 > The story of a frightened traveler.
 
@@ -26,7 +23,7 @@ coverTheme: 'light'
 
 </div><div slide>
 
-![This is an image](./drive/webzi2.svg)
+![This is an image](../../assets/dor-cronica/drive/webzi2.svg)
 
 > And then the story continues as it should. When the hero encounters terrific stuff.
 
@@ -34,7 +31,7 @@ coverTheme: 'light'
 
 </div><div slide>
 
-![This is an image](./drive/webzi3.svg)
+![This is an image](../../assets/dor-cronica/drive/webzi3.svg)
 
 > — What do you think happened here?
 > 

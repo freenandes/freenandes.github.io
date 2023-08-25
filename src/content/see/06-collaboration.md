@@ -9,16 +9,16 @@ This is important when a design team is new in the company or even when a new in
 
 Involving the team and hosting collaborative sessions is also helpful. It's a more inclusive approach that helps everyone be hands-on, motivated, and see the value in user-centered solutions.
 
-![Documentation snippet about the Discovery process in design.](../../assets/doc-process.png "I assisted in documenting the methodology and contribution models for Percona's newly established design team.")
+![Documentation snippet about the Discovery process in design.](../../assets/whiteboard/doc-process.png "I assisted in documenting the methodology and contribution models for Percona's newly established design team.")
 
-![Documentation snippet of the UX Research Repository home page.](../../assets/doc-repo.png "I set up multiple frameworks to build our tools at Percona to support the research practice.")
+![Documentation snippet of the UX Research Repository home page.](../../assets/whiteboard/doc-repo.png "I set up multiple frameworks to build our tools at Percona to support the research practice.")
 
 ---
 
-![Diagram illustrating the difference between focusing on a solution prematurely and focusing on a method of understanding the users' needs to find a solution.](../../assets/doc-problem.png "I delved into raising awareness about problem-solving by crafting educational artifacts focused on the design process.")
+![Diagram illustrating the difference between focusing on a solution prematurely and focusing on a method of understanding the users' needs to find a solution.](../../assets/whiteboard/doc-problem.png "I delved into raising awareness about problem-solving by crafting educational artifacts focused on the design process.")
 
-![Documentation snippet detailing how to contribute to the design process.](../../assets/doc-contribute.png "I always provide easily understandable information to our colleagues, so they can easily reach us and contribute.")
+![Documentation snippet detailing how to contribute to the design process.](../../assets/whiteboard/doc-contribute.png "I always provide easily understandable information to our colleagues, so they can easily reach us and contribute.")
 
-![Whiteboard screenshots illustrate the collaboration trail left from a workshop session.](../../assets/workshop.png "I advocate participating in a workshop or any other collaborative session to gather different expertise on solving users' problems.")
+![Whiteboard screenshots illustrate the collaboration trail left from a workshop session.](../../assets/whiteboard/workshop.png "I advocate participating in a workshop or any other collaborative session to gather different expertise on solving users' problems.")
 
-![Whiteboard screenshot showing a part of the critique process with design and fields on the side to ask for participants' feedback.](../../assets/critique.png "I developed a critique framework to ask for more and faster feedback on designs that is based on async collaboration, improving efficiency and product quality even before deployment.")
+![Whiteboard screenshot showing a part of the critique process with design and fields on the side to ask for participants' feedback.](../../assets/whiteboard/critique.png "I developed a critique framework to ask for more and faster feedback on designs that is based on async collaboration, improving efficiency and product quality even before deployment.")

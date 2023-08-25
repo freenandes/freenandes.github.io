@@ -11,7 +11,7 @@ function formatDate(isoDateString: string): string {
 }
 const formattedPubDate = formatDate(frontmatter.pubDate);
 ---
-<Shell title={ frontmatter.title } description={ frontmatter.description } author={ frontmatter.author } customClass={ frontmatter.customClass } metaImage={ frontmatter.image.url }></Shell>
+<Shell title={ frontmatter.title } description={ frontmatter.description } author={ frontmatter.author } customClass={ `wz-${frontmatter.id}` }></Shell>
     <div id="webzineView">
         <header>
             <a href={ parentFolder } class="delayed">Back to list</a>
@@ -25,7 +25,7 @@ const formattedPubDate = formatDate(frontmatter.pubDate);
         </main>
         <footer>
             <button id="langToggle" class="delayed" aria-label="Change story language">Read in Portuguese</button>
-            <small>Created by Pedro MC Fernandes in { formattedPubDate }</small>
+            <small>Created by { frontmatter.author } in { formattedPubDate }</small>
         </footer>
     </div>
 </Shell>
@@ -178,7 +178,7 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-image: url("/src/pages/dor-cronica/drive/cover.svg");
+    background-image: url("../assets/dor-cronica/drive/cover.svg");
     background-repeat: repeat;
     background-position: center;
     background-size: 160%;

@@ -15,7 +15,7 @@ I explain why and how we use the data, so everyone can be on the lookout for any
     <small>Exposing how design operates and the benefits of cross-functional work is essential to kickstart collaboration between departments.</small>
 </div>
 
-![A mosaic of interview excerpts made with a support expert. Each excerpt has colored tags to categorize the research.](../../assets/expert-interview.png "By exploring roles in support and customer-facing positions, we can quickly start to identify any issues with our products or services.")
+![A mosaic of interview excerpts made with a support expert. Each excerpt has colored tags to categorize the research.](../../assets/whiteboard/expert-interview.png "By exploring roles in support and customer-facing positions, we can quickly start to identify any issues with our products or services.")
 
 ---
 
@@ -23,6 +23,6 @@ This would be the first step to approach the research phase. More is definitely 
 
 We may need to go back to experts and users again to validate assumptions and tracking of success through interviews and tests. I usually map all collected information to facilitate the analysis of experts and stakeholders to have a shared understanding of our direction.
 
-![Post-its mapping of information about query analysis in database monitoring.](../../assets/expert-insights.png "When dealing with tech I'm new to, annotating the base concepts as I learn will help generate ideas to onboard users to products.")
+![Post-its mapping of information about query analysis in database monitoring.](../../assets/whiteboard/expert-insights.png "When dealing with tech I'm new to, annotating the base concepts as I learn will help generate ideas to onboard users to products.")
 
-![Post-its mapping of problems, their solutions, and the definition of success.](../../assets/solutions-vs-success.png "I usually map solutions and definitions of success to ask for collaboration on how we'll collect data after changing things.")
+![Post-its mapping of problems, their solutions, and the definition of success.](../../assets/whiteboard/solutions-vs-success.png "I usually map solutions and definitions of success to ask for collaboration on how we'll collect data after changing things.")

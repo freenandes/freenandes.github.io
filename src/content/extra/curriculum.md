@@ -6,7 +6,7 @@ title: "Pedro MC Fernandes CV"
 ## Product Designer<br>
 <br>
 
-![Portrait of the website's author, Pedro MC Fernandes](../../assets/pmcf.jpg)
+![Portrait of the website's author, Pedro MC Fernandes](../../assets/whiteboard/pmcf.jpg)
 
 [Contact me at www.pmcf.xyz](/)<br>
 <a href="https://linkedin.com/in/pmcfernandes" target="_blank">linkedin.com/in/pmcfernandes</a><br>

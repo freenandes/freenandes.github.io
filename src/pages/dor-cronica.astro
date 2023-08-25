@@ -14,7 +14,7 @@ const allZines = await Astro.glob('../pages/dor-cronica/*.md');
             {
                 allZines.sort((a, b) => new Date(b.frontmatter.pubDate).getTime() - new Date(a.frontmatter.pubDate).getTime())
                     .map((post) =>
-                        <WebzineCard url={post.url} title={post.frontmatter.title} cover={post.frontmatter.image.url} coverAlt={post.frontmatter.image.alt} coverTheme={post.frontmatter.coverTheme}/>
+                        <WebzineCard url={post.url} title={post.frontmatter.title} cover={`/src/assets/dor-cronica/${post.frontmatter.id}/cover.svg`} coverTheme={post.frontmatter.coverTheme} />
                     ) 
             }
         </ul>

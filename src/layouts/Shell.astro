@@ -586,6 +586,12 @@ import panzoom, { PanZoom } from 'panzoom';
 import tippy, { Props } from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import Mark from 'mark.js';
+import lozad from 'lozad';
+
+// Images w/ Intersection Observer
+const wildFigs = document.querySelectorAll('img, video');
+const observer = lozad(wildFigs);
+observer.observe();
 
 // Elements
 const canvas = document.getElementById('canvas') as HTMLElement;

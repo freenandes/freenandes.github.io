@@ -13,11 +13,13 @@
     "@jsplumb/browser-ui": "^6.2.9",
     "astro": "^2.9.6",
     "autoprefixer": "^10.4.14",
+    "lozad": "^1.16.0",
     "panzoom": "^9.4.3",
     "tippy.js": "^6.3.7",
     "typescript": "^5.1.6"
   },
   "devDependencies": {
+    "@types/lozad": "^1.16.1",
     "mark.js": "^8.11.1"
   }
 }

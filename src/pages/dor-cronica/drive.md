@@ -5,9 +5,12 @@ id: 'drive'
 description: 'This is my first story.'
 author: 'Pedro MC Fernandes'
 pubDate: 2023-07-09
+coverFormat: 'svg'
 coverTheme: 'light'
 ---
 <div slide="cover">
+
+![This is an image](../../assets/dor-cronica/drive/cover.svg)
 
 # Drive
 

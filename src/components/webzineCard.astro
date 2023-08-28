@@ -1,9 +1,10 @@
 ---
-const { title, url, coverTheme = 'dark' } = Astro.props;
+const { customClasses, url, title, imageSrc, imageAlt } = Astro.props;
+import { Image } from "astro:assets";
 ---
-<li class={ `webzineCard ${coverTheme}` }>
+<li class={ `webzineCard ${customClasses}` }>
     <a href={ url } class="delayed">
         <h2>{ title }</h2>
-        <img src="" width="1024" height="1024" alt="" />
+        <Image src={ imageSrc } alt={ imageAlt } />
     </a>
 </li>

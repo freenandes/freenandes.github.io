@@ -588,7 +588,7 @@ import 'tippy.js/dist/tippy.css';
 import Mark from 'mark.js';
 import lozad from 'lozad';
 
-// Images w/ Intersection Observer
+// Images w/ Lozad and Intersection Observer
 const wildFigs = document.querySelectorAll('img, video');
 const observer = lozad(wildFigs);
 observer.observe();
@@ -731,11 +731,6 @@ function initPanzoom() {
 	}
 }
 
-
-
-
-
-
 function highlightText() {
 	const searchTerm = (document.getElementById('highlighter') as HTMLInputElement).value.trim();
 
@@ -755,14 +750,33 @@ function highlightText() {
 }
 document.getElementById('highlighter')?.addEventListener('input', highlightText);
 
-
-
-
-
-
-
 // Initialization
 window.addEventListener('load', function() {
+	// Delayed buttons/links
+	const reel = document.getElementById('reel');
+    const DELAY = 400;
+    const clickableElements = document.querySelectorAll<HTMLAnchorElement | HTMLButtonElement>('a.delayed, #langToggle');
+    clickableElements.forEach(element => {
+        element.addEventListener('click', function(e) {
+            e.preventDefault();
+            element.classList.add('visible');
+            setTimeout(() => {
+                element.classList.remove('visible');
+                if (element instanceof HTMLAnchorElement) {
+                    window.location.href = element.href;
+                } else if (element.id === 'langToggle') {
+                    const langAttribute = reel ? reel.getAttribute('lang') : null;
+                    if (langAttribute === 'en') {
+                        reel?.setAttribute('lang', 'pt');
+                        element.textContent = 'Read in English';
+                    } else {
+                        reel?.setAttribute('lang', 'en');
+                        element.textContent = 'Read in Portuguese';
+                    }
+                }
+            }, DELAY);
+        });
+    });
 
 	// Tippy
 	const titles = Array.from(document.querySelectorAll<HTMLElement>(':not(section):not(h2)[aria-label]'));

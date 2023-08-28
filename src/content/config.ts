@@ -31,4 +31,18 @@ export const collections = {
       title: z.string(),
     }),
   }),
+  'dor-cronica': defineCollection ({
+    schema: ({ image }) => z.object({
+      layout: z.string().default("../../layouts/WebzineView.astro"),
+      title: z.string(),
+      description: z.string(),
+      author: z.string().default("Pedro MC Fernandes"),
+      pubDate: z.date(),
+      cover: image().refine((img) => img.width >= 1024, {
+        message: "Cover image must be at least 1024 pixels wide!",
+      }),
+      coverAlt: z.string(),
+      customClasses: z.string().default("dark"),
+    })
+  }),
 };

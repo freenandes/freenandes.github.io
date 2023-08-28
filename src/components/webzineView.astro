@@ -1,34 +1,29 @@
 ---
-import Shell from '../layouts/Shell.astro';
-const { frontmatter } = Astro.props;
-const urlBlocks = frontmatter.url.split('/');
-urlBlocks.pop();
-const parentFolder = urlBlocks.join('/');
+const { parentFolder, author, pubDate } = Astro.props;
+
 function formatDate(isoDateString: string): string {
     const date = new Date(isoDateString);
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
     return date.toLocaleDateString('en-US', options);
 }
-const formattedPubDate = formatDate(frontmatter.pubDate);
+const formattedPubDate = formatDate(pubDate);
 ---
-<Shell title={ frontmatter.title } description={ frontmatter.description } author={ frontmatter.author } customClass={ `wz-${frontmatter.id}` }></Shell>
-    <div id="webzineView">
-        <header>
-            <a href={ parentFolder } class="delayed">Back to list</a>
-        </header>
-        <main>
-            <button class="nav" id="prev" aria-label="Previous slide">←</button>
-            <button class="nav" id="next" aria-label="Next slide">→</button>
-            <div id="reel" lang="en" aria-live="assertive">
-                <slot />
-            </div>
-        </main>
-        <footer>
-            <button id="langToggle" class="delayed" aria-label="Change story language">Read in Portuguese</button>
-            <small>Created by { frontmatter.author } in { formattedPubDate }</small>
-        </footer>
-    </div>
-</Shell>
+<div id="webzineView">
+    <header>
+        <a href={ parentFolder } class="delayed">Back to list</a>
+    </header>
+    <main>
+        <button class="nav" id="prev" aria-label="Previous slide">←</button>
+        <button class="nav" id="next" aria-label="Next slide">→</button>
+        <div id="reel" lang="en" aria-live="assertive">
+            <slot />
+        </div>
+    </main>
+    <footer>
+        <button id="langToggle" class="delayed" aria-label="Change story language">Read in Portuguese</button>
+        <small>Created by { author } in { formattedPubDate }</small>
+    </footer>
+</div>
 <style is:global>
 /* Global Styles */
 @font-face {
@@ -270,31 +265,6 @@ blockquote > *:not(:last-child) {
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Delayed buttons/links
-    const DELAY = 400;
-    const clickableElements = document.querySelectorAll<HTMLAnchorElement | HTMLButtonElement>('a.delayed, #langToggle');
-    clickableElements.forEach(element => {
-        element.addEventListener('click', function(e) {
-            e.preventDefault();
-            element.classList.add('visible');
-            setTimeout(() => {
-                element.classList.remove('visible');
-                if (element instanceof HTMLAnchorElement) {
-                    window.location.href = element.href;
-                } else if (element.id === 'langToggle') {
-                    const langAttribute = reel ? reel.getAttribute('lang') : null;
-                    if (langAttribute === 'en') {
-                        reel?.setAttribute('lang', 'pt');
-                        element.textContent = 'Read in English';
-                    } else {
-                        reel?.setAttribute('lang', 'en');
-                        element.textContent = 'Read in Portuguese';
-                    }
-                }
-            }, DELAY);
-        });
-    });
-
     // Next/prev buttons on slideshow
     const reel = document.getElementById('reel');
     const nextButton = document.getElementById('next');

@@ -1,12 +1,9 @@
 ---
-layout: ../../layouts/WebzineView.astro
-title: 'Drive'
-id: 'drive'
-description: 'This is my first story.'
-author: 'Pedro MC Fernandes'
+title: "Drive"
+description: "This is my first story"
 pubDate: 2023-07-09
-coverFormat: 'svg'
-coverTheme: 'light'
+cover: "../../assets/dor-cronica/drive/cover.svg"
+coverAlt: "This is the cover image"
 ---
 <div slide="cover">
 

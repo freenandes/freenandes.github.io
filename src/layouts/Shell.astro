@@ -55,23 +55,23 @@ const { title, description, author = "Pedro MC Fernandes", customClass, metaImag
 	/* Colors */
 	--toast: #eeeeed;
 	--paper: #F8F8F7;
-	--paper-fade: rgba(248, 248, 247, 0.5);
+	--paperFade: rgba(248, 248, 247, 0.5);
 	--charcoal: #242630;
-	--charcoal-fade: #4a4c58;
-	--black-light: rgba(0, 0, 0, 0.07);
-	--black-fade: rgba(0, 0, 0, 0.2);
-	--black-medium: rgba(0, 0, 0, 0.4);
-	--black-strong: rgba(0, 0, 0, 0.8);
+	--charcoalFade: #4a4c58;
+	--blackLight: rgba(0, 0, 0, 0.07);
+	--blackFade: rgba(0, 0, 0, 0.2);
+	--blackMedium: rgba(0, 0, 0, 0.4);
+	--blackStrong: rgba(0, 0, 0, 0.8);
 	--white: white;
-	--white-light: rgba(255, 255, 255, 0.12);
-	--stickie-yellow: #ffe38c;
-	--yellow-fade: rgba(255, 227, 140, 0.25);
-	--stickie-blue: #c1edfc;
-	--blue-fade: rgba(193, 237, 252, 0.25);
-	--stickie-green: #d0f580;
-	--green-fade: rgba(208, 245, 128, 0.25);
-	--stickie-pink: #ffdadf;
-	--pink-fade: rgba(255, 218, 223, 0.25);
+	--whiteLight: rgba(255, 255, 255, 0.12);
+	--stickieYellow: #ffe38c;
+	--yellowFade: rgba(255, 227, 140, 0.25);
+	--stickieBlue: #c1edfc;
+	--blueFade: rgba(193, 237, 252, 0.25);
+	--stickieGreen: #d0f580;
+	--greenFade: rgba(208, 245, 128, 0.25);
+	--stickiePink: #ffdadf;
+	--pinkFade: rgba(255, 218, 223, 0.25);
 	--purple: #6a61dd;
 	--hilite: var(--purple);
 	/* Form */
@@ -83,24 +83,24 @@ const { title, description, author = "Pedro MC Fernandes", customClass, metaImag
 	--sf: 0.8125rem;
 	--sg: 1.3125rem;
 	--sz: 10em;
-	--shadow-a: var(--black-fade) 0 0.125rem 0 0;
-	--shadow-b: var(--black-light) 0 0.5rem 0 0;
+	--shadow01: var(--blackFade) 0 0.125rem 0 0;
+	--shadow02: var(--blackLight) 0 0.5rem 0 0;
 	/* Whiteboard grid control */
-	--maxcol-01: 17em;
-	--maxcol-02: calc(var(--maxcol-01) * 2 + 2em);
-	--maxcol-03: calc(var(--maxcol-01) * 3 + 3em);
-	--maxcol-04: calc(var(--maxcol-01) * 4 + 4em);
-	--maxcol-05: calc(var(--maxcol-01) * 5 + 5em);
-	--maxcol-06: calc(var(--maxcol-01) * 6 + 6em);
-	--maxcol-07: calc(var(--maxcol-01) * 7 + 7em);
+	--maxcol01: 17em;
+	--maxcol02: calc(var(--maxcol01) * 2 + 2em);
+	--maxcol03: calc(var(--maxcol01) * 3 + 3em);
+	--maxcol04: calc(var(--maxcol01) * 4 + 4em);
+	--maxcol05: calc(var(--maxcol01) * 5 + 5em);
+	--maxcol06: calc(var(--maxcol01) * 6 + 6em);
+	--maxcol07: calc(var(--maxcol01) * 7 + 7em);
 	/* Layering system */
-	--l-overlay: 1;
-	--l-overlap: 2;
-	--l-float: 4;
-	--l-modality: 8;
-	--l-system: 16;
+	--layerOverlay: 1;
+	--layerOverlap: 2;
+	--layerFloat: 4;
+	--layerModality: 8;
+	--layerSystem: 16;
 	/* GUI */
-	--cursor-default: url(/artwork/default.svg) 7 1, auto;
+	--cursorDefault: url(/artwork/default.svg) 7 1, auto;
 }
 @keyframes blink {
 	0%, 90% {
@@ -118,7 +118,7 @@ html {
 	line-height: 150%;
 	color: var(--charcoal);
 	background-color: var(--paper);
-	cursor: var(--cursor-default);
+	cursor: var(--cursorDefault);
 }
 html.index :not(a):not(input):not(textarea):not(button):not(button *):not(abbr[aria-label]):not(img:hover):not([video]):not(video) {
 	cursor: url(/artwork/grab.svg) 12 12, grab;
@@ -168,7 +168,7 @@ a, a:visited {
 	border-radius: var(--sa);
 }
 a:hover {
-	color: var(--black-medium);
+	color: var(--blackMedium);
 }
 a:active {
 	color: var(--accent);
@@ -177,7 +177,7 @@ a:active {
 	outline: none;
 }
 a:focus-visible {
-	outline: 0.125rem dashed var(--black-strong);
+	outline: 0.125rem dashed var(--blackStrong);
 	outline-offset: 0.0625rem;
 }
 small {
@@ -186,7 +186,7 @@ small {
 	line-height: 133%;
 }
 small a:hover {
-	color: var(--black-strong);
+	color: var(--blackStrong);
 }
 .preloader {
 	position: fixed;
@@ -199,7 +199,7 @@ small a:hover {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	z-index: var(--l-system);
+	z-index: var(--layerSystem);
 	opacity: 1;
 	pointer-events: none;
 	transition: opacity 600ms ease-out;
@@ -233,12 +233,12 @@ section {
 .button-3d.group button:nth-child(1n+2) {
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
-	border-left: 0.5px solid var(--black-medium);
+	border-left: 0.5px solid var(--blackMedium);
 }
 .button-3d.group button:nth-last-child(1n+2) {
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
-	border-right: 0.5px solid var(--black-medium);
+	border-right: 0.5px solid var(--blackMedium);
 }
 button {
 	font-family: "LexendDeca", system-ui, Arial, sans-serif;
@@ -255,20 +255,20 @@ button {
 	margin: 0;
 	transition: all 0.1s ease-out;
     /* transition: padding 0.1s ease-out, box-shadow 0.1s ease-out; */
-    box-shadow: var(--black-fade) 0 -0.25em 0 inset;
+    box-shadow: var(--blackFade) 0 -0.25em 0 inset;
 }
 button:hover {
     padding: 0.5em 0.75em 0.5em;
-    box-shadow: var(--black-fade) 0 0 0 inset;
+    box-shadow: var(--blackFade) 0 0 0 inset;
 }
 button:active {
     padding: 0.75em 0.75em 0.25em;
-    box-shadow: var(--black-medium) 0 0.25em 0 inset;
+    box-shadow: var(--blackMedium) 0 0.25em 0 inset;
 }
 button:focus-visible {
-	outline: 0.125rem dashed var(--black-strong);
+	outline: 0.125rem dashed var(--blackStrong);
 	outline-offset: 0.125rem;
-	z-index: var(--l-overlay);
+	z-index: var(--layerOverlay);
 }
 button.icon {
 	padding-right: 0.625em;
@@ -311,10 +311,10 @@ input, textarea {
     box-sizing: border-box;
 	font-weight: 350;
 	line-height: 150%;
-	color: var(--black-strong);
+	color: var(--blackStrong);
     background-color: transparent;
     padding: 0.125em 0.25em;
-    border: 0.125rem solid var(--black-fade);
+    border: 0.125rem solid var(--blackFade);
     border-radius: var(--sc);
 }
 textarea {
@@ -322,7 +322,7 @@ textarea {
     resize: vertical;
 }
 input::placeholder, textarea::placeholder {
-    color: var(--black-medium);
+    color: var(--blackMedium);
 }
 input:not([type="search"]):not(:placeholder-shown), textarea:not(:placeholder-shown) {
     border-color: transparent;
@@ -331,11 +331,11 @@ input:not(:placeholder-shown), textarea:not(:placeholder-shown) {
     background-color: var(--paper);
 }
 input:hover, textarea:hover {
-    border-color: var(--black-medium);
+    border-color: var(--blackMedium);
 }
 input:focus, textarea:focus {
     outline: none;
-    border-color: var(--black-strong);
+    border-color: var(--blackStrong);
     box-shadow: none;
 }
 input[type="search"] {
@@ -354,7 +354,7 @@ input[type="search"] {
     font-weight: 375;
 	line-height: 125%;
     padding: 0.125em 0.25em;
-	background-color: var(--black-light);
+	background-color: var(--blackLight);
 	border-radius: var(--sc);
 	white-space: nowrap;
 }
@@ -368,7 +368,7 @@ code {
 	padding-bottom: 0;
 }
 .footnote {
-	color: var(--black-medium);
+	color: var(--blackMedium);
 	display: flex;
 	flex-direction: column;
 	box-sizing: border-box;
@@ -391,7 +391,7 @@ code {
 	justify-content: center;
 	align-items: center;
 	color: var(--white);
-	background-color: var(--black-medium);
+	background-color: var(--blackMedium);
     top: 0;
     left: 0;
     width: 100%;
@@ -404,7 +404,7 @@ code {
 }
 abbr[aria-label] {
 	cursor: url(/artwork/help.svg) 12 12, help;
-	border-bottom: 0.125em dashed var(--black-medium);
+	border-bottom: 0.125em dashed var(--blackMedium);
 }
 ::selection {
 	color: var(--white);
@@ -425,19 +425,19 @@ mark {
 	line-height: 133%;
 	padding: 0.25em 0.5em;
 	color: var(--white);
-  	background-color: var(--charcoal-fade);
+  	background-color: var(--charcoalFade);
 	border-radius: var(--sc);
 }
 .tippy-content {
 	padding: 0.25em;
 }
 .tippy-arrow {
-	color: var(--charcoal-fade);
+	color: var(--charcoalFade);
 }
 /* jsPlumb */
 #plumbing {
 	position: relative;
-	z-index: var(--l-overlap);
+	z-index: var(--layerOverlap);
 }
 #plumbing path {
 	stroke: var(--charcoal);
@@ -459,7 +459,7 @@ aside {
 	word-spacing: -0.25em;
 }
 aside[id*="note"] {
-	z-index: var(--l-overlap);
+	z-index: var(--layerOverlap);
 }
 /* Dark mode */
 .dark, #modal.dark .dialog {
@@ -467,15 +467,15 @@ aside[id*="note"] {
 	background-color: var(--charcoal);
 }
 button.dark {
-	background-color: var(--charcoal-fade);
-	--black-fade: var(--black-medium);
-	--black-medium: var(--black-strong);
+	background-color: var(--charcoalFade);
+	--blackFade: var(--blackMedium);
+	--blackMedium: var(--blackStrong);
 }
 .dark button:focus-visible {
     outline-color: var(--paper);
 }
 .dark li, .dark code {
-	background-color: var(--white-light);
+	background-color: var(--whiteLight);
 }
 @media (min-width: 1440px) {
 	body > *:not(.whiteboard) .button-3d {
@@ -583,7 +583,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // Imports
 import panzoom, { PanZoom } from 'panzoom';
-import tippy, { Props } from 'tippy.js';
+import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import Mark from 'mark.js';
 import lozad from 'lozad';
@@ -678,19 +678,26 @@ function initPanzoom() {
 					newDotSize = 0; // No dot
 				}
 				mainElement.style.backgroundSize = `${newSize}px ${newSize}px`;
-				mainElement.style.backgroundImage = `radial-gradient(var(--black-light) ${newDotSize}em, transparent ${newDotSize}em)`;
+				mainElement.style.backgroundImage = `radial-gradient(var(--blackLight) ${newDotSize}em, transparent ${newDotSize}em)`;
 			}
 		});
 
 
 		// Zoom keys
-		zoomInButton?.addEventListener('click', () => zoom(pz, true));
-		zoomOutButton?.addEventListener('click', () => zoom(pz, false));
+		zoomInButton?.addEventListener('click', () => {
+			zoom(pz, true);
+			pz.resume();
+		});
+		zoomOutButton?.addEventListener('click', () => {
+			zoom(pz, false);
+			pz.resume();
+		});
 
 		// Reset navigation
 		resetNavButton?.addEventListener('click', function() {
 			pz.moveTo(pzSet.x, pzSet.y);
   			pz.zoomAbs(pzSet.x, pzSet.y, pzSet.z);
+			pz.resume();
 		});
 
 		// Handling interactables
@@ -784,7 +791,7 @@ window.addEventListener('load', function() {
 		tippy(el, {
 			content: el.getAttribute('aria-label') || '',
 			touch: 'hold',
-		} as Partial<Props>);
+		});
 	});
 
 	// Start panzoom

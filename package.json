@@ -11,15 +11,15 @@
   },
   "dependencies": {
     "@jsplumb/browser-ui": "^6.2.9",
-    "astro": "^2.9.6",
+    "astro": "^3.0.3",
     "autoprefixer": "^10.4.14",
     "lozad": "^1.16.0",
     "panzoom": "^9.4.3",
-    "tippy.js": "^6.3.7",
-    "typescript": "^5.1.6"
+    "tippy.js": "^6.3.7"
   },
   "devDependencies": {
     "@types/lozad": "^1.16.1",
-    "mark.js": "^8.11.1"
+    "mark.js": "^8.11.1",
+    "typescript": "^5.2.2"
   }
 }

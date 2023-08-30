@@ -3,7 +3,7 @@
 </article>
 <style is:global>
 article {
-	color: var(--black-strong);
+	color: var(--blackStrong);
     display: flex;
 	flex-direction: row;
     flex-wrap: wrap;
@@ -11,13 +11,13 @@ article {
 }
 article > * {
     box-sizing: border-box;
-    background-color: var(--stickie-yellow);
+    background-color: var(--stickieYellow);
     width: 17rem;
     padding: 1rem;
     margin: 0 1rem 1rem 0;
     border-radius: var(--sd);
     aspect-ratio: 1 / 1;
-    box-shadow: var(--shadow-a);
+    box-shadow: var(--shadow01);
 }
 .whiteboard article > h3 {
     font-size: 1.75em;
@@ -75,9 +75,9 @@ article video + small {
     max-height: 100%;
     padding: 4rem 1rem 1rem;
     color: var(--paper);
-    background: linear-gradient(to top, var(--black-strong) calc(100% - 8rem), transparent calc(100% - var(--sd)));
+    background: linear-gradient(to top, var(--blackStrong) calc(100% - 8rem), transparent calc(100% - var(--sd)));
     transition: opacity 1s ease-in-out;
-    z-index: var(--l-overlay);
+    z-index: var(--layerOverlay);
     pointer-events: none;
 }
 article img:hover + small,
@@ -99,21 +99,21 @@ article > hr + * {
 /* Content design */
 #who-01,
 #who-02 {
-    width: var(--maxcol-04);
+    width: var(--maxcol04);
 }
 #why-01,
 #wat-01,
 #wat-03,
 #wat-05 {
-    width: var(--maxcol-05);
+    width: var(--maxcol05);
 }
 #why-06,
 #wat-06,
 #wat-07,
 #wat-08 {
-    width: var(--maxcol-06);
+    width: var(--maxcol06);
 }
 #wat-04 {
-    width: var(--maxcol-07);
+    width: var(--maxcol07);
 }
 </style>

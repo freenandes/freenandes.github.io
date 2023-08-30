@@ -191,7 +191,7 @@ body > header {
 	left: 1em;
 	width: 100%;
 	max-width: calc(100vw - 1.5em);
-	z-index: var(--l-float);
+	z-index: var(--layerFloat);
 }
 body > header > * {
 	margin-right: 0.5rem;
@@ -216,7 +216,7 @@ main {
 	padding: 12em;
 	background-position: 0 0;
 	/*background-size: 1em 1em;*/
-	/*background-image: radial-gradient(var(--black-light) 0.0625em, transparent 0.0625em);*/
+	/*background-image: radial-gradient(var(--blackLight) 0.0625em, transparent 0.0625em);*/
 }
 main section:not(:last-of-type) {
 	margin-right: 7em;
@@ -242,7 +242,7 @@ main section:not(:last-of-type) {
 	border-radius: var(--sd);
 	color: var(--paper);
 	background-color: var(--charcoal);
-	box-shadow: var(--shadow-a);
+	box-shadow: var(--shadow01);
 }
 .title .badge {
 	margin-right: 1.5rem;
@@ -281,28 +281,28 @@ h1.title img {
 section {
 	padding: 6em 6em 6em 7em;
 	border-radius: var(--sf);
-	background-color: var(--yellow-fade);
+	background-color: var(--yellowFade);
 }
 section#who {
-	background-color: var(--blue-fade);
+	background-color: var(--blueFade);
 }
 section#why {
-	background-color: var(--green-fade);
+	background-color: var(--greenFade);
 }
 section#wat {
-	background-color: var(--pink-fade);
+	background-color: var(--pinkFade);
 }
 section:not(#pmcf-xyz) :global(article:not(:last-of-type)) {
 	margin-bottom: 8em;
 }
 section:nth-child(2) :global(article > *) {
-    background-color: var(--stickie-blue);
+    background-color: var(--stickieBlue);
 }
 section:nth-child(3) :global(article > *) {
-    background-color: var(--stickie-green);
+    background-color: var(--stickieGreen);
 }
 section:nth-child(4) :global(article > *) {
-    background-color: var(--stickie-pink);
+    background-color: var(--stickiePink);
 }
 .controls {
 	display: flex;
@@ -312,7 +312,7 @@ section:nth-child(4) :global(article > *) {
 	max-width: calc(100vw - 1.5em);
 	right: 0.5em;
 	bottom: 0.5em;
-	z-index: var(--l-float);
+	z-index: var(--layerFloat);
 }
 .controls > * {
 	margin-right: 0.5rem;
@@ -322,7 +322,7 @@ section:nth-child(4) :global(article > *) {
 	flex: 0 1 16em;
 	width: 100%;
 	min-height: 2.25em;
-	/* background-color: var(--paper-fade); */
+	/* background-color: var(--paperFade); */
 	/* backdrop-filter: blur(0.25rem); */
 	transition: all 200ms ease-out;
 }
@@ -398,7 +398,7 @@ aside#note-open {
 	position: absolute;
 	width: auto;
 	height: 14rem;
-	z-index: var(--l-overlap);
+	z-index: var(--layerOverlap);
 }
 .sticker[src*="peace"] {
 	top: 114rem;
@@ -469,7 +469,7 @@ aside#note-open {
 	overflow: hidden;
 	border-radius: var(--sf);
 	transform: rotate(355deg);
-	box-shadow: var(--black-fade) -0.0625rem 0.25rem 0 0;
+	box-shadow: var(--blackFade) -0.0625rem 0.25rem 0 0;
 }
 #pedroPort img {
 	width: 100%;
@@ -481,7 +481,7 @@ aside#note-open {
 section#pmcf-xyz {
 	flex-direction: row;
 	flex-wrap: wrap;
-	max-width: var(--maxcol-02);
+	max-width: var(--maxcol02);
 }
 section#pmcf-xyz > :global(article) {
 	margin: 0 1em 1em 0;

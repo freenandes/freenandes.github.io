@@ -1,39 +1,12 @@
 ---
+// Imports
+import PMCF from '../layouts/PMCF.astro';
+// Meta
 const title = "Page not found";
 const description = "The page you are looking for cannot be found, sorry. Please check the URL for typos or go to the main page.";
-const customClass = "404";
-const metaImage = "/meta.png";
-import Shell from '../layouts/Shell.astro';
-import Stickie from '../components/stickie.astro';
-import { Content as NotFound } from '../content/extra/404.md';
 ---
-<Shell title={ title } description={ description } customClass={ customClass } metaImage={ metaImage }>
-    <section>
-        <h1 class="title">{ title }</h1>
-        <Stickie>
-            <div>
-                <NotFound />
-            </div>
-        </Stickie>
-    </section>
-</Shell>
-<style>
-body {
-    width: 100vw;
-    min-height: 100vh;
-    min-height: 100dvh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-image: radial-gradient(var(--blackLight) 0.125em, transparent 0.125em);
-	background-size: 2em 2em;
-	background-position: center center;
-}
-section {
-    width: min-content;
-    padding: 2em 1em;
-}
-.title {
-    margin-bottom: 2rem;
-}
-</style>
+<PMCF title={title} description={description}>
+    <h1 class="title">{title}</h1>
+    <p>{description}</p>
+    <a href="/">Back to home page</a>
+</PMCF>

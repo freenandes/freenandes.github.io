@@ -1,0 +1,218 @@
+---
+
+// import { ViewTransitions } from 'astro:transitions';
+
+const { title, description, author="Pedro MC Fernandes" } = Astro.props;
+
+---
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{title}</title>
+        <!-- Favicon -->
+        <!-- Image -->
+        <meta name="description" content={description}>
+        <meta name="author" content={author}>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta charset="utf-8" />
+        <meta name="generator" content={Astro.generator} />
+        <!-- <ViewTransitions /> -->
+        <!-- <script data-respect-dnt data-no-cookie async src="https://cdn.splitbee.io/sb.js"></script> -->
+    </head>
+    <body>
+        <slot />
+    </body>
+</html>
+
+<style is:global>
+
+/* Setup */
+
+@font-face {
+	font-family: "LexendDeca";
+	src:
+		url("/fonts/LexendDeca.woff2") format("woff2 supports variations"),
+		url("/fonts/LexendDeca.woff2") format("woff2-variations");
+	font-weight: 100 1000;
+	font-display: swap;
+}
+@font-face {
+	font-family: "LexendPeta";
+	src:
+		url("/fonts/LexendPeta.woff2") format("woff2 supports variations"),
+		url("/fonts/LexendPeta.woff2") format("woff2-variations");
+	font-weight: 100 1000;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Park";
+	src:
+		url("/fonts/NationalPark-VariableVF.woff2") format("woff2 supports variations"),
+		url("/fonts/NationalPark-VariableVF.woff2") format("woff2-variations");
+	font-weight: 275 800;
+	font-display: swap;
+}
+:root {
+
+    /* Colors */
+
+    --charcoal: #242630;
+    --azulejo: #0151da;
+
+    /* Palette */
+
+    --paper: #F8F8F7;
+    --ink: var(--azulejo);
+
+    /* Spacing */
+
+    --s2p: 0.125em;
+    --s4p: 0.25em;
+    --s8p: 0.5em;
+    --s16p: 1em;
+    --s32p: 2em;
+    --s64p: 4em;
+}
+
+/* Scrollbar */
+
+* {
+    scrollbar-color: var(--ink) var(--paper);
+}
+*::-webkit-scrollbar {
+    width: 1em;
+}
+*::-webkit-scrollbar-thumb {
+    border-radius: 1em;
+    background-color: var(--ink);
+    border: var(--s4p) solid var(--paper);
+}
+*::-webkit-scrollbar-thumb:hover {
+    background-color: var(--charcoal);
+}
+*::-webkit-scrollbar-track {
+    background-color: var(--paper);
+}
+
+/* Animations */
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Basics */
+
+html {
+	font-family: "LexendDeca", system-ui, Helvetica, Arial, sans-serif;
+	font-size: 100%;
+	font-weight: 375;
+	line-height: 150%;
+	color: var(--ink);
+	background-color: var(--paper);
+}
+body {
+    margin: 0;
+    opacity: 0;
+    animation: fadeIn 200ms ease-out 100ms forwards;
+}
+::selection {
+    color: var(--paper);
+    background-color: var(--ink);
+}
+a {
+    color: var(--ink);
+    transition: opacity 100ms ease-out;
+}
+a:hover {
+    opacity: 0.5;
+}
+
+/* Typography */
+
+h1, h2, h3, h4, h5, h6 {
+    line-height: 100%;
+    text-transform: uppercase;
+    letter-spacing: -0.03125em;
+    margin: var(--s16p) 0 var(--s4p);
+    overflow-wrap: break-word;
+}
+h1 {
+    font-size: calc(2em + 4vw);
+    font-weight: 525;
+}
+h2 {
+    font-size: calc(1.625em + 2vw);
+    font-weight: 550;
+}
+h3 {
+    font-size: calc(1.375em + 1vw);
+    font-weight: 575;
+}
+h4 {
+    font-size: calc(1.25em + 0.5vw);
+    font-weight: 600;
+}
+h5 {
+    font-size: calc(1.125em + 0.25vw);
+    font-weight: 625;
+}
+h6 {
+    font-size: calc(1em + 0.125vw);
+}
+p {
+    font-size: calc(0.75em + 1vw);
+    font-weight: 350;
+    line-height: 150%;
+    margin: 0 0 var(--s16p);
+}
+
+</style>
+
+<script>
+
+// Detecting and working with the scrollbar width
+
+function setScrollbarWidthVariable() {
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.documentElement.style.setProperty('--scrollbarWidth', `${scrollbarWidth}px`);
+}
+setScrollbarWidthVariable();
+window.addEventListener('resize', setScrollbarWidthVariable);
+document.addEventListener('astro:after-swap', setScrollbarWidthVariable);
+
+// Save scroll position function
+
+function saveReelScrollPositions() {
+    const pageKey = window.location.pathname;
+    const reels = document.querySelectorAll(".reel");
+    reels.forEach((reel, index) => {
+        const scrollPos = reel.scrollLeft.toString();
+        sessionStorage.setItem(`reelScrollPos-${pageKey}-${index}`, scrollPos);
+    });
+}
+
+// Restore scroll position function
+
+function restoreReelScrollPositions() {
+    const pageKey = window.location.pathname;
+    const reels = document.querySelectorAll(".reel");
+    reels.forEach((reel, index) => {
+        const storedPos = sessionStorage.getItem(`reelScrollPos-${pageKey}-${index}`);
+        if (storedPos) {
+            reel.scrollLeft = Number(storedPos);
+        }
+    });
+}
+
+// Series of events to store and restore scroll
+
+window.addEventListener('beforeunload', saveReelScrollPositions);
+document.addEventListener('DOMContentLoaded', restoreReelScrollPositions);
+
+</script>

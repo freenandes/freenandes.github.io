@@ -15,77 +15,139 @@ const {Content} = await intro.render();
 ---
 
 <PMCF title={intro.data.title} description={intro.body}>
-	<div id="vscroll">
-		<header>
-			<div class="reel">
-				<div class="description card">
-					<h1>{intro.data.title}</h1>
-					<Content />
-				</div>
+	<header class="init">
+		<div class="reel">
+			<div id={intro.slug} class="description card">
+				<h1>{intro.data.title}</h1>
+				<Content />
 			</div>
-		</header>
-		{preface.map(async (preface) => {
-			const {Content} = await preface.render();
-			const relatedPosts = await getEntries(preface.data.relatedPosts);
-			return (
-				<section>
-					<button class="nav next" aria-label="Previous slide">←</button>
-        			<button class="nav prev" aria-label="Next slide">→</button>
-					<div class="reel">
-						<div class="description card">
-							<Content />
-						</div>
-						{relatedPosts.map(relatedPost => (
-							<article class="link card">
-								<a href=`/${relatedPost.collection}/${relatedPost.slug}`>
-									<Image src={relatedPost.data.cover} alt={relatedPost.data.coverAlt} width="200" />
-									{relatedPost.data.title}
-								</a>
-							</article>
-						))}
+		</div>
+	</header>
+	{preface.map(async (preface) => {
+		const {Content} = await preface.render();
+		const relatedPosts = await getEntries(preface.data.relatedPosts);
+		return (
+			<section class="gallery init">
+				<button class="nav next" aria-label="Next slide">→</button>
+				<button class="nav prev" aria-label="Previous slide">←</button>
+				<div class="reel">
+					<div id=`pre-${preface.slug}` class="description card">
+						<Content />
 					</div>
-				</section>
-			)}
+					{relatedPosts.map(relatedPost => (
+						<article class="link card">
+							<a href=`/${relatedPost.collection}/${relatedPost.slug}`>
+								<Image src={relatedPost.data.cover} alt={relatedPost.data.coverAlt} />
+								<span>{relatedPost.data.title}</span>
+							</a>
+						</article>
+					))}
+				</div>
+			</section>
 		)}
-	</div>
+	)}
+	<!-- <svg id="decOne" class="blob" width="1000" height="1000" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<title>Decorative ellipse shape filled with a chromatic gradient</title>
+		<defs>
+			<filter id="powerBlur" x="0" y="0" width="100%" height="100%" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+				<feFlood flood-opacity="0" result="bgImageFix" />
+				<feBlend mode="normal" in="SourceGraphic" in2="bgImageFix" result="withTransparency" />
+				<feGaussianBlur in="withTransparency" stdDeviation="100" result="blurred" />
+				<feTurbulence baseFrequency="1.5" result="noise" />
+				<feComposite in="blurred" in2="noise" operator="out" />
+			</filter>
+			<linearGradient id="ellipseFill" x1="25%" y1="0%" x2="75%" y2="100%" gradientUnits="userSpaceOnUse">
+				<stop stop-color="red" />
+				<stop offset="1" stop-color="blue" />
+			</linearGradient>
+		</defs>
+		<ellipse cx="50%" cy="50%" rx="25%" ry="25%" fill="url(#ellipseFill)" filter="url(#powerBlur)" />
+	</svg> -->
+	<footer class="clmnzd">
+		<form class="contact init" action="https://formspree.io/f/mnqyrkwr" method="POST" accept-charset="UTF-8">
+			<fieldset class="card">
+				<legend>Contact Pedro</legend>
+				<label for="email">Your Email</label>
+				<input type="email" id="email" name="email" maxlength="200" required autocomplete="on">
+				<label for="message">The Message</label>
+				<textarea id="message" name="message" maxlength="2000" required></textarea>
+				<button type="submit">Send thy missive</button>
+			</fieldset>
+		</form>
+		<nav class="hyperlinks init">
+			<a href="/whiteboard">
+				<span>About Pedro, a Whiteboard</span>
+			</a>
+			<a href="/cv">
+				<span>About Pedro, the Curriculum</span>
+			</a>
+			<a href="https://www.are.na/p-m-c-f" target="_blank">
+				<span>Are.na</span>
+			</a>
+			<a rel="me" href="https://mastodon.social/@freenandes" target="_blank">
+				<span>Mastodon</span>
+			</a>
+			<a href="https://www.linkedin.com/in/pmcfernandes/" target="_blank">
+				<span>LinkedIn</span>
+			</a>
+		</nav>
+		<small class="init">
+			Website designed, illustrated and assembled by me in 2023, inspired by historical portuguese references, using <a href="https://www.lexend.com/" target="_blank">Lexend</a> font by Bonnie Shaver-Troup and Thomas Jockin; Coconat Extended font by <a href="https://saralavazza.it/" target="_blank">Sara Lavazza</a>; Compagnon Script font by <a href="https://www.chloelozano.fr/" target="_blank">Chloé Lozano</a>; and <a href="https://astro.build/" target="_blank">Astro</a>'s web framework.
+		</small>
+	</footer>
 </PMCF>
 
 <style is:global>
 
-:root {
-
-	/* Slide defs */
-
-	--slideMargin: calc(var(--s4p) + 4vw);
-	--slideMarginTotal: calc(var(--slideMargin) * 2);
-	--slidePadding: calc(var(--slideMargin) * 1.5);
-	--slidePaddingTotal: calc(var(--slidePadding) * 2);
-	
-	/* Slide Description specifics */
-
-	--slideDescWidth: calc(100vw - (var(--slideMargin) * 2) - (var(--slidePadding) * 2) - var(--scrollbarWidth));
-	--slideDescContentWidth: calc(20em + 40vw);
-}
-
 /* Layout */
 
-/* #vscroll {
-	height: 100vh;
-	height: 100dvh;
-	overflow-x: hidden;
-    overflow-y: auto;
-    scroll-snap-type: y mandatory;
+section.gallery {
+	position: relative;
 }
-#vscroll > * {
-    scroll-snap-align: start;
-} */
+.gallery .nav {
+	--galleryNavFontSize: calc(1.5em + 2vw);
+	--galleryNavLenght: calc(var(--galleryNavFontSize) * 0.75);
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	z-index: 2;
+	font-family: var(--ffLexendPeta);
+	font-size: var(--galleryNavFontSize);
+	font-weight: 350;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: var(--galleryNavLenght);
+	height: var(--galleryNavLenght);
+	padding: calc(var(--galleryNavLenght) / 6);
+	border-radius: var(--galleryNavLenght);
+	color: var(--paper);
+	background-color: var(--paper);
+	/* box-shadow: 0 0 var(--s16p) 0 rgba(0, 0, 0, 0.05), 0 0 var(--s4p) 0 rgba(0, 0, 0, 0.1), 0 0 var(--s2p) 0 rgba(0, 0, 0, 0.2); */
+	transition: background-color 200ms ease-in, opacity 200ms ease-out;
+}
+.gallery .nav:hover {
+	background-color: var(--ink);
+	box-shadow: none;
+	opacity: 1;
+}
+.gallery .nav.hidden {
+	opacity: 0;
+	pointer-events: none;
+}
+.nav.next {
+	right: 1.5vw;
+}
+.nav.prev {
+	left: 1.5vw;
+}
 .reel {
 	display: flex;
 	align-items: center;
 	overflow-x: auto;
 	overflow-y: hidden;
 	scroll-snap-type: x mandatory;
-	scroll-snap-stop: always;
+	/* scroll-snap-stop: always; */
 	scrollbar-width: none;
 }
 .reel::-webkit-scrollbar {
@@ -101,28 +163,75 @@ const {Content} = await intro.render();
 	flex-direction: column;
 	justify-content: center;
 	box-sizing: content-box;
-	margin: var(--slideMargin) 0;
-    border-radius: var(--slidePadding);
+	margin: var(--slideMargin) 0 0;
 	overflow: hidden;
-	background-color: #ddd; /* Temp */
 }
+.reel .card:last-child {
+	margin-right: var(--slideMargin);
+}
+
+/* Description Card */
+
 .description.card {
 	width: var(--slideDescWidth);
 	max-width: var(--slideDescContentWidth);
-	min-height: 20em;
-	height: calc(30em + 30vw);
-    max-height: calc(100vh - var(--slideMarginTotal) - var(--slidePaddingTotal));
-    max-height: calc(100dvh - var(--slideMarginTotal) - var(--slidePaddingTotal));
+	min-height: calc(100vh - var(--slideMarginTotal) - var(--slidePaddingTotal));
+    min-height: calc(100dvh - var(--slideMarginTotal) - var(--slidePaddingTotal));
+	height: fit-content;
 	padding: var(--slidePadding);
 	margin-left: var(--slideMargin);
+	border-radius: var(--slidePadding);
+	background-size: calc(var(--fsBase) * 30);
+	background-position: center;
 }
-@media (min-width: 53em) {
-	.reel .card:first-child {
-		margin-left: calc((100vw - var(--slideDescContentWidth) - var(--slidePaddingTotal) - var(--scrollbarWidth)) / 2);
+
+/* Link Card */
+
+.link.card {
+	position: relative;
+	--slideLinkWidth: calc(100vw - var(--slideMarginTotal) - var(--scrollbarWidth));
+	max-width: var(--slideLinkWidth);
+	min-height: calc(100vh - var(--slideMarginTotal) - var(--slidePaddingTotal));
+	min-height: calc(100dvh - var(--slideMarginTotal) - var(--slidePaddingTotal));
+	max-height: calc(100vh - var(--slideMarginTotal));
+	max-height: calc(100dvh - var(--slideMarginTotal));
+	aspect-ratio: 3 / 4;
+	border-radius: var(--slidePadding);
+}
+@supports not (aspect-ratio: 3 / 4) {
+	.link.card::before {
+		float: left;
+		padding-top: 100%;
+		content: "";
 	}
-	.reel .card:last-child {
-		margin-right: calc((100vw - var(--slideDescContentWidth) - var(--slidePaddingTotal) - var(--scrollbarWidth)) / 2);
+	.link.card::after {
+		display: block;
+		content: "";
+		clear: both;
 	}
+}
+.link.card a {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-family: var(--ffLexendPeta);
+	font-weight: 625;
+	font-size: var(--fsBase);
+	text-decoration: none;
+}
+.link.card img {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+.link.card span {
+	z-index: 1;
 }
 
 /* Card Content */
@@ -133,6 +242,44 @@ const {Content} = await intro.render();
 .card *:nth-last-child(1) {
 	margin-bottom: 0;
 }
+#pmcf-intro {
+	background-image: url(../assets/pmcf/azulejo01.svg);
+}
+#pre-01 {
+	background-image: url(../assets/pmcf/azulejo02.svg);
+}
+
+/* Footer */
+
+footer > *:not(:last-child) {
+	margin-bottom: calc(var(--slideMargin) * 2);
+}
+.contact .card {
+	padding: var(--slidePadding);
+	border-radius: var(--slidePadding);
+}
+small.card {
+	display: block;
+}
+
+/* Constraints */
+
+@media (min-width: 53em) {
+	.reel .card:first-child {
+		margin-left: var(--slideDescMargins);
+	}
+	.reel .card:last-child {
+		margin-right: var(--slideDescMargins);
+	}
+	.link.card {
+		width: calc(var(--slideLinkWidth) / 2);
+	}
+}
+@media (pointer: coarse) and (max-width: 30em) {
+    .gallery .nav {
+        display: none;
+    }
+}
 
 </style>
 
@@ -141,20 +288,40 @@ const {Content} = await intro.render();
 // Previous/Next buttons for reels
 
 function initializeButtonFunctionality() {
-    document.querySelectorAll('.nav.prev, .nav.next').forEach(button => {
-        button.addEventListener('click', () => {
-            let sibling = button.nextElementSibling;
-            while (sibling && !sibling.classList.contains('reel')) {
-                sibling = sibling.nextElementSibling;
-            }
-            if (sibling && sibling.classList.contains('reel')) {
-                const direction = button.classList.contains('next') ? -1 : 1;
-                scrollToCard(sibling, direction);
-            }
+    const reels = document.querySelectorAll<HTMLElement>('.reel');
+    reels.forEach(reel => {
+        const prevButton = reel.previousElementSibling as HTMLElement;
+        const nextButton = reel.previousElementSibling?.previousElementSibling as HTMLElement;
+        if (!prevButton || !nextButton) return;
+        const handleVisibilityUpdate = () => {
+            setButtonVisibility(reel, prevButton, nextButton);
+        };
+        prevButton.addEventListener('click', () => {
+            scrollToCard(reel, -1);
+            handleVisibilityUpdate();
         });
+        nextButton.addEventListener('click', () => {
+            scrollToCard(reel, 1);
+            handleVisibilityUpdate();
+        });
+        reel.addEventListener('scroll', handleVisibilityUpdate);
+        handleVisibilityUpdate();
     });
 }
-const scrollToCard = (reel: Element, direction: number) => {
+function setButtonVisibility(reel: HTMLElement, prevButton: HTMLElement, nextButton: HTMLElement) {
+	const tolerance = 4;
+    if (reel.scrollLeft <= tolerance) {
+        prevButton.classList.add('hidden');
+    } else {
+        prevButton.classList.remove('hidden');
+    }
+    if (reel.scrollLeft + reel.clientWidth + tolerance >= reel.scrollWidth) {
+        nextButton.classList.add('hidden');
+    } else {
+        nextButton.classList.remove('hidden');
+    }
+}
+const scrollToCard = (reel: HTMLElement, direction: number) => {
     const cards = reel.querySelectorAll('.card');
     const currentScrollPosition = reel.scrollLeft;
     const cardWidth = cards.length ? (cards[0] as HTMLElement).offsetWidth : 0;
@@ -164,6 +331,6 @@ const scrollToCard = (reel: Element, direction: number) => {
         behavior: 'smooth'
     });
 };
-document.addEventListener('DOMContentLoaded', initializeButtonFunctionality);
+window.onload = initializeButtonFunctionality;
 
 </script>

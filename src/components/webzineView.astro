@@ -13,8 +13,8 @@ const formattedPubDate = formatDate(pubDate);
         <a href={ parentFolder } class="delayed">Back to list</a>
     </header>
     <main>
-        <button class="nav" id="prev" aria-label="Previous slide">←</button>
         <button class="nav" id="next" aria-label="Next slide">→</button>
+        <button class="nav" id="prev" aria-label="Previous slide">←</button>
         <div id="reel" lang="en" aria-live="assertive">
             <slot />
         </div>
@@ -29,8 +29,8 @@ const formattedPubDate = formatDate(pubDate);
 @font-face {
 	font-family: "Park";
 	src:
-		url("/fonts/NationalPark-VariableVF.woff2") format("woff2 supports variations"),
-		url("/fonts/NationalPark-VariableVF.woff2") format("woff2-variations");
+		url("/fonts/NationalPark.woff2") format("woff2 supports variations"),
+		url("/fonts/NationalPark.woff2") format("woff2-variations");
 	font-weight: 275 800;
 	font-display: swap;
 }
@@ -208,6 +208,7 @@ blockquote > *:not(:last-child) {
 }
 
 /* Language Toggle */
+
 #reel[lang="en"] [slide="cover"] > h1:nth-of-type(2),
 #reel[lang="en"] [slide] > blockquote:nth-of-type(2) {
     display: none;
@@ -262,8 +263,11 @@ blockquote > *:not(:last-child) {
         }
     }
 }
+
 </style>
+
 <script>
+
 document.addEventListener('DOMContentLoaded', function() {
     // Next/prev buttons on slideshow
     const reel = document.getElementById('reel');
@@ -294,4 +298,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
 </script>

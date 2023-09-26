@@ -1,8 +1,6 @@
 ---
 
-// import { ViewTransitions } from 'astro:transitions';
-
-const { title, description, author="Pedro MC Fernandes" } = Astro.props;
+const { title, description, author='Pedro MC Fernandes' } = Astro.props;
 
 ---
 
@@ -17,7 +15,6 @@ const { title, description, author="Pedro MC Fernandes" } = Astro.props;
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charset="utf-8" />
         <meta name="generator" content={Astro.generator} />
-        <!-- <ViewTransitions /> -->
         <!-- <script data-respect-dnt data-no-cookie async src="https://cdn.splitbee.io/sb.js"></script> -->
     </head>
     <body>
@@ -36,6 +33,7 @@ const { title, description, author="Pedro MC Fernandes" } = Astro.props;
 		url("/fonts/LexendDeca.woff2") format("woff2-variations");
 	font-weight: 100 1000;
 	font-display: swap;
+    font-variant-ligatures: common-ligatures;
 }
 @font-face {
 	font-family: "LexendPeta";
@@ -44,35 +42,86 @@ const { title, description, author="Pedro MC Fernandes" } = Astro.props;
 		url("/fonts/LexendPeta.woff2") format("woff2-variations");
 	font-weight: 100 1000;
 	font-display: swap;
+    font-variant-ligatures: common-ligatures;
 }
 @font-face {
 	font-family: "Park";
 	src:
-		url("/fonts/NationalPark-VariableVF.woff2") format("woff2 supports variations"),
-		url("/fonts/NationalPark-VariableVF.woff2") format("woff2-variations");
+		url("/fonts/NationalPark.woff2") format("woff2 supports variations"),
+		url("/fonts/NationalPark.woff2") format("woff2-variations");
 	font-weight: 275 800;
+	font-display: swap;
+    font-variant-ligatures: common-ligatures;
+}
+@font-face {
+	font-family: "Coconat";
+	src: url("/fonts/CoconatBoldExt.woff2") format("woff2");
+    font-weight: bold;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Coconat";
+	src: url("/fonts/CoconatRegular.woff2") format("woff2");
+    font-weight: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Compagnon";
+	src: url("/fonts/CompagnonScript.woff2") format("woff2");
 	font-display: swap;
 }
 :root {
 
+    /* Fonts */
+
+    --ffLexend:  "LexendDeca", system-ui, Helvetica, Arial, sans-serif;
+    --ffLexendPeta: "LexendPeta", var(--ffLexend);
+    --ffCoconat: "Coconat", serif;
+    --ffCompagnon: "Compagnon", serif;
+    --fsBase: calc(0.5em + 1.5vw);
+    --fsHeading: calc(0.75em + 4vw);
+
     /* Colors */
 
-    --charcoal: #242630;
-    --azulejo: #0151da;
+    --charcoal: hsla(230, 14%, 16%, 1);
+    --azulejo: 218, 100%, 43%;
 
     /* Palette */
 
-    --paper: #F8F8F7;
-    --ink: var(--azulejo);
+    --paper: hsla(60, 7%, 97%, 1);
+    --ink: hsla(var(--azulejo), 1);
+    --inkFade: hsla(var(--azulejo), 0.2);
+    --inkWash: hsla(var(--azulejo), 0.1);
 
     /* Spacing */
 
+    --s1p: 0.0625em;
     --s2p: 0.125em;
     --s4p: 0.25em;
     --s8p: 0.5em;
     --s16p: 1em;
     --s32p: 2em;
     --s64p: 4em;
+    
+    /* GUI */
+
+    --cursorDefault: url(/artwork/default.svg) 7 1, auto;
+    --cursorText: url(/artwork/text.svg) 12 12, text;
+    --cursorPointer: url(/artwork/pointer.svg) 7 4, pointer;
+
+    /* Slide defs */
+
+	--slideMargin: calc(var(--s4p) + 4vw);
+	--slideMarginTotal: calc(var(--slideMargin) * 2);
+	--slidePadding: calc(var(--slideMargin) * 1.5);
+	--slidePaddingTotal: calc(var(--slidePadding) * 2);
+	
+	/* Main slide primitives */
+
+	--slideDescWidth: calc(100vw - var(--slideMarginTotal) - var(--slidePaddingTotal) - var(--scrollbarWidth));
+	--slideDescContentWidth: calc(20em + 40vw);
+	--slideDescMargins: calc((100vw - var(--slideDescContentWidth) - var(--slidePaddingTotal) - var(--scrollbarWidth)) / 2);
+
 }
 
 /* Scrollbar */
@@ -89,7 +138,7 @@ const { title, description, author="Pedro MC Fernandes" } = Astro.props;
     border: var(--s4p) solid var(--paper);
 }
 *::-webkit-scrollbar-thumb:hover {
-    background-color: var(--charcoal);
+    background-color: var(--inkFade);
 }
 *::-webkit-scrollbar-track {
     background-color: var(--paper);
@@ -109,40 +158,90 @@ const { title, description, author="Pedro MC Fernandes" } = Astro.props;
 /* Basics */
 
 html {
-	font-family: "LexendDeca", system-ui, Helvetica, Arial, sans-serif;
+	font-family: var(--ffLexend);
 	font-size: 100%;
 	font-weight: 375;
 	line-height: 150%;
 	color: var(--ink);
 	background-color: var(--paper);
+    cursor: var(--cursorDefault);
 }
 body {
     margin: 0;
     opacity: 0;
-    animation: fadeIn 200ms ease-out 100ms forwards;
+    animation: fadeIn 200ms ease-in 100ms forwards;
 }
 ::selection {
     color: var(--paper);
     background-color: var(--ink);
 }
+hr {
+    font-size: calc(var(--fsBase) / 1.375);
+    height: 0.0625em;
+    margin: 0;
+    overflow: visible;
+    border: none;
+    box-shadow: 0 0.0625em 0 0 var(--inkFade), 0 -0.0625em 0 0 var(--inkFade) inset;
+}
+
+/* Links */
+
 a {
     color: var(--ink);
     transition: opacity 100ms ease-out;
+    cursor: var(--cursorPointer);
 }
 a:hover {
     opacity: 0.5;
+}
+nav.hyperlinks {
+	flex-direction: row;
+	justify-content: flex-start;
+	flex-wrap: wrap;
+    padding: 0.0625em 0;
+}
+nav a {
+    display: inline-block;
+	font-family: var(--ffLexendPeta);
+	font-size: calc(var(--fsBase) / 1.375);
+	font-weight: 625;
+	line-height: 125%;
+	text-transform: uppercase;
+	text-decoration: none;
+	outline: none;
+	padding: 0.25em 0;
+	margin-right: 0.25em;
+	box-shadow: 0 0.0625em 0 0 var(--inkFade), 0 -0.0625em 0 0 var(--inkFade) inset;
+}
+nav a:hover {
+	opacity: 1;
+	box-shadow: 0 0.0625em 0 0 var(--ink), 0 -0.0625em 0 0 var(--ink) inset, 0 -0.0625em 0 0 var(--ink), 0 0.0625em 0 0 var(--ink) inset;
+}
+nav a span {
+	display: inline-block;
+	padding: calc(var(--fsBase) / 2) calc(var(--fsBase) / 1.5);
+}
+nav a[target="_blank"] span::after {
+    content: " ↗";
+}
+nav a:hover span {
+	box-shadow: 0.125em 0 0 0 var(--ink) inset, -0.125em 0 0 0 var(--ink) inset;
 }
 
 /* Typography */
 
 h1, h2, h3, h4, h5, h6 {
+    font-family: var(--ffCoconat);
+    font-size: var(--fsHeading);
+    font-weight: bold;
     line-height: 100%;
     text-transform: uppercase;
-    letter-spacing: -0.03125em;
-    margin: var(--s16p) 0 var(--s4p);
+    letter-spacing: -0.0625em;
+    margin: var(--s16p) -0.0625em var(--s4p);
     overflow-wrap: break-word;
+    cursor: var(--cursorText);
 }
-h1 {
+/* h1 {
     font-size: calc(2em + 4vw);
     font-weight: 525;
 }
@@ -164,12 +263,156 @@ h5 {
 }
 h6 {
     font-size: calc(1em + 0.125vw);
-}
+    font-weight: 650;
+} */
 p {
-    font-size: calc(0.75em + 1vw);
+    font-size: var(--fsBase);
     font-weight: 350;
     line-height: 150%;
-    margin: 0 0 var(--s16p);
+    margin: 0 0 var(--fsBase);
+    cursor: var(--cursorText);
+}
+small {
+    font-size: calc(var(--fsBase) / 1.375);
+    line-height: 150%;
+    cursor: var(--cursorText);
+}
+
+/* Buttons and others */
+
+button {
+    font-family: var(--ffLexendPeta);
+    font-size: calc(var(--fsBase) / 1.25);
+    font-weight: 625;
+    line-height: 125%;
+    text-transform: uppercase;
+    padding: calc(var(--fsBase) / 1.875) calc(var(--fsBase) * 1.125);
+    margin: 0;
+    border: none;
+    border-radius: calc(var(--fsBase) * 2);
+    color: var(--paper);
+    background-color: var(--ink);
+    cursor: pointer;
+    outline: 0 double var(--ink);
+    transition: outline 100ms ease-in;
+    cursor: var(--cursorPointer);
+}
+form button {
+    align-self: flex-start;
+    margin-left: -0.125em;
+}
+form button:hover,
+form button:focus-visible {
+    outline: calc(var(--fsBase) / 4) double var(--ink);
+}
+
+/* Forms */
+
+fieldset {
+    border: calc(var(--fsBase) / 4) double var(--ink);
+}
+legend,
+label {
+    font-family: var(--ffLexendPeta);
+    font-size: calc(var(--fsBase) / 1.5);
+    font-weight: 625;
+    text-transform: uppercase;
+    cursor: var(--cursorDefault);
+}
+legend,
+label,
+input,
+textarea {
+    display: block;
+    line-height: 100%;
+    margin: 0;
+}
+fieldset legend {
+    padding: 0 0.5em;
+    margin-left: -0.5em;
+}
+fieldset legend + * {
+    margin-top: -0.5em;
+}
+input,
+textarea {
+    font-family: var(--ffCompagnon);
+    font-size: calc(var(--fsBase) * 1.5);
+    line-height: 150%;
+    width: 100%;
+    padding: 0;
+    border: none;
+    border-bottom: calc(var(--fsBase) / 8) dotted var(--ink);
+    border-radius: 0;
+    color: black;
+    background: transparent;
+    transition: background-color 200ms ease-out;
+    cursor: var(--cursorText);
+}
+input:focus,
+textarea:focus {
+    outline: none;
+}
+input:focus-visible,
+textarea:focus-visible {
+    background-color: var(--inkWash);
+}
+textarea {
+    overflow: hidden;
+    resize: none;
+}
+textarea::selection {
+    color: var(--paper);
+    background-color: var(--charcoal);
+}
+form input:not(:last-child),
+form textarea:not(:last-child) {
+    margin-bottom: 1.5em;
+}
+
+/* Grid */
+
+.clmnzd {
+	width: calc(100vw - var(--slideMarginTotal) - var(--scrollbarWidth));
+	max-width: calc(var(--slideDescContentWidth) + var(--slidePaddingTotal));
+	margin: var(--slideMargin) var(--slideMargin) calc(var(--slideMargin) * 2);
+}
+
+/* Header Top Bar */
+
+header.top {
+    position: sticky;
+    top: 0;
+    padding-top: 0.25em;
+    margin-bottom: var(--slideMargin);
+    background-color: var(--paper);
+}
+header.top nav {
+    display: flex;
+}
+header.top hr {
+    flex: 1;
+    height: auto;
+    margin: 0;
+}
+
+/* Animes */
+
+.init {
+    opacity: 0;
+    transition: opacity 200ms ease-in 100ms,
+}
+.in {
+    opacity: 1;
+}
+
+/* Constraints */
+
+@media (min-width: 53em) {
+	.clmnzd {
+		margin-left: var(--slideDescMargins);
+		margin-right: var(--slideDescMargins);
+	}
 }
 
 </style>
@@ -201,7 +444,7 @@ function saveReelScrollPositions() {
 
 function restoreReelScrollPositions() {
     const pageKey = window.location.pathname;
-    const reels = document.querySelectorAll(".reel");
+    const reels = document.querySelectorAll('.reel');
     reels.forEach((reel, index) => {
         const storedPos = sessionStorage.getItem(`reelScrollPos-${pageKey}-${index}`);
         if (storedPos) {
@@ -214,5 +457,67 @@ function restoreReelScrollPositions() {
 
 window.addEventListener('beforeunload', saveReelScrollPositions);
 document.addEventListener('DOMContentLoaded', restoreReelScrollPositions);
+
+// Dinamically resize the textarea
+
+const getSingleLineHeight = (): number => {
+    const dummy = document.createElement('textarea');
+    dummy.rows = 1;
+    document.body.appendChild(dummy);
+    const singleLineHeight = dummy.clientHeight;
+    document.body.removeChild(dummy);
+    return singleLineHeight;
+}
+const singleLineHeight = getSingleLineHeight();
+const adjustHeight = (textarea: HTMLTextAreaElement) => {
+    textarea.style.height = `${singleLineHeight}px`;
+    if (textarea.scrollHeight > singleLineHeight) {
+        textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+}
+const textareas = document.querySelectorAll<HTMLTextAreaElement>('textarea');
+textareas.forEach(textarea => {
+    textarea.addEventListener('input', () => adjustHeight(textarea));
+    textarea.addEventListener('blur', () => {
+        if (textarea.value.trim() === '') {
+            textarea.style.height = `${singleLineHeight}px`;
+        }
+    });
+    adjustHeight(textarea);
+});
+
+// Back button after transitions
+
+const goBack = () => {
+    history.back();
+};
+const setButton = () => {
+    const backLink: HTMLElement | null = document.getElementById('backLink');
+    if (backLink) {
+        backLink.removeEventListener('click', goBack); 
+        backLink.addEventListener('click', goBack);
+    }
+};
+setButton();
+document.addEventListener('DOMContentLoaded', setButton);
+
+// Intersection with the viewport
+
+document.addEventListener('DOMContentLoaded', function() {
+    const observer = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
+        entries.forEach((entry: IntersectionObserverEntry) => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('in');
+        }
+        });
+    }, {
+        rootMargin: '-5% 0px -5% 0px',
+        threshold: 0.33
+    });
+    const sections = document.querySelectorAll<HTMLElement>('.init');
+    sections.forEach((section: HTMLElement) => {
+        observer.observe(section);
+    });
+});
 
 </script>

@@ -1,0 +1,24 @@
+<svg width="1024" height="1024" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .colorOne {
+            fill: #feec9d;
+        }
+        .colorTwo {
+            fill: transparent;
+        }
+    </style>
+    <defs>
+        <pattern id="dynamicPattern" patternUnits="userSpaceOnUse" width="256" height="256">
+            <path d="M128,32l96,96l-96,96l-96,-96l96,-96Zm0,64l16,-16l-16,-16l-16,16l16,16Zm32,32l16,16l16,-16l-16,-16l-16,16Zm-32,32l-16,16l16,16l16,-16l-16,-16Zm-32,-32l-16,-16l-16,16l16,16l16,-16Zm-0,0l32,32l32,-32l-32,-32l-32,32Z" class="colorOne" transform="matrix(1,0,0,1,-362,9.9476e-14) matrix(1,0,0,1,362,0)"/>
+            <rect width="34" height="39" x="114" y="100" class="colorOne" transform="matrix(1,0,0,1,-362,9.9476e-14) matrix(1,0,0,1,362,0) matrix(0.470588,-0.470588,0.410256,0.410256,17.3273,140.621)"/>
+            <path d="M550,28l-28,-28l28,0l20,20l0,28l28,-0l20,20l0,28l-28,-28l-40,0l0,-40Zm-120,200l28,28l-28,-0l-20,-20l0,-28l-28,-0l-20,-20l0,-28l28,28l40,-0l-0,40Zm-0,-200l0,40l-40,0l-28,28l0,-28l20,-20l28,0l0,-28l20,-20l28,-0l-28,28Zm120,200l-0,-40l40,-0l28,-28l0,28l-20,20l-28,-0l0,28l-20,20l-28,0l28,-28Z" class="colorOne" transform="matrix(1,0,0,1,-362,9.9476e-14) matrix(1,0,0,1,362,0) matrix(1,0,0,1,-362,0)"/>
+            <path d="M570,0l48,0l0,48l-20,-0l-28,-28l0,-20Zm-160,0l0,20l-28,28l-20,0l0,-48l48,0Zm0,256l-48,-0l0,-48l20,0l28,28l0,20Zm160,0l0,-20l28,-28l20,0l0,48l-48,0Z" class="colorOne" transform="matrix(1,0,0,1,-362,9.9476e-14) matrix(1,0,0,1,362,0) matrix(1,0,0,1,-362,0)"/>
+            <path d="M618,96l0,64l-32,-32l32,-32Zm-160,-96l64,0l-32,32l-32,-32Zm0,256l32,-32l32,32l-64,0Zm-96,-160l32,32l-32,32l-0,-64Z" class="colorOne" transform="matrix(1,0,0,1,-362,9.9476e-14) matrix(1,0,0,1,362,0) matrix(1,0,0,1,-362,0)"/>
+            <path d="M570,20l-20,-20l20,-0l0,20Zm28,28l20,0l0,20l-20,-20Zm-28,-28l28,28l-28,-0l0,-28Zm-188,28l-20,20l0,-20l20,-0Zm28,-28l0,-20l20,0l-20,20Zm-28,28l28,-28l0,28l-28,-0Zm0,160l-20,-0l0,-20l20,20Zm28,28l20,20l-20,-0l0,-20Zm-28,-28l28,-0l0,28l-28,-28Zm188,28l0,-28l28,-0l-28,28Zm0,-0l0,20l-20,-0l20,-20Zm28,-28l20,-20l0,20l-20,-0Z" class="colorTwo" transform="matrix(1,0,0,1,-362,9.9476e-14) matrix(1,0,0,1,362,0) matrix(1,0,0,1,-362,0)"/>
+            <path d="M128,96l32,32l-32,32l-32,-32l32,-32Zm0,16l-16,16l16,16l16,-16l-16,-16Z" class="colorTwo" transform="matrix(1,0,0,1,-362,9.9476e-14) matrix(1,0,0,1,362,0)"/>
+            <path d="M538,112l16,16l-16,16l-16,-16l16,-16Zm-48,-48l16,16l-16,16l-16,-16l16,-16Zm-48,48l16,16l-16,16l-16,-16l16,-16Zm48,48l16,16l-16,16l-16,-16l16,-16Z" class="colorTwo" transform="matrix(1,0,0,1,-362,9.9476e-14) matrix(1,0,0,1,362,0) matrix(1,0,0,1,-362,0)"/>
+            <path d="M490,32l-96,96l-32,-32l28,-28l40,0l0,-40l28,-28l32,32Zm0,192l-32,32l-28,-28l0,-40l-40,-0l-28,-28l32,-32l96,96Zm0,0l96,-96l32,32l-28,28l-40,0l0,40l-28,28l-32,-32Zm0,-192l32,-32l28,28l0,40l40,0l28,28l-32,32l-96,-96Z" class="colorTwo" transform="matrix(1,0,0,1,-362,9.9476e-14) matrix(1,0,0,1,362,0) matrix(1,0,0,1,-362,0)"/>
+        </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#dynamicPattern)" />
+</svg>

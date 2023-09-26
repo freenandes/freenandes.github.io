@@ -3,6 +3,7 @@ import { defineCollection, z, reference } from 'astro:content';
 const basic = defineCollection({
   schema: z.object({
     title: z.string().optional(),
+    description: z.string().optional(),
   }),
 });
 const webZine = defineCollection({
@@ -28,7 +29,7 @@ const index = defineCollection({
 const gallery = defineCollection({
   schema: ({ image }) => z.object({
     title: z.string(),
-    description: z.string(),
+    description: z.string().optional(),
     cover: image().refine((img) => img.width >= 1024, {
       message: "Cover image must be at least 1024 pixels wide!",
     }),

@@ -15,6 +15,11 @@ const {Content} = await intro.render();
 ---
 
 <PMCF title={intro.data.title} description={intro.body}>
+	<svg style="display: none">
+		<symbol id="dCorner" viewBox="0 0 2 2">
+		  	<path d="M2 0H0V2C0 1.86865 0.0253906 1.73865 0.0761719 1.61731C0.125977 1.49597 0.200195 1.38574 0.292969 1.29291C0.361328 1.22491 0.438477 1.1673 0.522461 1.12158C0.553711 1.1048 0.584961 1.0896 0.617188 1.07611C0.738281 1.02588 0.869141 1 1 1C1 0.868652 1.02539 0.738647 1.07617 0.61731C1.10645 0.543518 1.14551 0.473816 1.19336 0.409607C1.22363 0.368286 1.25684 0.329285 1.29297 0.292908C1.38574 0.200012 1.49609 0.126404 1.61719 0.0761108C1.73828 0.0258789 1.86914 0 2 0Z" />
+		</symbol>
+	</svg>
 	<header class="init">
 		<div class="reel">
 			<div id={intro.slug} class="description card">
@@ -28,11 +33,30 @@ const {Content} = await intro.render();
 		const relatedPosts = await getEntries(preface.data.relatedPosts);
 		return (
 			<section class="gallery init">
-				<button class="nav next" aria-label="Next slide">→</button>
-				<button class="nav prev" aria-label="Previous slide">←</button>
+				<button class="nav next" aria-label="Next slide">
+					<svg class="icon" width="16" height="16" viewBox="0 0 16 16">
+						<path d="M2 8 L14 8" />
+						<path d="M14 8 L10 4" />
+						<path d="M14 8 L10 12" />
+					</svg>
+				</button>
+				<button class="nav prev" aria-label="Previous slide">
+					<svg class="icon" width="16" height="16" viewBox="0 0 16 16">
+						<path d="M2 8 L14 8" />
+						<path d="M14 8 L10 4" />
+						<path d="M14 8 L10 12" />
+					</svg>
+				</button>
 				<div class="reel">
 					<div id=`pre-${preface.slug}` class="description card">
 						<Content />
+						<a class="cta next" aria-label="Next slide">
+							<svg class="icon" width="16" height="16" viewBox="0 0 16 16">
+								<path d="M2 8 L14 8" />
+								<path d="M14 8 L10 4" />
+								<path d="M14 8 L10 12" />
+							</svg>
+						</a>
 					</div>
 					{relatedPosts.map(relatedPost => (
 						<article class="link card">
@@ -40,6 +64,7 @@ const {Content} = await intro.render();
 								<Image src={relatedPost.data.cover} alt={relatedPost.data.coverAlt} />
 								<span>{relatedPost.data.title}</span>
 							</a>
+							<svg width="2" height="2" viewBox="0 0 2 2"><use xlink:href="#dCorner" /></svg><svg width="2" height="2" viewBox="0 0 2 2"><use xlink:href="#dCorner" /></svg><svg width="2" height="2" viewBox="0 0 2 2"><use xlink:href="#dCorner" /></svg><svg width="2" height="2" viewBox="0 0 2 2"><use xlink:href="#dCorner" /></svg>
 						</article>
 					))}
 				</div>
@@ -76,7 +101,7 @@ const {Content} = await intro.render();
 		</form>
 		<nav class="hyperlinks init">
 			<a href="/whiteboard">
-				<span>About Pedro, a Whiteboard</span>
+				<span>Meet Pedro, a Whiteboard</span>
 			</a>
 			<a href="/cv">
 				<span>About Pedro, the Curriculum</span>
@@ -91,8 +116,8 @@ const {Content} = await intro.render();
 				<span>LinkedIn</span>
 			</a>
 		</nav>
-		<small class="init">
-			Website designed, illustrated and assembled by me in 2023, inspired by historical portuguese references, using <a href="https://www.lexend.com/" target="_blank">Lexend</a> font by Bonnie Shaver-Troup and Thomas Jockin; Coconat Extended font by <a href="https://saralavazza.it/" target="_blank">Sara Lavazza</a>; Compagnon Script font by <a href="https://www.chloelozano.fr/" target="_blank">Chloé Lozano</a>; and <a href="https://astro.build/" target="_blank">Astro</a>'s web framework.
+		<small class="footnote init">
+			Website designed, illustrated and assembled by me in 2023, inspired by portuguese cultural references using: <a href="https://www.lexend.com/" target="_blank">Lexend typefaces</a> by Bonnie Shaver-Troup and Thomas Jockin; Coconat Extended font by <a href="https://saralavazza.it/" target="_blank">Sara Lavazza</a>; Compagnon Script font by <a href="https://www.chloelozano.fr/" target="_blank">Chloé Lozano</a>; and <a href="https://astro.build/" target="_blank">Astro's web framework</a>.
 		</small>
 	</footer>
 </PMCF>
@@ -113,7 +138,7 @@ section.gallery {
 	z-index: 2;
 	font-family: var(--ffLexendPeta);
 	font-size: var(--galleryNavFontSize);
-	font-weight: 350;
+	font-weight: calc(var(--fwBase) - 25);
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -123,12 +148,21 @@ section.gallery {
 	border-radius: var(--galleryNavLenght);
 	color: var(--paper);
 	background-color: var(--paper);
-	/* box-shadow: 0 0 var(--s16p) 0 rgba(0, 0, 0, 0.05), 0 0 var(--s4p) 0 rgba(0, 0, 0, 0.1), 0 0 var(--s2p) 0 rgba(0, 0, 0, 0.2); */
-	transition: background-color 200ms ease-in, opacity 200ms ease-out;
+	box-shadow: 0 var(--s16p) var(--s32p) 0 rgba(0, 0, 0, 0.05), 0 var(--s4p) var(--s8p) 0 rgba(0, 0, 0, 0.1), 0 var(--s2p) var(--s4p) 0 rgba(0, 0, 0, 0.2);
+	transition: background-color 0.2s ease-in, opacity 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+.gallery .nav svg {
+	width: 100%;
+	height: auto;
+}
+.gallery .nav path {
+	stroke: var(--paper);
+	stroke-width: 0.09375rem;
+	stroke-linecap: round;
 }
 .gallery .nav:hover {
 	background-color: var(--ink);
-	box-shadow: none;
+	box-shadow: 0 0 var(--s8p) 0 rgba(0, 0, 0, 0.1), 0 0 var(--s2p) 0 rgba(0, 0, 0, 0.2), 0 0 var(--s1p) 0 rgba(0, 0, 0, 0.4);
 	opacity: 1;
 }
 .gallery .nav.hidden {
@@ -136,10 +170,28 @@ section.gallery {
 	pointer-events: none;
 }
 .nav.next {
-	right: 1.5vw;
+	right: 1vw;
 }
 .nav.prev {
-	left: 1.5vw;
+	left: 1vw;
+}
+.nav.prev svg {
+	transform: rotate(180deg);
+}
+.gallery .cta {
+	align-self: flex-start;
+	box-sizing: content-box;
+	font-size: calc(var(--fsBase) * 2);
+	padding: 0.5em;
+	margin: -0.5em;
+}
+.gallery .cta {
+	display: none;
+}
+.gallery .cta svg {
+	display: inline-block;
+	width: calc(var(--fsBase) * 1);
+	height: auto;
 }
 .reel {
 	display: flex;
@@ -163,7 +215,7 @@ section.gallery {
 	flex-direction: column;
 	justify-content: center;
 	box-sizing: content-box;
-	margin: var(--slideMargin) 0 0;
+	margin: var(--slideMargin) 0.125em 0;
 	overflow: hidden;
 }
 .reel .card:last-child {
@@ -176,13 +228,16 @@ section.gallery {
 	width: var(--slideDescWidth);
 	max-width: var(--slideDescContentWidth);
 	min-height: calc(100vh - var(--slideMarginTotal) - var(--slidePaddingTotal));
-    min-height: calc(100dvh - var(--slideMarginTotal) - var(--slidePaddingTotal));
 	height: fit-content;
+	max-height: calc(100vh - var(--slideMarginTotal));
 	padding: var(--slidePadding);
 	margin-left: var(--slideMargin);
 	border-radius: var(--slidePadding);
-	background-size: calc(var(--fsBase) * 30);
 	background-position: center;
+	clip-path: var(--clipBevel);
+}
+.description.card > p {
+	margin-right: -0.25em;
 }
 
 /* Link Card */
@@ -190,13 +245,12 @@ section.gallery {
 .link.card {
 	position: relative;
 	--slideLinkWidth: calc(100vw - var(--slideMarginTotal) - var(--scrollbarWidth));
-	max-width: var(--slideLinkWidth);
-	min-height: calc(100vh - var(--slideMarginTotal) - var(--slidePaddingTotal));
-	min-height: calc(100dvh - var(--slideMarginTotal) - var(--slidePaddingTotal));
+	width: calc(var(--slideLinkWidth) / 1.375);
+	max-width: 40em;
+	min-height: calc((100vh - var(--slideMarginTotal) - var(--slidePaddingTotal)) / 2);
+	height: fit-content;
 	max-height: calc(100vh - var(--slideMarginTotal));
-	max-height: calc(100dvh - var(--slideMarginTotal));
 	aspect-ratio: 3 / 4;
-	border-radius: var(--slidePadding);
 }
 @supports not (aspect-ratio: 3 / 4) {
 	.link.card::before {
@@ -210,6 +264,39 @@ section.gallery {
 		clear: both;
 	}
 }
+.link.card:nth-of-type(4n+2) {
+	align-self: flex-start;
+}
+.link.card:nth-of-type(4n+4) {
+	align-self: flex-end;
+}
+.link.card > svg {
+	position: absolute;
+	width: auto;
+	height: var(--cvB1);
+	max-height: 15em;
+	fill: var(--paper);
+	pointer-events: none;
+}
+.link.card > svg:nth-of-type(1) {
+	top: 0;
+	left: 0;
+}
+.link.card > svg:nth-of-type(2) {
+	top: 0;
+	right: 0;
+	transform: rotate(90deg);
+}
+.link.card > svg:nth-of-type(3) {
+	bottom: 0;
+	left: 0;
+	transform: rotate(270deg);
+}
+.link.card > svg:nth-of-type(4) {
+	right: 0;
+	bottom: 0;
+	transform: rotate(180deg);
+}
 .link.card a {
 	position: absolute;
 	top: 0;
@@ -220,17 +307,18 @@ section.gallery {
 	justify-content: center;
 	align-items: center;
 	font-family: var(--ffLexendPeta);
-	font-weight: 625;
+	font-weight: calc(var(--fwBase) + 225);
 	font-size: var(--fsBase);
 	text-decoration: none;
 }
 .link.card img {
 	position: absolute;
-	width: 100%;
-	height: 100%;
+	width: calc(100% - 2px);
+	height: calc(100% - 2px);
 	object-fit: cover;
 }
 .link.card span {
+	text-align: center;
 	z-index: 1;
 }
 
@@ -244,14 +332,29 @@ section.gallery {
 }
 #pmcf-intro {
 	background-image: url(../assets/pmcf/azulejo01.svg);
+	background-size: calc(var(--fsBase) * 35);
 }
 #pre-01 {
 	background-image: url(../assets/pmcf/azulejo02.svg);
+	background-size: calc(var(--fsBase) * 41);
+}
+#pre-02 {
+	background-image: url(../assets/pmcf/azulejo03.svg);
+	background-size: calc(var(--fsBase) * 60);
+}
+#pre-03 {
+	background-image: url(../assets/pmcf/azulejo04.svg);
+	background-size: calc(var(--fsBase) * 50);
+}
+#pre-04 {
+	background-image: url(../assets/pmcf/azulejo05.svg);
+	background-size: calc(var(--fsBase) * 65);
 }
 
 /* Footer */
 
 footer > *:not(:last-child) {
+	margin-top: calc(var(--slideMargin) * 2);
 	margin-bottom: calc(var(--slideMargin) * 2);
 }
 .contact .card {
@@ -275,10 +378,21 @@ small.card {
 		width: calc(var(--slideLinkWidth) / 2);
 	}
 }
-@media (pointer: coarse) and (max-width: 30em) {
+@media (pointer: coarse) and (max-width: 50em) {
     .gallery .nav {
         display: none;
     }
+	.gallery .cta:not(.hidden) {
+		display: inline;
+	}
+}
+@media (max-width: 30em) and (min-height: 40em) {
+	.description.card {
+		min-height: calc(70vh - var(--slideMarginTotal) - var(--slidePaddingTotal));
+	}
+	.link.card {
+		min-height: calc((70vh - var(--slideMarginTotal) - var(--slidePaddingTotal)) / 2);
+	}
 }
 
 </style>
@@ -292,9 +406,10 @@ function initializeButtonFunctionality() {
     reels.forEach(reel => {
         const prevButton = reel.previousElementSibling as HTMLElement;
         const nextButton = reel.previousElementSibling?.previousElementSibling as HTMLElement;
-        if (!prevButton || !nextButton) return;
+		const inlineNextButton = reel.querySelector('.cta.next') as HTMLElement; 
+        if (!prevButton || !nextButton || !inlineNextButton) return;
         const handleVisibilityUpdate = () => {
-            setButtonVisibility(reel, prevButton, nextButton);
+            setButtonVisibility(reel, prevButton, nextButton, inlineNextButton);
         };
         prevButton.addEventListener('click', () => {
             scrollToCard(reel, -1);
@@ -304,11 +419,15 @@ function initializeButtonFunctionality() {
             scrollToCard(reel, 1);
             handleVisibilityUpdate();
         });
+		inlineNextButton.addEventListener('click', () => {
+            scrollToCard(reel, 1);
+            // handleVisibilityUpdate();
+        });
         reel.addEventListener('scroll', handleVisibilityUpdate);
         handleVisibilityUpdate();
     });
 }
-function setButtonVisibility(reel: HTMLElement, prevButton: HTMLElement, nextButton: HTMLElement) {
+function setButtonVisibility(reel: HTMLElement, prevButton: HTMLElement, nextButton: HTMLElement, inlineNextButton: HTMLElement) {
 	const tolerance = 4;
     if (reel.scrollLeft <= tolerance) {
         prevButton.classList.add('hidden');
@@ -317,8 +436,10 @@ function setButtonVisibility(reel: HTMLElement, prevButton: HTMLElement, nextBut
     }
     if (reel.scrollLeft + reel.clientWidth + tolerance >= reel.scrollWidth) {
         nextButton.classList.add('hidden');
+		// inlineNextButton.classList.add('hidden');
     } else {
         nextButton.classList.remove('hidden');
+		// inlineNextButton.classList.remove('hidden');
     }
 }
 const scrollToCard = (reel: HTMLElement, direction: number) => {

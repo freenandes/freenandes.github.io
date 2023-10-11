@@ -1,10 +1,10 @@
 <svg width="1024" height="1024" xmlns="http://www.w3.org/2000/svg">
     <style>
         .colorOne {
-            fill: #feec9d;
+            fill: hsl(48 98% 70%);
         }
         .colorTwo {
-            fill: transparent;
+            fill: hsl(22 42% 94%);
         }
     </style>
     <defs>

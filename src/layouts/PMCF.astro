@@ -78,21 +78,23 @@ const { title, description, author='Pedro MC Fernandes' } = Astro.props;
     --ffLexendPeta: "LexendPeta", var(--ffLexend);
     --ffCoconat: "Coconat", serif;
     --ffCompagnon: "Compagnon", serif;
-    --fsBase: calc(0.5em + 1.5vw);
+    --fsBase: calc(0.75em + 1vw);
     --fsHeading: calc(0.75em + 4vw);
+    --fwBase: 375;
 
     /* Colors */
 
     --charcoal: hsla(230, 14%, 16%, 1);
     --azulejo: 218, 100%, 43%;
+    --pardo: 60, 7%, 97%;
 
     /* Palette */
 
-    --paper: hsla(60, 7%, 97%, 1);
-    --ink: hsla(var(--azulejo), 1);
+    --paper: hsl(var(--pardo));
+    --ink: hsl(var(--azulejo));
     --inkFade: hsla(var(--azulejo), 0.2);
     --inkWash: hsla(var(--azulejo), 0.1);
-
+    
     /* Spacing */
 
     --s1p: 0.0625em;
@@ -111,9 +113,9 @@ const { title, description, author='Pedro MC Fernandes' } = Astro.props;
 
     /* Slide defs */
 
-	--slideMargin: calc(var(--s4p) + 4vw);
+	--slideMargin: calc(var(--s2p) + 4vw);
 	--slideMarginTotal: calc(var(--slideMargin) * 2);
-	--slidePadding: calc(var(--slideMargin) * 1.5);
+	--slidePadding: calc(var(--slideMargin) * 1 + 2vw);
 	--slidePaddingTotal: calc(var(--slidePadding) * 2);
 	
 	/* Main slide primitives */
@@ -122,6 +124,66 @@ const { title, description, author='Pedro MC Fernandes' } = Astro.props;
 	--slideDescContentWidth: calc(20em + 40vw);
 	--slideDescMargins: calc((100vw - var(--slideDescContentWidth) - var(--slidePaddingTotal) - var(--scrollbarWidth)) / 2);
 
+    /* Clippings */
+
+    --cvA1: calc(var(--slidePadding) * 1.25);
+    --cvA2: calc(100% - var(--cvA1));
+    --cvB1: calc(var(--slidePadding) * 2.5);
+
+    --clipBevel: polygon(
+        var(--cvA1) 0,
+        var(--cvA2) 0,
+        100% var(--cvA1),
+        100% var(--cvA2),
+        var(--cvA2) 100%,
+        var(--cvA1) 100%,
+        0 var(--cvA2),
+        0 var(--cvA1)
+    );
+
+    --clipRabbet: polygon(
+        0 var(--cvA1),
+        var(--cvA1) var(--cvA1),
+        var(--cvA1) 0,
+        var(--cvA2) 0,
+        var(--cvA2) var(--cvA1),
+        100% var(--cvA1),
+        100% var(--cvA2),
+        var(--cvA2) var(--cvA2),
+        var(--cvA2) 100%,
+        var(--cvA1) 100%,
+        var(--cvA1) var(--cvA2),
+        0 var(--cvA2)
+    );
+
+    --clipHexagon: polygon(
+        0 var(--cvA1),
+        50% 0,
+        100% var(--cvA1),
+        100% var(--cvA2),
+        50% 100%,
+        0 var(--cvA2)
+    );
+
+}
+
+/* 2x */
+
+@media 
+    only screen and (-webkit-min-device-pixel-ratio: 2),
+    only screen and (min-resolution: 2dppx) and (max-resolution: 2.9dppx) {
+        :root {
+            --fwBase: 400;
+        }
+}
+
+/* 3x (Retina HD) */
+@media 
+    only screen and (-webkit-min-device-pixel-ratio: 3), 
+    only screen and (min-resolution: 3dppx) {
+        :root {
+            --fwBase: 425;
+        }
 }
 
 /* Scrollbar */
@@ -154,19 +216,29 @@ const { title, description, author='Pedro MC Fernandes' } = Astro.props;
         opacity: 1;
     }
 }
+@keyframes blink {
+    0%, 49.9% {
+        opacity: 1;
+    }
+    50%, 100% {
+        opacity: 0;
+    }
+}
 
 /* Basics */
 
 html {
+    position: relative;
 	font-family: var(--ffLexend);
 	font-size: 100%;
-	font-weight: 375;
+	font-weight: calc(var(--fwBase) - 25);
 	line-height: 150%;
 	color: var(--ink);
 	background-color: var(--paper);
     cursor: var(--cursorDefault);
 }
 body {
+    position: relative;
     margin: 0;
     opacity: 0;
     animation: fadeIn 200ms ease-in 100ms forwards;
@@ -184,48 +256,67 @@ hr {
     box-shadow: 0 0.0625em 0 0 var(--inkFade), 0 -0.0625em 0 0 var(--inkFade) inset;
 }
 
+/* SVG */
+
+svg.icon path {
+	stroke: currentColor;
+	stroke-width: 0.0625rem;
+	stroke-linecap: round;
+}
+
 /* Links */
 
 a {
     color: var(--ink);
-    transition: opacity 100ms ease-out;
+    transition: opacity 0.2s ease-in;
     cursor: var(--cursorPointer);
 }
 a:hover {
     opacity: 0.5;
 }
 nav.hyperlinks {
+    display: flex;
 	flex-direction: row;
 	justify-content: flex-start;
 	flex-wrap: wrap;
     padding: 0.0625em 0;
+    margin-right: -0.1875em;
 }
 nav a {
     display: inline-block;
 	font-family: var(--ffLexendPeta);
 	font-size: calc(var(--fsBase) / 1.375);
-	font-weight: 625;
+	font-weight: calc(var(--fwBase) + 225);
 	line-height: 125%;
 	text-transform: uppercase;
 	text-decoration: none;
 	outline: none;
 	padding: 0.25em 0;
-	margin-right: 0.25em;
-	box-shadow: 0 0.0625em 0 0 var(--inkFade), 0 -0.0625em 0 0 var(--inkFade) inset;
+	margin-right: 0.375em;
+    box-shadow: 0 0.0625em 0 0 var(--inkFade), 0 -0.0625em 0 0 var(--inkFade) inset, 0 -0.0625em 0 0 transparent, 0 0.0625em 0 0 transparent inset;
+    transition: box-shadow 0.1s ease-in;
 }
 nav a:hover {
 	opacity: 1;
 	box-shadow: 0 0.0625em 0 0 var(--ink), 0 -0.0625em 0 0 var(--ink) inset, 0 -0.0625em 0 0 var(--ink), 0 0.0625em 0 0 var(--ink) inset;
 }
 nav a span {
+    box-sizing: border-box;
 	display: inline-block;
+    width: 100%;
 	padding: calc(var(--fsBase) / 2) calc(var(--fsBase) / 1.5);
-}
-nav a[target="_blank"] span::after {
-    content: " ↗";
+    box-shadow: 0.125em 0 0 0 transparent inset, -0.125em 0 0 0 transparent inset;
+    transition: box-shadow 0.1s ease-in;
 }
 nav a:hover span {
 	box-shadow: 0.125em 0 0 0 var(--ink) inset, -0.125em 0 0 0 var(--ink) inset;
+}
+nav a[target="_blank"] span::after {
+    content: " \2197";
+    display: inline;
+}
+nav a[target="_blank"]:hover span::after {
+    animation: blink 0.2s steps(1) infinite;
 }
 
 /* Typography */
@@ -241,41 +332,21 @@ h1, h2, h3, h4, h5, h6 {
     overflow-wrap: break-word;
     cursor: var(--cursorText);
 }
-/* h1 {
-    font-size: calc(2em + 4vw);
-    font-weight: 525;
-}
-h2 {
-    font-size: calc(1.625em + 2vw);
-    font-weight: 550;
-}
-h3 {
-    font-size: calc(1.375em + 1vw);
-    font-weight: 575;
-}
-h4 {
-    font-size: calc(1.25em + 0.5vw);
-    font-weight: 600;
-}
-h5 {
-    font-size: calc(1.125em + 0.25vw);
-    font-weight: 625;
-}
-h6 {
-    font-size: calc(1em + 0.125vw);
-    font-weight: 650;
-} */
 p {
     font-size: var(--fsBase);
-    font-weight: 350;
+    font-weight: calc(var(--fwBase) - 25);
     line-height: 150%;
     margin: 0 0 var(--fsBase);
     cursor: var(--cursorText);
 }
 small {
     font-size: calc(var(--fsBase) / 1.375);
+    font-weight: calc(var(--fwBase) + 0);
     line-height: 150%;
     cursor: var(--cursorText);
+}
+small.footnote {
+    display: inline-block;
 }
 
 /* Buttons and others */
@@ -283,7 +354,7 @@ small {
 button {
     font-family: var(--ffLexendPeta);
     font-size: calc(var(--fsBase) / 1.25);
-    font-weight: 625;
+    font-weight: calc(var(--fwBase) + 225);
     line-height: 125%;
     text-transform: uppercase;
     padding: calc(var(--fsBase) / 1.875) calc(var(--fsBase) * 1.125);
@@ -294,7 +365,7 @@ button {
     background-color: var(--ink);
     cursor: pointer;
     outline: 0 double var(--ink);
-    transition: outline 100ms ease-in;
+    transition: outline 0.1s ease-in;
     cursor: var(--cursorPointer);
 }
 form button {
@@ -315,7 +386,7 @@ legend,
 label {
     font-family: var(--ffLexendPeta);
     font-size: calc(var(--fsBase) / 1.5);
-    font-weight: 625;
+    font-weight: calc(var(--fwBase) + 225);
     text-transform: uppercase;
     cursor: var(--cursorDefault);
 }
@@ -346,7 +417,7 @@ textarea {
     border-radius: 0;
     color: black;
     background: transparent;
-    transition: background-color 200ms ease-out;
+    transition: background-color 0.2s ease-out;
     cursor: var(--cursorText);
 }
 input:focus,
@@ -413,6 +484,17 @@ header.top hr {
 		margin-left: var(--slideDescMargins);
 		margin-right: var(--slideDescMargins);
 	}
+}
+@media (max-width: 30em) {
+    .gallery .nav {
+        display: none;
+    }
+    footer nav.hyperlinks > * {
+        flex-grow: 1;
+    }
+    footer nav a {
+        text-align: center;
+    }
 }
 
 </style>
@@ -511,8 +593,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         });
     }, {
-        rootMargin: '-5% 0px -5% 0px',
-        threshold: 0.33
+        rootMargin: '-5% 0% -5% 0%',
+        threshold: 0.2
     });
     const sections = document.querySelectorAll<HTMLElement>('.init');
     sections.forEach((section: HTMLElement) => {

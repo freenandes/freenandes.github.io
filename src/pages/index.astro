@@ -5,6 +5,7 @@
 import PMCF from '../layouts/PMCF.astro';
 import { getCollection, getEntries, getEntry } from 'astro:content';
 import {Image} from 'astro:assets';
+import Footer from '../components/footer.astro';
 
 // Content
 
@@ -16,8 +17,8 @@ const {Content} = await intro.render();
 
 <PMCF title={intro.data.title} description={intro.body}>
 	<svg style="display: none">
-		<symbol id="dCorner" viewBox="0 0 2 2">
-		  	<path d="M2 0H0V2C0 1.86865 0.0253906 1.73865 0.0761719 1.61731C0.125977 1.49597 0.200195 1.38574 0.292969 1.29291C0.361328 1.22491 0.438477 1.1673 0.522461 1.12158C0.553711 1.1048 0.584961 1.0896 0.617188 1.07611C0.738281 1.02588 0.869141 1 1 1C1 0.868652 1.02539 0.738647 1.07617 0.61731C1.10645 0.543518 1.14551 0.473816 1.19336 0.409607C1.22363 0.368286 1.25684 0.329285 1.29297 0.292908C1.38574 0.200012 1.49609 0.126404 1.61719 0.0761108C1.73828 0.0258789 1.86914 0 2 0Z" />
+		<symbol id="dCorner" viewBox="0 0 256 256">
+			<path d="M256 0.5V0H0V256H0.5C0.5 239.187 3.25 222.547 9.75 207.016C16.1251 191.484 25.625 177.375 37.5 165.492C46.25 156.788 56.1251 149.414 66.875 143.562C70.875 141.414 74.875 139.469 79.0001 137.742C94.5 131.313 111.25 128 128 128C128 111.187 131.25 94.5468 137.75 79.0157C141.626 69.5703 146.625 60.6484 152.75 52.4297C156.625 47.1406 160.876 42.1485 165.5 37.4922C177.375 25.6015 191.5 16.1797 207 9.74218C222.5 3.3125 239.25 0.5 256 0.5Z"/>
 		</symbol>
 	</svg>
 	<header class="init">
@@ -61,65 +62,17 @@ const {Content} = await intro.render();
 					{relatedPosts.map(relatedPost => (
 						<article class="link card">
 							<a href=`/${relatedPost.collection}/${relatedPost.slug}`>
-								<Image src={relatedPost.data.cover} alt={relatedPost.data.coverAlt} />
+								<Image src={relatedPost.data.cover} alt="Decorative image" densities={[1.5, 2, 2.5, 3]} />
 								<span>{relatedPost.data.title}</span>
 							</a>
-							<svg width="2" height="2" viewBox="0 0 2 2"><use xlink:href="#dCorner" /></svg><svg width="2" height="2" viewBox="0 0 2 2"><use xlink:href="#dCorner" /></svg><svg width="2" height="2" viewBox="0 0 2 2"><use xlink:href="#dCorner" /></svg><svg width="2" height="2" viewBox="0 0 2 2"><use xlink:href="#dCorner" /></svg>
+							<svg width="256" height="256" viewBox="0 0 256 256"><use xlink:href="#dCorner" /></svg><svg width="256" height="256" viewBox="0 0 256 256"><use xlink:href="#dCorner" /></svg><svg width="256" height="256" viewBox="0 0 256 256"><use xlink:href="#dCorner" /></svg><svg width="256" height="256" viewBox="0 0 256 256"><use xlink:href="#dCorner" /></svg>
 						</article>
 					))}
 				</div>
 			</section>
 		)}
 	)}
-	<!-- <svg id="decOne" class="blob" width="1000" height="1000" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
-		<title>Decorative ellipse shape filled with a chromatic gradient</title>
-		<defs>
-			<filter id="powerBlur" x="0" y="0" width="100%" height="100%" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-				<feFlood flood-opacity="0" result="bgImageFix" />
-				<feBlend mode="normal" in="SourceGraphic" in2="bgImageFix" result="withTransparency" />
-				<feGaussianBlur in="withTransparency" stdDeviation="100" result="blurred" />
-				<feTurbulence baseFrequency="1.5" result="noise" />
-				<feComposite in="blurred" in2="noise" operator="out" />
-			</filter>
-			<linearGradient id="ellipseFill" x1="25%" y1="0%" x2="75%" y2="100%" gradientUnits="userSpaceOnUse">
-				<stop stop-color="red" />
-				<stop offset="1" stop-color="blue" />
-			</linearGradient>
-		</defs>
-		<ellipse cx="50%" cy="50%" rx="25%" ry="25%" fill="url(#ellipseFill)" filter="url(#powerBlur)" />
-	</svg> -->
-	<footer class="clmnzd">
-		<form class="contact init" action="https://formspree.io/f/mnqyrkwr" method="POST" accept-charset="UTF-8">
-			<fieldset class="card">
-				<legend>Contact Pedro</legend>
-				<label for="email">Your Email</label>
-				<input type="email" id="email" name="email" maxlength="200" required autocomplete="on">
-				<label for="message">The Message</label>
-				<textarea id="message" name="message" maxlength="2000" required></textarea>
-				<button type="submit">Send thy missive</button>
-			</fieldset>
-		</form>
-		<nav class="hyperlinks init">
-			<a href="/whiteboard">
-				<span>Meet Pedro, a Whiteboard</span>
-			</a>
-			<a href="/cv">
-				<span>About Pedro, the Curriculum</span>
-			</a>
-			<a href="https://www.are.na/p-m-c-f" target="_blank">
-				<span>Are.na</span>
-			</a>
-			<a rel="me" href="https://mastodon.social/@freenandes" target="_blank">
-				<span>Mastodon</span>
-			</a>
-			<a href="https://www.linkedin.com/in/pmcfernandes/" target="_blank">
-				<span>LinkedIn</span>
-			</a>
-		</nav>
-		<small class="footnote init">
-			Website designed, illustrated and assembled by me in 2023, inspired by portuguese cultural references using: <a href="https://www.lexend.com/" target="_blank">Lexend typefaces</a> by Bonnie Shaver-Troup and Thomas Jockin; Coconat Extended font by <a href="https://saralavazza.it/" target="_blank">Sara Lavazza</a>; Compagnon Script font by <a href="https://www.chloelozano.fr/" target="_blank">Chloé Lozano</a>; and <a href="https://astro.build/" target="_blank">Astro's web framework</a>.
-		</small>
-	</footer>
+	<Footer />
 </PMCF>
 
 <style is:global>
@@ -215,7 +168,7 @@ section.gallery {
 	flex-direction: column;
 	justify-content: center;
 	box-sizing: content-box;
-	margin: var(--slideMargin) 0.125em 0;
+	margin: var(--slideMargin) 0 0;
 	overflow: hidden;
 }
 .reel .card:last-child {
@@ -251,6 +204,7 @@ section.gallery {
 	height: fit-content;
 	max-height: calc(100vh - var(--slideMarginTotal));
 	aspect-ratio: 3 / 4;
+	background-color: var(--cru);
 }
 @supports not (aspect-ratio: 3 / 4) {
 	.link.card::before {
@@ -279,30 +233,26 @@ section.gallery {
 	pointer-events: none;
 }
 .link.card > svg:nth-of-type(1) {
-	top: 0;
-	left: 0;
+	top: -0.05vw;
+	left: -0.05vw;
 }
 .link.card > svg:nth-of-type(2) {
-	top: 0;
-	right: 0;
+	top: -0.05vw;
+	right: -0.05vw;
 	transform: rotate(90deg);
 }
 .link.card > svg:nth-of-type(3) {
-	bottom: 0;
-	left: 0;
+	bottom: -0.05vw;
+	left: -0.05vw;
 	transform: rotate(270deg);
 }
 .link.card > svg:nth-of-type(4) {
-	right: 0;
-	bottom: 0;
+	right: -0.05vw;
+	bottom: -0.05vw;
 	transform: rotate(180deg);
 }
 .link.card a {
 	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -310,16 +260,35 @@ section.gallery {
 	font-weight: calc(var(--fwBase) + 225);
 	font-size: var(--fsBase);
 	text-decoration: none;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	padding: 1em;
+}
+.link.card a:hover {
+	opacity: unset;
 }
 .link.card img {
 	position: absolute;
-	width: calc(100% - 2px);
-	height: calc(100% - 2px);
+	width: 100%;
+	height: 100%;
 	object-fit: cover;
+	opacity: 0.2;
+	filter: brightness(0.9);
+	transition: all 0.2s ease-out;
 }
 .link.card span {
 	text-align: center;
 	z-index: 1;
+}
+.link.card a:hover img {
+	transform: scale(1.1);
+	opacity: 0.4;
+	filter: brightness(1);
+}
+.link.card a:hover span {
+	animation: blink 0.4s steps(1) infinite;
 }
 
 /* Card Content */
@@ -349,20 +318,6 @@ section.gallery {
 #pre-04 {
 	background-image: url(../assets/pmcf/azulejo05.svg);
 	background-size: calc(var(--fsBase) * 65);
-}
-
-/* Footer */
-
-footer > *:not(:last-child) {
-	margin-top: calc(var(--slideMargin) * 2);
-	margin-bottom: calc(var(--slideMargin) * 2);
-}
-.contact .card {
-	padding: var(--slidePadding);
-	border-radius: var(--slidePadding);
-}
-small.card {
-	display: block;
 }
 
 /* Constraints */

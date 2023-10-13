@@ -23,7 +23,7 @@ const webZine = defineCollection({
 const index = defineCollection({
   schema: z.object({
     title: z.string().optional(),
-    relatedPosts: z.array(reference('image')),
+    relatedPosts: z.array(reference('xp')),
   }),
 });
 const gallery = defineCollection({
@@ -33,7 +33,7 @@ const gallery = defineCollection({
     cover: image().refine((img) => img.width >= 1024, {
       message: "Cover image must be at least 1024 pixels wide!",
     }),
-    coverAlt: z.string(),
+    coverAlt: z.string().optional(),
   }),
 });
 
@@ -48,5 +48,5 @@ export const collections = {
   'dor-cronica': webZine,
   // PMCF 2
   'pmcf': index,
-  'image': gallery,
+  'xp': gallery,
 };

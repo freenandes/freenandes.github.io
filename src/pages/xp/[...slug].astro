@@ -1,0 +1,58 @@
+---
+
+// Imports
+
+import PMCF from '../../layouts/PMCF.astro';
+// import {Image} from 'astro:assets';
+import Footer from '../../components/footer.astro';
+
+// Content
+
+import {getCollection} from 'astro:content';
+export async function getStaticPaths() {
+    const allImages = await getCollection('xp');
+    return allImages.map(entry => ({
+        params: {slug: entry.slug},
+        props: {entry},
+    }));
+};
+const {entry} = Astro.props;
+const {Content} = await entry.render();
+
+---
+
+<PMCF title={entry.data.title}>
+    <div class="grided post">
+        <header class="top init">
+            <nav class="hyperlinks">
+                <a id="backLink">
+                    <span>&larr; Back</span>
+                </a>
+                <hr>
+            </nav>
+        </header>
+        <article class="init">
+            <h1>{entry.data.title}</h1>
+            <!-- <Image src={entry.data.cover} alt={entry.data.coverAlt} /> -->
+            <Content/>
+        </article>
+    </div>
+    <Footer />
+</PMCF>
+
+<style>
+
+/* .post {
+    margin-bottom: calc(var(--s8p) + 16vw);
+} */
+h1 {
+    margin-bottom: var(--s8p);
+}
+:global(img) {
+    width: 100%;
+    height: auto;
+    margin: 0;
+    border-radius: var(--s8p);
+}
+
+</style>

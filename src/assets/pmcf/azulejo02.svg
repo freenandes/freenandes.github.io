@@ -4,7 +4,7 @@
             fill: hsl(192 82% 83%);
         }
         .colorOne {
-            fill: hsl(22 42% 94%);
+            fill: hsl(25 42% 94%);
         }
     </style>
     <defs>

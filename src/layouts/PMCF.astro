@@ -86,7 +86,8 @@ const { title, description, author='Pedro MC Fernandes' } = Astro.props;
 
     --charcoal: hsla(230, 14%, 16%, 1);
     --azulejo: 218, 100%, 43%;
-    --pardo: 60, 7%, 97%;
+    --pardo: 50, 12%, 97%;
+    --cru: hsl(25 42% 94%);
 
     /* Palette */
 
@@ -241,7 +242,7 @@ body {
     position: relative;
     margin: 0;
     opacity: 0;
-    animation: fadeIn 200ms ease-in 100ms forwards;
+    animation: fadeIn 0.2s ease-in 0.1s forwards;
 }
 ::selection {
     color: var(--paper);
@@ -311,12 +312,18 @@ nav a span {
 nav a:hover span {
 	box-shadow: 0.125em 0 0 0 var(--ink) inset, -0.125em 0 0 0 var(--ink) inset;
 }
-nav a[target="_blank"] span::after {
+a::after,
+nav a:not(#backLink) span::after {
     content: " \2197";
-    display: inline;
 }
-nav a[target="_blank"]:hover span::after {
-    animation: blink 0.2s steps(1) infinite;
+article a::after,
+nav a::after,
+nav a[href*="pmcf.xyz"]::after,
+nav a[href*="pmcf.xyz"] span::after {
+    content: none;
+}
+nav a:hover span::after {
+    animation: blink 0.4s steps(1) infinite;
 }
 
 /* Typography */
@@ -443,7 +450,7 @@ form textarea:not(:last-child) {
 
 /* Grid */
 
-.clmnzd {
+.grided {
 	width: calc(100vw - var(--slideMarginTotal) - var(--scrollbarWidth));
 	max-width: calc(var(--slideDescContentWidth) + var(--slidePaddingTotal));
 	margin: var(--slideMargin) var(--slideMargin) calc(var(--slideMargin) * 2);
@@ -464,7 +471,7 @@ header.top nav {
 header.top hr {
     flex: 1;
     height: auto;
-    margin: 0;
+    margin: 0 0.1875em 0 0;
 }
 
 /* Animes */
@@ -480,7 +487,7 @@ header.top hr {
 /* Constraints */
 
 @media (min-width: 53em) {
-	.clmnzd {
+	.grided {
 		margin-left: var(--slideDescMargins);
 		margin-right: var(--slideDescMargins);
 	}

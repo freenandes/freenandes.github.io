@@ -17,8 +17,26 @@ const {Content} = await intro.render();
 
 <PMCF title={intro.data.title} description={intro.body}>
 	<svg style="display: none">
+		<!-- <defs>
+			<filter id="boxShadow" x="-50%" y="-50%" width="200%" height="200%">
+				<feGaussianBlur in="SourceAlpha" stdDeviation="48"/>
+				<feOffset dx="0" dy="0" result="offsetblur"/>
+				<feComponentTransfer>
+					<feFuncA type="linear" slope="0.15"/>
+				</feComponentTransfer>
+				<feMerge> 
+					<feMergeNode in="color" />
+					<feMergeNode in="SourceGraphic"/>
+				</feMerge>
+			</filter>
+		</defs> -->
 		<symbol id="dCorner" viewBox="0 0 256 256">
-			<path d="M256 0.5V0H0V256H0.5C0.5 239.187 3.25 222.547 9.75 207.016C16.1251 191.484 25.625 177.375 37.5 165.492C46.25 156.788 56.1251 149.414 66.875 143.562C70.875 141.414 74.875 139.469 79.0001 137.742C94.5 131.313 111.25 128 128 128C128 111.187 131.25 94.5468 137.75 79.0157C141.626 69.5703 146.625 60.6484 152.75 52.4297C156.625 47.1406 160.876 42.1485 165.5 37.4922C177.375 25.6015 191.5 16.1797 207 9.74218C222.5 3.3125 239.25 0.5 256 0.5Z"/>
+			<path d="M256 0.5V0H0V256H0.5C0.5 239.187 3.25 222.547 9.75 207.016C16.1251 191.484 25.625 177.375 37.5 165.492C46.25 156.788 56.1251 149.414 66.875 143.562C70.875 141.414 74.875 139.469 79.0001 137.742C94.5 131.313 111.25 128 128 128C128 111.187 131.25 94.5468 137.75 79.0157C141.626 69.5703 146.625 60.6484 152.75 52.4297C156.625 47.1406 160.876 42.1485 165.5 37.4922C177.375 25.6015 191.5 16.1797 207 9.74218C222.5 3.3125 239.25 0.5 256 0.5Z" />
+		</symbol>
+		<symbol id="arrow" viewBox="0 0 16 16">
+			<path d="M1 8 L14 8" stroke-linecap="butt" />
+			<path d="M14 8 L10 4" stroke-linecap="square" />
+			<path d="M14 8 L10 12" stroke-linecap="square" />
 		</symbol>
 	</svg>
 	<header class="init">
@@ -36,26 +54,20 @@ const {Content} = await intro.render();
 			<section class="gallery init">
 				<button class="nav next" aria-label="Next slide">
 					<svg class="icon" width="16" height="16" viewBox="0 0 16 16">
-						<path d="M2 8 L14 8" />
-						<path d="M14 8 L10 4" />
-						<path d="M14 8 L10 12" />
+						<use xlink:href="#arrow" />
 					</svg>
 				</button>
 				<button class="nav prev" aria-label="Previous slide">
-					<svg class="icon" width="16" height="16" viewBox="0 0 16 16">
-						<path d="M2 8 L14 8" />
-						<path d="M14 8 L10 4" />
-						<path d="M14 8 L10 12" />
+					<svg class="icon" width="16" height="16">
+						<use xlink:href="#arrow" />
 					</svg>
 				</button>
 				<div class="reel">
 					<div id=`pre-${preface.slug}` class="description card">
 						<Content />
 						<a class="cta next" aria-label="Next slide">
-							<svg class="icon" width="16" height="16" viewBox="0 0 16 16">
-								<path d="M2 8 L14 8" />
-								<path d="M14 8 L10 4" />
-								<path d="M14 8 L10 12" />
+							<svg class="icon" width="16" height="16">
+								<use xlink:href="#arrow" />
 							</svg>
 						</a>
 					</div>
@@ -65,7 +77,7 @@ const {Content} = await intro.render();
 								<Image src={relatedPost.data.cover} alt="Decorative image" densities={[1.5, 2, 2.5, 3]} />
 								<span>{relatedPost.data.title}</span>
 							</a>
-							<svg width="256" height="256" viewBox="0 0 256 256"><use xlink:href="#dCorner" /></svg><svg width="256" height="256" viewBox="0 0 256 256"><use xlink:href="#dCorner" /></svg><svg width="256" height="256" viewBox="0 0 256 256"><use xlink:href="#dCorner" /></svg><svg width="256" height="256" viewBox="0 0 256 256"><use xlink:href="#dCorner" /></svg>
+							<svg width="256" height="256"><use xlink:href="#dCorner" /></svg><svg width="256" height="256"><use xlink:href="#dCorner" /></svg><svg width="256" height="256"><use xlink:href="#dCorner" /></svg><svg width="256" height="256"><use xlink:href="#dCorner" /></svg>
 						</article>
 					))}
 				</div>
@@ -79,12 +91,19 @@ const {Content} = await intro.render();
 
 /* Layout */
 
+body {
+	--galleryNavFontSize: calc(1.5em + 2vw);
+	--galleryNavLenght: calc(var(--galleryNavFontSize) * 0.75);
+	--slideLinkWidth: calc(100vw - var(--slideMarginTotal) - var(--scrollbarWidth));
+	/* --slideLinkShadow: 0 0 48px 0 hsla(0, 0%, 0%, 0.2); */
+}
+/* #dCorner path {
+	box-shadow: var(--slideLinkShadow);
+} */
 section.gallery {
 	position: relative;
 }
 .gallery .nav {
-	--galleryNavFontSize: calc(1.5em + 2vw);
-	--galleryNavLenght: calc(var(--galleryNavFontSize) * 0.75);
 	position: absolute;
 	top: 50%;
 	transform: translateY(-50%);
@@ -99,23 +118,23 @@ section.gallery {
 	height: var(--galleryNavLenght);
 	padding: calc(var(--galleryNavLenght) / 6);
 	border-radius: var(--galleryNavLenght);
-	color: var(--paper);
+	color: var(--inkFade);
 	background-color: var(--paper);
-	box-shadow: 0 var(--s16p) var(--s32p) 0 rgba(0, 0, 0, 0.05), 0 var(--s4p) var(--s8p) 0 rgba(0, 0, 0, 0.1), 0 var(--s2p) var(--s4p) 0 rgba(0, 0, 0, 0.2);
+	/* box-shadow: 0 var(--s16p) var(--s32p) 0 rgba(0, 0, 0, 0.05), 0 var(--s4p) var(--s8p) 0 rgba(0, 0, 0, 0.1), 0 var(--s2p) var(--s4p) 0 rgba(0, 0, 0, 0.2); */
 	transition: background-color 0.2s ease-in, opacity 0.2s ease-out, box-shadow 0.2s ease-out;
 }
 .gallery .nav svg {
 	width: 100%;
 	height: auto;
 }
-.gallery .nav path {
-	stroke: var(--paper);
+#arrow path {
+	stroke: currentColor;
 	stroke-width: 0.09375rem;
-	stroke-linecap: round;
 }
 .gallery .nav:hover {
+	color: var(--paper);
 	background-color: var(--ink);
-	box-shadow: 0 0 var(--s8p) 0 rgba(0, 0, 0, 0.1), 0 0 var(--s2p) 0 rgba(0, 0, 0, 0.2), 0 0 var(--s1p) 0 rgba(0, 0, 0, 0.4);
+	/* box-shadow: 0 0 var(--s8p) 0 rgba(0, 0, 0, 0.1), 0 0 var(--s2p) 0 rgba(0, 0, 0, 0.2), 0 0 var(--s1p) 0 rgba(0, 0, 0, 0.4); */
 	opacity: 1;
 }
 .gallery .nav.hidden {
@@ -138,7 +157,8 @@ section.gallery {
 	padding: 0.5em;
 	margin: -0.5em;
 }
-.gallery .cta {
+.gallery .cta,
+.gallery a.cta::after {
 	display: none;
 }
 .gallery .cta svg {
@@ -197,7 +217,6 @@ section.gallery {
 
 .link.card {
 	position: relative;
-	--slideLinkWidth: calc(100vw - var(--slideMarginTotal) - var(--scrollbarWidth));
 	width: calc(var(--slideLinkWidth) / 1.375);
 	max-width: 40em;
 	min-height: calc((100vh - var(--slideMarginTotal) - var(--slidePaddingTotal)) / 2);
@@ -258,16 +277,20 @@ section.gallery {
 	align-items: center;
 	font-family: var(--ffLexendPeta);
 	font-weight: calc(var(--fwBase) + 225);
-	font-size: var(--fsBase);
+	font-size: calc(var(--fsBase) / 1.0625);
+	line-height: 112.5%;
 	text-decoration: none;
+	text-transform: uppercase;
 	top: 0;
 	right: 0;
 	bottom: 0;
 	left: 0;
 	padding: 1em;
+	/* box-shadow: var(--slideLinkShadow) inset; */
 }
 .link.card a:hover {
 	opacity: unset;
+	color: var(--paper);
 }
 .link.card img {
 	position: absolute;
@@ -275,17 +298,21 @@ section.gallery {
 	height: 100%;
 	object-fit: cover;
 	opacity: 0.2;
-	filter: brightness(0.9);
 	transition: all 0.2s ease-out;
 }
 .link.card span {
 	text-align: center;
+	padding: 0.125em 0.25em;
+	border-radius: var(--s4p);
 	z-index: 1;
+}
+.link.card a:hover span {
+	background-color: var(--charcoal);
 }
 .link.card a:hover img {
 	transform: scale(1.1);
-	opacity: 0.4;
-	filter: brightness(1);
+	opacity: 1;
+	filter: contrast(50%) invert(100%) hue-rotate(285deg) saturate(150%);
 }
 .link.card a:hover span {
 	animation: blink 0.4s steps(1) infinite;
@@ -296,7 +323,8 @@ section.gallery {
 .card *:nth-child(1) {
 	margin-top: 0;
 }
-.card *:nth-last-child(1) {
+.card *:nth-last-child(1),
+.card p:nth-last-of-type(1) {
 	margin-bottom: 0;
 }
 #pmcf-intro {

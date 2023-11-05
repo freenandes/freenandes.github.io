@@ -3,7 +3,6 @@
 // Imports
 
 import PMCF from '../../layouts/PMCF.astro';
-// import {Image} from 'astro:assets';
 import Footer from '../../components/footer.astro';
 
 // Content
@@ -33,7 +32,6 @@ const {Content} = await entry.render();
         </header>
         <article class="init">
             <h1>{entry.data.title}</h1>
-            <!-- <Image src={entry.data.cover} alt={entry.data.coverAlt} /> -->
             <Content/>
         </article>
     </div>
@@ -42,9 +40,6 @@ const {Content} = await entry.render();
 
 <style>
 
-/* .post {
-    margin-bottom: calc(var(--s8p) + 16vw);
-} */
 h1 {
     margin-bottom: var(--s8p);
 }

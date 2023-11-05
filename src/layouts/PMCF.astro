@@ -15,7 +15,11 @@ const { title, description, author='Pedro MC Fernandes' } = Astro.props;
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charset="utf-8" />
         <meta name="generator" content={Astro.generator} />
-        <!-- <script data-respect-dnt data-no-cookie async src="https://cdn.splitbee.io/sb.js"></script> -->
+        <script>
+            // @ts-nocheck
+            !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+            posthog.init('phc_D7wSUSel6iBgWFp0s1mTdLF264z8iTxSdVElps52lKg',{api_host:'https://eu.posthog.com',persistence:'memory'})
+        </script>
     </head>
     <body>
         <slot />
@@ -85,16 +89,16 @@ const { title, description, author='Pedro MC Fernandes' } = Astro.props;
     /* Colors */
 
     --charcoal: hsla(230, 14%, 16%, 1);
-    --azulejo: 218, 100%, 43%;
+    --azulejo: 218, 100%;
     --pardo: 50, 12%, 97%;
     --cru: hsl(25 42% 94%);
 
     /* Palette */
 
     --paper: hsl(var(--pardo));
-    --ink: hsl(var(--azulejo));
-    --inkFade: hsla(var(--azulejo), 0.2);
-    --inkWash: hsla(var(--azulejo), 0.1);
+    --ink: hsl(var(--azulejo), 43%);
+    --inkFade: hsl(var(--azulejo), 86%);
+    --inkWash: hsl(var(--azulejo), 93%);
     
     /* Spacing */
 
@@ -262,7 +266,7 @@ hr {
 svg.icon path {
 	stroke: currentColor;
 	stroke-width: 0.0625rem;
-	stroke-linecap: round;
+	stroke-linecap: square;
 }
 
 /* Links */
@@ -314,7 +318,7 @@ nav a:hover span {
 }
 a::after,
 nav a:not(#backLink) span::after {
-    content: " \2197";
+    content: "\00A0\2197";
 }
 article a::after,
 nav a::after,
@@ -461,8 +465,8 @@ form textarea:not(:last-child) {
 header.top {
     position: sticky;
     top: 0;
-    padding-top: 0.25em;
-    margin-bottom: var(--slideMargin);
+    padding: 0.25em 0.5em 0;
+    margin: 0 -0.5em var(--slideMargin);
     background-color: var(--paper);
 }
 header.top nav {
@@ -471,7 +475,7 @@ header.top nav {
 header.top hr {
     flex: 1;
     height: auto;
-    margin: 0 0.1875em 0 0;
+    margin: 0 0.1875rem 0 0;
 }
 
 /* Animes */

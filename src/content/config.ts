@@ -23,7 +23,7 @@ const webZine = defineCollection({
 const index = defineCollection({
   schema: z.object({
     title: z.string().optional(),
-    relatedPosts: z.array(reference('xp')),
+    relatedPosts: z.array(reference('experience')),
   }),
 });
 const gallery = defineCollection({
@@ -48,5 +48,5 @@ export const collections = {
   'dor-cronica': webZine,
   // PMCF 2
   'pmcf': index,
-  'xp': gallery,
+  'experience': gallery,
 };

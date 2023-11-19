@@ -1,8 +1,8 @@
 ---
 title: "Benchmarking"
-cover: "./accessibility-cover.png"
+cover: "./benchmarking-cover.png"
 ---
-![Compilation of web interface screenshots depitcting outputs from tools that evaluate color contrast, simulate color blindness, and keyboard interaction sequence on a web input](./accessibility.png)
+![Compilation of presentation slides showing some benchmarking results like screen prints from competitor websites with side annotations and some insights and guidelines in the form of graphs and text blocks](./benchmarking.png)
 
 It has been a no-brainer step in my process. Benchmarking outputs act as a compass to understand key differentiators so we can adjust, as a team, our design strategy.
 

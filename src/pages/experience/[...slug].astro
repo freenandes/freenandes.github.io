@@ -9,7 +9,7 @@ import Footer from '../../components/footer.astro';
 
 import {getCollection} from 'astro:content';
 export async function getStaticPaths() {
-    const allImages = await getCollection('xp');
+    const allImages = await getCollection('experience');
     return allImages.map(entry => ({
         params: {slug: entry.slug},
         props: {entry},
@@ -25,7 +25,7 @@ const {Content} = await entry.render();
         <header class="top init">
             <nav class="hyperlinks">
                 <a id="backLink">
-                    <span>&larr; Back</span>
+                    <span>Back</span>
                 </a>
                 <hr>
             </nav>
@@ -46,8 +46,12 @@ h1 {
 :global(img) {
     width: 100%;
     height: auto;
-    margin: 0;
+    margin: 2em 0 0.5em;
     border-radius: var(--s8p);
+}
+:global(img + small) {
+    display: block;
+    font-size: 0.75em;
 }
 
 </style>

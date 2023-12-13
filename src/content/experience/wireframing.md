@@ -1,8 +1,8 @@
 ---
 title: "Wireframing"
-cover: "./accessibility-cover.png"
+cover: "./wireframing-cover.png"
 ---
-![Compilation of web interface screenshots depitcting outputs from tools that evaluate color contrast, simulate color blindness, and keyboard interaction sequence on a web input](./accessibility.png)
+![Compilation of wireframes. The first two are photos captured from a live whiteboarding session. The third one is a sketched on paper wireframe, and the last is a digital wireframe of a travel website with references to locations and hotels](./wireframing.png)
 
 I have it easy with wireframing. I have some drawing skills that allow me to pass ideas onto paper or digital canvases quickly. I also brainstorm and speak better in images and graphical markings.
 

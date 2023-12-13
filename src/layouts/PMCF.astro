@@ -254,11 +254,11 @@ body {
 }
 hr {
     font-size: calc(var(--fsBase) / 1.375);
-    height: 0.0625em;
+    height: 0.078125em;
     margin: 0;
     overflow: visible;
     border: none;
-    box-shadow: 0 0.0625em 0 0 var(--inkFade), 0 -0.0625em 0 0 var(--inkFade) inset;
+    box-shadow: 0 0.078125em 0 0 var(--inkFade), 0 -0.078125em 0 0 var(--inkFade) inset;
 }
 
 /* SVG */
@@ -298,23 +298,27 @@ nav a {
 	outline: none;
 	padding: 0.25em 0;
 	margin-right: 0.375em;
-    box-shadow: 0 0.0625em 0 0 var(--inkFade), 0 -0.0625em 0 0 var(--inkFade) inset, 0 -0.0625em 0 0 transparent, 0 0.0625em 0 0 transparent inset;
+    --navaS1: 0.078125em;
+    --navaS0: -0.078125em;
+    box-shadow: 0 var(--navaS1) 0 0 var(--inkFade), 0 var(--navaS0) 0 0 var(--inkFade) inset, 0 var(--navaS0) 0 0 transparent, 0 var(--navaS1) 0 0 transparent inset;
     transition: box-shadow 0.1s ease-in;
 }
 nav a:hover {
 	opacity: 1;
-	box-shadow: 0 0.0625em 0 0 var(--ink), 0 -0.0625em 0 0 var(--ink) inset, 0 -0.0625em 0 0 var(--ink), 0 0.0625em 0 0 var(--ink) inset;
+	box-shadow: 0 var(--navaS1) 0 0 var(--ink), 0 var(--navaS0) 0 0 var(--ink) inset, 0 var(--navaS0) 0 0 var(--ink), 0 var(--navaS1) 0 0 var(--ink) inset;
 }
 nav a span {
     box-sizing: border-box;
 	display: inline-block;
     width: 100%;
 	padding: calc(var(--fsBase) / 2) calc(var(--fsBase) / 1.5);
-    box-shadow: 0.125em 0 0 0 transparent inset, -0.125em 0 0 0 transparent inset;
+    --navaSP1: 0.15625em;
+    --navaSP0: -0.15625em;
+    box-shadow: var(--navaSP1) 0 0 0 transparent inset, var(--navaSP0) 0 0 0 transparent inset;
     transition: box-shadow 0.1s ease-in;
 }
 nav a:hover span {
-	box-shadow: 0.125em 0 0 0 var(--ink) inset, -0.125em 0 0 0 var(--ink) inset;
+	box-shadow: var(--navaSP1) 0 0 0 var(--ink) inset, var(--navaSP0) 0 0 0 var(--ink) inset;
 }
 a::after,
 nav a:not(#backLink) span::after {

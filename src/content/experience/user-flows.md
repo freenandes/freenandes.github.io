@@ -2,8 +2,10 @@
 title: "User Flows"
 cover: "./user-flows-cover.png"
 ---
-![Screenshots of various diagrams. They don't show much of the content as they're small on the image but they show a lot of notes that are linked with arrows, implying that they form a path or a flow](./user-flows.png)
+![Screenshots of bits of digital whiteboards with various diagrams made from post-its, arrows, and other similar graphical schemes.](./user-flows.png)
 
-As a product designer, prioritizing the user’s experience is crucial. One of the most effective ways to demonstrate empathy is to map out their journey(s) and understand how users interact with our product. This process enables designers and the rest of the team to identify opportunities to improve the experience and iterate the solution to mitigate any weaknesses.
+For me, prioritizing a person’s experience is crucial. One of the most effective ways to demonstrate sympathy for people’s problems and frustrations is to map out their journey(s) and try to understand how they could make sense of the mess we made in the first place, either existing or fictional ideas.
 
-I look into creating diagrams, journey maps, golden paths, and any other technique we can discover that can capture the essence of the user’s feeling, whether frustrated or delighted, so that we can design a better service through our product.
+This type of process is not simply method acting. It enables designers and their teams to identify what needs improvement. It’s also a great way to understand what we’ll do without jumping into a definitive solution. We can iterate from these user flows until we get it right. Still, it’s not all stone carving. We can always go back, adjust, or scrap it to make a new user flow. I believe it’s an open-game tool to drive an effective solution.
+
+To help unlock the creation mode and start discussing some pre-solutions, I look into creating diagrams, journey maps, golden paths, and other techniques we can discover in the design industry. This way, we can capture the essence of the user’s feelings, whether frustrated or delighted, to design a better service.

@@ -1,12 +1,24 @@
 ---
+
 // Imports
+
 import PMCF from '../layouts/PMCF.astro';
-// Meta
+
+// Content
+
 const title = "Page not found";
-const description = "The page you are looking for cannot be found, sorry. Please check the URL for typos or go to the main page.";
+const description = "The page you are looking for cannot be found, sorry. Please check the URL for typos or go to the home page to find more content.";
+
 ---
+
 <PMCF title={title} description={description}>
-    <h1 class="title">{title}</h1>
-    <p>{description}</p>
-    <a href="/">Back to home page</a>
+    <div class="grided">
+        <h1 class="title">{title}</h1>
+        <p>{description}</p>
+        <nav class="hyperlinks">
+            <a class="feat" href="/">
+                <span>Home page</span>
+            </a>
+        </nav>
+    </div>
 </PMCF>

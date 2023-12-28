@@ -2,10 +2,12 @@
 title: "User Experience Architecture"
 cover: "./ux-architecture-cover.png"
 ---
-![Compilation of web interface screenshots with diagrams and post-its. All of them illustrate the same topic of UX architecture, with relationships between pages and or interface components](./ux-architecture.png)
+![Screenshots of digital whiteboard diagrams, tables and matrices of colored post-its.](./ux-architecture.png)
 
-I view this as an exercise in redesigning the bones of a product. It is the big-picture framework for visualizing the interaction between humans and software products.
+I view the architectural work of structuring the user experience as an exercise in defining the bones of a product. It’s one of the most potent ways to help build an exemplary product.
 
-I approach the organization of information structures from an object-oriented perspective, as it helps align hierarchy, navigation structures, and taxonomy in a way that makes more sense to people in their daily lives relationship with the tridimensional environment. It results in a more clicky and instinctive result.
+By doing this, we get to influence more than just the front-end development but also the database creation, the back-end development, the content design, the sales of the product, and more. Doing the architecture of a product helps us bind everything together so that the experience is fully cohesive for everyone, not just the end user.
 
-With this, we trim the complexity and get a more intuitive user journey. But to make sure the output is effectual, a cross-functional collaboration is needed since most product servicing concepts draw from operational structures and the team’s know-how.
+Everyone responsible for building and selling the product will get to collaborate and establish a better groundwork to build components focused on the user’s experience. It’s beyond just solving technical problems for the challenge. It’s a directed effort from all fronts to make sure the product is suited for people.
+
+I approach the organization of information structures from an object-oriented perspective, as it helps align hierarchy, navigation structures, and taxonomy in a way that makes more sense to real people. It results in a more clicky and intuitive result. A cross-functional collaboration is needed to ensure the output is productive since most product servicing concepts draw from operational structures and the team’s know-how.

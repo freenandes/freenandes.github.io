@@ -8,10 +8,10 @@ description: "Hi 👋 This is my CV. It's where I show my career as a Product De
 
 ## Product Designer
 
-[Contact me at www.pmcf.xyz](/)<br>
+[Contact me at www.pmcf.xyz](/)
 <a href="https://linkedin.com/in/pmcfernandes" target="_blank">linkedin.com/in/pmcfernandes</a>
 
-Hi, my name is Pedro, and I'm a designer, a creator inspired by art and creativity. I want to contribute to building a more accessible and humane tech world. While I have experience working in various industries, my focus has been on information technology. I aim to design better experiences that help humans overcome personal and social problems, live healthier and more caring of future generations.
+Hi, my name is Pedro, and I’m a designer, a creator inspired by art and creativity. I want to contribute to building a more accessible and humane tech world. While I have experience working in various industries, my focus has been on information technology. I aim to design better experiences that help humans overcome personal and social problems, live healthier and more caring of future generations.
 
 ### 9+ years as a digital Product Designer
 

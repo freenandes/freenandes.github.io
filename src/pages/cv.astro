@@ -42,17 +42,28 @@ main > *:first-child {
 main > *:last-child {
     margin-bottom: 0;
 }
-h3, h4, h5, h6 {
+h1 {
+    font-size: calc(var(--fsHeading) / 1.0625);
+}
+h2, h3, h4, h5, h6 {
     font-family: var(--ffLexendPeta);
     font-size: calc(var(--fsHeading) / 2);
     font-weight: 700;
     line-height: 100%;
     letter-spacing: unset;
+}
+h3, h4, h5, h6 {
     margin-top: 4rem;
+}
+h2 + p > * {
+    display: inline-block;
+}
+h2 + p a[href] {
+    margin-right: 1em;
 }
 img {
     float: right;
-    --frameRound: calc(var(--s64p) * 1.1875);
+    --frameRound: calc(var(--s64p) * 1.375);
     width: var(--frameRound);
     height: var(--frameRound);
     border-radius: var(--frameRound);

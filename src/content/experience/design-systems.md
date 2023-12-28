@@ -2,12 +2,12 @@
 title: "Design Systems"
 cover: "./design-systems-cover.png"
 ---
-![Amalgamation of screen prints from a design system's documentation. Has majorly bits of design refinement, documentation and examples of tables, buttons, colors to use, etc.](./design-systems.png)
+![Compilation of screenshots of the design system’s documentation pages with examples of components and styles.](./design-systems.png)
 
-I've been dedicated to design systems for a long time. The Lego-like experience and systematization draws me in.
+I’ve been dedicated to designing systems for a long time. The Lego-like experience in building them and the systematization intricacies draw me in.
 
-I have built three design systems for web interfaces from scratch. For the first one, I had to go through the whole flow of setting it up, designing, coding, and testing — learning how to — so it would be ready to use.
+I have helped build a few design systems for web interfaces. I had to make their foundations, design, code some of the components, and test them to be ready for use. I had to set up robust and scalable documentation schemas, allowing partners to use them independently.
 
-At TUI Group and Percona, I had to set up a more robust and scalable documentation schema. And at Farfetch, I had the chance to contribute to their design system by complying with demanding bureaucracy and elevated implementation risk.
+Furthermore, I also had the chance to contribute to other matured design systems by complying with their demanding bureaucracy and elevated implementation risks. I used my experience and aptitude to integrate work perfectly into existing brands and elevate their messaging.
 
-So far, I've learned how invaluable a design system is to grease the design machine and move faster and an innovative company. My experience here can benefit teams looking to build impactful experiences and brands that scale with minimal regressions.
+I’ve learned much about how invaluable a design system can be to grease the design operations and the manufacturing machine, to move faster, and to propel innovation. My experience here benefits teams looking to build impactful experiences and brands that can scale with minimal regressions but with a powerful face.

@@ -2,14 +2,16 @@
 title: "Insight Gathering"
 cover: "./insight-gathering-cover.png"
 ---
-![A whiteboard screenshot with snippets of research slides filled with diverse content mostly captures interviews with customers. Overlaid, some annotations are in the form of post-it notes. The topic is recycling of beauty products](./insight-gathering-01.png)
+![Screenshot of a digital whiteboard with a collage of presentation slides overlapped with post-it annotations.](./insight-gathering-01.png)
 
-Like a detective, I search high and low, left and right, across all departments to find the root problems we face on a given initiative.
+Like a true detective, I search high and low, left and right, and across all departments to find the root problems. I arrange collaborative sessions with experts, users, or customers to gather relevant insights.
 
-I arrange collaborative and dynamic sessions with a small group of colleagues, including users or customers, to gather relevant leads. The main objective is to collect and condense evidence and formulate valuable insights for the work ahead. I help unveil nuanced user needs, aligning our design solutions more closely with real-world user experiences.
+The main objective of this type of exercise is to listen. Understand the problem clearly without coming close to premature solutions. Collect the evidence so we can then condense it into valuable insights.
 
-![Various screenshots of presentation slides. Some capture parts of diagrams and annotations on the Percona website. Others present a digested, succinct insight after the investigation of fashion shoppers' behaviors](./insight-gathering-02.png)
-<small>My quickest strategy would be to go through all the steps by myself, capture the screenshots, and analyze them with a critical mindset. I can even check any session recordings or other similar artifacts we may have, to support this exercise.</small>
+I’ve led many interviews and focus groups, and, with my experience, I can help unveil those nuanced user needs and help the team drive toward design solutions that are more closely aligned with the real world of people trying to understand products in their daily lives.
 
-![Some screen captures of user feedback quotes in the form of cards, quantitative data in the form of a radial graph on website visitors showing conversion rates, and also some captures of interviews with database experts showing some of the main quotes](./insight-gathering-03.png)
-<small>Another advantageous way would be to collect any qualitative and quantitative data we have to find clues about the user's experience. I also like to rely on industry experts, like support team experts, who also share a good first-hand perspective on how they receive the problems.</small>
+![Multiple screenshots of presentation slides containing website designs overlaid with post-it annotations.](./insight-gathering-02.png)
+<small>One quick strategy would be to go through the same steps the user would. Then, capture the screenshots to analyze, with a critical mindset, by stepping back and seeing what users have to face. If available, checking session recordings or similar artifacts will help provide additional clues on how they interact with the product.</small>
+
+![Screenshots of multiple captures of users’ and experts’ quotes and multicolored charts.](./insight-gathering-03.png)
+<small>Another way would be to collect qualitative and quantitative data to find hints about the user’s experience. Industry experts, like from the support teams, can be an excellent complement to the data, or in the lack of it, to share first-hand perspectives on how users express their problems.</small>

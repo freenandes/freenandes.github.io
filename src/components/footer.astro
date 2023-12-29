@@ -1,0 +1,56 @@
+<footer class="grided">
+    <form class="contact init" action="https://formspree.io/f/mnqyrkwr" method="POST" accept-charset="UTF-8">
+        <fieldset class="card">
+            <legend>Contact Pedro</legend>
+            <label for="email">Your Email</label>
+            <input type="email" id="email" name="email" maxlength="200" required autocomplete="on">
+            <label for="message">The Message</label>
+            <textarea id="message" name="message" maxlength="2000" required></textarea>
+            <button type="submit">Send thy missive</button>
+        </fieldset>
+    </form>
+    <nav class="hyperlinks init">
+        <a class="feat" href="/whiteboard">
+            <span>Meet Pedro, a whiteboard</span>
+        </a>
+        <a class="feat" href="/cv">
+            <span>About Pedro, the curriculum</span>
+        </a>
+        <a href="/topo-da-mente">
+            <span>Topo da Mente, my notebook</span>
+        </a>
+        <a href="https://www.are.na/p-m-c-f">
+            <span>Are.na, a collection</span>
+        </a>
+        <a rel="me" href="https://mastodon.social/@freenandes">
+            <span>Mastodon</span>
+        </a>
+        <a href="https://github.com/freenandes">
+            <span>GitHub</span>
+        </a>
+        <a href="https://www.linkedin.com/in/pmcfernandes/">
+            <span>LinkedIn</span>
+        </a>
+    </nav>
+    <small class="footnote init">
+        Website designed, illustrated and assembled by me in 2023, inspired by portuguese cultural references using: <a href="https://www.lexend.com/">Lexend typefaces</a> by Bonnie Shaver-Troup and Thomas Jockin; Coconat Extended font by <a href="https://saralavazza.it/">Sara Lavazza</a>; Compagnon Script font by <a href="https://www.chloelozano.fr/">Chloé Lozano</a>; and rendered with <a href="https://astro.build/">Astro's web framework</a>.
+    </small>
+</footer>
+
+<style>
+
+/* Footer */
+
+footer > *:not(:last-child) {
+	margin-top: calc(var(--slideMargin) * 2);
+	margin-bottom: calc(var(--slideMargin) * 2);
+}
+.contact .card {
+	padding: var(--slidePadding);
+	border-radius: var(--slidePadding);
+}
+small.card {
+	display: block;
+}
+
+</style>

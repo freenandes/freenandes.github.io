@@ -15,7 +15,6 @@ const allZines = await getCollection('dor-cronica');
         <h1>{ title }</h1>
         <ul>
             {
-                
                 allZines.sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime())
                     .map((post) => 
                         <WebzineCard customClasses={post.data.customClasses} url={`/${post.collection}/${post.slug}`} title={post.data.title} imageSrc={post.data.cover} imageAlt={post.data.coverAlt} />

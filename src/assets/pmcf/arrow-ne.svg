@@ -1,0 +1,14 @@
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        path {
+            stroke: hsl(218, 100%, 43%);
+            stroke-width: 2.5px;
+	        stroke-linecap: round;
+        }
+    </style>
+    <g transform="rotate(-45 8 8)">
+        <path d="M2 8 L14 8" />
+        <path d="M14 8 L8 2" />
+        <path d="M14 8 L8 14" />
+    </g>
+</svg>

@@ -1,119 +1,92 @@
 ---
-const title = "Pedro MC Fernandes CV";
-const description = "Hi 👋 This is my CV. It's where I show my career as a Product Designer. If you need one, get in touch so we can start talking. Have a nice one!";
-const customClass = "vitae";
-const metaImage = "/meta.png";
-import Shell from '../layouts/Shell.astro';
+
+// Imports
+
+import PMCF from '../layouts/PMCF.astro';
+import { getEntry } from 'astro:content';
 import { Content as Curriculum } from '../content/extra/curriculum.md';
+
+// Content
+
+const meta = await getEntry('extra', 'curriculum');
+
 ---
-<Shell title={ title } description={ description } customClass={ customClass } metaImage={ metaImage }>
-    <div class="print">
-        <nav>
-            <div class="button-3d">
-                <button type="button" onclick="window.location.href = '/';" aria-label="Back to the home page">&larr; Back</button>
-            </div>
-            <div class="button-3d">
-                <button type="button" onclick="window.print()">Print page</button>
-            </div>
-        </nav>
-        <Curriculum />
+
+<PMCF title={meta.data.title} description={meta.data.description}>
+    <div class="print grided">
+        <header class="top">
+            <nav class="hyperlinks">
+                <a id="backLink">
+                    <span>Back</span>
+                </a>
+                <hr>
+            </nav>
+        </header>
+        <main>
+            <Curriculum />
+        </main>
     </div>
-</Shell>
-<style>
-@font-face {
-	font-family: "LexendDeca";
-	src:
-		url("/fonts/LexendDeca.woff2") format("woff2 supports variations"),
-		url("/fonts/LexendDeca.woff2") format("woff2-variations");
-	font-weight: 100 1000;
-	font-display: swap;
-}
-@font-face {
-	font-family: "LexendPeta";
-	src:
-		url("/fonts/LexendPeta.woff2") format("woff2 supports variations"),
-		url("/fonts/LexendPeta.woff2") format("woff2-variations");
-	font-weight: 100 1000;
-	font-display: swap;
-}
-@font-face {
-	font-family: "Whiteboard";
-	src: url("/fonts/whiteboardbeta.woff2") format("woff2");
-	font-weight: 400;
-	font-display: swap;
-	font-variant-ligatures: common-ligatures;
-}
+</PMCF>
+
+<style is:global>
+
 html {
-    background-color: var(--white);
+    background-color: var(--paper);
 }
-body {
-    box-sizing: border-box;
-    font-family: "LexendDeca", system-ui, Arial, sans-serif;
-    width: 100%;
-    max-width: 44em;
-    padding: 2em;
-    margin: 0 auto;
+main > * {
+    margin: 1.25rem 0;
 }
-.print {
-    position: relative;
+main > *:first-child {
+    margin-top: 0;
 }
-:global(h1) {
-    margin-bottom: 0.25em;
-}
-:global(h2) {
+main > *:last-child {
     margin-bottom: 0;
 }
-:global(p) {
-    margin-bottom: 0.875em;
+h1 {
+    font-size: calc(var(--fsHeading) / 1.0625);
 }
-:global(small) {
+h2, h3, h4, h5, h6 {
+    font-family: var(--ffLexendPeta);
+    font-size: calc(var(--fsHeading) / 2);
+    font-weight: 700;
+    line-height: 100%;
+    letter-spacing: unset;
+}
+h3, h4, h5, h6 {
+    margin-top: 4rem;
+}
+h2 + p > * {
     display: inline-block;
-    color: var(--blackMedium);
-    margin-bottom: 0.75em;
 }
-nav {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 1em;
+h2 + p a[href] {
+    margin-right: 1em;
 }
-.button-3d {
-    font-size: 1.2em;
-    margin: 0 0.5em 0.5em 0;
-}
-button {
-    background-color: var(--toast);
-}
-:global(img) {
-    float: left;
-    width: 4em;
-    height: 4em;
-    margin: 0.5em 1em 0.5em 0;
-    border-radius: var(--sd);
-}
-:global(a[href*="linkedin"]) {
-    display: inline-block;
-    margin-top: 0.25em;
-}
-@media (max-width: 480px) {
-    body {
-        font-size: 0.875em;
-        padding: 1em;
-    }
-    .button-3d {
-        font-size: 1.6em;
-    }
+img {
+    float: right;
+    --frameRound: calc(var(--s64p) * 1.375);
+    width: var(--frameRound);
+    height: var(--frameRound);
+    border-radius: var(--frameRound);
 }
 @media print {
-    body {
-        font-size: 0.875em;
-        max-width: none;
-        padding: 0;
+    html {
+        font-size: 50%;
     }
-    :global(a) {
-        text-decoration: none;
+    .grided {
+        width: 100%;
+        max-width: unset;
+        margin: 0;
     }
-    nav {
+    header {
         display: none;
     }
+    main {
+        color: var(--charcoal);
+    }
+    a {
+        color: var(--charcoal);
+        text-decoration: none;
+    }
 }
+
 </style>

@@ -1,0 +1,630 @@
+---
+
+const { title, description, author='Pedro MC Fernandes' } = Astro.props;
+
+---
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{title}</title>
+        <!-- Favicon -->
+        <!-- Image -->
+        <meta name="description" content={description}>
+        <meta name="author" content={author}>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta charset="utf-8" />
+        <meta name="generator" content={Astro.generator} />
+        <script>
+            // @ts-nocheck
+            !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+            posthog.init('phc_D7wSUSel6iBgWFp0s1mTdLF264z8iTxSdVElps52lKg',{api_host:'https://eu.posthog.com',persistence:'sessionStorage'})
+        </script>
+    </head>
+    <body>
+        <slot />
+    </body>
+</html>
+
+<style is:global>
+
+/* Setup */
+
+@font-face {
+	font-family: "LexendDeca";
+	src:
+		url("/fonts/LexendDeca.woff2") format("woff2 supports variations"),
+		url("/fonts/LexendDeca.woff2") format("woff2-variations");
+	font-weight: 100 1000;
+	font-display: swap;
+    font-variant-ligatures: common-ligatures;
+}
+@font-face {
+	font-family: "LexendPeta";
+	src:
+		url("/fonts/LexendPeta.woff2") format("woff2 supports variations"),
+		url("/fonts/LexendPeta.woff2") format("woff2-variations");
+	font-weight: 100 1000;
+	font-display: swap;
+    font-variant-ligatures: common-ligatures;
+}
+@font-face {
+	font-family: "Park";
+	src:
+		url("/fonts/NationalPark.woff2") format("woff2 supports variations"),
+		url("/fonts/NationalPark.woff2") format("woff2-variations");
+	font-weight: 275 800;
+	font-display: swap;
+    font-variant-ligatures: common-ligatures;
+}
+@font-face {
+	font-family: "Coconat";
+	src: url("/fonts/CoconatBoldExt.woff2") format("woff2");
+    font-weight: bold;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Coconat";
+	src: url("/fonts/CoconatRegular.woff2") format("woff2");
+    font-weight: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: "Compagnon";
+	src: url("/fonts/CompagnonScript.woff2") format("woff2");
+	font-display: swap;
+}
+:root {
+
+    /* Fonts */
+
+    --ffLexend:  "LexendDeca", system-ui, Helvetica, Arial, sans-serif;
+    --ffLexendPeta: "LexendPeta", var(--ffLexend);
+    --ffCoconat: "Coconat", serif;
+    --ffCompagnon: "Compagnon", serif;
+    --fsBase: calc(0.75em + 1vw);
+    --fsHeading: calc(0.75em + 4vw);
+    --fwBase: 375;
+
+    /* Colors */
+
+    --charcoal: hsla(230, 14%, 16%, 1);
+    --azulejo: 218, 100%;
+    --pardo: 50, 12%, 97%;
+    --cru: hsl(25 42% 94%);
+
+    /* Palette */
+
+    --paper: hsl(var(--pardo));
+    --ink: hsl(var(--azulejo), 43%);
+    --inkFade: hsl(var(--azulejo), 86%);
+    --inkWash: hsl(var(--azulejo), 93%);
+    
+    /* Spacing */
+
+    --s1p: 0.0625em;
+    --s2p: 0.125em;
+    --s4p: 0.25em;
+    --s8p: 0.5em;
+    --s16p: 1em;
+    --s32p: 2em;
+    --s64p: 4em;
+    
+    /* GUI */
+
+    --cursorDefault: url(/artwork/c-default.svg) 5 5, auto;
+    --cursorText: url(/artwork/c-text.svg) 12 44, text;
+    --cursorPointer: url(/artwork/pointer.svg) 7 4, pointer;
+
+    /* Slide defs */
+
+	--slideMargin: calc(var(--s2p) + 4vw);
+	--slideMarginTotal: calc(var(--slideMargin) * 2);
+	--slidePadding: calc(var(--slideMargin) * 1 + 2vw);
+	--slidePaddingTotal: calc(var(--slidePadding) * 2);
+	
+	/* Main slide primitives */
+
+	--slideDescWidth: calc(100vw - var(--slideMarginTotal) - var(--slidePaddingTotal) - var(--scrollbarWidth));
+	--slideDescContentWidth: calc(20em + 40vw);
+	--slideDescMargins: calc((100vw - var(--slideDescContentWidth) - var(--slidePaddingTotal) - var(--scrollbarWidth)) / 2);
+
+    /* Clippings */
+
+    --cvA1: calc(var(--slidePadding) * 1.25);
+    --cvA2: calc(100% - var(--cvA1));
+    --cvB1: calc(var(--slidePadding) * 2.5);
+
+    --clipBevel: polygon(
+        var(--cvA1) 0,
+        var(--cvA2) 0,
+        100% var(--cvA1),
+        100% var(--cvA2),
+        var(--cvA2) 100%,
+        var(--cvA1) 100%,
+        0 var(--cvA2),
+        0 var(--cvA1)
+    );
+
+    --clipRabbet: polygon(
+        0 var(--cvA1),
+        var(--cvA1) var(--cvA1),
+        var(--cvA1) 0,
+        var(--cvA2) 0,
+        var(--cvA2) var(--cvA1),
+        100% var(--cvA1),
+        100% var(--cvA2),
+        var(--cvA2) var(--cvA2),
+        var(--cvA2) 100%,
+        var(--cvA1) 100%,
+        var(--cvA1) var(--cvA2),
+        0 var(--cvA2)
+    );
+
+    --clipHexagon: polygon(
+        0 var(--cvA1),
+        50% 0,
+        100% var(--cvA1),
+        100% var(--cvA2),
+        50% 100%,
+        0 var(--cvA2)
+    );
+
+}
+
+/* 2x */
+
+@media 
+    only screen and (-webkit-min-device-pixel-ratio: 2),
+    only screen and (min-resolution: 2dppx) and (max-resolution: 2.9dppx) {
+        :root {
+            --fwBase: 400;
+        }
+}
+
+/* 3x (Retina HD) */
+@media 
+    only screen and (-webkit-min-device-pixel-ratio: 3), 
+    only screen and (min-resolution: 3dppx) {
+        :root {
+            --fwBase: 425;
+        }
+}
+
+/* Scrollbar */
+
+* {
+    scrollbar-color: var(--ink) var(--paper);
+}
+*::-webkit-scrollbar {
+    width: 1em;
+}
+*::-webkit-scrollbar-thumb {
+    border-radius: 1em;
+    background-color: var(--ink);
+    border: var(--s4p) solid var(--paper);
+}
+*::-webkit-scrollbar-thumb:hover {
+    background-color: var(--inkFade);
+}
+*::-webkit-scrollbar-track {
+    background-color: var(--paper);
+}
+
+/* Animations */
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+@keyframes blink {
+    0%, 49.9% {
+        opacity: 1;
+    }
+    50%, 100% {
+        opacity: 0;
+    }
+}
+
+/* Basics */
+
+html {
+    position: relative;
+	font-family: var(--ffLexend);
+	font-size: 100%;
+	font-weight: calc(var(--fwBase) - 25);
+	line-height: 150%;
+	color: var(--ink);
+	background-color: var(--paper);
+    cursor: var(--cursorDefault);
+}
+body {
+    position: relative;
+    margin: 0;
+    opacity: 0;
+    animation: fadeIn 0.2s ease-in 0.1s forwards;
+}
+::selection {
+    color: var(--paper);
+    background-color: var(--ink);
+}
+hr {
+    font-size: calc(var(--fsBase) / 1.375);
+    height: 0.078125em;
+    margin: 0;
+    overflow: visible;
+    border: none;
+    box-shadow: 0 0.078125em 0 0 var(--inkFade), 0 -0.078125em 0 0 var(--inkFade) inset;
+}
+
+/* SVG */
+
+svg.icon path {
+	stroke: currentColor;
+	stroke-width: 0.0625rem;
+	stroke-linecap: square;
+}
+
+/* Links */
+
+a {
+    color: var(--ink);
+    transition: opacity 0.2s ease-in;
+    cursor: var(--cursorPointer);
+}
+a:hover {
+    opacity: 0.5;
+}
+nav.hyperlinks {
+    display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	flex-wrap: wrap;
+    padding: 0.0625em 0;
+    margin-right: -0.1875em;
+}
+nav a {
+    display: inline-block;
+	font-family: var(--ffLexendPeta);
+	font-size: calc(var(--fsBase) / 1.375);
+	font-weight: calc(var(--fwBase) + 225);
+	line-height: 125%;
+	text-transform: uppercase;
+	text-decoration: none;
+	outline: none;
+	padding: 0.25em 0;
+	margin-right: 0.375em;
+    --navaS1: 0.078125em;
+    --navaS0: -0.078125em;
+    box-shadow: 0 var(--navaS1) 0 0 var(--inkFade), 0 var(--navaS0) 0 0 var(--inkFade) inset, 0 var(--navaS0) 0 0 transparent, 0 var(--navaS1) 0 0 transparent inset;
+    transition: box-shadow 0.1s ease-in;
+}
+nav a:hover {
+	opacity: 1;
+	box-shadow: 0 var(--navaS1) 0 0 var(--ink), 0 var(--navaS0) 0 0 var(--ink) inset, 0 var(--navaS0) 0 0 var(--ink), 0 var(--navaS1) 0 0 var(--ink) inset;
+}
+nav a span {
+    box-sizing: border-box;
+	display: inline-block;
+    width: 100%;
+	padding: calc(var(--fsBase) / 2) calc(var(--fsBase) / 1.5);
+    --navaSP1: 0.15625em;
+    --navaSP0: -0.15625em;
+    box-shadow: var(--navaSP1) 0 0 0 transparent inset, var(--navaSP0) 0 0 0 transparent inset;
+    transition: box-shadow 0.1s ease-in;
+}
+nav a:hover span {
+	box-shadow: var(--navaSP1) 0 0 0 var(--ink) inset, var(--navaSP0) 0 0 0 var(--ink) inset;
+}
+a::after,
+nav a:not(#backLink) span::after {
+    content: url('data:image/svg+xml,<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 13 13 3" stroke="%230050db" stroke-width="2"/><path d="M13 3H7M13 3v6" stroke="%230050db" stroke-width="2" stroke-linecap="square"/></svg>');
+    display: inline-block;
+    vertical-align: -0.1875em;
+    height: auto;
+    width: 1em;
+    margin-left: 0.125em;
+}
+small a::after,
+small nav a:not(#backLink) span::after {
+    vertical-align: -0.125em;
+    width: 0.75em;
+}
+article a::after,
+nav a::after,
+nav a[href*="pmcf.xyz"]::after,
+nav a[href*="pmcf.xyz"] span::after {
+    content: none;
+}
+nav a:hover span::after {
+    animation: blink 0.4s steps(1) infinite;
+}
+
+/* Typography */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--ffCoconat);
+    font-size: var(--fsHeading);
+    font-weight: bold;
+    line-height: 100%;
+    text-transform: uppercase;
+    letter-spacing: -0.0625em;
+    margin: var(--s16p) -0.0625em var(--s4p);
+    overflow-wrap: break-word;
+    cursor: var(--cursorText);
+}
+p {
+    font-size: var(--fsBase);
+    font-weight: calc(var(--fwBase) - 25);
+    line-height: 150%;
+    margin: 0 0 var(--fsBase);
+    cursor: var(--cursorText);
+}
+small {
+    font-size: calc(var(--fsBase) / 1.375);
+    font-weight: calc(var(--fwBase) - 25);
+    line-height: 150%;
+    cursor: var(--cursorText);
+}
+small.footnote {
+    display: inline-block;
+}
+
+/* Buttons and others */
+
+button {
+    font-family: var(--ffLexendPeta);
+    font-size: calc(var(--fsBase) / 1.25);
+    font-weight: calc(var(--fwBase) + 225);
+    line-height: 125%;
+    text-transform: uppercase;
+    padding: calc(var(--fsBase) / 1.875) calc(var(--fsBase) * 1.125);
+    margin: 0;
+    border: none;
+    border-radius: calc(var(--fsBase) * 2);
+    color: var(--paper);
+    background-color: var(--ink);
+    cursor: pointer;
+    outline: 0 double var(--ink);
+    transition: outline 0.1s ease-in;
+    cursor: var(--cursorPointer);
+}
+form button {
+    align-self: flex-start;
+    margin-left: -0.125em;
+}
+form button:hover,
+form button:focus-visible {
+    outline: calc(var(--fsBase) / 4) double var(--ink);
+}
+
+/* Forms */
+
+fieldset {
+    border: calc(var(--fsBase) / 4) double var(--ink);
+}
+legend,
+label {
+    font-family: var(--ffLexendPeta);
+    font-size: calc(var(--fsBase) / 1.5);
+    font-weight: calc(var(--fwBase) + 225);
+    text-transform: uppercase;
+    cursor: var(--cursorDefault);
+}
+legend,
+label,
+input,
+textarea {
+    display: block;
+    line-height: 100%;
+    margin: 0;
+}
+fieldset legend {
+    padding: 0 0.5em;
+    margin-left: -0.5em;
+}
+fieldset legend + * {
+    margin-top: -0.5em;
+}
+input,
+textarea {
+    font-family: var(--ffCompagnon);
+    font-size: calc(var(--fsBase) * 1.5);
+    line-height: 150%;
+    width: 100%;
+    padding: 0;
+    border: none;
+    border-bottom: calc(var(--fsBase) / 8) dotted var(--ink);
+    border-radius: 0;
+    color: black;
+    background: transparent;
+    transition: background-color 0.2s ease-out;
+    cursor: var(--cursorText);
+}
+input:focus,
+textarea:focus {
+    outline: none;
+}
+input:focus-visible,
+textarea:focus-visible {
+    background-color: var(--inkWash);
+}
+textarea {
+    overflow: hidden;
+    resize: none;
+}
+textarea::selection {
+    color: var(--paper);
+    background-color: var(--charcoal);
+}
+form input:not(:last-child),
+form textarea:not(:last-child) {
+    margin-bottom: 1.5em;
+}
+
+/* Grid */
+
+.grided {
+	width: calc(100vw - var(--slideMarginTotal) - var(--scrollbarWidth));
+	max-width: calc(var(--slideDescContentWidth) + var(--slidePaddingTotal));
+	margin: var(--slideMargin) var(--slideMargin) calc(var(--slideMargin) * 2);
+}
+
+/* Header Top Bar */
+
+header.top {
+    position: sticky;
+    top: 0;
+    padding: 0.25em 0.5em 0;
+    margin: 0 -0.5em var(--slideMargin);
+    background-color: var(--paper);
+}
+header.top nav {
+    display: flex;
+}
+header.top hr {
+    flex: 1;
+    height: auto;
+    margin: 0 0.1875rem 0 0;
+}
+
+/* Animes */
+
+.init {
+    opacity: 0;
+    transition: opacity 200ms ease-in 100ms,
+}
+.in {
+    opacity: 1;
+}
+
+/* Constraints */
+
+@media (min-width: 53em) {
+	.grided {
+		margin-left: var(--slideDescMargins);
+		margin-right: var(--slideDescMargins);
+	}
+}
+@media (max-width: 30em) {
+    .gallery .nav {
+        display: none;
+    }
+    footer nav.hyperlinks > * {
+        flex-grow: 1;
+    }
+    footer nav a {
+        text-align: center;
+    }
+}
+
+</style>
+
+<script>
+
+// Detecting and working with the scrollbar width
+
+function setScrollbarWidthVariable() {
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.documentElement.style.setProperty('--scrollbarWidth', `${scrollbarWidth}px`);
+}
+setScrollbarWidthVariable();
+window.addEventListener('resize', setScrollbarWidthVariable);
+document.addEventListener('astro:after-swap', setScrollbarWidthVariable);
+
+// Save scroll position function
+
+function saveReelScrollPositions() {
+    const pageKey = window.location.pathname;
+    const reels = document.querySelectorAll(".reel");
+    reels.forEach((reel, index) => {
+        const scrollPos = reel.scrollLeft.toString();
+        sessionStorage.setItem(`reelScrollPos-${pageKey}-${index}`, scrollPos);
+    });
+}
+
+// Restore scroll position function
+
+function restoreReelScrollPositions() {
+    const pageKey = window.location.pathname;
+    const reels = document.querySelectorAll('.reel');
+    reels.forEach((reel, index) => {
+        const storedPos = sessionStorage.getItem(`reelScrollPos-${pageKey}-${index}`);
+        if (storedPos) {
+            reel.scrollLeft = Number(storedPos);
+        }
+    });
+}
+
+// Series of events to store and restore scroll
+
+window.addEventListener('beforeunload', saveReelScrollPositions);
+document.addEventListener('DOMContentLoaded', restoreReelScrollPositions);
+
+// Dinamically resize the textarea
+
+const getSingleLineHeight = (): number => {
+    const dummy = document.createElement('textarea');
+    dummy.rows = 1;
+    document.body.appendChild(dummy);
+    const singleLineHeight = dummy.clientHeight;
+    document.body.removeChild(dummy);
+    return singleLineHeight;
+}
+const singleLineHeight = getSingleLineHeight();
+const adjustHeight = (textarea: HTMLTextAreaElement) => {
+    textarea.style.height = `${singleLineHeight}px`;
+    if (textarea.scrollHeight > singleLineHeight) {
+        textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+}
+const textareas = document.querySelectorAll<HTMLTextAreaElement>('textarea');
+textareas.forEach(textarea => {
+    textarea.addEventListener('input', () => adjustHeight(textarea));
+    textarea.addEventListener('blur', () => {
+        if (textarea.value.trim() === '') {
+            textarea.style.height = `${singleLineHeight}px`;
+        }
+    });
+    adjustHeight(textarea);
+});
+
+// Back button after transitions
+
+const goBack = () => {
+    history.back();
+};
+const setButton = () => {
+    const backLink: HTMLElement | null = document.getElementById('backLink');
+    if (backLink) {
+        backLink.removeEventListener('click', goBack); 
+        backLink.addEventListener('click', goBack);
+    }
+};
+setButton();
+document.addEventListener('DOMContentLoaded', setButton);
+
+// Intersection with the viewport
+
+document.addEventListener('DOMContentLoaded', function() {
+    const observer = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
+        entries.forEach((entry: IntersectionObserverEntry) => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('in');
+        }
+        });
+    }, {
+        rootMargin: '-5% 0% -5% 0%',
+        threshold: 0.1
+    });
+    const sections = document.querySelectorAll<HTMLElement>('.init');
+    sections.forEach((section: HTMLElement) => {
+        observer.observe(section);
+    });
+});
+
+</script>

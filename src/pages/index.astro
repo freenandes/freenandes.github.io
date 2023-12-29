@@ -1,508 +1,440 @@
 ---
-// Definitions
-const title = "Pedro MC Fernandes, Product Designer";
-const description = "Hi 👋 This is my website. It's where I show myself as a Product Designer. If you need one, get in touch so we can start talking. Have a nice one!";
-const customClass = "index";
-const metaImage = "/meta.png";
-const sections = [
-	{ title: 'Profile', normTitle: 'pmcf-xyz' },
-	{ title: 'About me', normTitle: 'who' },
-	{ title: 'Why Design', normTitle: 'why' },
-	{ title: 'How I Work', normTitle: 'wat' },
-];
 
-// Components
-import Shell from '../layouts/Shell.astro';
-import Stickie from '../components/stickie.astro';
-import Contact from '../components/contact.astro';
-import Modal from '../components/modal.astro';
+// Imports
+
+import PMCF from '../layouts/PMCF.astro';
+import { getCollection, getEntries, getEntry } from 'astro:content';
+import {Image} from 'astro:assets';
+import Footer from '../components/footer.astro';
 
 // Content
 
-	// Collections
-import { getCollection } from 'astro:content';
-const firstSection = await getCollection('base');
-const secondSection = await getCollection('who');
-const thirdSection = await getCollection('why');
-const fourthSection = await getCollection('see');
+const preface = await getCollection('pmcf');
+const intro = await getEntry('extra', 'pmcf-intro');
+const {Content} = await intro.render();
 
-	// Footer
-import { Content as Footer } from '../content/extra/footer.md';
-
-	// Images
-import { Image } from 'astro:assets';
-import pedroPort from "../assets/whiteboard/pmcf.jpg";
 ---
-<Shell title={ title } description={ description } customClass={ customClass } metaImage={ metaImage }>
-	<header>
-		<div class="button-3d">
-			<button type="button" id="resetNav" class="dark" aria-label="Return to initial area">
-				<svg id="logoFull" width="142" height="16" viewBox="0 0 142 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<title>PMCF.XYZ logo</title>
-					<path fill-rule="evenodd" clip-rule="evenodd" d="M0.600006 14C0.600006 14.7732 1.22681 15.4 2.00001 15.4C2.7732 15.4 3.40001 14.7732 3.40001 14V9.4H8.00001C8.38755 9.4 8.73831 9.24254 8.99181 8.98809L14.9881 2.99182L14.9989 2.98089C15.0153 2.96423 15.0308 2.94771 15.0453 2.93131C15.2659 2.68387 15.4 2.35759 15.4 2C15.4 1.2268 14.7732 0.600002 14 0.600002H2.00573C2.00382 0.599995 2.00191 0.599991 2.00001 0.599991C1.22681 0.599991 0.600006 1.22679 0.600006 1.99999V14ZM3.40001 3.4V6.6H7.4201L10.6201 3.4H3.40001Z" fill="black"/>
-					<path d="M20 15.4C19.2268 15.4 18.6 14.7732 18.6 14V1.99999C18.6 1.22679 19.2268 0.599991 20 0.599991C20.3887 0.599991 20.7404 0.758381 20.994 1.01414L26 6.02009L31.01 1.01005C31.0254 0.994707 31.0405 0.980282 31.0553 0.966753C31.3043 0.738963 31.6359 0.599991 32 0.599991C32.7732 0.599991 33.4 1.22679 33.4 1.99999V14C33.4 14.7732 32.7732 15.4 32 15.4C31.2268 15.4 30.6 14.7732 30.6 14V5.37988L26.9947 8.98513C26.9932 8.98674 26.9916 8.98835 26.9899 8.98995C26.7849 9.19498 26.5321 9.32312 26.2674 9.37437C26.0661 9.41334 25.8579 9.40787 25.6586 9.35795C25.4209 9.29845 25.1959 9.17579 25.01 8.98995C25.0083 8.98827 25.0067 8.98658 25.005 8.98488L21.4 5.37991V14C21.4 14.7732 20.7732 15.4 20 15.4Z" fill="black"/>
-					<path d="M37.9706 15.3997C37.211 15.384 36.6 14.7634 36.6 14V1.99999C36.6 1.22679 37.2268 0.599991 38 0.599991L38.0057 0.600002H50C50.7732 0.600002 51.4 1.2268 51.4 2C51.4 2.7732 50.7732 3.4 50 3.4H39.4V12.6H50C50.7732 12.6 51.4 13.2268 51.4 14C51.4 14.7732 50.7732 15.4 50 15.4H38C37.99 15.4 37.9802 15.3999 37.9706 15.3997Z" fill="black"/>
-					<path d="M54.6 14C54.6 14.7732 55.2268 15.4 56 15.4C56.7732 15.4 57.4 14.7732 57.4 14V9.4H68C68.7732 9.4 69.4 8.7732 69.4 8C69.4 7.2268 68.7732 6.6 68 6.6H57.4V3.4H68C68.7732 3.4 69.4 2.7732 69.4 2C69.4 1.2268 68.7732 0.600002 68 0.600002H56.0057C56.0038 0.599995 56.0019 0.599991 56 0.599991C55.2268 0.599991 54.6 1.22679 54.6 1.99999V14Z" fill="black"/>
-					<path class="star" d="M74.9546 1.0454C74.4274 0.518192 73.5726 0.518192 73.0454 1.0454C72.5182 1.57261 72.5182 2.42738 73.0454 2.95459L76.7408 6.64999H74C73.2544 6.64999 72.65 7.2544 72.65 7.99999C72.65 8.74557 73.2544 9.34999 74 9.34999H76.7408L73.0454 13.0454C72.5182 13.5726 72.5182 14.4274 73.0454 14.9546C73.5726 15.4818 74.4274 15.4818 74.9546 14.9546L78.65 11.2592V14C78.65 14.7456 79.2544 15.35 80 15.35C80.7456 15.35 81.35 14.7456 81.35 14V11.2592L85.0454 14.9546C85.5726 15.4818 86.4274 15.4818 86.9546 14.9546C87.4818 14.4274 87.4818 13.5726 86.9546 13.0454L83.2592 9.34999H86C86.7456 9.34999 87.35 8.74557 87.35 7.99999C87.35 7.2544 86.7456 6.64999 86 6.64999H83.2592L86.9546 2.95459C87.4818 2.42739 87.4818 1.57261 86.9546 1.04541C86.4274 0.518198 85.5726 0.518198 85.0454 1.04541L81.35 4.74082V2C81.35 1.25442 80.7456 0.65 80 0.65C79.2544 0.65 78.65 1.25442 78.65 2V4.74079L74.9546 1.0454Z" fill="black"/>
-					<path d="M92.99 1.01006C92.4432 0.463323 91.5568 0.463323 91.0101 1.01006C90.4633 1.55679 90.4633 2.44322 91.0101 2.98996L96.0201 8L91.0101 13.0101C90.4633 13.5568 90.4633 14.4432 91.0101 14.99C91.5568 15.5367 92.4432 15.5367 92.99 14.99L98 9.9799L103.01 14.99C103.557 15.5367 104.443 15.5367 104.99 14.99C105.537 14.4432 105.537 13.5568 104.99 13.0101L99.9799 8L104.99 2.98996C105.537 2.44323 105.537 1.5568 104.99 1.01006C104.443 0.463327 103.557 0.463327 103.01 1.01006L98 6.0201L92.99 1.01006Z" fill="black"/>
-					<path d="M122.99 1.01004C123.537 1.55678 123.537 2.44321 122.99 2.98994L117.4 8.57988V14C117.4 14.7732 116.773 15.4 116 15.4C115.227 15.4 114.6 14.7732 114.6 14L114.6 8.57989L109.01 2.98995C108.463 2.44321 108.463 1.55678 109.01 1.01005C109.557 0.463312 110.443 0.463312 110.99 1.01005L116 6.02009L121.01 1.01004C121.557 0.463307 122.443 0.463307 122.99 1.01004Z" fill="black"/>
-					<path d="M126.705 14.532C126.773 14.6986 126.875 14.8547 127.01 14.99C127.145 15.1246 127.3 15.2262 127.466 15.2945C127.63 15.3625 127.811 15.4 128 15.4H140C140.773 15.4 141.4 14.7732 141.4 14C141.4 13.2268 140.773 12.6 140 12.6H131.38L140.987 2.99242C140.995 2.98446 141.003 2.97641 141.011 2.96826C141.252 2.71681 141.4 2.37569 141.4 2.00001C141.4 1.80835 141.361 1.62568 141.292 1.45933C141.226 1.30228 141.131 1.15477 141.005 1.02548C140.995 1.01512 140.985 1.00491 140.975 0.994869C140.725 0.753241 140.387 0.603443 140.013 0.600064C140.009 0.600025 140.004 0.600006 140 0.600006H128C127.227 0.600006 126.6 1.22681 126.6 2.00001C126.6 2.7732 127.227 3.40001 128 3.40001H136.62L127.01 13.0101C126.746 13.2744 126.609 13.6181 126.6 13.9644C126.6 13.9881 126.6 14.0118 126.6 14.0355C126.605 14.2109 126.641 14.3783 126.705 14.532Z" fill="black"/>
-				</svg>
-				<svg id="logoShort" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-					<title>Star symbol, the alternative short logo</title>
-					<path class="star" d="M2.9546 1.5454C2.4274 1.01819 1.57262 1.01819 1.04541 1.5454C0.518207 2.07261 0.518207 2.92738 1.04541 3.45459L4.74081 7.14999H1.99999C1.25441 7.14999 0.649994 7.7544 0.649994 8.49999C0.649994 9.24557 1.25441 9.84999 1.99999 9.84999H4.74082L1.04541 13.5454C0.518198 14.0726 0.518198 14.9274 1.04541 15.4546C1.57261 15.9818 2.42739 15.9818 2.95459 15.4546L6.64999 11.7592V14.5C6.64999 15.2456 7.25441 15.85 7.99999 15.85C8.74558 15.85 9.34999 15.2456 9.34999 14.5V11.7592L13.0454 15.4546C13.5726 15.9818 14.4274 15.9818 14.9546 15.4546C15.4818 14.9274 15.4818 14.0726 14.9546 13.5454L11.2592 9.84999H14C14.7456 9.84999 15.35 9.24557 15.35 8.49999C15.35 7.7544 14.7456 7.14999 14 7.14999H11.2592L14.9546 3.45459C15.4818 2.92739 15.4818 2.07261 14.9546 1.54541C14.4274 1.0182 13.5726 1.0182 13.0454 1.54541L9.34999 5.24082V2.5C9.34999 1.75442 8.74558 1.15 7.99999 1.15C7.25441 1.15 6.64999 1.75442 6.64999 2.5V5.24079L2.9546 1.5454Z" fill="black"/>
-				</svg>									
-			</button>
+
+<PMCF title={intro.data.title} description={intro.body}>
+	<svg style="display: none">
+		<!-- <defs>
+			<filter id="boxShadow" x="-50%" y="-50%" width="200%" height="200%">
+				<feGaussianBlur in="SourceAlpha" stdDeviation="48"/>
+				<feOffset dx="0" dy="0" result="offsetblur"/>
+				<feComponentTransfer>
+					<feFuncA type="linear" slope="0.15"/>
+				</feComponentTransfer>
+				<feMerge> 
+					<feMergeNode in="color" />
+					<feMergeNode in="SourceGraphic"/>
+				</feMerge>
+			</filter>
+		</defs> -->
+		<symbol id="dCorner" viewBox="0 0 256 256">
+			<path d="M256 0.5V0H0V256H0.5C0.5 239.187 3.25 222.547 9.75 207.016C16.1251 191.484 25.625 177.375 37.5 165.492C46.25 156.788 56.1251 149.414 66.875 143.562C70.875 141.414 74.875 139.469 79.0001 137.742C94.5 131.313 111.25 128 128 128C128 111.187 131.25 94.5468 137.75 79.0157C141.626 69.5703 146.625 60.6484 152.75 52.4297C156.625 47.1406 160.876 42.1485 165.5 37.4922C177.375 25.6015 191.5 16.1797 207 9.74218C222.5 3.3125 239.25 0.5 256 0.5Z" />
+		</symbol>
+		<symbol id="arrow" viewBox="0 0 16 16">
+			<path d="M1 8 L14 8" stroke-linecap="butt" />
+			<path d="M14 8 L10 4" stroke-linecap="square" />
+			<path d="M14 8 L10 12" stroke-linecap="square" />
+		</symbol>
+	</svg>
+	<header class="init">
+		<div class="reel">
+			<div id={intro.slug} class="description card">
+				<h1>{intro.data.title}</h1>
+				<Content />
+			</div>
 		</div>
-		<input type="search" id="highlighter" placeholder="Find in page...">
 	</header>
-	<nav class="controls">
-		<div class="button-3d">
-			<button type="button" id="info" class="dark" aria-label="About this website">Info</button>
-		</div>
-		<div class="button-3d group">
-			<button type="button" id="zoomOut" class="icon dark" aria-label="Zoom out">
-				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-					<title>Minus sign</title>
-					<path d="M2 8L14 8" stroke="black" stroke-width="3" stroke-linecap="round"/>
-				</svg>
-			</button>
-			<button type="button" id="zoomIn" class="icon dark" aria-label="Zoom in">
-				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-					<title>Plus sign</title>
-					<path d="M2 8L14 8" stroke="black" stroke-width="3" stroke-linecap="round"/>
-					<path d="M8 14L8 2" stroke="black" stroke-width="3" stroke-linecap="round"/>
-				</svg>
-			</button>
-		</div>
-	</nav>
-	<div id="canvas" class="whiteboard">
-		<div id="plumbing" aria-hidden="true"></div>
-		<main>
-			<!-- I N T R O -->
-			<section id={sections[0].normTitle}>
-				<aside id="note-start" aria-labelledby={sections[0].normTitle}>Start Here!</aside>
-				<h1 class="title">{sections[0].title}</h1>
-				{
-					firstSection.map(async (post) => {
-						const { Content } = await post.render()
-						return (
-						<Stickie>
-							<Content />
-						</Stickie>
-						)
-					})
-				}
-				<Contact />
-				<small class="footnote">
-					<Footer />
-				</small>
-				<aside id="note-contact" aria-labelledby="note-form">Contact me here</aside>
-				<div id="pedroPort">
-					<Image src={pedroPort} alt="Portrait of the website's author, Pedro MC Fernandes." />
+	{preface.map(async (preface) => {
+		const {Content} = await preface.render();
+		const relatedPosts = await getEntries(preface.data.relatedPosts);
+		return (
+			<section class="gallery init">
+				<button class="nav next" aria-label="Next slide">
+					<svg class="icon" width="16" height="16" viewBox="0 0 16 16">
+						<use xlink:href="#arrow" />
+					</svg>
+				</button>
+				<button class="nav prev" aria-label="Previous slide">
+					<svg class="icon" width="16" height="16">
+						<use xlink:href="#arrow" />
+					</svg>
+				</button>
+				<div class="reel">
+					<div id=`pre-${preface.slug}` class="description card">
+						<Content />
+						<a class="cta next" aria-label="Next slide">
+							<svg class="icon" width="16" height="16">
+								<use xlink:href="#arrow" />
+							</svg>
+						</a>
+					</div>
+					{relatedPosts.map(relatedPost => (
+						<article class="link card">
+							<a href=`/${relatedPost.collection}/${relatedPost.slug}`>
+								<Image src={relatedPost.data.cover} alt="Decorative image" densities={[1.5, 2, 2.5, 3]} />
+								<span>{relatedPost.data.title}</span>
+							</a>
+							<svg width="256" height="256"><use xlink:href="#dCorner" /></svg><svg width="256" height="256"><use xlink:href="#dCorner" /></svg><svg width="256" height="256"><use xlink:href="#dCorner" /></svg><svg width="256" height="256"><use xlink:href="#dCorner" /></svg>
+						</article>
+					))}
 				</div>
 			</section>
-			<!-- W H O -->
-			<section id={sections[1].normTitle}>
-				<aside id="note-who" aria-labelledby={sections[1].normTitle}>Pedro Who?!</aside>
-				<h2 class="title">{sections[1].title}</h2>
-				{
-					secondSection.map(async (post) => {
-						const { Content } = await post.render();
-						const idNum = post.slug.split('-')[0];
-						const id = `${sections[1].normTitle}-${idNum}`;
-						return (
-						<Stickie id={id}>
-							<Content />
-						</Stickie>
-						)
-					})
-				}
-				<aside id="note-anxiety" aria-labelledby="how-do-you-grow-and-plan-the-future">As if I'm not an anxious person...</aside>
-				<img class="sticker" src="/artwork/peace.svg" alt="Drawing of a hand doing the peace gesture (v-shaped) drawn in a comic-book style." width="512" height="512" aria-describedby="what-values-guide-you"/>
-				<img class="sticker" src="/artwork/growth.svg" alt="A pair of rubber gloves, drawn in a comic-book style, tapping the dirt at the base of a plant as if they're gardening and taking care of the plant's growth." width="512" height="512" aria-describedby="how-do-you-grow-and-plan-the-future"/>
-				<img class="sticker" src="/artwork/death.svg" alt="Comic-book style drawing of the Death. A skull with a black cape that looks like a flying ghost and that is holding a scythe." width="512" height="512" aria-describedby="whats-your-favorite-book"/>
-			</section>
-			<!-- W H Y -->
-			<section id={sections[2].normTitle}>
-				<aside id="note-why" aria-labelledby={sections[2].normTitle}>A whole career, going steady</aside>
-				<h2 class="title">{sections[2].title}</h2>
-				{
-					thirdSection.map(async (post) => {
-						const { Content } = await post.render();
-						const idNum = post.slug.split('-')[0];
-						const id = `${sections[2].normTitle}-${idNum}`;
-						return (
-						<Stickie id={id}>
-							<Content />
-						</Stickie>
-						)
-					})
-				}
-				<aside id="note-challenges" aria-labelledby="what-are-some-of-the-biggest-challenges-youve-faced">Design is defiant. Every day there's overcoming</aside>
-				<aside id="note-open" aria-labelledby="where-do-you-want-to-go-from-here">I want to help design a world that's more open, accessible</aside>
-				<img class="sticker" src="/artwork/challenge.svg" alt="Drawing, in comic-book style, of a hand trying to insert a cube in a box that has a rounded hole. The cube is clearly oversized for the hole." width="512" height="512" aria-describedby="what-are-some-of-the-biggest-challenges-youve-faced"/>
-				<img class="sticker" src="/artwork/improv.svg" alt="Comics-style drawing of a jazz, trumpet player. It's just the bust, hands and the trumpet. The player is wearing a suit and has the eys closed as if playing with their soul into the instrument." width="512" height="512" aria-describedby="how-do-you-approach-the-design-process"/>
-				<img class="sticker" src="/artwork/deal-with-it.svg" alt="Comics-style drawing of a bust of a person with sunglasses on, smirking, acting cool." width="512" height="512" aria-describedby="what-do-you-consider-to-be-your-greatest-strengths"/>
-				<img class="sticker" src="/artwork/creativity.svg" alt="Comics-style drawing of a hand with fingertips that resemble graphite pencils, and it's drawing, with almost all fingers, on the floor as if it were a piece of paper." width="512" height="512" aria-describedby="where-do-you-want-to-go-from-here"/>
-			</section>
-			<!-- S E E -->
-			<section id={sections[3].normTitle}>
-				<aside id="note-see" aria-labelledby={sections[3].normTitle}>Sneak peek at how I've been working</aside>
-				<h2 class="title">{sections[3].title}</h2>
-				{
-					fourthSection.map(async (post) => {
-						const { Content } = await post.render();
-						const idNum = post.slug.split('-')[0];
-						const id = `${sections[3].normTitle}-${idNum}`;
-						return (
-						<Stickie id={id}>
-							<Content />
-						</Stickie>
-						)
-					})
-				}
-				<img class="sticker" src="/artwork/research.svg" alt="The bust of a long-haired person, drawn in comic books style, with their hands holding a pair of binoculars in front of the face. The viewer can see their eyes on the binocular lens." width="512" height="512" aria-describedby="how-do-you-approach-the-research-phase"/>
-				<img class="sticker" src="/artwork/collaboration.svg" alt="Comics-style drawing two futuristic digital screens are floating and facing each other. Out of each is coming out a hand. The left screen's hand is building the other screen like a puzzle. The opposite hand finishes painting the other screen as if it were incomplete and made of paint." width="512" height="512" aria-describedby="how-do-you-balance-user-needs-and-business-goals"/>
-				<img class="sticker" src="/artwork/experimentation.svg" alt="Comics-style drawing of the bust of a dog, salivating, looks at a floating smartphone vibrating and ringing as an allusion to the Pavlovian experimentation methods." width="512" height="512" aria-describedby="what-do-you-use-for-prototyping-and-how-do-you-iterate"/>
-				<img class="sticker" src="/artwork/satisfaction.svg" alt="Comics-style drawing of six hands, doing the thumbs up gesture, displayed as a circle around a star." width="512" height="512" aria-describedby="how-do-you-measure-success"/>
-				<img class="sticker" src="/artwork/inclusivity.svg" alt="Four faces profiles gathered round to share a comics-style balloon as they're all in unison and equally sharing the same idea." width="512" height="512" aria-describedby="how-do-you-design-for-inclusivity"/>
-				<aside id="note-end">Thank you for watching ♥</aside>
-			</section>
-		</main>
-	</div>
-	<Modal title="Info" openID="info" uiMode="dark" />
-</Shell>
-<style>
-html, body {
-	overflow: hidden;
-}
-body {
-	position: fixed;
-	width: 100vw;
-	height: 100vh;
-	height: 100dvh;
-}
-body > header {
-	display: flex;
-	align-items: flex-start;
-	position: fixed;
-	top: 1em;
-	left: 1em;
-	width: 100%;
-	max-width: calc(100vw - 1.5em);
-	z-index: var(--layerFloat);
-}
-body > header > * {
-	margin-right: 0.5rem;
-	margin-bottom: 0.5rem;
-}
-.whiteboard {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100vw;
-	height: 100vh;
-	height: 100dvh;
-	border: none;
-	outline: none;
-}
-main {
-	box-sizing: border-box;
-	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
-	width: fit-content;
-	padding: 12em;
-	background-position: 0 0;
-	/*background-size: 1em 1em;*/
-	/*background-image: radial-gradient(var(--blackLight) 0.0625em, transparent 0.0625em);*/
-}
-main section:not(:last-of-type) {
-	margin-right: 7em;
-}
+		)}
+	)}
+	<Footer />
+</PMCF>
 
-/* Whiteboard headings */
-.title {
-	box-sizing: border-box;
-	font-size: 7em;
-	font-weight: 675;
-	width: 100%;
-	margin-bottom: 4rem;
+<style is:global>
+
+/* Layout */
+
+body {
+	--galleryNavFontSize: calc(1.5em + 2vw);
+	--galleryNavLenght: calc(var(--galleryNavFontSize) * 0.75);
+	--slideLinkWidth: calc(100vw - var(--slideMarginTotal) - var(--scrollbarWidth));
+	/* --slideLinkShadow: 0 0 48px 0 hsla(0, 0%, 0%, 0.2); */
 }
-/* Alternative boxed-layout headings */
-/* .title {
-	box-sizing: border-box;
-	line-height: 83%;
-	display: flex;
-	align-items: center;
-	width: 100%;
-	padding: 1.5rem 2rem;
-	margin: 0 1rem 4.5rem 0;
-	border-radius: var(--sd);
-	color: var(--paper);
-	background-color: var(--charcoal);
-	box-shadow: var(--shadow01);
+/* #dCorner path {
+	box-shadow: var(--slideLinkShadow);
+} */
+section.gallery {
+	position: relative;
 }
-.title .badge {
-	margin-right: 1.5rem;
-}
-.title svg {
-	display: block;
-}
-h1.title img {
-	padding: 0.5rem;
-}
-.badge {
+.gallery .nav {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	z-index: 2;
+	font-family: var(--ffLexendPeta);
+	font-size: var(--galleryNavFontSize);
+	font-weight: calc(var(--fwBase) - 25);
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	width: 3.5rem;
-	height: 3.5rem;
-	border-radius: 50%;
-	background: var(--paper);
-}
-.badge > * {
-	width: 2rem;
-	height: 2rem;
-}
-.badge path {
-	stroke: var(--charcoal);
-} */
-
-/* Continuation */
-:global(#pmcf-xyz h2), :global(#pmcf-xyz h3) {
-	font-family: "LexendPeta", system-ui, Arial, sans-serif;
-	font-weight: 750;
-	font-size: 0.75em;
-	line-height: 133%;
-	text-transform: uppercase;
-}
-section {
-	padding: 6em 6em 6em 7em;
-	border-radius: var(--sf);
-	background-color: var(--yellowFade);
-}
-section#who {
-	background-color: var(--blueFade);
-}
-section#why {
-	background-color: var(--greenFade);
-}
-section#wat {
-	background-color: var(--pinkFade);
-}
-section:not(#pmcf-xyz) :global(article:not(:last-of-type)) {
-	margin-bottom: 8em;
-}
-section:nth-child(2) :global(article > *) {
-    background-color: var(--stickieBlue);
-}
-section:nth-child(3) :global(article > *) {
-    background-color: var(--stickieGreen);
-}
-section:nth-child(4) :global(article > *) {
-    background-color: var(--stickiePink);
-}
-.controls {
-	display: flex;
-	flex-wrap: wrap-reverse;
-	justify-content: flex-end;
-	position: fixed;
-	max-width: calc(100vw - 1.5em);
-	right: 0.5em;
-	bottom: 0.5em;
-	z-index: var(--layerFloat);
-}
-.controls > * {
-	margin-right: 0.5rem;
-	margin-bottom: 0.5rem;
-}
-#highlighter {
-	flex: 0 1 16em;
-	width: 100%;
-	min-height: 2.25em;
-	/* background-color: var(--paperFade); */
-	/* backdrop-filter: blur(0.25rem); */
-	transition: all 200ms ease-out;
-}
-#highlighter:hover {
+	width: var(--galleryNavLenght);
+	height: var(--galleryNavLenght);
+	padding: calc(var(--galleryNavLenght) / 6);
+	border-radius: var(--galleryNavLenght);
+	color: var(--ink);
 	background-color: var(--paper);
-	border-color: inherit;
+	/* box-shadow: 0 var(--s16p) var(--s32p) 0 rgba(0, 0, 0, 0.05), 0 var(--s4p) var(--s8p) 0 rgba(0, 0, 0, 0.1), 0 var(--s2p) var(--s4p) 0 rgba(0, 0, 0, 0.2); */
+	transition: background-color 0.2s ease-in, opacity 0.2s ease-out, box-shadow 0.2s ease-out;
 }
-p img:hover {
-	cursor: url(/artwork/eye.svg) 12 12, auto;
+.gallery .nav svg {
+	width: 100%;
+	height: auto;
 }
-/* Annotations */
-aside[id] {
-	font-size: 4em;
-	position: absolute;
-	text-align: center;
+#arrow path {
+	stroke: currentColor;
+	stroke-width: 0.09375rem;
 }
-aside#note-start {
-	top: -2rem;
-	left: -10rem;
-	width: 14rem;
-	transform: rotate(350deg);
+.gallery .nav:hover {
+	color: var(--paper);
+	background-color: var(--ink);
+	/* box-shadow: 0 0 var(--s8p) 0 rgba(0, 0, 0, 0.1), 0 0 var(--s2p) 0 rgba(0, 0, 0, 0.2), 0 0 var(--s1p) 0 rgba(0, 0, 0, 0.4); */
+	opacity: 1;
 }
-aside#note-contact {
-	bottom: -12rem;
-	left: 20rem;
-	width: 18rem;
-	transform: rotate(10deg);
+.gallery .nav.hidden {
+	opacity: 0;
+	pointer-events: none;
 }
-aside#note-who {
-	top: -6rem;
-	left: 2rem;
-	width: 12rem;
-	transform: rotate(340deg);
+.nav.next {
+	right: 1vw;
 }
-aside#note-why {
-	top: 36rem;
-	left: -24rem;
-	width: 36rem;
-	transform: rotate(280deg);
+.nav.prev {
+	left: 1vw;
 }
-aside#note-see {
-	top: -12rem;
-	left: -40rem;
-	width: 42rem;
-	transform: rotate(5deg);
+.nav.prev svg {
+	transform: rotate(180deg);
 }
-aside#note-end {
-	top: 260rem;
-	right: -20rem;
-	width: 42rem;
-	transform: rotate(300deg);
+.gallery .cta {
+	align-self: flex-start;
+	box-sizing: content-box;
+	font-size: calc(var(--fsBase) * 2);
+	padding: 0.5em;
+	margin: -0.5em;
 }
-aside#note-anxiety {
-	top: 141rem;
-	right: 18rem;
-	width: 42rem;
-	transform: rotate(355deg);
+.gallery .cta,
+.gallery a.cta::after {
+	display: none;
 }
-aside#note-challenges {
-	top: 102rem;
-	right: -10rem;
-	width: 48rem;
-	transform: rotate(350deg);
+.gallery .cta svg {
+	display: inline-block;
+	width: calc(var(--fsBase) * 1);
+	height: auto;
 }
-aside#note-open {
-	bottom: -17rem;
-	left: 24rem;
-	width: 48rem;
-	transform: rotate(10deg);
+.reel {
+	display: flex;
+	align-items: center;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scroll-snap-type: x mandatory;
+	/* scroll-snap-stop: always; */
+	scrollbar-width: none;
 }
-/* Sticker */
-.sticker {
+.reel::-webkit-scrollbar {
+	display: none;
+}
+
+/* Card Component */
+
+.card {
+	scroll-snap-align: center;
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	box-sizing: content-box;
+	margin: var(--slideMargin) 0 0;
+	overflow: hidden;
+}
+.reel .card:last-child {
+	margin-right: var(--slideMargin);
+}
+
+/* Description Card */
+
+.description.card {
+	width: var(--slideDescWidth);
+	max-width: var(--slideDescContentWidth);
+	min-height: calc(100vh - var(--slideMarginTotal) - var(--slidePaddingTotal));
+	height: fit-content;
+	max-height: calc(100vh - var(--slideMarginTotal));
+	padding: var(--slidePadding);
+	margin-left: var(--slideMargin);
+	border-radius: var(--slidePadding);
+	background-position: center;
+	clip-path: var(--clipBevel);
+}
+.description.card > p {
+	margin-right: -0.25em;
+}
+
+/* Link Card */
+
+.link.card {
+	position: relative;
+	width: calc(var(--slideLinkWidth) / 1.375);
+	max-width: 40em;
+	min-height: calc((100vh - var(--slideMarginTotal) - var(--slidePaddingTotal)) / 2);
+	height: fit-content;
+	max-height: calc(100vh - var(--slideMarginTotal));
+	aspect-ratio: 3 / 4;
+	background-color: var(--cru);
+}
+@supports not (aspect-ratio: 3 / 4) {
+	.link.card::before {
+		float: left;
+		padding-top: 100%;
+		content: "";
+	}
+	.link.card::after {
+		display: block;
+		content: "";
+		clear: both;
+	}
+}
+.link.card:nth-of-type(4n+2) {
+	align-self: flex-start;
+}
+.link.card:nth-of-type(4n+4) {
+	align-self: flex-end;
+}
+.link.card > svg {
 	position: absolute;
 	width: auto;
-	height: 14rem;
-	z-index: var(--layerOverlap);
+	height: var(--cvB1);
+	max-height: 15em;
+	fill: var(--paper);
+	pointer-events: none;
 }
-.sticker[src*="peace"] {
-	top: 114rem;
-	left: 55rem;
-	transform: rotate(30deg);
+.link.card > svg:nth-of-type(1) {
+	top: -0.05vw;
+	left: -0.05vw;
 }
-.sticker[src*="growth"] {
-	top: 140rem;
-	left: -4rem;
-	transform: rotate(0);
+.link.card > svg:nth-of-type(2) {
+	top: -0.05vw;
+	right: -0.05vw;
+	transform: rotate(90deg);
 }
-.sticker[src*="death"] {
-	top: 169rem;
-	left: 63rem;
-	transform: rotate(0);
+.link.card > svg:nth-of-type(3) {
+	bottom: -0.05vw;
+	left: -0.05vw;
+	transform: rotate(270deg);
 }
-.sticker[src*="challenge"] {
-	top: 90rem;
-	left: 100rem;
-	transform: rotate(0);
+.link.card > svg:nth-of-type(4) {
+	right: -0.05vw;
+	bottom: -0.05vw;
+	transform: rotate(180deg);
 }
-.sticker[src*="improv"] {
-	top: 124rem;
-	left: 14rem;
-	transform: rotate(10deg);
-}
-.sticker[src*="deal-with-it"] {
-	top: 199rem;
-	left: 9rem;
-	transform: rotate(10deg);
-}
-.sticker[src*="creativity"] {
-	top: 241rem;
-	left: 45rem;
-	transform: rotate(0);
-}
-.sticker[src*="research"] {
-	top: 28rem;
-	left: -2rem;
-	transform: rotate(0);
-}
-.sticker[src*="collaboration"] {
-	top: 83rem;
-	left: 94rem;
-	transform: rotate(350deg);
-}
-.sticker[src*="experimentation"] {
-	top: 142rem;
-	left: 10rem;
-	transform: rotate(0);
-}
-.sticker[src*="satisfaction"] {
-	top: 254rem;
-	left: 110rem;
-	transform: rotate(320deg);
-}
-.sticker[src*="inclusivity"] {
-	top: 314rem;
-	left: -4rem;
-	transform: rotate(10deg);
-}
-#pedroPort {
+.link.card a {
 	position: absolute;
-	top: 15rem;
-	left: 39rem;
-	width: 8em;
-	height: 8em;
-	overflow: hidden;
-	border-radius: var(--sf);
-	transform: rotate(355deg);
-	box-shadow: var(--blackFade) -0.0625rem 0.25rem 0 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-family: var(--ffLexendPeta);
+	font-weight: calc(var(--fwBase) + 225);
+	font-size: calc(var(--fsBase) / 1.0625);
+	line-height: 112.5%;
+	text-decoration: none;
+	text-transform: uppercase;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	padding: 1em;
+	/* box-shadow: var(--slideLinkShadow) inset; */
 }
-#pedroPort img {
+.link.card a:hover {
+	opacity: unset;
+	color: var(--paper);
+}
+.link.card img {
+	position: absolute;
 	width: 100%;
-    height: 100%;
+	height: 100%;
 	object-fit: cover;
+	opacity: 0.2;
+	transition: all 0.2s ease-out;
+}
+.link.card span {
+	text-align: center;
+	padding: 0.125em 0.25em;
+	border-radius: var(--s4p);
+	z-index: 1;
+}
+.link.card a:hover span {
+	background-color: var(--charcoal);
+}
+.link.card a:hover img {
+	transform: scale(1.1);
+	opacity: 1;
+	filter: contrast(50%) invert(100%) hue-rotate(285deg) saturate(150%);
+}
+.link.card a:hover span {
+	animation: blink 0.4s steps(1) infinite;
 }
 
-/* Content design */
-section#pmcf-xyz {
-	flex-direction: row;
-	flex-wrap: wrap;
-	max-width: var(--maxcol02);
+/* Card Content */
+
+.card *:nth-child(1) {
+	margin-top: 0;
 }
-section#pmcf-xyz > :global(article) {
-	margin: 0 1em 1em 0;
+.card *:nth-last-child(1),
+.card p:nth-last-of-type(1) {
+	margin-bottom: 0;
+}
+#pmcf-intro {
+	background-image: url(../assets/pmcf/azulejo01.svg);
+	background-size: calc(var(--fsBase) * 35);
+}
+#pre-01 {
+	background-image: url(../assets/pmcf/azulejo02.svg);
+	background-size: calc(var(--fsBase) * 41);
+}
+#pre-02 {
+	background-image: url(../assets/pmcf/azulejo03.svg);
+	background-size: calc(var(--fsBase) * 60);
+}
+#pre-03 {
+	background-image: url(../assets/pmcf/azulejo04.svg);
+	background-size: calc(var(--fsBase) * 50);
+}
+#pre-04 {
+	background-image: url(../assets/pmcf/azulejo05.svg);
+	background-size: calc(var(--fsBase) * 65);
 }
 
-/* Media queries */
-@media (min-width: 1440px) {
-	#highlighter {
-		font-size: 1.3333em;
+/* Constraints */
+
+@media (min-width: 53em) {
+	.reel .card:first-child {
+		margin-left: var(--slideDescMargins);
+	}
+	.reel .card:last-child {
+		margin-right: var(--slideDescMargins);
+	}
+	.link.card {
+		width: calc(var(--slideLinkWidth) / 2);
 	}
 }
-@media (max-width: 480px) {
-	.controls {
-		flex-wrap: wrap;
-		justify-content: space-between;
-		right: 0.5em;
-		left: 1em;
-	}
-	#highlighter {
-		flex-basis: auto;
-		font-size: 1.1666em;
+@media (pointer: coarse) and (max-width: 50em) {
+    .gallery .nav {
+        display: none;
+    }
+	.gallery .cta:not(.hidden) {
+		display: inline;
 	}
 }
+@media (max-width: 30em) and (min-height: 40em) {
+	.description.card {
+		min-height: calc(70vh - var(--slideMarginTotal) - var(--slidePaddingTotal));
+	}
+	.link.card {
+		min-height: calc((70vh - var(--slideMarginTotal) - var(--slidePaddingTotal)) / 2);
+	}
+}
+
 </style>
+
+<script>
+
+// Previous/Next buttons for reels
+
+function initializeButtonFunctionality() {
+    const reels = document.querySelectorAll<HTMLElement>('.reel');
+    reels.forEach(reel => {
+        const prevButton = reel.previousElementSibling as HTMLElement;
+        const nextButton = reel.previousElementSibling?.previousElementSibling as HTMLElement;
+		const inlineNextButton = reel.querySelector('.cta.next') as HTMLElement; 
+        if (!prevButton || !nextButton || !inlineNextButton) return;
+        const handleVisibilityUpdate = () => {
+            setButtonVisibility(reel, prevButton, nextButton, inlineNextButton);
+        };
+        prevButton.addEventListener('click', () => {
+            scrollToCard(reel, -1);
+            handleVisibilityUpdate();
+        });
+        nextButton.addEventListener('click', () => {
+            scrollToCard(reel, 1);
+            handleVisibilityUpdate();
+        });
+		inlineNextButton.addEventListener('click', () => {
+            scrollToCard(reel, 1);
+            // handleVisibilityUpdate();
+        });
+        reel.addEventListener('scroll', handleVisibilityUpdate);
+        handleVisibilityUpdate();
+    });
+}
+function setButtonVisibility(reel: HTMLElement, prevButton: HTMLElement, nextButton: HTMLElement, inlineNextButton: HTMLElement) {
+	const tolerance = 4;
+    if (reel.scrollLeft <= tolerance) {
+        prevButton.classList.add('hidden');
+    } else {
+        prevButton.classList.remove('hidden');
+    }
+    if (reel.scrollLeft + reel.clientWidth + tolerance >= reel.scrollWidth) {
+        nextButton.classList.add('hidden');
+		// inlineNextButton.classList.add('hidden');
+    } else {
+        nextButton.classList.remove('hidden');
+		// inlineNextButton.classList.remove('hidden');
+    }
+}
+const scrollToCard = (reel: HTMLElement, direction: number) => {
+    const cards = reel.querySelectorAll('.card');
+    const currentScrollPosition = reel.scrollLeft;
+    const cardWidth = cards.length ? (cards[0] as HTMLElement).offsetWidth : 0;
+    const newScrollPosition = currentScrollPosition + cardWidth * direction;
+    reel.scroll({
+        left: newScrollPosition,
+        behavior: 'smooth'
+    });
+};
+window.onload = initializeButtonFunctionality;
+
+</script>

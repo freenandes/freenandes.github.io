@@ -112,7 +112,7 @@ const { title, description, author='Pedro MC Fernandes' } = Astro.props;
     
     /* GUI */
 
-    --cursorDefault: url(/artwork/default.svg) 7 1, auto;
+    --cursorDefault: url(/artwork/c-default.svg) 3 3, auto;
     --cursorText: url(/artwork/text.svg) 12 12, text;
     --cursorPointer: url(/artwork/pointer.svg) 7 4, pointer;
 
@@ -322,7 +322,17 @@ nav a:hover span {
 }
 a::after,
 nav a:not(#backLink) span::after {
-    content: "\00A0\2197";
+    content: url('data:image/svg+xml,<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 13 13 3" stroke="%230050db" stroke-width="2"/><path d="M13 3H7M13 3v6" stroke="%230050db" stroke-width="2" stroke-linecap="square"/></svg>');
+    display: inline-block;
+    vertical-align: -0.1875em;
+    height: auto;
+    width: 1em;
+    margin-left: 0.125em;
+}
+small a::after,
+small nav a:not(#backLink) span::after {
+    vertical-align: -0.125em;
+    width: 0.75em;
 }
 article a::after,
 nav a::after,

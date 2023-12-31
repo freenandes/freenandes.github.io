@@ -335,7 +335,7 @@ a[href^="/"]::after,
 a[href^="#"]::after,
 nav a::after,
 nav a[href^="/"] span::after {
-    content: none;
+    content: none !important;
 }
 nav a:hover span::after {
     animation: blink 0.4s steps(1) infinite;
@@ -421,6 +421,7 @@ textarea {
     margin: 0;
 }
 fieldset legend {
+    width: fit-content;
     padding: 0 0.5em;
     margin-left: -0.5em;
 }

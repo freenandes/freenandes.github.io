@@ -324,19 +324,17 @@ a::after,
 nav a:not(#backLink) span::after {
     content: url('data:image/svg+xml,<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 13 13 3" stroke="%230050db" stroke-width="2"/><path d="M13 3H7M13 3v6" stroke="%230050db" stroke-width="2" stroke-linecap="square"/></svg>');
     display: inline-block;
-    vertical-align: -0.125em;
     height: auto;
     width: 0.75em;
     margin-left: 0.125em;
 }
 nav a:not(#backLink) span::after {
-    vertical-align: -0.1875em;
     width: 1em;
 }
-article a[href*="pmcf.xyz"]::after,
+a[href^="/"]::after,
+a[href^="#"]::after,
 nav a::after,
-nav a[href*="pmcf.xyz"]::after,
-nav a[href*="pmcf.xyz"] span::after {
+nav a[href^="/"] span::after {
     content: none;
 }
 nav a:hover span::after {

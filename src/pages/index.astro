@@ -31,7 +31,6 @@ const {Content} = await intro.render();
 			<div id={intro.slug} class="description card">
 				<h1>{intro.data.title}</h1>
 				<Content />
-				<p><a href="#contact">Jump into contacts</a> or keep reading about my skills below.</p>
 			</div>
 		</div>
 	</header>
@@ -316,8 +315,22 @@ section.gallery {
 	margin-bottom: 0;
 }
 #pmcf-intro {
+	position: relative;
 	background-image: url(../assets/pmcf/azulejo01.svg);
 	background-size: calc(var(--fsBase) * 35);
+}
+#pmcf-intro::after {
+	content: "";
+	position: absolute;
+	top: 2vh;
+	left: 50%;
+	width: calc(50% + 2vw);
+	height: 75%;
+	background-image: url(/artwork/cardo.svg);
+	background-repeat: no-repeat;
+	background-position: top right;
+	background-size: contain;
+	/* opacity: 0.3; */
 }
 #pre-01 {
 	background-image: url(../assets/pmcf/azulejo02.svg);

@@ -12,10 +12,11 @@ import Footer from '../components/footer.astro';
 const preface = await getCollection('pmcf');
 const intro = await getEntry('extra', 'pmcf-intro');
 const {Content} = await intro.render();
+const {description} = "Product designer in Lisbon, Portugal. Wants to design interfaces that help people embrace technology and live better.";
 
 ---
 
-<PMCF title={intro.data.title} description={intro.body}>
+<PMCF title={intro.data.title} description={description}>
 	<svg style="display: none">
 		<symbol id="dCorner" viewBox="0 0 256 256">
 			<path d="M256 0.5V0H0V256H0.5C0.5 239.187 3.25 222.547 9.75 207.016C16.1251 191.484 25.625 177.375 37.5 165.492C46.25 156.788 56.1251 149.414 66.875 143.562C70.875 141.414 74.875 139.469 79.0001 137.742C94.5 131.313 111.25 128 128 128C128 111.187 131.25 94.5468 137.75 79.0157C141.626 69.5703 146.625 60.6484 152.75 52.4297C156.625 47.1406 160.876 42.1485 165.5 37.4922C177.375 25.6015 191.5 16.1797 207 9.74218C222.5 3.3125 239.25 0.5 256 0.5Z" />

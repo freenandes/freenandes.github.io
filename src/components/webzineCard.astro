@@ -1,10 +1,13 @@
 ---
+
 const { customClasses, url, title, imageSrc, imageAlt } = Astro.props;
-import { Image } from "astro:assets";
+import {Image} from "astro:assets";
+
 ---
+
 <li class={ `webzineCard ${customClasses}` }>
-    <a href={ url } class="delayed">
-        <h2>{ title }</h2>
-        <Image src={ imageSrc } alt={ imageAlt } />
+    <a href={url} class="delayed">
+        <h2>{title}</h2>
+        <Image src={imageSrc} alt={imageAlt} />
     </a>
 </li>

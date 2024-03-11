@@ -43,6 +43,15 @@ const description = "Product designer in Lisbon, Portugal. Wants to design inter
 			</div>
 		</div>
 	</header>
+	<section class="init">
+		<div class="reel">
+			<div class="description card showreel">
+				<video width="1920" height="1080" autoplay muted loop src="videos/showreel.mp4">
+					Showcase of examples of my work.
+				</video> 
+			</div>
+		</div>
+	</section>
 	{preface.map(async (preface) => {
 		const {Content} = await preface.render();
 		const relatedPosts = await getEntries(preface.data.relatedPosts);
@@ -209,6 +218,23 @@ section.gallery {
 	margin-right: -0.25em;
 }
 
+/* Showreel */
+
+.showreel {
+	position: relative;
+	background-color: white;
+}
+.showreel video {
+	position: absolute;
+	display: block;
+	top: 50%;
+	left: 50%;
+	height: 100%;
+	width: 100%;
+	transform: translate(-50%, -50%);
+	object-fit: cover;
+}
+
 /* Link Card */
 
 .link.card {
@@ -328,13 +354,13 @@ section.gallery {
 	background-size: calc(var(--fsBase) * 35);
 }
 #cardoon {
-	width: calc(var(--fsBase) * 8);
-	height: calc(var(--fsBase) * 8);
+	width: calc(var(--fsBase) * 6);
+	height: calc(var(--fsBase) * 6);
 	fill: none;
 	stroke: currentColor;
 	stroke-width: 0.05em;
 	stroke-linecap: square;
-	margin: -0.75em -0.75em 0;
+	margin: -3em -0.75em -0.5em;
 }
 #cardoon + h1 {
 	margin-top: 0;
@@ -381,8 +407,21 @@ section.gallery {
 	.description.card {
 		min-height: calc(70vh - var(--slideMarginTotal) - var(--slidePaddingTotal));
 	}
+	.showreel video {
+		height: 75%;
+	}
 	.link.card {
 		min-height: calc((70vh - var(--slideMarginTotal) - var(--slidePaddingTotal)) / 2);
+	}
+}
+@media (max-width: 40em) {
+	.showreel video {
+		height: 80%;
+	}
+}
+@media (max-width: 30em) {
+	.showreel video {
+		height: 75%;
 	}
 }
 

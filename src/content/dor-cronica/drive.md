@@ -4,6 +4,7 @@ description: "This is my first story"
 pubDate: 2023-07-09
 cover: "../../assets/dor-cronica/drive/cover.svg"
 coverAlt: "This is the cover image"
+customClasses: "dark"
 ---
 <div slide="cover">
 
@@ -35,10 +36,10 @@ coverAlt: "This is the cover image"
 
 > — What do you think happened here?
 > 
-> — I'm not sure...
+> — I’m not sure…
 
 > — O que achas que aconteceu aqui?
 > 
-> — Não tenho a certeza...
+> — Não tenho a certeza…
 
 </div>

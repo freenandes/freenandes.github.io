@@ -1,5 +1,6 @@
 ---
-import Shell from '../../layouts/Shell.astro';
+
+import PMCF from '../../layouts/PMCF.astro';
 import WebzineView from '../../components/webzineView.astro';
 import { getCollection } from 'astro:content';
 export async function getStaticPaths() {
@@ -10,9 +11,18 @@ export async function getStaticPaths() {
 };
 const { entry } = Astro.props;
 const { Content } = await entry.render();
+
 ---
-<Shell title={ entry.data.title } description={ entry.data.description } author={ entry.data.author } customClass={ `wz-${entry.slug}` }>
-    <WebzineView parentFolder={`/${entry.collection}`} author={entry.data.author} pubDate={entry.data.pubDate}>
+
+<PMCF
+title={entry.data.title}
+description={entry.data.description}
+author={entry.data.author}
+customClass={`wz-${entry.slug}`}>
+    <WebzineView
+    parentFolder={`/${entry.collection}`}
+    author={entry.data.author}
+    pubDate={entry.data.pubDate}>
         <Content />
     </WebzineView>
-</Shell>
+</PMCF>

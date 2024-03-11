@@ -1,39 +1,55 @@
 ---
-const title = "Dor Crónica";
-const description = "Short stories about living as a coward. A webzine by Pedro MC Fernandes.";
-const customClass = "dor-cronica";
-const metaImage = "/meta.png";
-import Shell from '../layouts/Shell.astro';
-import WebzineCard from '../components/webzineCard.astro';
 
-// Content
+// Imports
+
+import PMCF from '../layouts/PMCF.astro';
+import WebzineCard from '../components/webzineCard.astro';
 import { getCollection } from 'astro:content';
 const allZines = await getCollection('dor-cronica');
+
+// Content
+
+const title = "Dor Crónica";
+const description = "Short stories about living as a coward. A webzine by Pedro MC Fernandes.";
+
 ---
-<Shell title={ title } description={ description } customClass={ customClass } metaImage={ metaImage }>
+
+<PMCF title={title} description={description}>
     <div id="webzineList">
-        <h1>{ title }</h1>
+        <h1>{title}</h1>
         <ul>
-            {
-                allZines.sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime())
-                    .map((post) => 
-                        <WebzineCard customClasses={post.data.customClasses} url={`/${post.collection}/${post.slug}`} title={post.data.title} imageSrc={post.data.cover} imageAlt={post.data.coverAlt} />
-                    )
+            { allZines.sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime())
+                .map((post) => 
+                    <WebzineCard
+                    customClasses={post.data.customClasses}
+                    url={`/${post.collection}/${post.slug}`}
+                    title={post.data.title}
+                    imageSrc={post.data.cover}
+                    imageAlt={post.data.coverAlt} />
+                )
             }
         </ul>
     </div>
-</Shell>
+</PMCF>
+
 <style is:global>
+
 #webzineList {
     box-sizing: border-box;
     text-align: center;
     width: 100%;
-    max-width: 40em;
+    max-width: 50em;
     padding: 1.5em 1em 1em;
     margin: 0 auto;
 }
-#webzineList > h1 {
-    margin-bottom: 0.5em;
+h1 {
+    margin: 0.25em 0 0.5em;
+}
+h2 {
+    font-family: var(--ffLexendPeta);
+    font-size: var(--fsBase);
+    margin: 0;
+    cursor: inherit;
 }
 #webzineList > ul {
     list-style-type: none;
@@ -60,27 +76,19 @@ const allZines = await getCollection('dor-cronica');
     left: 0;
     width: 100%;
     height: 100%;
-    border-radius: var(--se);
+    border-radius: calc(var(--s8p) + 0.5vw);
     overflow: hidden;
     text-decoration: none;
-    color: var(--charcoal);
-    transition: all 200ms ease-out;
+    color: var(--ink);
+    transition: all 0.2s ease-in;
 }
 .webzineCard.dark a {
     color: var(--paper);
 }
 .webzineCard a:hover {
     color: var(--paper);
-    background-color: var(--blackStrong);
-}
-.webzineCard h2 {
-    font-size: 1.5em;
-    cursor: inherit;
-    transition: font-size 1s linear, opacity 1s linear;
-}
-.webzineCard a.visible h2 {
-    font-size: 8em;
-    opacity: 0;
+    background-color: var(--ink);
+    opacity: 1;
 }
 .webzineCard img {
     position: absolute;
@@ -106,4 +114,5 @@ const allZines = await getCollection('dor-cronica');
         max-width: none;
     }
 }
+
 </style>

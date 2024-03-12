@@ -45,7 +45,7 @@ const description = "Product designer in Lisbon, Portugal. Wants to design inter
 	</header>
 	<section class="init">
 		<div class="reel">
-			<div class="description card showreel">
+			<div class="showreel card">
 				<video width="1920" height="1080" autoplay muted loop src="videos/showreel.mp4">
 					Showcase of examples of my work.
 				</video> 
@@ -220,19 +220,41 @@ section.gallery {
 
 /* Showreel */
 
-.showreel {
+.showreel.card {
 	position: relative;
+	width: var(--slideDescWidth);
+	max-width: var(--slideDescContentWidth);
+	height: fit-content;
+	aspect-ratio: 16 / 9;
+	padding: var(--slidePadding);
+	margin-left: var(--slideMargin);
+	border-radius: var(--slidePadding);
+	clip-path: var(--clipBevel);
 	background-color: white;
 }
-.showreel video {
+@supports not (aspect-ratio: 16 / 9) {
+	.showreel.card::before {
+		float: left;
+		padding-top: 56.25%;
+		content: "";
+	}
+	.showreel.card::after {
+		display: block;
+		content: "";
+		clear: both;
+	}
+}
+.showreel.card video {
 	position: absolute;
 	display: block;
-	top: 50%;
-	left: 50%;
-	height: 100%;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
 	width: 100%;
-	transform: translate(-50%, -50%);
+	height: 100%;
 	object-fit: cover;
+	transform: scale(0.875);
 }
 
 /* Link Card */
@@ -250,7 +272,7 @@ section.gallery {
 @supports not (aspect-ratio: 3 / 4) {
 	.link.card::before {
 		float: left;
-		padding-top: 100%;
+		padding-top: 75%;
 		content: "";
 	}
 	.link.card::after {
@@ -394,6 +416,7 @@ section.gallery {
 	.link.card {
 		width: calc(var(--slideLinkWidth) / 2);
 	}
+	
 }
 @media (pointer: coarse) and (max-width: 50em) {
     .gallery .nav {
@@ -401,6 +424,46 @@ section.gallery {
     }
 	.gallery .cta:not(.hidden) {
 		display: inline;
+	}
+}
+@media (max-width: 50em) {
+	.showreel.card {
+		aspect-ratio: 4 / 3;
+	}
+	@supports not (aspect-ratio: 4 / 3) {
+		.showreel.card::before {
+			float: left;
+			padding-top: 75%;
+			content: "";
+		}
+		.showreel.card::after {
+			display: block;
+			content: "";
+			clear: both;
+		}
+	}
+	.showreel.card video {
+		transform: scale(0.9375);
+	}
+}
+@media (max-width: 30em) {
+	.showreel.card {
+		aspect-ratio: 1 / 1;
+	}
+	@supports not (aspect-ratio: 1 / 1) {
+		.showreel.card::before {
+			float: left;
+			padding-top: 100%;
+			content: "";
+		}
+		.showreel.card::after {
+			display: block;
+			content: "";
+			clear: both;
+		}
+	}
+	.showreel.card video {
+		transform: scale(1);
 	}
 }
 @media (max-width: 30em) and (min-height: 40em) {
@@ -412,16 +475,6 @@ section.gallery {
 	}
 	.link.card {
 		min-height: calc((70vh - var(--slideMarginTotal) - var(--slidePaddingTotal)) / 2);
-	}
-}
-@media (max-width: 40em) {
-	.showreel video {
-		height: 80%;
-	}
-}
-@media (max-width: 30em) {
-	.showreel video {
-		height: 75%;
 	}
 }
 

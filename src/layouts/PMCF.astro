@@ -600,18 +600,18 @@ textareas.forEach(textarea => {
 
 // Back button after transitions
 
-const goBack = () => {
-    history.back();
-};
-const setButton = () => {
-    const backLink: HTMLElement | null = document.getElementById('backLink');
-    if (backLink) {
-        backLink.removeEventListener('click', goBack); 
-        backLink.addEventListener('click', goBack);
-    }
-};
-setButton();
-document.addEventListener('DOMContentLoaded', setButton);
+// const goBack = () => {
+//     history.back();
+// };
+// const setButton = () => {
+//     const backLink: HTMLElement | null = document.getElementById('backLink');
+//     if (backLink) {
+//         backLink.removeEventListener('click', goBack); 
+//         backLink.addEventListener('click', goBack);
+//     }
+// };
+// setButton();
+// document.addEventListener('DOMContentLoaded', setButton);
 
 // Intersection with the viewport
 

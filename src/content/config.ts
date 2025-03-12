@@ -13,9 +13,10 @@ const webZine = defineCollection({
     description: z.string(),
     author: z.string().default("Pedro MC Fernandes"),
     pubDate: z.date(),
-    cover: image().refine((img) => img.width >= 1024, {
-      message: "Cover image must be at least 1024 pixels wide!",
-    }),
+    // cover: image().refine((img) => img.width >= 1024, {
+    //   message: "Cover image must be at least 1024 pixels wide!",
+    // }),
+    cover: image(),
     coverAlt: z.string(),
     customClasses: z.string().default("dark"),
   })
@@ -30,9 +31,10 @@ const gallery = defineCollection({
   schema: ({ image }) => z.object({
     title: z.string(),
     description: z.string().optional(),
-    cover: image().refine((img) => img.width >= 1024, {
-      message: "Cover image must be at least 1024 pixels wide!",
-    }),
+    // cover: image().refine((img) => img.width >= 1024, {
+    //   message: "Cover image must be at least 1024 pixels wide!",
+    // }),
+    cover: image(),
     coverAlt: z.string().optional(),
   }),
 });

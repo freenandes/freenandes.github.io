@@ -4,14 +4,14 @@
 
 import PMCF from '../layouts/PMCF.astro';
 import { getCollection, getEntries, getEntry } from 'astro:content';
-import {Image} from 'astro:assets';
+import { Image } from 'astro:assets';
 import Footer from '../components/footer.astro';
 
 // Content
 
 const preface = await getCollection('pmcf');
 const intro = await getEntry('extra', 'pmcf-intro');
-const {Content} = await intro.render();
+const { Content } = await intro.render();
 const description = "Product designer in Lisbon, Portugal. Wants to design interfaces that help people embrace technology and live better.";
 
 ---

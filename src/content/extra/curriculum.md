@@ -2,7 +2,7 @@
 title: "Pedro MC Fernandes CV"
 description: "Hi 👋 This is my CV. It's where I show my career as a Product Designer. If you need one, get in touch so we can start talking. Have a nice one!"
 ---
-![Portrait of the website's author, Pedro MC Fernandes](../../assets/whiteboard/pmcf.jpg)
+![Portrait of the website's author, Pedro MC Fernandes](../../assets/pmcf/pedro.jpeg)
 
 # Pedro M.C. Fernandes
 
@@ -11,36 +11,20 @@ description: "Hi 👋 This is my CV. It's where I show my career as a Product De
 [Contact me at www.pmcf.xyz](/)
 <a href="https://linkedin.com/in/pmcfernandes" target="_blank">linkedin.com/in/pmcfernandes</a>
 
-Hi, my name is Pedro, and I’m a designer, a creator inspired by art and creativity. I want to contribute to building a more accessible and humane tech world. While I have experience working in various industries, my focus has been on information technology. I aim to design better experiences that help humans overcome personal and social problems, live healthier and more caring of future generations.
+I'm a systems-thinking Product Designer who transforms stagnating products into growth engines by fixing ecosystems, not just interfaces. I operate at the intersection of Product Strategy and execution, defining visions that influence executive roadmaps while shipping production code that helps scale teams and operations. My specialty is diagnosing why products underperform, then building the frameworks and systems that unlock their potential.
 
-### 9+ years as a digital Product Designer
+### 12 years as a Product Designer
 
-<small>
-    Since 2013 at Percona, Farfetch, TUI Group, Smartidiom, and Noise Goods.
-</small>
+I specialize in Product Strategy, Design Systems, User Research, and Stakeholder Management. At Percona, I contributed to 45% PMM adoption growth through systematic UX improvements. At Farfetch, I shifted sustainability from a cost center to a business opportunity through research-driven discovery improvements. At TUI Group, I designed systems generating 100K+ pages supporting 4x organic traffic growth. I thrive in ambiguous 0→1 spaces where I can own strategy as well as delivery, building systems that become force multipliers for teams.
 
-I worked in Design Operations and Design Systems, setting up processes, documentation, facilitating cross-collaboration, and boosting design impact and efficacy. I also worked hands-on in User Experience Research and Design, crafting digital solutions to recurring and critical user problems. I have worked in Experimentation and User Testing to shape products in a better direction. And I also worked on influencing Back-end architecture and crafting Front-end Development bits to complete our vision and prepare us for a smoother implementation.
+### 9 years of Systems-Thinking & Technical Leadership
 
-### 9+ years of Design systematization
+I build scalable systems adopted across multiple product and engineering teams, reducing handoff and front-end development time. I've established analytics frameworks enabling data-driven decisions, shipped production code for internal platforms, and led user-facing documentation redesigns across 10+ products. My systematic approach ensures 99% implementation accuracy through self-serve components and developer tooling, creating predictable and cost-effective workflows.
 
-<small>
-    Since 2007 at Percona, TUI Group, Smartidiom, and Comopi.
-</small>
+### 9 years of Cross-functional Leadership & Mentorship
 
-I prioritized the systematization of Design for a more predictable, organizable, and cost-effective way of working. With this working framework, we guaranteed coherence and surfaced more innate intuitiveness in products. I focused on centralizing and minimalizing information, processes, assets, and artifacts that were polished and acted as building blocks for the now and then for the later of the product development.
+I mentor designers and engineers, establishing research practices, design excellence standards, and modernized front-end practices. I influence executive strategy with compelling vision prototypes and extensive User Research, securing buy-in for roadmap initiatives. I've co-founded innovation hubs, scaled teams, and managed external development partnerships ensuring high implementation quality across distributed teams.
 
-### 6+ years of mentorship
+### 18 years of Design Thinking
 
-<small>
-    Since 2007 at Percona, Farfetch, TUI Group and Comopi.
-</small>
-
-I played a mentorship role in hiring and welcoming new colleagues. I helped onboard, lead, and motivate them to share their ideas and opinions early on with stakeholders and colleagues. I made myself available to them to give and receive feedback and help them when needed.
-
-### Around 16 years of much more Design
-
-<small>
-    Since 2007 as a freelancer and at Smartidiom, Noise Goods, Stricker, and Comopi.
-</small>
-
-I worked as a visual, graphic, print, web, interior and industrial designer and illustrator for the arts, press, editorial, photography, web design, advertising, cabinetry, and many other industries.
+I've worked across visual design, graphic design, web design, industrial design, and illustration. I've designed and coded interconnected products showcased at CES, secured European Community funding, and mastered e-commerce reaching 50+ countries. My foundation spans Enterprise UX, Front-end Development, and multi-market product deployment across B2B and B2C contexts.

@@ -1,0 +1,24 @@
+{
+  "name": "portfolio",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "encrypt": "node scripts/encrypt-projects.mjs",
+    "prebuild": "node scripts/encrypt-projects.mjs",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.2.4",
+    "@astrojs/rss": "^4.0.11",
+    "@astrojs/sitemap": "^3.3.0",
+    "@fontsource-variable/space-grotesk": "^5.2.5",
+    "@fontsource/space-mono": "^5.2.5",
+    "astro": "^5.7.5",
+    "marked": "^15.0.8"
+  }
+}

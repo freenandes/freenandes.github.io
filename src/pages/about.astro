@@ -1,0 +1,384 @@
+---
+import Base from '../layouts/Base.astro';
+import RegMark from '../components/RegMark.astro';
+import { site } from '../site.config';
+import { cv } from '../cv.config';
+---
+
+<Base title="About / CV" description={`Curriculum vitae of ${site.name}, ${site.role}.`}>
+  <article class="cv container">
+    <!-- Masthead -->
+    <header class="cv__head" data-reveal>
+      <div class="cv__id">
+        <p class="label cv__kicker"><RegMark size={12} /> Curriculum Vitae</p>
+        <h1 class="cv__name">{site.name}</h1>
+        <p class="cv__role">{site.role}</p>
+      </div>
+
+      <div class="cv__actions no-print">
+        <button id="download-pdf" class="btn" type="button">
+          ↓ Download PDF
+        </button>
+        <ul role="list" class="cv__contact">
+          {
+            site.socials.map((s) => (
+              <li>
+                <a href={s.href} class="cv__contact-link">{s.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </header>
+
+    <p class="cv__summary" data-reveal style="--reveal-delay:80ms;">
+      {cv.summary}
+    </p>
+
+    <!-- Experience -->
+    <section class="cv__section" data-reveal style="--reveal-delay:140ms;">
+      <h2 class="cv__section-title"><span class="label">01</span> Experience</h2>
+      <div class="cv__list">
+        {
+          cv.experience.map((job) => (
+            <div class="entry">
+              <div class="entry__period mono">{job.period}</div>
+              <div class="entry__main">
+                <h3 class="entry__role">
+                  {job.role} <span class="entry__org">— {job.org}</span>
+                </h3>
+                {job.location && <p class="entry__loc mono">{job.location}</p>}
+                {job.summary && <p class="entry__summary">{job.summary}</p>}
+                <ul role="list" class="entry__points">
+                  {job.points.map((pt) => (
+                    <li>{pt}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Skills + Education in a two-column band -->
+    <div class="cv__cols">
+      <section class="cv__section" data-reveal>
+        <h2 class="cv__section-title"><span class="label">02</span> Capabilities</h2>
+        <div class="skills">
+          {
+            cv.skills.map((group) => (
+              <div class="skills__group">
+                <p class="label">{group.label}</p>
+                <ul role="list" class="skills__items">
+                  {group.items.map((item) => (
+                    <li class="chip">{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="cv__section" data-reveal>
+        <h2 class="cv__section-title"><span class="label">03</span> Education</h2>
+        <div class="cv__list">
+          {
+            cv.education.map((e) => (
+              <div class="entry">
+                <div class="entry__period mono">{e.period}</div>
+                <div class="entry__main">
+                  <h3 class="entry__role">{e.title}</h3>
+                  <p class="entry__org-line">{e.org}</p>
+                  {e.note && <p class="entry__summary">{e.note}</p>}
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+    </div>
+
+    <!-- Recognition -->
+    <section class="cv__section" data-reveal>
+      <h2 class="cv__section-title"><span class="label">04</span> Recognition</h2>
+      <div class="cv__list">
+        {
+          cv.recognition.map((r) => (
+            <div class="entry">
+              <div class="entry__period mono">{r.period}</div>
+              <div class="entry__main">
+                <h3 class="entry__role">
+                  {r.title} <span class="entry__org">— {r.org}</span>
+                </h3>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Clients -->
+    <section class="cv__section" data-reveal>
+      <h2 class="cv__section-title"><span class="label">05</span> Selected Clients</h2>
+      <p class="cv__clients mono">{cv.selectedClients.join('  ·  ')}</p>
+    </section>
+
+    <p class="cv__foot mono no-print">
+      Tip: in the print dialog choose “Save as PDF” for a pixel-clean résumé.
+    </p>
+  </article>
+</Base>
+
+<script>
+  const btn = document.getElementById('download-pdf');
+  btn?.addEventListener('click', () => window.print());
+</script>
+
+<style>
+  .cv {
+    padding-block: var(--space-xl);
+    max-width: 54rem;
+  }
+
+  .cv__head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-m);
+    justify-content: space-between;
+    align-items: end;
+    padding-block-end: var(--space-m);
+    border-block-end: 2px solid var(--ink);
+  }
+
+  .cv__kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6ch;
+  }
+  .cv__name {
+    margin-block-start: var(--space-2xs);
+    font-size: var(--step-4);
+  }
+  .cv__role {
+    font-family: var(--font-mono);
+    color: var(--ink-2);
+    letter-spacing: var(--tracking-mono);
+  }
+
+  .cv__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-s);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5ch;
+    border-radius: var(--radius-pill);
+    padding: 0.7rem 1.3rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: var(--tracking-mono);
+    transition: transform var(--dur-fast) var(--ease),
+      background var(--dur-fast) var(--ease);
+  }
+  .btn:hover {
+    transform: translateY(-1px);
+    background: var(--accent-ink);
+    border-color: var(--accent-ink);
+  }
+
+  .cv__contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+    justify-content: flex-end;
+  }
+  .cv__contact-link {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--ink-2);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .cv__contact-link:hover {
+    color: var(--accent-ink);
+  }
+
+  .cv__summary {
+    margin-block-start: var(--space-l);
+    font-size: var(--step-1);
+    max-width: 60ch;
+    color: var(--ink);
+  }
+
+  .cv__section {
+    margin-block-start: var(--space-2xl);
+  }
+  .cv__section-title {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-s);
+    font-size: var(--step-2);
+    padding-block-end: var(--space-s);
+    border-block-end: 1px solid var(--line);
+    margin-block-end: var(--space-m);
+  }
+  .cv__section-title .label {
+    color: var(--ink-3);
+  }
+
+  .cv__list {
+    display: grid;
+    gap: var(--space-l);
+  }
+
+  .entry {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: var(--space-m);
+  }
+  @media (max-width: 640px) {
+    .entry {
+      grid-template-columns: 1fr;
+      gap: var(--space-2xs);
+    }
+  }
+  .entry__period {
+    color: var(--ink-2);
+    padding-block-start: 0.2rem;
+  }
+  .entry__role {
+    font-size: var(--step-1);
+    font-weight: 600;
+  }
+  .entry__org {
+    color: var(--ink-2);
+    font-weight: 400;
+  }
+  .entry__org-line {
+    color: var(--ink-2);
+  }
+  .entry__loc {
+    color: var(--ink-3);
+    margin-block-start: 0.1rem;
+  }
+  .entry__summary {
+    margin-block-start: var(--space-2xs);
+    color: var(--ink-2);
+  }
+  .entry__points {
+    margin-block-start: var(--space-2xs);
+    display: grid;
+    gap: var(--space-3xs);
+    padding-inline-start: 1.1em;
+    list-style: square;
+    color: var(--ink);
+  }
+  .entry__points li::marker {
+    color: var(--accent);
+  }
+
+  .cv__cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+  }
+  @media (max-width: 720px) {
+    .cv__cols {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .skills {
+    display: grid;
+    gap: var(--space-m);
+  }
+  .skills__items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs);
+    margin-block-start: var(--space-2xs);
+  }
+  .chip {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    padding: 0.15rem 0.6rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line);
+    background: var(--paper-2);
+    color: var(--ink-2);
+  }
+
+  .cv__clients {
+    font-size: var(--step-1);
+    color: var(--ink);
+  }
+
+  .cv__foot {
+    margin-block-start: var(--space-2xl);
+    color: var(--ink-3);
+  }
+
+  /* ============================ PRINT / PDF ============================ */
+  @media print {
+    .cv {
+      padding: 0;
+      max-width: none;
+      font-size: 10.5pt;
+    }
+    .cv__name {
+      font-size: 22pt;
+    }
+    .cv__section {
+      margin-block-start: 14pt;
+      break-inside: avoid;
+    }
+    .cv__section-title {
+      font-size: 12pt;
+    }
+    .entry {
+      break-inside: avoid;
+    }
+    .cv__summary {
+      font-size: 11pt;
+    }
+    .cv__clients {
+      font-size: 11pt;
+    }
+    .no-print {
+      display: none !important;
+    }
+    .chip {
+      border-color: #ccc;
+    }
+  }
+</style>
+
+<style is:global>
+  @media print {
+    /* Strip site chrome + backgrounds for a clean résumé. */
+    .site-header,
+    .site-footer,
+    .wash,
+    .grid-overlay,
+    .skip-link {
+      display: none !important;
+    }
+    html,
+    body {
+      background: #fff !important;
+      color: #000 !important;
+    }
+    @page {
+      margin: 14mm;
+    }
+  }
+</style>

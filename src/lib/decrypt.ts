@@ -16,17 +16,30 @@ export interface LockedPayload {
   ct: string;
 }
 
-const fromB64 = (b64: string): Uint8Array =>
-  Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+/** Decode base64 into a fresh ArrayBuffer-backed Uint8Array (BufferSource). */
+const fromB64 = (b64: string): Uint8Array<ArrayBuffer> => {
+  const bin = atob(b64);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+};
+
+/** Encode a string into a fresh ArrayBuffer-backed Uint8Array. */
+const toBytes = (s: string): Uint8Array<ArrayBuffer> => {
+  const encoded = new TextEncoder().encode(s);
+  const out = new Uint8Array(encoded.length);
+  out.set(encoded);
+  return out;
+};
 
 async function deriveKey(
   password: string,
-  salt: Uint8Array,
+  salt: Uint8Array<ArrayBuffer>,
   iterations: number
 ): Promise<CryptoKey> {
   const baseKey = await crypto.subtle.importKey(
     'raw',
-    new TextEncoder().encode(password),
+    toBytes(password),
     'PBKDF2',
     false,
     ['deriveKey']

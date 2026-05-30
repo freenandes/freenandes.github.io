@@ -5,6 +5,7 @@ import Cover from '../../components/Cover.astro';
 import PasswordGate from '../../components/PasswordGate.astro';
 import RegMark from '../../components/RegMark.astro';
 import { getProjects, projectYear } from '../../lib/projects';
+import { withBase } from '../../lib/base';
 
 export async function getStaticPaths() {
   const projects = await getProjects();
@@ -26,7 +27,7 @@ const dateLabel = data.date.toLocaleDateString('en-US', {
 
 <Base title={data.title} description={data.description}>
   <article class="project container">
-    <a class="back mono" href="/">← Index</a>
+    <a class="back mono" href={withBase('/')}>← Index</a>
 
     <header class="project__head">
       <p class="label project__num">

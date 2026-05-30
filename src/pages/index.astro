@@ -4,6 +4,7 @@ import ProjectCard from '../components/ProjectCard.astro';
 import RegMark from '../components/RegMark.astro';
 import { site } from '../site.config';
 import { getProjects, projectYear } from '../lib/projects';
+import { withBase } from '../lib/base';
 
 const projects = await getProjects();
 const count = String(projects.length).padStart(2, '0');
@@ -32,7 +33,7 @@ const count = String(projects.length).padStart(2, '0');
     </div>
 
     <p class="hero__actions" data-reveal style="--reveal-delay:240ms;">
-      <a class="btn" href="/about">Read the CV →</a>
+      <a class="btn" href={withBase('/about')}>Read the CV →</a>
       <a class="btn btn--ghost" href={site.socials[0].href}>Get in touch</a>
     </p>
   </section>

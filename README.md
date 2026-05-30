@@ -88,6 +88,36 @@ the case study openly.
 > client gating, not server-side auth for highly sensitive data. See
 > `src/protected/README.md` for details.
 
+## Deploying to GitHub Pages
+
+This repo ships with a GitHub Actions workflow (`.github/workflows/deploy.yml`)
+that builds the site and publishes it to **GitHub Pages** on every push to
+`main`.
+
+One-time setup in the GitHub UI: **Settings → Pages → Build and deployment →
+Source = GitHub Actions**. After the first successful run the site is live at:
+
+```
+https://freenandes.github.io/portfolio/
+```
+
+Because it's served from the `/portfolio/` sub-path, `astro.config.mjs` sets
+both `site` and `base`. All internal links go through the `withBase()` helper
+(`src/lib/base.ts`) so they resolve correctly under that sub-path — including
+the client-side fetch for password-locked projects.
+
+**Custom domain or user/org page?** Set the deployment URL and sub-path via env
+vars (the workflow passes these to the build):
+
+| Scenario | `SITE` | `BASE_PATH` |
+| --- | --- | --- |
+| Project page (default) | `https://freenandes.github.io` | `/portfolio` |
+| User/org page (`<user>.github.io` repo) | `https://freenandes.github.io` | `/` |
+| Custom domain | `https://your-domain.com` | `/` |
+
+For a custom domain, also add a `public/CNAME` file containing the domain and
+configure it under **Settings → Pages → Custom domain**.
+
 ## Tech
 
 - [Astro](https://astro.build) + MDX, sitemap

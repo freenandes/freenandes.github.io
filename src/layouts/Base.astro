@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import { site } from '../site.config';
+import { withBase } from '../lib/base';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
@@ -22,7 +23,7 @@ const {
 
 const pageTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site.role}`;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString();
-const ogImage = new URL(site.ogImage, Astro.site ?? Astro.url).toString();
+const ogImage = new URL(withBase(site.ogImage), Astro.site ?? Astro.url).toString();
 ---
 
 <!doctype html>
@@ -46,8 +47,8 @@ const ogImage = new URL(site.ogImage, Astro.site ?? Astro.url).toString();
     <meta name="theme-color" content="#f2efe7" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#14130f" media="(prefers-color-scheme: dark)" />
 
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
+    <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>

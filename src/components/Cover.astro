@@ -5,6 +5,7 @@
  * technical typography. Deterministic per project so it stays stable.
  */
 import RegMark from './RegMark.astro';
+import { withBase } from '../lib/base';
 
 interface Props {
   title: string;
@@ -26,6 +27,9 @@ const {
 } = Astro.props;
 
 const num = String(index).padStart(2, '0');
+// Local cover assets live under /public and need the base prefix; leave remote
+// URLs (and data URIs) untouched.
+const coverSrc = cover && /^(https?:|data:)/.test(cover) ? cover : cover ? withBase(cover) : undefined;
 ---
 
 <div
@@ -35,7 +39,7 @@ const num = String(index).padStart(2, '0');
 >
   {
     cover ? (
-      <img class="cover__img" src={cover} alt={coverAlt} loading="lazy" decoding="async" />
+      <img class="cover__img" src={coverSrc} alt={coverAlt} loading="lazy" decoding="async" />
     ) : (
       <div class="cover__gen" aria-hidden="true">
         <div class="cover__field"></div>

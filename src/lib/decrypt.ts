@@ -53,8 +53,10 @@ async function deriveKey(
   );
 }
 
+import { withBase } from './base';
+
 export async function fetchPayload(slug: string): Promise<LockedPayload> {
-  const res = await fetch(`/locked/${slug}.json`, { cache: 'no-store' });
+  const res = await fetch(withBase(`/locked/${slug}.json`), { cache: 'no-store' });
   if (!res.ok) throw new Error(`Locked content not found for "${slug}".`);
   return res.json() as Promise<LockedPayload>;
 }

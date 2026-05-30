@@ -370,7 +370,7 @@ function buildCV({ sidebar, main }) {
     contact,
     _meta: {
       source: 'linkedin-pdf',
-      syncedAt: new Date().toISOString(),
+      generatedBy: 'scripts/sync-linkedin.mjs',
     },
   };
 }

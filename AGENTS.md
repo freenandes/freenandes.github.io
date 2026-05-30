@@ -19,7 +19,13 @@ password-locked projects feature (build-time encryption + client-side decrypt).
 
 | Service | Required | Notes |
 |---------|----------|-------|
-| Astro dev server | for local dev | `npm run dev` → http://localhost:4321 |
+| Astro dev server | for local dev | `npm run dev` → http://localhost:4321/portfolio/ |
+| Astro preview | to test prod build | `npm run preview` (serves `dist/` at the base path) |
+
+The site is served from the `/portfolio/` sub-path on GitHub Pages, so both dev
+and preview mount under that base. Internal links must use `withBase()` from
+`src/lib/base.ts`; `astro.config.mjs` reads `SITE`/`BASE_PATH` env vars
+(defaults `https://freenandes.github.io` and `/portfolio`).
 
 ### Lint / test / build / run
 
@@ -40,6 +46,15 @@ No separate test runner or linter is configured yet.
 - Demo locked project `halcyon` uses passphrase `soft-club`.
 - On a fresh checkout without the plaintext sources, `npm run encrypt` skips
   missing projects and the committed ciphertext is used as-is.
+
+### Deployment (GitHub Pages)
+
+- CI workflow: `.github/workflows/deploy.yml` builds and deploys on push to
+  `main` (and via manual `workflow_dispatch`).
+- One-time GitHub setup: **Settings → Pages → Source = GitHub Actions**.
+- Live URL: `https://freenandes.github.io/portfolio/`.
+- `prebuild` (encryption) no-ops safely without secrets, so CI builds succeed
+  using the committed `public/locked/*.json` ciphertext.
 
 ### VM update script
 

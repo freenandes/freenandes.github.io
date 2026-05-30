@@ -1,15 +1,19 @@
 ---
 import { site } from '../site.config';
+import { withBase, normalizePath } from '../lib/base';
 import RegMark from './RegMark.astro';
 
-const path = Astro.url.pathname;
-const isActive = (href: string) =>
-  href === '/' ? path === '/' : path.startsWith(href);
+const path = normalizePath(Astro.url.pathname);
+const home = normalizePath(withBase('/'));
+const isActive = (href: string) => {
+  const target = normalizePath(withBase(href));
+  return href === '/' ? path === home : path.startsWith(target);
+};
 ---
 
 <header class="site-header">
   <div class="container bar">
-    <a class="mark" href="/" aria-label={`${site.name} — home`}>
+    <a class="mark" href={withBase('/')} aria-label={`${site.name} — home`}>
       <RegMark size={14} />
       <span class="mark__text">{site.mark}</span>
     </a>
@@ -20,7 +24,7 @@ const isActive = (href: string) =>
           site.nav.map((item, i) => (
             <li class="nav__item">
               <a
-                href={item.href}
+                href={withBase(item.href)}
                 class:list={['nav__link', { 'is-active': isActive(item.href) }]}
                 aria-current={isActive(item.href) ? 'page' : undefined}
               >

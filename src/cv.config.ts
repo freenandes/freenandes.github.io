@@ -1,9 +1,16 @@
 /* =========================================================================
    CV / RÉSUMÉ CONTENT
-   Edit this structured data to update the About page and the downloadable
-   PDF (the PDF is produced from this same page via the print stylesheet, so
-   it always matches what you see). Prose-first fields accept plain strings.
+   The About page renders from this data. It is generated from your LinkedIn
+   profile PDF — drop a fresh export in `sources/linkedin-profile.pdf`, run
+   `npm run sync:linkedin`, and `src/cv.data.json` (imported below) is rebuilt.
+
+   The PDF always wins on a sync, so edit content on LinkedIn, not here. Tweak
+   the *types* / page layout in this file and in `src/pages/about.astro`.
+   See `scripts/sync-linkedin.mjs` and the "Sync from LinkedIn" section of the
+   README for the full workflow.
    ========================================================================= */
+
+import cvData from './cv.data.json';
 
 export interface CVExperience {
   role: string;
@@ -16,8 +23,8 @@ export interface CVExperience {
 
 export interface CVEntry {
   title: string;
-  org: string;
-  period: string;
+  org?: string;
+  period?: string;
   note?: string;
 }
 
@@ -26,88 +33,30 @@ export interface CVSkillGroup {
   items: string[];
 }
 
+export interface CVContact {
+  email?: string;
+  phone?: string;
+  linkedin?: string;
+  website?: string;
+  location?: string;
+}
+
 export interface CVConfig {
+  /** Full name, from the LinkedIn profile header. */
+  name?: string;
+  /** LinkedIn headline (the line under your name). */
+  headline?: string;
+  /** Location string, e.g. "Leiria, Portugal". */
+  location?: string;
   summary: string;
-  /** Where to link the PDF, if you prefer a pre-rendered file over print. */
   experience: CVExperience[];
   education: CVEntry[];
   skills: CVSkillGroup[];
+  /** Distinct companies, derived from experience. */
   selectedClients: string[];
   recognition: CVEntry[];
+  /** Parsed contact details (kept for reference; not auto-rendered). */
+  contact?: CVContact;
 }
 
-export const cv: CVConfig = {
-  summary:
-    'Design engineer with 8+ years bridging product design and front-end engineering. I build design systems, ship polished interfaces, and prototype the things that are easier shown than specced. Equally comfortable in Figma and a text editor.',
-  experience: [
-    {
-      role: 'Lead Design Engineer',
-      org: 'Northwind',
-      period: '2022 — Present',
-      location: 'Remote',
-      summary: 'Own the design system and the design–engineering interface.',
-      points: [
-        'Architected the Atlas token system, now powering 40+ product surfaces.',
-        'Built a framework-agnostic component library with scoped styles and automated a11y gates.',
-        'Cut average time-to-ship for new screens by ~30%.',
-      ],
-    },
-    {
-      role: 'Senior Product Designer (Eng-leaning)',
-      org: 'Helio',
-      period: '2019 — 2022',
-      location: 'Lisbon',
-      summary: 'Design + front-end for a consumer banking app.',
-      points: [
-        'Led the redesign around a single "can I spend this?" home screen.',
-        'Defined and prototyped the spring-based motion language.',
-        'Shipped a shared design–dev spec that made prototypes the contract.',
-      ],
-    },
-    {
-      role: 'Front-end Developer',
-      org: 'Studio Meridian',
-      period: '2016 — 2019',
-      location: 'Porto',
-      points: [
-        'Built editorial and commerce sites with a heavy focus on typography and performance.',
-        'Introduced design tokens and a component-driven workflow to the studio.',
-      ],
-    },
-  ],
-  education: [
-    {
-      title: 'BA, Communication Design',
-      org: 'University of the Arts',
-      period: '2012 — 2016',
-      note: 'Thesis on systematic typography for screens.',
-    },
-  ],
-  skills: [
-    {
-      label: 'Design',
-      items: ['Design systems', 'Typography', 'Interaction', 'Motion', 'Prototyping'],
-    },
-    {
-      label: 'Engineering',
-      items: ['HTML / CSS', 'TypeScript', 'Astro', 'Web Components', 'Accessibility'],
-    },
-    {
-      label: 'Tools',
-      items: ['Figma', 'Git', 'Storybook', 'Playwright', 'Vite'],
-    },
-  ],
-  selectedClients: ['Northwind', 'Helio', 'Meridian', 'Halcyon', 'Field Notes'],
-  recognition: [
-    {
-      title: 'Awwwards — Site of the Day',
-      org: 'Field Notes',
-      period: '2024',
-    },
-    {
-      title: 'Speaker',
-      org: 'CSS Café — "Tokens all the way down"',
-      period: '2023',
-    },
-  ],
-};
+export const cv: CVConfig = cvData as CVConfig;

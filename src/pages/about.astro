@@ -3,16 +3,22 @@ import Base from '../layouts/Base.astro';
 import RegMark from '../components/RegMark.astro';
 import { site } from '../site.config';
 import { cv } from '../cv.config';
+
+const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
 ---
 
-<Base title="About / CV" description={`Curriculum vitae of ${site.name}, ${site.role}.`}>
+<Base
+  title="About / CV"
+  description={`Curriculum vitae of ${cv.name ?? site.name}, ${cv.headline ?? site.role}.`}
+>
   <article class="cv container">
     <!-- Masthead -->
     <header class="cv__head" data-reveal>
       <div class="cv__id">
         <p class="label cv__kicker"><RegMark size={12} /> Curriculum Vitae</p>
-        <h1 class="cv__name">{site.name}</h1>
-        <p class="cv__role">{site.role}</p>
+        <h1 class="cv__name">{cv.name ?? site.name}</h1>
+        <p class="cv__role">{cv.headline ?? site.role}</p>
+        {cv.location && <p class="cv__loc mono">{cv.location}</p>}
       </div>
 
       <div class="cv__actions no-print">
@@ -31,9 +37,9 @@ import { cv } from '../cv.config';
       </div>
     </header>
 
-    <p class="cv__summary" data-reveal style="--reveal-delay:80ms;">
-      {cv.summary}
-    </p>
+    <div class="cv__summary" data-reveal style="--reveal-delay:80ms;">
+      {summaryParagraphs.map((para) => <p>{para}</p>)}
+    </div>
 
     <!-- Experience -->
     <section class="cv__section" data-reveal style="--reveal-delay:140ms;">
@@ -110,7 +116,8 @@ import { cv } from '../cv.config';
               <div class="entry__period mono">{r.period}</div>
               <div class="entry__main">
                 <h3 class="entry__role">
-                  {r.title} <span class="entry__org">— {r.org}</span>
+                  {r.title}
+                  {r.org && <span class="entry__org"> — {r.org}</span>}
                 </h3>
               </div>
             </div>
@@ -119,9 +126,9 @@ import { cv } from '../cv.config';
       </div>
     </section>
 
-    <!-- Clients -->
+    <!-- Companies -->
     <section class="cv__section" data-reveal>
-      <h2 class="cv__section-title"><span class="label">05</span> Selected Clients</h2>
+      <h2 class="cv__section-title"><span class="label">05</span> Selected Companies</h2>
       <p class="cv__clients mono">{cv.selectedClients.join('  ·  ')}</p>
     </section>
 
@@ -165,6 +172,11 @@ import { cv } from '../cv.config';
     font-family: var(--font-mono);
     color: var(--ink-2);
     letter-spacing: var(--tracking-mono);
+    max-width: 48ch;
+  }
+  .cv__loc {
+    margin-block-start: var(--space-2xs);
+    color: var(--ink-3);
   }
 
   .cv__actions {
@@ -217,6 +229,9 @@ import { cv } from '../cv.config';
     font-size: var(--step-1);
     max-width: 60ch;
     color: var(--ink);
+  }
+  .cv__summary p + p {
+    margin-block-start: var(--space-s);
   }
 
   .cv__section {

@@ -13,7 +13,19 @@ password-locked projects feature (build-time encryption + client-side decrypt).
 - **Remote:** `github.com/freenandes/portfolio` on branch `main`.
 - **Key paths:** `src/site.config.ts` (global content), `src/styles/tokens.css`
   (design tokens), `src/content/projects/*.mdx` (projects),
-  `src/cv.config.ts` (CV), `scripts/encrypt-projects.mjs` (lock encryption).
+  `src/cv.data.json` (About/CV content, generated from LinkedIn),
+  `src/cv.config.ts` (CV types + JSON loader), `src/pages/about.astro` (CV
+  layout), `scripts/sync-linkedin.mjs` (LinkedIn PDF → CV data),
+  `scripts/encrypt-projects.mjs` (lock encryption).
+
+### LinkedIn sync (About page)
+
+- The About page renders from `src/cv.data.json`, generated from
+  `sources/linkedin-profile.pdf` by `npm run sync:linkedin`. Edit content on
+  LinkedIn (Save to PDF → replace the file → run the script), not by hand —
+  a sync overwrites the JSON.
+- `.github/workflows/sync-linkedin.yml` auto-regenerates and commits
+  `cv.data.json` on push when the PDF changes.
 
 ### Services
 
@@ -36,6 +48,8 @@ and preview mount under that base. Internal links must use `withBase()` from
 - **Preview:** `npm run preview`
 - **Type/diagnostics:** `npx astro check`
 - **Encrypt locked projects:** `npm run encrypt`
+- **Sync About page from LinkedIn:** `npm run sync:linkedin` (parses
+  `sources/linkedin-profile.pdf` → `src/cv.data.json`)
 
 No separate test runner or linter is configured yet.
 

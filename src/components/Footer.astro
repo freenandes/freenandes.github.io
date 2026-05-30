@@ -1,0 +1,104 @@
+---
+import { site } from '../site.config';
+import RegMark from './RegMark.astro';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container grid">
+    <div class="col">
+      <p class="label">Index / Connect</p>
+      <ul role="list" class="links">
+        {
+          site.socials.map((s) => (
+            <li>
+              <a
+                href={s.href}
+                class="link"
+                rel={s.href.startsWith('http') ? 'me noopener' : undefined}
+              >
+                <span>{s.label}</span>
+                <span aria-hidden="true">↗</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="col col--end">
+      <RegMark size={18} />
+      <p class="meta mono">
+        {site.mark} — {site.role}<br />
+        © {year} {site.name}. All rights reserved.
+      </p>
+      <p class="colophon mono">
+        Built with Astro · Space Grotesk &amp; Space Mono
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-block-start: var(--space-3xl);
+    border-block-start: 1px solid var(--line);
+    padding-block: var(--space-xl);
+  }
+
+  .grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xl);
+    justify-content: space-between;
+    align-items: start;
+  }
+
+  .col--end {
+    text-align: right;
+    margin-inline-start: auto;
+  }
+  .col--end .reg-mark {
+    margin-inline-start: auto;
+  }
+
+  .label {
+    margin-block-end: var(--space-s);
+  }
+
+  .links {
+    display: grid;
+    gap: var(--space-2xs);
+  }
+
+  .link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6ch;
+    font-size: var(--step-1);
+    letter-spacing: var(--tracking-tight);
+    transition: color var(--dur-fast) var(--ease);
+  }
+  .link:hover {
+    color: var(--accent-ink);
+  }
+  .link span[aria-hidden] {
+    font-size: 0.7em;
+    color: var(--ink-3);
+    transition: transform var(--dur) var(--ease);
+  }
+  .link:hover span[aria-hidden] {
+    transform: translate(2px, -2px);
+  }
+
+  .meta,
+  .colophon {
+    color: var(--ink-2);
+    line-height: var(--leading-snug);
+  }
+  .colophon {
+    margin-block-start: var(--space-s);
+    color: var(--ink-3);
+  }
+</style>

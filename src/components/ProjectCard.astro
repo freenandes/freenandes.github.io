@@ -1,0 +1,168 @@
+---
+import Cover from './Cover.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  slug: string;
+  index: number;
+  year: number | string;
+  tags?: string[];
+  accent: string;
+  cover?: string;
+  coverAlt?: string;
+  locked?: boolean;
+  role?: string;
+}
+const {
+  title,
+  description,
+  slug,
+  index,
+  year,
+  tags = [],
+  accent,
+  cover,
+  coverAlt,
+  locked = false,
+  role,
+} = Astro.props;
+---
+
+<a
+  class="card"
+  href={`/projects/${slug}/`}
+  data-reveal
+  style={`--reveal-delay:${index * 70}ms;`}
+>
+  <Cover
+    title={title}
+    accent={accent}
+    index={index}
+    cover={cover}
+    coverAlt={coverAlt}
+    locked={locked}
+  />
+
+  <div class="card__body">
+    <div class="card__meta">
+      <span class="mono card__num">{String(index).padStart(2, '0')}</span>
+      <span class="mono card__year">{year}</span>
+      {role && <span class="mono card__role">{role}</span>}
+    </div>
+
+    <h3 class="card__title">
+      {title}
+      <span class="card__arrow" aria-hidden="true">→</span>
+    </h3>
+
+    <p class="card__desc">{description}</p>
+
+    {
+      tags.length > 0 && (
+        <ul role="list" class="card__tags">
+          {tags.slice(0, 4).map((t) => (
+            <li class={`chip chip--${accent}`}>{t}</li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</a>
+
+<style>
+  .card {
+    display: grid;
+    gap: var(--space-s);
+    grid-template-rows: auto 1fr;
+    padding: var(--space-2xs);
+    border-radius: var(--radius-l);
+    border: 1px solid transparent;
+    transition: border-color var(--dur) var(--ease),
+      transform var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+  .card:hover {
+    border-color: var(--line);
+    background: color-mix(in oklab, var(--paper-2) 70%, transparent);
+    transform: translateY(-3px);
+  }
+
+  .card :global(.cover) {
+    transition: box-shadow var(--dur) var(--ease);
+  }
+  .card:hover :global(.cover) {
+    box-shadow: var(--shadow-lift);
+  }
+
+  .card__body {
+    padding-inline: var(--space-2xs);
+    padding-block-end: var(--space-2xs);
+  }
+
+  .card__meta {
+    display: flex;
+    gap: var(--space-s);
+    color: var(--ink-3);
+    margin-block-end: var(--space-3xs);
+  }
+  .card__num {
+    color: var(--ink-2);
+  }
+
+  .card__title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-s);
+    font-size: var(--step-2);
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+  }
+  .card__arrow {
+    color: var(--ink-3);
+    transition: transform var(--dur) var(--ease), color var(--dur) var(--ease);
+  }
+  .card:hover .card__arrow {
+    transform: translate(4px, 0);
+    color: var(--accent-ink);
+  }
+
+  .card__desc {
+    margin-block-start: var(--space-3xs);
+    color: var(--ink-2);
+    max-width: 48ch;
+  }
+
+  .card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs);
+    margin-block-start: var(--space-s);
+  }
+
+  .chip {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: var(--tracking-mono);
+    padding: 0.15rem 0.6rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--line);
+    background: var(--paper-2);
+    color: var(--ink-2);
+  }
+  .chip--lilac {
+    background: color-mix(in oklab, #c9bcff 35%, var(--paper-2));
+  }
+  .chip--mint {
+    background: color-mix(in oklab, #b6ecd2 38%, var(--paper-2));
+  }
+  .chip--peach {
+    background: color-mix(in oklab, #ffd0bb 38%, var(--paper-2));
+  }
+  .chip--sky {
+    background: color-mix(in oklab, #bfe0ff 38%, var(--paper-2));
+  }
+  .chip--butter {
+    background: color-mix(in oklab, #ffe7a3 40%, var(--paper-2));
+  }
+</style>

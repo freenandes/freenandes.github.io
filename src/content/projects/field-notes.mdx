@@ -1,0 +1,33 @@
+---
+title: Field Notes
+description: An interactive essay platform where prose and live diagrams share one column.
+date: 2024-09-01
+order: 2
+accent: mint
+role: Designer & Engineer
+client: Self-initiated
+tags: ['MDX', 'Dataviz', 'Editorial', 'Motion']
+links:
+  - label: Read online
+    href: https://example.com/field-notes
+---
+
+Field Notes is an experiment in *explorable explanations*: long-form writing
+where the diagrams aren't illustrations bolted on afterwards, they're live and
+inline, reacting as you read.
+
+## The idea
+
+Most technical writing forces a context switch — read a paragraph, scroll to a
+figure, lose your place. Field Notes keeps the diagram in the same column as the
+prose and lets a sentence *drive* it. Hover a term, the chart highlights. Scroll,
+the system animates state.
+
+## How it's built
+
+- Authoring in **MDX** so writers stay in prose and drop in components only when
+  a concept needs to move.
+- A tiny reactive store wires text annotations to canvas state.
+- Everything degrades gracefully: with JS off, you get a clean static figure.
+
+The result reads like an essay and behaves like a toy.

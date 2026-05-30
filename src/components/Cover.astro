@@ -1,0 +1,201 @@
+---
+/**
+ * Cover — the visual for a project. Uses a supplied image when present,
+ * otherwise renders a generative "soft-club × TDR" gradient plate with
+ * technical typography. Deterministic per project so it stays stable.
+ */
+import RegMark from './RegMark.astro';
+
+interface Props {
+  title: string;
+  accent: string;
+  index?: number;
+  cover?: string;
+  coverAlt?: string;
+  locked?: boolean;
+  ratio?: string;
+}
+const {
+  title,
+  accent = 'lilac',
+  index = 0,
+  cover,
+  coverAlt = '',
+  locked = false,
+  ratio = '4 / 3',
+} = Astro.props;
+
+const num = String(index).padStart(2, '0');
+---
+
+<div
+  class:list={['cover', `cover--${accent}`]}
+  style={`--ratio:${ratio};`}
+  data-locked={locked ? '' : undefined}
+>
+  {
+    cover ? (
+      <img class="cover__img" src={cover} alt={coverAlt} loading="lazy" decoding="async" />
+    ) : (
+      <div class="cover__gen" aria-hidden="true">
+        <div class="cover__field"></div>
+        <div class="cover__grid"></div>
+        <span class="cover__num mono">{num}</span>
+        <span class="cover__title">{title}</span>
+        <span class="cover__tm mono">™</span>
+        <RegMark size={20} class="cover__mark" />
+      </div>
+    )
+  }
+  {
+    locked && (
+      <span class="cover__lock label" title="Password protected">
+        <svg width="11" height="11" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5Zm3 8H9V6a3 3 0 1 1 6 0Z"
+          />
+        </svg>
+        Locked
+      </span>
+    )
+  }
+</div>
+
+<style>
+  .cover {
+    position: relative;
+    aspect-ratio: var(--ratio);
+    border-radius: var(--radius-m);
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--paper-2);
+    isolation: isolate;
+  }
+
+  .cover__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Generative plate */
+  .cover__gen {
+    position: absolute;
+    inset: 0;
+    color: var(--ink);
+  }
+
+  .cover__field {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        120% 120% at 18% 12%,
+        var(--c1) 0%,
+        transparent 55%
+      ),
+      radial-gradient(110% 110% at 88% 18%, var(--c2) 0%, transparent 50%),
+      radial-gradient(140% 120% at 70% 100%, var(--c3) 0%, transparent 55%),
+      linear-gradient(180deg, var(--paper-2), var(--paper-2));
+    filter: saturate(1.05);
+  }
+
+  .cover__grid {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(
+        to right,
+        color-mix(in oklab, var(--ink) 8%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in oklab, var(--ink) 8%, transparent) 1px,
+        transparent 1px
+      );
+    background-size: 16.6% 25%;
+    mix-blend-mode: multiply;
+    opacity: 0.5;
+  }
+
+  .cover__num {
+    position: absolute;
+    top: var(--space-s);
+    left: var(--space-s);
+    font-weight: 700;
+    font-size: var(--step-1);
+    color: color-mix(in oklab, var(--ink) 70%, transparent);
+  }
+
+  .cover__title {
+    position: absolute;
+    left: var(--space-s);
+    right: var(--space-s);
+    bottom: var(--space-s);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(1.1rem, 0.6rem + 2.4vw, 2.1rem);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  .cover__tm {
+    position: absolute;
+    top: var(--space-s);
+    right: var(--space-s);
+    font-weight: 700;
+    color: color-mix(in oklab, var(--ink) 55%, transparent);
+  }
+
+  .cover__mark {
+    position: absolute !important;
+    right: var(--space-s);
+    bottom: var(--space-s);
+    color: color-mix(in oklab, var(--ink) 50%, transparent) !important;
+  }
+
+  .cover__lock {
+    position: absolute;
+    top: var(--space-s);
+    right: var(--space-s);
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4ch;
+    background: color-mix(in oklab, var(--ink) 88%, transparent);
+    color: var(--paper);
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--radius-pill);
+    backdrop-filter: blur(4px);
+  }
+
+  /* Accent palettes feed the generative field. */
+  .cover--lilac {
+    --c1: #c9bcff;
+    --c2: #ffd6e6;
+    --c3: #bfe0ff;
+  }
+  .cover--mint {
+    --c1: #b6ecd2;
+    --c2: #e8f6c9;
+    --c3: #bfeae0;
+  }
+  .cover--peach {
+    --c1: #ffd0bb;
+    --c2: #ffe3a8;
+    --c3: #ffc6d6;
+  }
+  .cover--sky {
+    --c1: #bfe0ff;
+    --c2: #cdedff;
+    --c3: #d8d4ff;
+  }
+  .cover--butter {
+    --c1: #ffe7a3;
+    --c2: #fff0c4;
+    --c3: #ffd8b0;
+  }
+</style>

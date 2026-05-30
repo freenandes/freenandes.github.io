@@ -1,0 +1,166 @@
+---
+import Base from '../layouts/Base.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import RegMark from '../components/RegMark.astro';
+import { site } from '../site.config';
+import { getProjects, projectYear } from '../lib/projects';
+
+const projects = await getProjects();
+const count = String(projects.length).padStart(2, '0');
+---
+
+<Base>
+  <!-- ============================== HERO ============================== -->
+  <section class="hero container">
+    <p class="hero__status label" data-reveal>
+      <RegMark size={12} />
+      Available for select work · Lisbon / Remote
+    </p>
+
+    <h1 class="hero__headline" data-reveal style="--reveal-delay:80ms;">
+      I design <em>and</em> build interfaces where
+      <span class="hero__hl">form follows function</span> — with a little flair.
+    </h1>
+
+    <div class="hero__lede prose" data-reveal style="--reveal-delay:160ms;">
+      <p>
+        I'm {site.name}, a {site.role.toLowerCase()} living between design and
+        code. I care about typographic detail, honest markup, motion that means
+        something, and systems that make the next thing faster to build. This
+        is a living document — edit it freely.
+      </p>
+    </div>
+
+    <p class="hero__actions" data-reveal style="--reveal-delay:240ms;">
+      <a class="btn" href="/about">Read the CV →</a>
+      <a class="btn btn--ghost" href={site.socials[0].href}>Get in touch</a>
+    </p>
+  </section>
+
+  <!-- ============================ SELECTED WORK ====================== -->
+  <section class="work container" aria-labelledby="work-h">
+    <header class="work__head">
+      <h2 id="work-h" class="work__title">Selected Work</h2>
+      <p class="label work__count">[ {count} projects · {new Date().getFullYear()} ]</p>
+    </header>
+
+    <div class="work__grid">
+      {
+        projects.map((p, i) => (
+          <ProjectCard
+            title={p.data.title}
+            description={p.data.description}
+            slug={p.id}
+            index={i + 1}
+            year={projectYear(p)}
+            tags={p.data.tags}
+            accent={p.data.accent}
+            cover={p.data.cover}
+            coverAlt={p.data.coverAlt}
+            locked={p.data.locked}
+            role={p.data.role}
+          />
+        ))
+      }
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding-block: clamp(var(--space-2xl), 12vh, var(--space-3xl)) var(--space-2xl);
+  }
+
+  .hero__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6ch;
+    color: var(--ink-2);
+  }
+
+  .hero__headline {
+    margin-block-start: var(--space-m);
+    font-size: var(--step-5);
+    max-width: 18ch;
+    line-height: 1.02;
+  }
+  .hero__headline em {
+    font-style: italic;
+    font-weight: 400;
+  }
+  .hero__hl {
+    background: linear-gradient(
+      180deg,
+      transparent 62%,
+      color-mix(in oklab, var(--lilac) 70%, transparent) 62%
+    );
+    padding-inline: 0.05em;
+  }
+
+  .hero__lede {
+    margin-block-start: var(--space-l);
+    font-size: var(--step-1);
+    color: var(--ink-2);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+    margin-block-start: var(--space-l);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5ch;
+    border-radius: var(--radius-pill);
+    padding: 0.7rem 1.3rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: var(--tracking-mono);
+    transition: transform var(--dur-fast) var(--ease),
+      background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+  }
+  .btn:hover {
+    transform: translateY(-1px);
+    background: var(--accent-ink);
+    border-color: var(--accent-ink);
+  }
+  .btn--ghost {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--line-strong);
+  }
+  .btn--ghost:hover {
+    background: var(--paper-2);
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .work {
+    padding-block-start: var(--space-l);
+  }
+  .work__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-m);
+    padding-block-end: var(--space-m);
+    border-block-end: 1px solid var(--line);
+    margin-block-end: var(--space-xl);
+  }
+  .work__count {
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+
+  .work__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+    gap: clamp(var(--space-m), 4vw, var(--space-xl));
+  }
+</style>

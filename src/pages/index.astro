@@ -3,11 +3,17 @@ import Base from '../layouts/Base.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import RegMark from '../components/RegMark.astro';
 import { site } from '../site.config';
+import { cv } from '../cv.config';
 import { getProjects, projectYear } from '../lib/projects';
 import { withBase } from '../lib/base';
 
 const projects = await getProjects();
 const count = String(projects.length).padStart(2, '0');
+
+// Lede mirrors the LinkedIn summary (first paragraph) so the home page stays
+// in sync with the About/CV page. Falls back to the site description.
+const lede = cv.summary.split(/\n{2,}/)[0]?.trim() || site.description;
+const homeLocation = cv.contact?.location || cv.location || 'Leiria, Portugal';
 ---
 
 <Base>
@@ -15,21 +21,16 @@ const count = String(projects.length).padStart(2, '0');
   <section class="hero container">
     <p class="hero__status label" data-reveal>
       <RegMark size={12} />
-      Available for select work · Lisbon / Remote
+      {site.role} · {homeLocation}
     </p>
 
     <h1 class="hero__headline" data-reveal style="--reveal-delay:80ms;">
-      I design <em>and</em> build interfaces where
-      <span class="hero__hl">form follows function</span> — with a little flair.
+      I design <em>and</em> build — fixing the
+      <span class="hero__hl">system</span>, not just the screen.
     </h1>
 
     <div class="hero__lede prose" data-reveal style="--reveal-delay:160ms;">
-      <p>
-        I'm {site.name}, a {site.role.toLowerCase()} living between design and
-        code. I care about typographic detail, honest markup, motion that means
-        something, and systems that make the next thing faster to build. This
-        is a living document — edit it freely.
-      </p>
+      <p>{lede}</p>
     </div>
 
     <p class="hero__actions" data-reveal style="--reveal-delay:240ms;">

@@ -10,9 +10,6 @@ import { withBase } from '../lib/base';
 const projects = await getProjects();
 const count = String(projects.length).padStart(2, '0');
 
-// Lede mirrors the LinkedIn summary (first paragraph) so the home page stays
-// in sync with the About/CV page. Falls back to the site description.
-const lede = cv.summary.split(/\n{2,}/)[0]?.trim() || site.description;
 const homeLocation = cv.contact?.location || cv.location || 'Leiria, Portugal';
 ---
 
@@ -23,19 +20,15 @@ const homeLocation = cv.contact?.location || cv.location || 'Leiria, Portugal';
       <RegMark size={12} />
       {site.role} · {homeLocation}
     </p>
-
     <h1 class="hero__headline" data-reveal style="--reveal-delay:80ms;">
-      I design <em>and</em> build — fixing the
-      <span class="hero__hl">system</span>, not just the screen.
+      I design and build systems, not just screens
     </h1>
-
-    <div class="hero__lede prose" data-reveal style="--reveal-delay:160ms;">
-      <p>{lede}</p>
-    </div>
-
+    <p class="hero__lede prose" data-reveal style="--reveal-delay:160ms;">
+      Products stop growing for a reason. I find it in the system, work where strategy meets execution, and ship the code that gets them moving again.
+    </p>
     <p class="hero__actions" data-reveal style="--reveal-delay:240ms;">
-      <a class="btn" href={withBase('/about')}>Read the CV →</a>
-      <a class="btn btn--ghost" href={site.socials[0].href}>Get in touch</a>
+      <a class="btn" href={site.socials[0].href}>Get in touch</a>
+      <a class="btn btn--ghost" href={withBase('/about')}>More at About page</a>
     </p>
   </section>
 

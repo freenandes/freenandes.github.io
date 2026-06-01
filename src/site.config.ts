@@ -33,20 +33,20 @@ export interface SiteConfig {
 }
 
 export const site: SiteConfig = {
-  name: 'Fernando Nandes',
-  role: 'Design Engineer',
-  mark: 'FN™',
+  name: 'Pedro MC Fernandes',
+  role: 'Senior Product Designer',
+  mark: 'PF™',
   description:
-    'Design engineer working at the seam of form and function — interfaces, systems and the occasional pixel-perfect obsession.',
+    'Systems-thinking product designer turning stagnating products into growth engines — fixing ecosystems, not just interfaces, and shipping the code to prove it.',
   nav: [
     { label: 'Work', href: '/' },
     { label: 'About', href: '/about' },
   ],
   socials: [
-    { label: 'Email', href: 'mailto:hello@example.com' },
+    { label: 'Email', href: 'mailto:redacted@example.invalid' },
+    { label: 'Website', href: 'https://pmcf.xyz' },
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/pmcfernandes' },
     { label: 'GitHub', href: 'https://github.com/freenandes' },
-    { label: 'LinkedIn', href: 'https://linkedin.com/in/example' },
-    { label: 'Bluesky', href: 'https://bsky.app/profile/example' },
   ],
   ogImage: '/og.png',
 };

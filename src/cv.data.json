@@ -1,0 +1,211 @@
+{
+  "name": "Pedro MC Fernandes",
+  "headline": "Experienced Product Designer | Systems Thinker | Enterprise 0→1 Strategy & Code-Shipping | 18+ Years Building & Scaling",
+  "location": "Leiria, Leiria, Portugal",
+  "summary": "I'm a systems-thinking product designer who transforms stagnating products into growth engines by fixing ecosystems, not just interfaces.\n\nI operate at the intersection of strategy and execution, defining a vision that influences executive roadmaps while shipping production code that helps scale teams and operations. My specialty is diagnosing why products underperform, then building the frameworks and systems that unlock their potential.\n\nAt Percona, I helped upkeep and then amplify product adoption growth by identifying the underlying problems, beyond UI cosmetics, and systematizing core, scalable fixes that slowly start to scaffold. At Farfetch, I shifted sustainability from being costly to being a business opportunity by revealing how shopping discovery barriers created vicious cycles.\n\nI thrive in ambiguous 0→1 spaces where I can own strategy as well as delivery, building design systems that become force multipliers for teams.",
+  "experience": [
+    {
+      "role": "Senior Product Designer",
+      "org": "Percona",
+      "period": "August 2022 — Present",
+      "location": "Leiria, Portugal",
+      "points": [
+        "Contributed to the team effort of 45% PMM adoption growth through systematic UX improvements across product ecosystem",
+        "Identified critical adoption barriers through user pathway analysis, shifting strategy from UI updates to ecosystem-wide improvements",
+        "Delivered validated SaaS prototype in 2-week sprint securing executive investment",
+        "Influenced executive strategy with compelling vision prototypes and extensive user research, securing buy-in for roadmap initiatives",
+        "Built Peak Design System adopted across 3 products and 10+ engineers, reducing handoff and front-end development by ~50%",
+        "Achieved near 100% implementation accuracy through self-serve components and developer tooling",
+        "Established analytics framework (PostHog) enabling data-driven decisions across documentation and products",
+        "Shipped production code for internal services platform, eliminating handoff friction",
+        "Led documentation redesign across 10+ products, establishing patterns for consistent onboarding",
+        "Initiated New Native Navigation project to reduce Grafana dependency, unblocking strategies against technical debt",
+        "Mentored designers and engineers, establishing research practices, design excellence standards, and a modernized front-end practice"
+      ]
+    },
+    {
+      "role": "Senior Product Designer",
+      "org": "FARFETCH",
+      "period": "June 2021 — July 2022",
+      "location": "Lisbon, Portugal",
+      "points": [
+        "Led sustainability research revealing discovery barriers and supporting corporate sustainability goals",
+        "Created taxonomy frameworks addressing catalog confusion while informing sustainability roadmap",
+        "Enabled direct purchasing capability from listing pages through card redesign, removing unnecessary navigation steps",
+        "Developed testing protocols and comparison matrices adopted by multiple teams",
+        "Built modular component patterns balancing luxury aesthetics with functional requirements",
+        "Established documentation bridging design and catalog teams, reducing cross-team friction",
+        "Research showed path and margin to grow conscious products improved discovery",
+        "Shifted organizational narrative from “sustainability as cost center” to “sustainability as growth opportunity”",
+        "Earned leadership recognition for cross-department alignment on sustainable product strategy"
+      ]
+    },
+    {
+      "role": "Senior Product Designer",
+      "org": "TUI",
+      "period": "March 2019 — May 2021",
+      "location": "Lisbon, Portugal",
+      "points": [
+        "Designed PageBuilder system generating 100K+ destination pages, supporting 4x organic traffic growth and reducing metasearch business dependence",
+        "Influenced product strategy and roadmaps through data-driven vision prototypes earning executive recognition",
+        "Co-founded TUI Lisbon hub, scaling the team while establishing innovation practices",
+        "Created Tagus design system unifying experiences across 5 global markets",
+        "Helped build a templating framework accelerating multi-market deployment",
+        "Designed complete e-commerce flows from inspiration through checkout, standardized across markets",
+        "Partnered with distributed teams across European offices sharing rapid deployment methodologies",
+        "Validated team approaches through A/B testing and Baymard benchmarking before scaling",
+        "Managed external development partnerships ensuring high implementation quality"
+      ]
+    },
+    {
+      "role": "Founder and Manager",
+      "org": "Noise Goods",
+      "period": "June 2013 — August 2019",
+      "location": "Leiria, Portugal",
+      "points": [
+        "Scaled accessories brand to 50+ countries through e-commerce and wholesale channels",
+        "Managed complete product lifecycle from concept through manufacturing with Portuguese suppliers",
+        "Secured international stockists and editorial features through strategic brand positioning",
+        "Built custom e-commerce platform through front-end skills",
+        "Optimized for international SEO and conversion through analytics-driven iteration",
+        "Created sustainable supply chain balancing growth with environmental responsibility"
+      ]
+    },
+    {
+      "role": "User Experience Designer",
+      "org": "SMARTIDIOM",
+      "period": "May 2016 — March 2019",
+      "location": "Leiria, Portugal",
+      "points": [
+        "Designed and coded 4 interconnected products and showcased at CES 2017",
+        "Secured European Community funding through compelling product demonstration and market validation",
+        "Helped transform a traditional direct-servicing company into digital platform connecting customers with certified professionals",
+        "Delivered production front-end code in a lean 4-person team format",
+        "Built component system from scratch enabling ~50-75% faster feature development",
+        "Created platform micro-tools: calendar, finance tracking, bidding systems, ISO-compliant onboarding"
+      ]
+    },
+    {
+      "role": "Product Designer",
+      "org": "Stricker",
+      "period": "June 2010 — October 2013",
+      "location": "Aveiro, Portugal",
+      "points": [
+        "Designed 50+ B2B products using systematic approach to customization and categorization",
+        "Established modular design systems enabling mass customization within the manufacturing constraints",
+        "Conducted competitive analysis at international trade shows informing product strategy",
+        "Conducted field research at international trade shows, analyzing competitor offerings",
+        "Developed user testing protocols reducing overseas production iterations by 25-50%",
+        "Presented to C-level stakeholders securing buy-in for innovative product lines",
+        "Established digital catalog foundations through information architecture work"
+      ]
+    },
+    {
+      "role": "Illustrator and Graphic Designer",
+      "org": "Self-employed",
+      "period": "September 2009 — June 2011",
+      "location": "Lisbon, Portugal",
+      "points": [
+        "Published illustrations in leading Portuguese editorial publications",
+        "Self-taught web technologies (HTML, CSS, JavaScript) bridging design and development",
+        "Contributed to open-source communities while building technical foundation",
+        "Produced marketing collaterals translating brand messages into compelling visual designs",
+        "Designed brand identities with comprehensive guidelines for visual consistency"
+      ]
+    },
+    {
+      "role": "Industrial Designer",
+      "org": "COMOPI Kitchen Design",
+      "period": "September 2007 — September 2009",
+      "location": "Coimbra, Portugal",
+      "points": [
+        "Designed modular furniture system enabling 3x faster production",
+        "Benchmarked against industry leaders (Boffi, Bulthaup, Poggenpohl) elevating design quality",
+        "Customized CAD software reducing design-to-production time by ~50-70%",
+        "Pioneered digital pipeline connecting customer requirements directly to manufacturing parameters",
+        "Led 15+ interior design projects translating lifestyle needs into functional kitchen solutions"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "title": "Master’s Degree, Industrial and Product Design",
+      "org": "Escola Universitária das Artes de Coimbra",
+      "period": "2002 — 2007"
+    },
+    {
+      "title": "Multimedia Design",
+      "org": "Instituto Politécnico de Coimbra - Escola Superior de Educação",
+      "period": "2001 — 2002"
+    },
+    {
+      "title": "High School, Tridimensional Design",
+      "org": "Escola Secundária José Falcão",
+      "period": "1998 — 2001"
+    }
+  ],
+  "skills": [
+    {
+      "label": "Top Skills",
+      "items": [
+        "Product Design",
+        "Design Systems",
+        "Product Strategy"
+      ]
+    },
+    {
+      "label": "Languages",
+      "items": [
+        "Portuguese (Native or Bilingual)",
+        "French (Elementary)",
+        "Spanish (Elementary)",
+        "English (Full Professional)"
+      ]
+    },
+    {
+      "label": "Certifications",
+      "items": [
+        "Object-Oriented UX Fundamentals",
+        "Cultivating Creative Collaboration",
+        "AI x Design Thinking"
+      ]
+    }
+  ],
+  "selectedClients": [
+    "Percona",
+    "FARFETCH",
+    "TUI",
+    "Noise Goods",
+    "SMARTIDIOM",
+    "Stricker",
+    "COMOPI Kitchen Design"
+  ],
+  "recognition": [
+    {
+      "title": "\"Break the Spell\" Exhibition"
+    },
+    {
+      "title": "\"Break the Spell\" Design Prize"
+    },
+    {
+      "title": "\"Boeing 345\" Exhibition"
+    },
+    {
+      "title": "\"Show Windows\" Design Prize"
+    },
+    {
+      "title": "\"Martini Glasses\" Design Prize"
+    }
+  ],
+  "contact": {
+    "location": "Leiria, Portugal",
+    "phone": "+000000000000",
+    "email": "redacted@example.invalid",
+    "linkedin": "https://www.linkedin.com/in/pmcfernandes",
+    "website": "https://pmcf.xyz"
+  },
+  "_meta": {
+    "source": "linkedin-pdf",
+    "generatedBy": "scripts/sync-linkedin.mjs"
+  }
+}

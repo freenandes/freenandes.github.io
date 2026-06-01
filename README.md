@@ -36,8 +36,62 @@ npm run preview    # preview the production build
 | Base styles / utilities | `src/styles/global.css` |
 | Projects (content) | `src/content/projects/*.mdx` |
 | Project schema | `src/content.config.ts` |
-| CV / résumé content | `src/cv.config.ts` |
+| CV / résumé content | `src/cv.data.json` (generated — see below) |
+| CV types / page layout | `src/cv.config.ts`, `src/pages/about.astro` |
 | Layout & components | `src/layouts/`, `src/components/` |
+
+## Syncing the About page from LinkedIn
+
+The **About / CV** page renders from `src/cv.data.json`, which is generated from
+your LinkedIn profile — so keeping it current is mostly a copy-paste:
+
+1. On LinkedIn, open your profile → **Resources** (or the **More** button) →
+   **Save to PDF**.
+2. Replace `sources/linkedin-profile.pdf` with the new export.
+3. Regenerate the data:
+
+   ```bash
+   npm run sync:linkedin
+   ```
+
+   This reads the PDF and writes `src/cv.data.json`. Commit both files.
+
+That's it — the next build picks up the new content.
+
+### Fully hands-off (GitHub Action)
+
+`.github/workflows/sync-linkedin.yml` does steps 3 for you: when you push a new
+`sources/linkedin-profile.pdf` to `main`, it runs the sync, commits the
+regenerated `src/cv.data.json`, and that commit triggers the normal Pages
+deploy. So the entire workflow becomes: **Save to PDF → replace the file →
+commit**. You can even do the replace-and-commit from the GitHub web UI, no
+local checkout needed.
+
+### How the sync works
+
+`scripts/sync-linkedin.mjs` parses LinkedIn's two-column PDF with `pdf.js`
+(via `unpdf`), using each text fragment's position to rebuild the visual lines
+per column. It maps:
+
+| LinkedIn | About page |
+| --- | --- |
+| Name + headline + location | CV masthead |
+| Summary | Intro paragraphs |
+| Experience (role, company, dates, bullets) | `01 Experience` |
+| Top Skills · Languages · Certifications | `02 Capabilities` |
+| Education | `03 Education` |
+| Honors-Awards | `04 Recognition` |
+| Companies from your experience | `05 Selected Companies` |
+
+Wrapped bullet lines are re-joined and LinkedIn's bold thematic sub-headings
+(e.g. "Impact & Strategy") are dropped, so the page shows a clean, flat list.
+Edit your content on LinkedIn — a sync overwrites `src/cv.data.json`. Tweak the
+*layout* in `src/pages/about.astro` and the *types* in `src/cv.config.ts`.
+
+> The parser targets LinkedIn's standard **"Save to PDF"** export. Other PDF
+> résumé layouts won't parse. The script also captures your contact block into
+> `cv.data.json` for reference, but it never rewrites your global name/socials
+> in `src/site.config.ts` — change those by hand if you want.
 
 ## Adding a project
 

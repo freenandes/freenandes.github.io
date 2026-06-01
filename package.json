@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
+    "sync:linkedin": "node scripts/sync-linkedin.mjs",
     "encrypt": "node scripts/encrypt-projects.mjs",
     "check": "astro check",
     "prebuild": "node scripts/encrypt-projects.mjs",
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "unpdf": "^1.6.2"
   }
 }

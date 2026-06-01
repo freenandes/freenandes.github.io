@@ -18,7 +18,6 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
         <p class="label cv__kicker"><RegMark size={12} /> Curriculum Vitae</p>
         <h1 class="cv__name">{cv.name ?? site.name}</h1>
         <p class="cv__role">{cv.headline ?? site.role}</p>
-        {cv.location && <p class="cv__loc mono">{cv.location}</p>}
       </div>
 
       <div class="cv__actions no-print">
@@ -67,69 +66,23 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
       </div>
     </section>
 
-    <!-- Skills + Education in a two-column band -->
-    <div class="cv__cols">
-      <section class="cv__section" data-reveal>
-        <h2 class="cv__section-title"><span class="label">02</span> Capabilities</h2>
-        <div class="skills">
-          {
-            cv.skills.map((group) => (
-              <div class="skills__group">
-                <p class="label">{group.label}</p>
-                <ul role="list" class="skills__items">
-                  {group.items.map((item) => (
-                    <li class="chip">{item}</li>
-                  ))}
-                </ul>
-              </div>
-            ))
-          }
-        </div>
-      </section>
-
-      <section class="cv__section" data-reveal>
-        <h2 class="cv__section-title"><span class="label">03</span> Education</h2>
-        <div class="cv__list">
-          {
-            cv.education.map((e) => (
-              <div class="entry">
-                <div class="entry__period mono">{e.period}</div>
-                <div class="entry__main">
-                  <h3 class="entry__role">{e.title}</h3>
-                  <p class="entry__org-line">{e.org}</p>
-                  {e.note && <p class="entry__summary">{e.note}</p>}
-                </div>
-              </div>
-            ))
-          }
-        </div>
-      </section>
-    </div>
-
-    <!-- Recognition -->
+    <!-- Education -->
     <section class="cv__section" data-reveal>
-      <h2 class="cv__section-title"><span class="label">04</span> Recognition</h2>
+      <h2 class="cv__section-title"><span class="label">02</span> Education</h2>
       <div class="cv__list">
         {
-          cv.recognition.map((r) => (
+          cv.education.map((e) => (
             <div class="entry">
-              <div class="entry__period mono">{r.period}</div>
+              <div class="entry__period mono">{e.period}</div>
               <div class="entry__main">
-                <h3 class="entry__role">
-                  {r.title}
-                  {r.org && <span class="entry__org"> — {r.org}</span>}
-                </h3>
+                <h3 class="entry__role">{e.title}</h3>
+                <p class="entry__org-line">{e.org}</p>
+                {e.note && <p class="entry__summary">{e.note}</p>}
               </div>
             </div>
           ))
         }
       </div>
-    </section>
-
-    <!-- Companies -->
-    <section class="cv__section" data-reveal>
-      <h2 class="cv__section-title"><span class="label">05</span> Selected Companies</h2>
-      <p class="cv__clients mono">{cv.selectedClients.join('  ·  ')}</p>
     </section>
 
     <p class="cv__foot mono no-print">
@@ -173,10 +126,6 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
     color: var(--ink-2);
     letter-spacing: var(--tracking-mono);
     max-width: 48ch;
-  }
-  .cv__loc {
-    margin-block-start: var(--space-2xs);
-    color: var(--ink-3);
   }
 
   .cv__actions {
@@ -301,42 +250,6 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
     color: var(--accent);
   }
 
-  .cv__cols {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-xl);
-  }
-  @media (max-width: 720px) {
-    .cv__cols {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .skills {
-    display: grid;
-    gap: var(--space-m);
-  }
-  .skills__items {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3xs);
-    margin-block-start: var(--space-2xs);
-  }
-  .chip {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    padding: 0.15rem 0.6rem;
-    border-radius: var(--radius-pill);
-    border: 1px solid var(--line);
-    background: var(--paper-2);
-    color: var(--ink-2);
-  }
-
-  .cv__clients {
-    font-size: var(--step-1);
-    color: var(--ink);
-  }
-
   .cv__foot {
     margin-block-start: var(--space-2xl);
     color: var(--ink-3);
@@ -365,14 +278,8 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
     .cv__summary {
       font-size: 11pt;
     }
-    .cv__clients {
-      font-size: 11pt;
-    }
     .no-print {
       display: none !important;
-    }
-    .chip {
-      border-color: #ccc;
     }
   }
 </style>

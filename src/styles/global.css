@@ -1,27 +1,11 @@
-/* =========================================================================
-   GLOBAL STYLES
-   A tiny, opinionated reset + base typography + a few layout primitives.
-   Everything is plain CSS reading from tokens.css. No framework opinions.
-   ========================================================================= */
-
 @import './tokens.css';
 
-/* Fonts (self-hosted via @fontsource, bundled at build) */
-@import '@fontsource-variable/space-grotesk';
-@import '@fontsource/space-mono/400.css';
-@import '@fontsource/space-mono/700.css';
-
-/* ---- Reset ------------------------------------------------------------- */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-}
-
-* {
   margin: 0;
 }
-
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
@@ -49,10 +33,7 @@ body {
   font-size: var(--step-0);
   line-height: var(--leading-normal);
   font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
 }
-
 img,
 picture,
 svg,
@@ -61,7 +42,6 @@ video {
   max-width: 100%;
   height: auto;
 }
-
 input,
 button,
 textarea,
@@ -69,34 +49,29 @@ select {
   font: inherit;
   color: inherit;
 }
-
 button {
   cursor: pointer;
 }
-
 a {
   color: inherit;
   text-decoration: none;
 }
-
 ul[role='list'],
 ol[role='list'] {
   list-style: none;
   padding: 0;
 }
-
 :focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-  border-radius: 2px;
+  outline: 2px dashed var(--accent);
+  outline-offset: 2px;
+  border-radius: 0.1875rem;
 }
-
 ::selection {
-  background: color-mix(in oklab, var(--lilac) 60%, transparent);
   color: var(--ink);
 }
 
-/* ---- Headings ---------------------------------------------------------- */
+/* Headings */
+
 h1,
 h2,
 h3,
@@ -106,109 +81,98 @@ h4 {
   letter-spacing: var(--tracking-tight);
   text-wrap: balance;
 }
-
 h1 {
-  font-size: var(--step-4);
+  font-size: var(--step-5);
 }
 h2 {
-  font-size: var(--step-3);
+  font-size: var(--step-4);
 }
 h3 {
+  font-size: var(--step-3);
+}
+h4 {
   font-size: var(--step-2);
 }
-
 p {
   text-wrap: pretty;
 }
 
-/* ---- Layout primitives ------------------------------------------------- */
+/* Layout primitives */
+
 .container {
   width: 100%;
   max-width: var(--content-max);
   margin-inline: auto;
   padding-inline: var(--gutter);
 }
-
 .prose {
   max-width: var(--measure);
 }
-
 .prose > * + * {
-  margin-block-start: 1.1em;
+  margin-block-start: var(--step-0);
 }
-
 .prose h2 {
-  margin-block-start: 1.8em;
+  margin-block-start: var(--step-3);
+  font-size: var(--step-3);
+}
+.prose h3 {
+  margin-block-start: var(--step-2);
   font-size: var(--step-2);
 }
-
-.prose h3 {
-  margin-block-start: 1.6em;
-  font-size: var(--step-1);
-}
-
 .prose a {
   color: var(--accent-ink);
   text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
-  text-decoration-color: color-mix(in oklab, var(--accent) 50%, transparent);
+  text-underline-offset: 0.125em;
+  text-decoration-thickness: 0.125em;
+  text-decoration-color: var(--accent-ink);
 }
-
 .prose a:hover {
+  color: var(--accent);
   text-decoration-color: var(--accent);
 }
-
 .prose code {
   font-family: var(--font-mono);
-  font-size: 0.9em;
-  background: color-mix(in oklab, var(--ink) 6%, transparent);
-  padding: 0.1em 0.4em;
-  border-radius: var(--radius-s);
+  font-size: var(--step-0);
+  background: var(--line);
+  padding: 0.25em;
+  border-radius: var(--radius-sm);
 }
-
 .prose pre {
   font-family: var(--font-mono);
-  background: var(--paper-2);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-m);
-  padding: var(--space-s);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  padding: 1rem;
   overflow-x: auto;
 }
-
 .prose pre code {
   background: none;
   padding: 0;
 }
-
 .prose blockquote {
   border-inline-start: 2px solid var(--accent);
-  padding-inline-start: var(--space-s);
+  padding-inline-start: var(--space-sm);
   color: var(--ink-2);
   font-style: italic;
 }
-
 .prose img {
-  border-radius: var(--radius-m);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--line);
 }
-
 .prose ul,
 .prose ol {
-  padding-inline-start: 1.2em;
+  padding-inline-start: 1.25em;
 }
-
 .prose li + li {
-  margin-block-start: 0.4em;
+  margin-block-start: 0.5em;
 }
 
-/* ---- Mono label (the TDR "technical caption") -------------------------- */
+/* Mono label */
+
 .mono {
   font-family: var(--font-mono);
   font-size: var(--step--1);
   letter-spacing: var(--tracking-mono);
 }
-
 .label {
   font-family: var(--font-mono);
   font-size: var(--step--1);
@@ -217,7 +181,8 @@ p {
   color: var(--ink-2);
 }
 
-/* ---- Accessibility ----------------------------------------------------- */
+/* Accessibility */
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -229,41 +194,37 @@ p {
   white-space: nowrap;
   border: 0;
 }
-
 .skip-link {
   position: absolute;
-  left: var(--space-s);
+  left: var(--space-sm);
   top: -100%;
   z-index: var(--z-overlay);
   background: var(--ink);
   color: var(--paper);
-  padding: var(--space-2xs) var(--space-s);
-  border-radius: var(--radius-s);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
   transition: top var(--dur) var(--ease);
 }
-
 .skip-link:focus {
-  top: var(--space-s);
+  top: var(--space-sm);
 }
 
-/* ---- Reveal-on-load motion (progressive enhancement) ------------------- */
+/* Reveal-on-load motion (progressive enhancement) */
+
 [data-reveal] {
   opacity: 0;
-  transform: translateY(14px);
+  transform: translateY(16px);
 }
-
 .is-ready [data-reveal] {
   animation: reveal var(--dur-slow) var(--ease) forwards;
   animation-delay: var(--reveal-delay, 0ms);
 }
-
 @keyframes reveal {
   to {
     opacity: 1;
     transform: none;
   }
 }
-
 @media (prefers-reduced-motion: reduce) {
   [data-reveal] {
     opacity: 1;

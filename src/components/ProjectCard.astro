@@ -74,10 +74,10 @@ const {
 <style>
   .card {
     display: grid;
-    gap: var(--space-s);
+    gap: var(--space-sm);
     grid-template-rows: auto 1fr;
-    padding: var(--space-2xs);
-    border-radius: var(--radius-l);
+    padding: var(--space-xs);
+    border-radius: var(--radius-lg);
     border: 1px solid transparent;
     transition: border-color var(--dur) var(--ease),
       transform var(--dur) var(--ease), background var(--dur) var(--ease);
@@ -96,15 +96,15 @@ const {
   }
 
   .card__body {
-    padding-inline: var(--space-2xs);
-    padding-block-end: var(--space-2xs);
+    padding-inline: var(--space-xs);
+    padding-block-end: var(--space-xs);
   }
 
   .card__meta {
     display: flex;
-    gap: var(--space-s);
+    gap: var(--space-sm);
     color: var(--ink-3);
-    margin-block-end: var(--space-3xs);
+    margin-block-end: var(--space-xs);
   }
   .card__num {
     color: var(--ink-2);
@@ -114,7 +114,7 @@ const {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    gap: var(--space-s);
+    gap: var(--space-sm);
     font-size: var(--step-2);
     font-weight: 600;
     letter-spacing: var(--tracking-tight);
@@ -129,7 +129,7 @@ const {
   }
 
   .card__desc {
-    margin-block-start: var(--space-3xs);
+    margin-block-start: var(--space-xs);
     color: var(--ink-2);
     max-width: 48ch;
   }
@@ -137,8 +137,8 @@ const {
   .card__tags {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-3xs);
-    margin-block-start: var(--space-s);
+    gap: var(--space-xs);
+    margin-block-start: var(--space-sm);
   }
 
   .chip {

@@ -543,7 +543,7 @@ import { withBase } from '../lib/base';
         const dx = e.b.x - e.a.x;
         const dy = e.b.y - e.a.y;
         const d = Math.hypot(dx, dy) || 1;
-        const f = (d - e.rest) * 0.02;
+        const f = (d - e.rest) * 0.026;
         const ux = (dx / d) * f;
         const uy = (dy / d) * f;
         e.a.fx += ux;
@@ -560,25 +560,30 @@ import { withBase } from '../lib/base';
           n.vy *= 0.6;
           continue;
         }
+        // Idle "breathing": a slow two-frequency wander so the molecule
+        // visibly floats even when untouched.
         let tx = n.ax;
         let ty = n.ay;
-        tx += Math.cos(time * 0.6 + n.phase) * 7;
-        ty += Math.sin(time * 0.5 + n.phase * 1.3) * 7;
-        n.fx += (tx - n.x) * 0.02;
-        n.fy += (ty - n.y) * 0.02;
+        tx += Math.cos(time * 0.65 + n.phase) * 24 + Math.sin(time * 0.28 + n.phase) * 11;
+        ty += Math.sin(time * 0.57 + n.phase * 1.3) * 24 + Math.cos(time * 0.22 + n.phase) * 11;
+        // Pointer repulsion as a *bounded target offset* (not an accumulating
+        // force), so a node nudges aside near the cursor but never outruns it —
+        // you can always catch it to hover.
         if (pointer.active) {
           const dx = n.x - pointer.x;
           const dy = n.y - pointer.y;
           const d = Math.hypot(dx, dy);
-          const R = 130;
+          const R = 150;
           if (d < R && d > 0.01) {
-            const force = (1 - d / R) * 2.6;
-            n.fx += (dx / d) * force;
-            n.fy += (dy / d) * force;
+            const off = (1 - d / R) * 52;
+            tx += (dx / d) * off;
+            ty += (dy / d) * off;
           }
         }
-        n.vx = (n.vx + n.fx) * 0.9;
-        n.vy = (n.vy + n.fy) * 0.9;
+        n.fx += (tx - n.x) * 0.02;
+        n.fy += (ty - n.y) * 0.02;
+        n.vx = (n.vx + n.fx) * 0.92;
+        n.vy = (n.vy + n.fy) * 0.92;
         n.x += n.vx;
         n.y += n.vy;
       }

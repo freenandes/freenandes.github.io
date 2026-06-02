@@ -70,7 +70,7 @@ const coverSrc = cover && /^(https?:|data:)/.test(cover) ? cover : cover ? withB
   .cover {
     position: relative;
     aspect-ratio: var(--ratio);
-    border-radius: var(--radius-m);
+    border-radius: var(--radius-md);
     overflow: hidden;
     border: 1px solid var(--line);
     background: var(--paper-2);
@@ -124,8 +124,8 @@ const coverSrc = cover && /^(https?:|data:)/.test(cover) ? cover : cover ? withB
 
   .cover__num {
     position: absolute;
-    top: var(--space-s);
-    left: var(--space-s);
+    top: var(--space-sm);
+    left: var(--space-sm);
     font-weight: 700;
     font-size: var(--step-1);
     color: color-mix(in oklab, var(--ink) 70%, transparent);
@@ -133,9 +133,9 @@ const coverSrc = cover && /^(https?:|data:)/.test(cover) ? cover : cover ? withB
 
   .cover__title {
     position: absolute;
-    left: var(--space-s);
-    right: var(--space-s);
-    bottom: var(--space-s);
+    left: var(--space-sm);
+    right: var(--space-sm);
+    bottom: var(--space-sm);
     font-family: var(--font-mono);
     font-weight: 700;
     font-size: clamp(1.1rem, 0.6rem + 2.4vw, 2.1rem);
@@ -148,23 +148,23 @@ const coverSrc = cover && /^(https?:|data:)/.test(cover) ? cover : cover ? withB
 
   .cover__tm {
     position: absolute;
-    top: var(--space-s);
-    right: var(--space-s);
+    top: var(--space-sm);
+    right: var(--space-sm);
     font-weight: 700;
     color: color-mix(in oklab, var(--ink) 55%, transparent);
   }
 
   .cover__mark {
     position: absolute !important;
-    right: var(--space-s);
-    bottom: var(--space-s);
+    right: var(--space-sm);
+    bottom: var(--space-sm);
     color: color-mix(in oklab, var(--ink) 50%, transparent) !important;
   }
 
   .cover__lock {
     position: absolute;
-    top: var(--space-s);
-    right: var(--space-s);
+    top: var(--space-sm);
+    right: var(--space-sm);
     z-index: 2;
     display: inline-flex;
     align-items: center;

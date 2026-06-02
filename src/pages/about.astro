@@ -105,10 +105,10 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
   .cv__head {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-m);
+    gap: var(--space-md);
     justify-content: space-between;
     align-items: end;
-    padding-block-end: var(--space-m);
+    padding-block-end: var(--space-md);
     border-block-end: 2px solid var(--ink);
   }
 
@@ -118,7 +118,7 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
     gap: 0.6ch;
   }
   .cv__name {
-    margin-block-start: var(--space-2xs);
+    margin-block-start: var(--space-xs);
     font-size: var(--step-4);
   }
   .cv__role {
@@ -132,7 +132,7 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: var(--space-s);
+    gap: var(--space-sm);
   }
 
   .btn {
@@ -159,7 +159,7 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
   .cv__contact {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-s);
+    gap: var(--space-sm);
     justify-content: flex-end;
   }
   .cv__contact-link {
@@ -174,26 +174,26 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
   }
 
   .cv__summary {
-    margin-block-start: var(--space-l);
+    margin-block-start: var(--space-lg);
     font-size: var(--step-1);
     max-width: 60ch;
     color: var(--ink);
   }
   .cv__summary p + p {
-    margin-block-start: var(--space-s);
+    margin-block-start: var(--space-sm);
   }
 
   .cv__section {
-    margin-block-start: var(--space-2xl);
+    margin-block-start: var(--space-xl);
   }
   .cv__section-title {
     display: flex;
     align-items: baseline;
-    gap: var(--space-s);
+    gap: var(--space-sm);
     font-size: var(--step-2);
-    padding-block-end: var(--space-s);
+    padding-block-end: var(--space-sm);
     border-block-end: 1px solid var(--line);
-    margin-block-end: var(--space-m);
+    margin-block-end: var(--space-md);
   }
   .cv__section-title .label {
     color: var(--ink-3);
@@ -201,18 +201,18 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
 
   .cv__list {
     display: grid;
-    gap: var(--space-l);
+    gap: var(--space-lg);
   }
 
   .entry {
     display: grid;
     grid-template-columns: 9rem 1fr;
-    gap: var(--space-m);
+    gap: var(--space-md);
   }
   @media (max-width: 640px) {
     .entry {
       grid-template-columns: 1fr;
-      gap: var(--space-2xs);
+      gap: var(--space-xs);
     }
   }
   .entry__period {
@@ -235,13 +235,13 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
     margin-block-start: 0.1rem;
   }
   .entry__summary {
-    margin-block-start: var(--space-2xs);
+    margin-block-start: var(--space-xs);
     color: var(--ink-2);
   }
   .entry__points {
-    margin-block-start: var(--space-2xs);
+    margin-block-start: var(--space-xs);
     display: grid;
-    gap: var(--space-3xs);
+    gap: var(--space-xs);
     padding-inline-start: 1.1em;
     list-style: square;
     color: var(--ink);
@@ -251,7 +251,7 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
   }
 
   .cv__foot {
-    margin-block-start: var(--space-2xl);
+    margin-block-start: var(--space-xl);
     color: var(--ink-3);
   }
 

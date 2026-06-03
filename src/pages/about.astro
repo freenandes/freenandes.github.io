@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import RegMark from '../components/RegMark.astro';
 import { site } from '../site.config';
 import { cv } from '../cv.config';
+import { withBase } from '../lib/base';
 
 const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
 ---
@@ -12,6 +13,8 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
   description={`Curriculum vitae of ${cv.name ?? site.name}, ${cv.headline ?? site.role}.`}
 >
   <article class="cv container">
+    <a class="back mono" href={withBase('/')}>← Back to map</a>
+
     <!-- Masthead -->
     <header class="cv__head" data-reveal>
       <div class="cv__id">
@@ -100,6 +103,16 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
   .cv {
     padding-block: var(--space-xl);
     max-width: 54rem;
+  }
+
+  .back {
+    display: inline-block;
+    color: var(--ink-2);
+    margin-block-end: var(--space-lg);
+    transition: color var(--dur-fast) var(--ease);
+  }
+  .back:hover {
+    color: var(--ink);
   }
 
   .cv__head {

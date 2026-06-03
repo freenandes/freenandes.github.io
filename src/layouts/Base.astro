@@ -12,6 +12,8 @@ interface Props {
   bare?: boolean;
   /** Adds a class to <main> for page-specific tweaks. */
   mainClass?: string;
+  /** Render the site header + footer. Off for the full-bleed diagram home. */
+  chrome?: boolean;
 }
 
 const {
@@ -19,6 +21,7 @@ const {
   description = site.description,
   bare = false,
   mainClass,
+  chrome = true,
 } = Astro.props;
 
 const pageTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site.role}`;
@@ -56,13 +59,13 @@ const ogImage = new URL(withBase(site.ogImage), Astro.site ?? Astro.url).toStrin
     {!bare && <div class="wash" aria-hidden="true"></div>}
     <div class="grid-overlay" aria-hidden="true"></div>
 
-    <Header />
+    {chrome && <Header />}
 
     <main id="main" class:list={[mainClass]}>
       <slot />
     </main>
 
-    <Footer />
+    {chrome && <Footer />}
 
     <script>
       // Progressive enhancement: enable reveal animations only with JS on.

@@ -210,8 +210,8 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
   .diagram__links :global(.link-line) {
     fill: none;
     stroke: var(--ink);
-    stroke-width: 1;
-    opacity: 0.28;
+    stroke-width: 1.2;
+    opacity: 0.34;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
@@ -648,20 +648,20 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
     function generateEdgeShapes() {
       for (const e of edges) {
         const r = Math.random();
-        if (r < 0.22) {
+        if (r < 0.15) {
           e.shape = { kind: 'straight', amp: 0, waves: 1, phase: 0, segs: 4 };
-        } else if (r < 0.62) {
+        } else if (r < 0.6) {
           e.shape = {
             kind: 'wave',
-            amp: 14 + Math.random() * 26,
+            amp: 24 + Math.random() * 34,
             waves: 1 + Math.floor(Math.random() * 3),
             phase: Math.random() * Math.PI * 2,
-            segs: 28,
+            segs: 30,
           };
         } else {
           e.shape = {
             kind: 'zig',
-            amp: 12 + Math.random() * 22,
+            amp: 18 + Math.random() * 30,
             waves: 1,
             phase: 0,
             segs: 3 + Math.floor(Math.random() * 4),

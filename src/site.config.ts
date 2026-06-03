@@ -33,7 +33,7 @@ export interface SiteConfig {
 }
 
 export const site: SiteConfig = {
-  name: 'Pedro MC Fernandes',
+  name: 'Pedro Fernandes',
   role: 'Senior Product Designer',
   mark: 'PF™',
   description:

@@ -1,3 +1,5 @@
+import { site } from './site.config';
+
 /* =========================================================================
    DIAGRAM NAVIGATION CONFIG
    The home page is a kinetic mind-map. Every node and connection below is
@@ -5,12 +7,9 @@
    in that component's client script. Edit content here — positions, labels,
    reveal copy, links — without touching the markup or the simulation.
 
-   Coordinates are normalised (0..1) fractions of the diagram canvas. Two
-   layouts are provided per node:
-     - `portrait`  : narrow / mobile screens (the graph stacks vertically).
-     - `landscape` : wide / desktop screens (the graph spreads horizontally).
-   The component picks one based on the canvas aspect ratio and animates
-   between them on resize.
+   `portrait` / `landscape` are normalised (0..1) hint coords used only when
+   resize adaptation needs a soft nudge toward a readable map — initial layout
+   is random on each load (see NavDiagram `generateLayout`).
    ========================================================================= */
 
 export interface DiagramPoint {
@@ -39,6 +38,9 @@ export type NodeShape = 'triangle' | 'square' | 'pentagon' | 'hexagon';
 export interface DiagramNode {
   id: string;
   label: string;
+  /** Optional secondary line shown directly under the node label
+      (e.g. role/title for the identity node). */
+  subLabel?: string;
   kind: NodeKind;
   /** Visual weight of the node dot. */
   size?: 'lg' | 'md' | 'sm';
@@ -67,18 +69,12 @@ export interface DiagramNode {
 export const diagramNodes: DiagramNode[] = [
   {
     id: 'pedro',
-    label: 'Pedro MC Fernandes',
+    label: site.name,
+    subLabel: site.role,
     kind: 'identity',
     size: 'lg',
     shape: 'hexagon',
     place: 'bottom',
-    tagline:
-      'Systems-thinking product designer. I fix the system, not just the screen — at the boundary between strategy and execution, shipping the code too.',
-    metrics: [
-      { value: '18+ yrs', label: 'building & scaling products' },
-      { value: '4×', label: 'organic traffic · 100K+ pages' },
-      { value: '~50%', label: 'faster delivery via design systems' },
-    ],
     portrait: { x: 0.5, y: 0.28 },
     landscape: { x: 0.26, y: 0.5 },
   },

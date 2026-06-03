@@ -532,9 +532,22 @@ import { withBase } from '../lib/base';
       }
     }
 
+    // The simulation only runs while there is something to resolve — settling
+    // after load, a resize, a drag, or pointer interaction. Once everything is
+    // at rest it sleeps (no rAF), so a stationary diagram is truly static.
     let raf = 0;
-    function frame(t: number) {
-      const time = t / 1000;
+    let running = false;
+    let settledFrames = 0;
+
+    function wake() {
+      settledFrames = 0;
+      if (!running) {
+        running = true;
+        raf = requestAnimationFrame(frame);
+      }
+    }
+
+    function frame() {
       for (const n of nodes) {
         n.fx = 0;
         n.fy = 0;
@@ -551,21 +564,26 @@ import { withBase } from '../lib/base';
         e.b.fx -= ux;
         e.b.fy -= uy;
       }
+
+      let maxMotion = 0;
+      let anyDragging = false;
       for (const n of nodes) {
-        if (n.dragging) continue;
-        if (n.calm) {
-          n.x += (n.ax - n.x) * 0.18;
-          n.y += (n.ay - n.y) * 0.18;
-          n.vx *= 0.6;
-          n.vy *= 0.6;
+        if (n.dragging) {
+          anyDragging = true;
           continue;
         }
-        // Idle "breathing": a slow two-frequency wander so the molecule
-        // visibly floats even when untouched.
+        if (n.calm) {
+          const mx = n.ax - n.x;
+          const my = n.ay - n.y;
+          n.x += mx * 0.2;
+          n.y += my * 0.2;
+          n.vx = 0;
+          n.vy = 0;
+          maxMotion = Math.max(maxMotion, Math.abs(mx) + Math.abs(my));
+          continue;
+        }
         let tx = n.ax;
         let ty = n.ay;
-        tx += Math.cos(time * 0.65 + n.phase) * 24 + Math.sin(time * 0.28 + n.phase) * 11;
-        ty += Math.sin(time * 0.57 + n.phase * 1.3) * 24 + Math.cos(time * 0.22 + n.phase) * 11;
         // Pointer repulsion as a *bounded target offset* (not an accumulating
         // force), so a node nudges aside near the cursor but never outruns it —
         // you can always catch it to hover.
@@ -582,12 +600,40 @@ import { withBase } from '../lib/base';
         }
         n.fx += (tx - n.x) * 0.02;
         n.fy += (ty - n.y) * 0.02;
-        n.vx = (n.vx + n.fx) * 0.92;
-        n.vy = (n.vy + n.fy) * 0.92;
+        n.vx = (n.vx + n.fx) * 0.9;
+        n.vy = (n.vy + n.fy) * 0.9;
         n.x += n.vx;
         n.y += n.vy;
+        maxMotion = Math.max(
+          maxMotion,
+          Math.abs(n.vx) + Math.abs(n.vy) + Math.abs(tx - n.x) + Math.abs(ty - n.y)
+        );
       }
       render();
+
+      if (anyDragging) {
+        settledFrames = 0;
+        raf = requestAnimationFrame(frame);
+        return;
+      }
+      settledFrames = maxMotion < 0.12 ? settledFrames + 1 : 0;
+      if (settledFrames >= 6) {
+        // Fully at rest. Snap to exact anchors (unless the pointer is holding
+        // nodes aside) and stop the loop until the next interaction.
+        if (!pointer.active) {
+          for (const n of nodes) {
+            if (n.dragging) continue;
+            n.x = n.ax;
+            n.y = n.ay;
+            n.vx = 0;
+            n.vy = 0;
+          }
+          render();
+        }
+        running = false;
+        raf = 0;
+        return;
+      }
       raf = requestAnimationFrame(frame);
     }
 
@@ -600,6 +646,7 @@ import { withBase } from '../lib/base';
         .querySelector('.node__hit')
         ?.setAttribute('aria-expanded', open ? 'true' : 'false');
       setCalm(n);
+      wake();
     }
     function closeAll(except?: Node) {
       for (const n of nodes) if (n !== except) setOpen(n, false);
@@ -611,9 +658,11 @@ import { withBase } from '../lib/base';
       pointer.x = ev.clientX - r.left;
       pointer.y = ev.clientY - r.top;
       pointer.active = true;
+      wake();
     });
     root.addEventListener('pointerleave', () => {
       pointer.active = false;
+      wake();
     });
 
     // Close panels when clicking empty canvas; flag first interaction.
@@ -633,18 +682,22 @@ import { withBase } from '../lib/base';
       n.el.addEventListener('pointerenter', () => {
         n.hover = true;
         setCalm(n);
+        wake();
       });
       n.el.addEventListener('pointerleave', () => {
         n.hover = false;
         setCalm(n);
+        wake();
       });
       n.el.addEventListener('focusin', () => {
         n.focus = true;
         setCalm(n);
+        wake();
       });
       n.el.addEventListener('focusout', () => {
         n.focus = false;
         setCalm(n);
+        wake();
       });
 
       let downX = 0;
@@ -661,6 +714,7 @@ import { withBase } from '../lib/base';
         try {
           hit.setPointerCapture(pid);
         } catch {}
+        wake();
       });
       hit.addEventListener('pointermove', (ev) => {
         if (pid === null) return;
@@ -677,6 +731,7 @@ import { withBase } from '../lib/base';
           n.y = ev.clientY - r.top;
           n.vx = 0;
           n.vy = 0;
+          wake();
         }
       });
       const endDrag = () => {
@@ -688,6 +743,7 @@ import { withBase } from '../lib/base';
         if (n.dragging) {
           n.dragging = false;
           n.el.classList.remove('is-dragging');
+          wake();
         }
       };
       hit.addEventListener('pointerup', endDrag);
@@ -712,6 +768,7 @@ import { withBase } from '../lib/base';
       requestAnimationFrame(() => {
         resizeScheduled = false;
         computeAnchors();
+        wake();
       });
     };
     const ro = new ResizeObserver(onResize);
@@ -729,14 +786,16 @@ import { withBase } from '../lib/base';
       return;
     }
 
-    raf = requestAnimationFrame(frame);
+    // Settle from the initial scattered positions, then sleep.
+    wake();
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         cancelAnimationFrame(raf);
         raf = 0;
-      } else if (!raf) {
-        raf = requestAnimationFrame(frame);
+        running = false;
+      } else {
+        wake();
       }
     });
   }

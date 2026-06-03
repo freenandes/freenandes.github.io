@@ -158,10 +158,14 @@ export const diagramNodes: DiagramNode[] = [
   },
 ];
 
-/** Connections (the "bonds" between nodes). Order is [from, to]. */
+/** Connections (the "bonds" between nodes). Order is [from, to].
+   A single open chain — contact → about → pedro → systems-thinker →
+   design-at-scale → visionary — so the diagram reads as one continuous line
+   rather than a fork. The home page renders this line in a fresh random shape
+   on every load / identity-node click. */
 export const diagramEdges: Array<[string, string]> = [
+  ['contact', 'about'],
   ['about', 'pedro'],
-  ['contact', 'pedro'],
   ['pedro', 'systems-thinker'],
   ['systems-thinker', 'design-at-scale'],
   ['design-at-scale', 'visionary'],

@@ -208,10 +208,12 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
     z-index: 0;
   }
   .diagram__links :global(.link-line) {
+    fill: none;
     stroke: var(--ink);
     stroke-width: 1;
     opacity: 0.28;
     stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   /* The "Selected projects" wrapper is purely a semantic grouping — it must
@@ -484,8 +486,9 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
   type Node = {
     el: HTMLElement;
     id: string;
-    portrait: { x: number; y: number };
-    landscape: { x: number; y: number };
+    /** Layout position as a fraction (0..1) of the padded canvas. Regenerated
+        randomly on each load / reset; updated when a node is dragged. */
+    frac: { x: number; y: number };
     x: number;
     y: number;
     vx: number;
@@ -494,11 +497,18 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
     fy: number;
     ax: number;
     ay: number;
-    phase: number;
     calm: boolean;
     dragging: boolean;
     hover: boolean;
     focus: boolean;
+  };
+
+  type EdgeShape = {
+    kind: 'straight' | 'wave' | 'zig';
+    amp: number;
+    waves: number;
+    phase: number;
+    segs: number;
   };
 
   function initDiagram(root: HTMLElement) {
@@ -516,8 +526,7 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
     const nodes: Node[] = nodeEls.map((el) => ({
       el,
       id: el.dataset.id || '',
-      portrait: { x: +(el.dataset.px || 0.5), y: +(el.dataset.py || 0.5) },
-      landscape: { x: +(el.dataset.lx || 0.5), y: +(el.dataset.ly || 0.5) },
+      frac: { x: 0.5, y: 0.5 },
       x: 0,
       y: 0,
       vx: 0,
@@ -526,7 +535,6 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
       fy: 0,
       ax: 0,
       ay: 0,
-      phase: Math.random() * Math.PI * 2,
       calm: false,
       dragging: false,
       hover: false,
@@ -539,49 +547,163 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
         const a = byId.get(li.dataset.a || '');
         const b = byId.get(li.dataset.b || '');
         if (!a || !b) return null;
-        const line = document.createElementNS(SVG_NS, 'line');
+        const line = document.createElementNS(SVG_NS, 'path');
         line.setAttribute('class', 'link-line');
+        line.setAttribute('fill', 'none');
         svgEl.appendChild(line);
-        return { a, b, line, rest: 0 };
+        const shape: EdgeShape = {
+          kind: 'straight',
+          amp: 0,
+          waves: 1,
+          phase: 0,
+          segs: 4,
+        };
+        return { a, b, line, rest: 0, shape };
       })
-      .filter(Boolean) as { a: Node; b: Node; line: SVGLineElement; rest: number }[];
+      .filter(Boolean) as {
+      a: Node;
+      b: Node;
+      line: SVGPathElement;
+      rest: number;
+      shape: EdgeShape;
+    }[];
+
+    // Order the nodes along the chain (the diagram is one open line) so the
+    // random walk lays them out sequentially and the connectors read as a line.
+    const chainOrder: Node[] = (() => {
+      const adj = new Map<string, string[]>();
+      for (const e of edges) {
+        (adj.get(e.a.id) || adj.set(e.a.id, []).get(e.a.id)!).push(e.b.id);
+        (adj.get(e.b.id) || adj.set(e.b.id, []).get(e.b.id)!).push(e.a.id);
+      }
+      const ends = [...adj.keys()].filter((id) => (adj.get(id) || []).length === 1);
+      if (!ends.length) return nodes.slice();
+      const order: Node[] = [];
+      const seen = new Set<string>();
+      let cur: string | undefined = ends[0];
+      while (cur && !seen.has(cur)) {
+        seen.add(cur);
+        const n = byId.get(cur);
+        if (n) order.push(n);
+        cur = (adj.get(cur) || []).find((id) => !seen.has(id));
+      }
+      // Append any stragglers (defensive: not a clean path).
+      for (const n of nodes) if (!seen.has(n.id)) order.push(n);
+      return order;
+    })();
 
     let W = 0;
     let H = 0;
 
-    // --- User-arranged layout (persisted for the tab session) ----------------
-    // `custom` holds absolute drop positions for nodes the user has dragged.
-    // It survives reloads via sessionStorage, and is wiped when the user clicks
-    // their name (the identity node) or when a resize would crop a kept node.
-    const STORAGE_KEY = 'navdiagram:layout';
-    let custom: Record<string, { x: number; y: number }> = {};
+    // --- Dynamic layout ------------------------------------------------------
+    // The line is laid out fresh on every load / reset: a random walk in
+    // fraction space (kept inside a padded box) so consecutive chain nodes stay
+    // near each other and the whole thing reads as one wandering line. Storing
+    // *fractions* (not pixels) means a resize just remaps them — nothing crops.
+    const FLO = 0.06;
+    const FHI = 0.94;
 
-    function loadCustom() {
-      try {
-        const raw = sessionStorage.getItem(STORAGE_KEY);
-        custom = raw ? JSON.parse(raw) : {};
-      } catch {
-        custom = {};
+    function inset() {
+      const mx = Math.min(0.14 * W, 150);
+      const my = Math.min(0.12 * H, 110);
+      return { mx, my, iw: Math.max(1, W - 2 * mx), ih: Math.max(1, H - 2 * my) };
+    }
+
+    // Lay the chain out as a random walk with momentum + light overlap-avoidance.
+    function generateLayout() {
+      const placed: { x: number; y: number }[] = [];
+      const clampReflect = (v: number) => {
+        if (v < FLO) v = FLO + (FLO - v);
+        if (v > FHI) v = FHI - (v - FHI);
+        return Math.max(FLO, Math.min(FHI, v));
+      };
+      let x = FLO + Math.random() * (FHI - FLO);
+      let y = FLO + Math.random() * (FHI - FLO);
+      let ang = Math.random() * Math.PI * 2;
+      for (let i = 0; i < chainOrder.length; i++) {
+        if (i > 0) {
+          let nx = x;
+          let ny = y;
+          for (let t = 0; t < 16; t++) {
+            const a = ang + (Math.random() * 2 - 1) * 1.3;
+            const step = 0.2 + Math.random() * 0.24;
+            nx = clampReflect(x + Math.cos(a) * step);
+            ny = clampReflect(y + Math.sin(a) * step);
+            ang = a;
+            const ok = placed.every(
+              (p) => Math.hypot(p.x - nx, p.y - ny) > 0.16
+            );
+            if (ok || t === 15) break;
+          }
+          x = nx;
+          y = ny;
+        }
+        placed.push({ x, y });
+        chainOrder[i].frac = { x, y };
       }
     }
-    function saveCustom() {
-      try {
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(custom));
-      } catch {}
-    }
-    function clearCustom() {
-      custom = {};
-      try {
-        sessionStorage.removeItem(STORAGE_KEY);
-      } catch {}
+
+    // Each connector gets a random style — straight, sine-wave, or zig-zag —
+    // refreshed alongside the layout so reloads/resets feel different.
+    function generateEdgeShapes() {
+      for (const e of edges) {
+        const r = Math.random();
+        if (r < 0.22) {
+          e.shape = { kind: 'straight', amp: 0, waves: 1, phase: 0, segs: 4 };
+        } else if (r < 0.62) {
+          e.shape = {
+            kind: 'wave',
+            amp: 14 + Math.random() * 26,
+            waves: 1 + Math.floor(Math.random() * 3),
+            phase: Math.random() * Math.PI * 2,
+            segs: 28,
+          };
+        } else {
+          e.shape = {
+            kind: 'zig',
+            amp: 12 + Math.random() * 22,
+            waves: 1,
+            phase: 0,
+            segs: 3 + Math.floor(Math.random() * 4),
+          };
+        }
+      }
     }
 
-    // A stored position "fits" when the node (including its label box) stays
-    // fully on-canvas. Used to decide whether a resize should keep or reset.
-    function fits(n: Node, x: number, y: number): boolean {
-      const hw = n.el.offsetWidth / 2 || 40;
-      const hh = n.el.offsetHeight / 2 || 20;
-      return x >= hw && x <= W - hw && y >= hh && y <= H - hh;
+    // Build the SVG path for an edge from its current endpoints + its shape.
+    function edgePath(e: { a: Node; b: Node; shape: EdgeShape }): string {
+      const ax = e.a.x;
+      const ay = e.a.y;
+      const bx = e.b.x;
+      const by = e.b.y;
+      const dx = bx - ax;
+      const dy = by - ay;
+      const len = Math.hypot(dx, dy) || 1;
+      const s = e.shape;
+      if (s.kind === 'straight' || len < 4) return `M ${ax} ${ay} L ${bx} ${by}`;
+      const nx = -dy / len; // unit perpendicular
+      const ny = dx / len;
+      let d = `M ${ax} ${ay}`;
+      if (s.kind === 'wave') {
+        for (let i = 1; i <= s.segs; i++) {
+          const t = i / s.segs;
+          // Taper to 0 at both ends so the curve meets the nodes cleanly.
+          const off =
+            Math.sin(t * Math.PI * s.waves + s.phase) * s.amp * Math.sin(t * Math.PI);
+          const x = ax + dx * t + nx * off;
+          const y = ay + dy * t + ny * off;
+          d += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
+        }
+      } else {
+        for (let i = 1; i <= s.segs; i++) {
+          const t = i / s.segs;
+          const off = i === s.segs ? 0 : (i % 2 ? 1 : -1) * s.amp;
+          const x = ax + dx * t + nx * off;
+          const y = ay + dy * t + ny * off;
+          d += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
+        }
+      }
+      return d;
     }
 
     function recomputeRests() {
@@ -607,47 +729,18 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
       return opts[0][0];
     }
 
+    // Map the stored fractions to pixel anchors for the current size. A resize
+    // only remaps (no re-randomising), so the chosen shape is preserved.
     function computeAnchors(first = false) {
       const rect = root.getBoundingClientRect();
       W = rect.width;
       H = rect.height;
       svgEl.setAttribute('width', String(W));
       svgEl.setAttribute('height', String(H));
-      const landscape = W > H * 1.15;
-      const padX = Math.min(0.16 * W, 180);
-      const padY = Math.min(0.12 * H, 120);
-
-      // 1) Default layout for the current size.
+      const { mx, my, iw, ih } = inset();
       for (const n of nodes) {
-        const src = landscape ? n.landscape : n.portrait;
-        n.ax = padX + src.x * (W - 2 * padX);
-        n.ay = padY + src.y * (H - 2 * padY);
-      }
-
-      // 2) Overlay any user-arranged positions. If even one kept node would now
-      //    be cropped, drop the whole custom layout and fall back to default.
-      const customIds = Object.keys(custom);
-      if (customIds.length) {
-        const allFit = customIds.every((id) => {
-          const n = byId.get(id);
-          return !n || fits(n, custom[id].x, custom[id].y);
-        });
-        if (allFit) {
-          for (const id of customIds) {
-            const n = byId.get(id);
-            if (n) {
-              n.ax = custom[id].x;
-              n.ay = custom[id].y;
-            }
-          }
-        } else {
-          clearCustom();
-        }
-      }
-
-      // 3) Seed initial scatter once, then settle into the (custom-or-default)
-      //    anchors. Panel placement and edge rest-lengths follow the anchors.
-      for (const n of nodes) {
+        n.ax = mx + n.frac.x * iw;
+        n.ay = my + n.frac.y * ih;
         if (first) {
           n.x = n.ax + (Math.random() - 0.5) * 18;
           n.y = n.ay + (Math.random() - 0.5) * 18;
@@ -657,8 +750,10 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
       recomputeRests();
     }
 
+    // A fresh random shape: new positions + new connector styles, animated to.
     function resetLayout() {
-      clearCustom();
+      generateLayout();
+      generateEdgeShapes();
       computeAnchors();
       wake();
     }
@@ -670,10 +765,7 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
         n.el.style.transform = `translate(${n.x}px, ${n.y}px) translate(-50%, -50%)`;
       }
       for (const e of edges) {
-        e.line.setAttribute('x1', String(e.a.x));
-        e.line.setAttribute('y1', String(e.a.y));
-        e.line.setAttribute('x2', String(e.b.x));
-        e.line.setAttribute('y2', String(e.b.y));
+        e.line.setAttribute('d', edgePath(e));
       }
     }
 
@@ -888,12 +980,15 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
         if (n.dragging) {
           n.dragging = false;
           n.el.classList.remove('is-dragging');
-          // Pin the node where it was dropped: its anchor becomes the drop
-          // position, edge rest-lengths re-settle around it, and it persists.
+          // Pin the node where it was dropped: store it as a fraction so it
+          // settles there and survives resizes, and re-settle edge springs.
+          const { mx, my, iw, ih } = inset();
+          n.frac = {
+            x: Math.max(0, Math.min(1, (n.x - mx) / iw)),
+            y: Math.max(0, Math.min(1, (n.y - my) / ih)),
+          };
           n.ax = n.x;
           n.ay = n.y;
-          custom[n.id] = { x: n.x, y: n.y };
-          saveCustom();
           recomputeRests();
           n.el.dataset.place = placeFor(n);
           wake();
@@ -929,7 +1024,8 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
     const ro = new ResizeObserver(onResize);
     ro.observe(root);
 
-    loadCustom();
+    generateLayout();
+    generateEdgeShapes();
     computeAnchors(true);
     render();
 

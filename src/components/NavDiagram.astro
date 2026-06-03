@@ -110,6 +110,22 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
                 </ul>
               )}
 
+              {node.kind === 'contact' && (
+                <ul class="panel__socials" role="list">
+                  {site.socials.map((s) => (
+                    <li>
+                      <a
+                        class="panel__social"
+                        href={s.href}
+                        rel={s.href.startsWith('http') ? 'me noopener' : undefined}
+                      >
+                        {s.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
               {node.email && (
                 <a class="panel__link" href={`mailto:${node.email}`}>
                   {node.email}

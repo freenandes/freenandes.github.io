@@ -110,6 +110,22 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
                 </ul>
               )}
 
+              {node.kind === 'contact' && (
+                <ul class="panel__socials" role="list">
+                  {site.socials.map((s) => (
+                    <li>
+                      <a
+                        class="panel__social"
+                        href={s.href}
+                        rel={s.href.startsWith('http') ? 'me noopener' : undefined}
+                      >
+                        {s.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
               {node.email && (
                 <a class="panel__link" href={`mailto:${node.email}`}>
                   {node.email}
@@ -504,26 +520,6 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
     border: 1px solid var(--line);
     background: var(--paper-2);
     color: var(--ink-2);
-  }
-
-  .panel__socials {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem 1rem;
-    margin-block-start: 0.75rem;
-    padding-block-start: 0.6rem;
-    border-block-start: 1px solid var(--line);
-  }
-  .panel__social {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    letter-spacing: var(--tracking-mono);
-    text-transform: uppercase;
-    color: var(--ink-2);
-    transition: color var(--dur-fast) var(--ease);
-  }
-  .panel__social:hover {
-    color: var(--accent-ink);
   }
 
   .panel__link {

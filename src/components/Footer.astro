@@ -1,42 +1,28 @@
 ---
 import { site } from '../site.config';
-import RegMark from './RegMark.astro';
 
 const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
-  <div class="container grid">
-    <div class="col">
-      <p class="label">Index / Connect</p>
-      <ul role="list" class="links">
-        {
-          site.socials.map((s) => (
-            <li>
-              <a
-                href={s.href}
-                class="link"
-                rel={s.href.startsWith('http') ? 'me noopener' : undefined}
-              >
-                <span>{s.label}</span>
-                <span aria-hidden="true">↗</span>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
+  <div class="container site-footer__bar">
+    <ul role="list" class="site-footer__links">
+      {
+        site.socials.map((s) => (
+          <li>
+            <a
+              class="site-footer__link"
+              href={s.href}
+              rel={s.href.startsWith('http') ? 'me noopener' : undefined}
+            >
+              {s.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
 
-    <div class="col col--end">
-      <RegMark size={18} />
-      <p class="meta mono">
-        {site.mark} — {site.role}<br />
-        © {year} {site.name}. All rights reserved.
-      </p>
-      <p class="colophon mono">
-        Built with Astro · Space Grotesk &amp; Space Mono
-      </p>
-    </div>
+    <p class="site-footer__meta mono">© {year} {site.name}</p>
   </div>
 </footer>
 
@@ -44,61 +30,39 @@ const year = new Date().getFullYear();
   .site-footer {
     margin-block-start: var(--space-xl);
     border-block-start: 1px solid var(--line);
-    padding-block: var(--space-xl);
   }
 
-  .grid {
+  .site-footer__bar {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-xl);
+    align-items: baseline;
     justify-content: space-between;
-    align-items: start;
+    gap: var(--space-sm) var(--space-lg);
+    padding-block: var(--space-md);
   }
 
-  .col--end {
-    text-align: right;
-    margin-inline-start: auto;
-  }
-  .col--end .reg-mark {
-    margin-inline-start: auto;
-  }
-
-  .label {
-    margin-block-end: var(--space-sm);
+  .site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm) var(--space-lg);
+    margin: 0;
   }
 
-  .links {
-    display: grid;
-    gap: var(--space-xs);
-  }
-
-  .link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6ch;
-    font-size: var(--step-1);
-    letter-spacing: var(--tracking-tight);
+  .site-footer__link {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--ink-2);
     transition: color var(--dur-fast) var(--ease);
   }
-  .link:hover {
-    color: var(--accent-ink);
-  }
-  .link span[aria-hidden] {
-    font-size: 0.7em;
-    color: var(--ink-3);
-    transition: transform var(--dur) var(--ease);
-  }
-  .link:hover span[aria-hidden] {
-    transform: translate(2px, -2px);
+  .site-footer__link:hover {
+    color: var(--ink);
   }
 
-  .meta,
-  .colophon {
-    color: var(--ink-2);
-    line-height: var(--leading-snug);
-  }
-  .colophon {
-    margin-block-start: var(--space-sm);
+  .site-footer__meta {
+    font-size: var(--step--1);
     color: var(--ink-3);
+    letter-spacing: var(--tracking-mono);
   }
 </style>

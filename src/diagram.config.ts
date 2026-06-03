@@ -101,12 +101,6 @@ export const diagramNodes: DiagramNode[] = [
     shape: 'square',
     place: 'left',
     tagline: 'Open to principal / lead product design and design-engineering work.',
-    email: 'redacted@example.invalid',
-    link: {
-      label: 'LinkedIn',
-      href: 'https://www.linkedin.com/in/pmcfernandes',
-      external: true,
-    },
     portrait: { x: 0.76, y: 0.16 },
     landscape: { x: 0.12, y: 0.74 },
   },

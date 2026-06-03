@@ -2,7 +2,6 @@
 import '../styles/global.css';
 import { site } from '../site.config';
 import { withBase } from '../lib/base';
-import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
 interface Props {
@@ -12,8 +11,9 @@ interface Props {
   bare?: boolean;
   /** Adds a class to <main> for page-specific tweaks. */
   mainClass?: string;
-  /** Render the site header + footer. Off for the full-bleed diagram home. */
-  chrome?: boolean;
+  /** Render the site footer. Off for the full-bleed diagram home, since the
+      home is the navigation map itself. */
+  footer?: boolean;
 }
 
 const {
@@ -21,7 +21,7 @@ const {
   description = site.description,
   bare = false,
   mainClass,
-  chrome = true,
+  footer = true,
 } = Astro.props;
 
 const pageTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site.role}`;
@@ -59,13 +59,11 @@ const ogImage = new URL(withBase(site.ogImage), Astro.site ?? Astro.url).toStrin
     {!bare && <div class="wash" aria-hidden="true"></div>}
     <div class="grid-overlay" aria-hidden="true"></div>
 
-    {chrome && <Header />}
-
     <main id="main" class:list={[mainClass]}>
       <slot />
     </main>
 
-    {chrome && <Footer />}
+    {footer && <Footer />}
 
     <script>
       // Progressive enhancement: enable reveal animations only with JS on.

@@ -243,7 +243,7 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
     fill: none;
     stroke: var(--ink);
     stroke-width: 1.2;
-    opacity: 0.34;
+    opacity: 0.42;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
@@ -698,7 +698,9 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
         } else {
           e.shape = {
             kind: 'elbow',
-            amp: 0,
+            // Signed perpendicular jog height (guaranteed visible regardless of
+            // how aligned the two nodes happen to be).
+            amp: (16 + Math.random() * 16) * (Math.random() < 0.5 ? 1 : -1),
             waves: 1,
             phase: 0,
             f: 0.4 + Math.random() * 0.2,
@@ -736,21 +738,41 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
         return d;
       }
 
-      // Elbow: clean right-angled routing on screen axes (like the reference).
-      const horiz = Math.abs(dx) >= Math.abs(dy);
+      // Elbow: a clean right-angled jog relative to the edge direction — a
+      // small step out and back, echoing the routed look of the reference.
+      // 'L' is a single corner; 'Z' is the full step. Both have crisp 90°
+      // angles because the jog is perpendicular to the A→B direction.
       const r2 = (v: number) => v.toFixed(1);
+      const ux = dx / len;
+      const uy = dy / len;
+      const px = -uy; // perpendicular unit
+      const py = ux;
+      const amp = s.amp;
       if (s.style === 'L') {
-        const cx = horiz ? bx : ax;
-        const cy = horiz ? ay : by;
-        return `M ${r2(ax)} ${r2(ay)} L ${r2(cx)} ${r2(cy)} L ${r2(bx)} ${r2(by)}`;
+        // One corner: go along to f, step across to B's offset, then in to B.
+        const a1 = len * s.f;
+        const c1x = ax + ux * a1;
+        const c1y = ay + uy * a1;
+        const c2x = c1x + px * amp;
+        const c2y = c1y + py * amp;
+        return `M ${r2(ax)} ${r2(ay)} L ${r2(c1x)} ${r2(c1y)} L ${r2(c2x)} ${r2(c2y)} L ${r2(bx)} ${r2(by)}`;
       }
-      // 'Z' jog: travel, step across at fraction f, continue.
-      if (horiz) {
-        const mx = ax + dx * s.f;
-        return `M ${r2(ax)} ${r2(ay)} L ${r2(mx)} ${r2(ay)} L ${r2(mx)} ${r2(by)} L ${r2(bx)} ${r2(by)}`;
-      }
-      const my = ay + dy * s.f;
-      return `M ${r2(ax)} ${r2(ay)} L ${r2(ax)} ${r2(my)} L ${r2(bx)} ${r2(my)} L ${r2(bx)} ${r2(by)}`;
+      // 'Z' step: along → out → along (offset) → back → along to B.
+      const g = 0.18; // length of the offset run, as a fraction of the edge
+      const a1 = len * Math.max(0.05, s.f - g / 2);
+      const a2 = len * Math.min(0.95, s.f + g / 2);
+      const p1x = ax + ux * a1;
+      const p1y = ay + uy * a1;
+      const p2x = p1x + px * amp;
+      const p2y = p1y + py * amp;
+      const p3x = ax + ux * a2 + px * amp;
+      const p3y = ay + uy * a2 + py * amp;
+      const p4x = ax + ux * a2;
+      const p4y = ay + uy * a2;
+      return (
+        `M ${r2(ax)} ${r2(ay)} L ${r2(p1x)} ${r2(p1y)} L ${r2(p2x)} ${r2(p2y)} ` +
+        `L ${r2(p3x)} ${r2(p3y)} L ${r2(p4x)} ${r2(p4y)} L ${r2(bx)} ${r2(by)}`
+      );
     }
 
     function recomputeRests() {

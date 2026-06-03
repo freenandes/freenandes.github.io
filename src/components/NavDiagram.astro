@@ -11,8 +11,36 @@
    panel. Everything degrades to a static, readable list without JS, and the
    simulation is skipped under `prefers-reduced-motion`.
    ========================================================================= */
-import { diagramNodes, diagramEdges } from '../diagram.config';
+import { diagramNodes, diagramEdges, type NodeShape } from '../diagram.config';
 import { withBase } from '../lib/base';
+
+// Node "points" are polygons (no circles). Compute the points string for a
+// regular n-gon inscribed in a 20×20 viewBox, rotated to sit upright.
+const SHAPE_SIDES: Record<NodeShape, number> = {
+  triangle: 3,
+  square: 4,
+  pentagon: 5,
+  hexagon: 6,
+};
+const SHAPE_ROT: Record<NodeShape, number> = {
+  triangle: -90, // point up
+  square: -45, // flat sides
+  pentagon: -90, // point up
+  hexagon: -90, // point top
+};
+function polygonPoints(shape: NodeShape = 'hexagon'): string {
+  const sides = SHAPE_SIDES[shape] ?? 6;
+  const rot = SHAPE_ROT[shape] ?? -90;
+  const cx = 10;
+  const cy = 10;
+  const r = 8.4;
+  const pts: string[] = [];
+  for (let i = 0; i < sides; i++) {
+    const a = ((rot + (i * 360) / sides) * Math.PI) / 180;
+    pts.push(`${(cx + r * Math.cos(a)).toFixed(2)},${(cy + r * Math.sin(a)).toFixed(2)}`);
+  }
+  return pts.join(' ');
+}
 
 // Split the nodes so the markup mirrors the page's real outline: the identity
 // node carries the page <h1>, the remaining single nodes are <h2> landmarks,
@@ -54,7 +82,9 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
               aria-expanded="false"
               aria-controls={`panel-${node.id}`}
             >
-              <span class="node__dot" aria-hidden="true" />
+              <svg class="node__dot" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                <polygon points={polygonPoints(node.shape)} />
+              </svg>
               <span class="node__label">{node.label}</span>
             </button>
           </Heading>
@@ -116,7 +146,9 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
               aria-expanded="false"
               aria-controls={`panel-${node.id}`}
             >
-              <span class="node__dot" aria-hidden="true" />
+              <svg class="node__dot" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                <polygon points={polygonPoints(node.shape)} />
+              </svg>
               <span class="node__label">{node.label}</span>
             </button>
           </h2>
@@ -268,32 +300,41 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
   }
 
   .node__dot {
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-    border: 1.5px solid var(--ink);
-    background: var(--paper);
-    transition: transform var(--dur-fast) var(--ease),
-      background var(--dur-fast) var(--ease),
-      border-color var(--dur-fast) var(--ease),
-      box-shadow var(--dur) var(--ease);
+    width: 15px;
+    height: 15px;
+    overflow: visible;
+    flex: none;
+    transition: transform var(--dur-fast) var(--ease);
   }
   .node--lg .node__dot {
-    width: 17px;
-    height: 17px;
-    border-width: 2px;
+    width: 21px;
+    height: 21px;
   }
   .node--sm .node__dot {
-    width: 8px;
-    height: 8px;
+    width: 11px;
+    height: 11px;
+  }
+  .node__dot polygon {
+    fill: var(--paper);
+    stroke: var(--ink);
+    stroke-width: 1.6;
+    vector-effect: non-scaling-stroke;
+    transition: fill var(--dur-fast) var(--ease),
+      stroke var(--dur-fast) var(--ease);
+  }
+  .node--lg .node__dot polygon {
+    stroke-width: 1.9;
   }
   .node__hit:hover .node__dot,
   .node:focus-within .node__dot,
   .node.is-open .node__dot {
-    background: var(--accent);
-    border-color: var(--accent-ink);
-    transform: scale(1.25);
-    box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent) 16%, transparent);
+    transform: scale(1.2);
+  }
+  .node__hit:hover .node__dot polygon,
+  .node:focus-within .node__dot polygon,
+  .node.is-open .node__dot polygon {
+    fill: var(--accent);
+    stroke: var(--accent-ink);
   }
 
   .node__label {
@@ -504,11 +545,14 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
   };
 
   type EdgeShape = {
-    kind: 'straight' | 'wave' | 'zig';
+    kind: 'straight' | 'wave' | 'elbow';
     amp: number;
     waves: number;
     phase: number;
-    segs: number;
+    /** Elbow bend position along the edge (0..1). */
+    f: number;
+    /** Elbow corner count: 'L' = one corner, 'Z' = a centred jog. */
+    style: 'L' | 'Z';
   };
 
   function initDiagram(root: HTMLElement) {
@@ -556,7 +600,8 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
           amp: 0,
           waves: 1,
           phase: 0,
-          segs: 4,
+          f: 0.5,
+          style: 'Z',
         };
         return { a, b, line, rest: 0, shape };
       })
@@ -596,75 +641,68 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
     let H = 0;
 
     // --- Dynamic layout ------------------------------------------------------
-    // The line is laid out fresh on every load / reset: a random walk in
-    // fraction space (kept inside a padded box) so consecutive chain nodes stay
-    // near each other and the whole thing reads as one wandering line. Storing
-    // *fractions* (not pixels) means a resize just remaps them — nothing crops.
-    const FLO = 0.06;
-    const FHI = 0.94;
-
+    // The line is laid out fresh on every load / reset, but gently: the chain
+    // is an evenly-spaced "spine" along the dominant axis, slightly tilted and
+    // with a soft perpendicular meander. The shape varies between loads without
+    // flinging nodes around. Stored as *fractions* so resizing just remaps.
     function inset() {
       const mx = Math.min(0.14 * W, 150);
       const my = Math.min(0.12 * H, 110);
       return { mx, my, iw: Math.max(1, W - 2 * mx), ih: Math.max(1, H - 2 * my) };
     }
 
-    // Lay the chain out as a random walk with momentum + light overlap-avoidance.
     function generateLayout() {
-      const placed: { x: number; y: number }[] = [];
-      const clampReflect = (v: number) => {
-        if (v < FLO) v = FLO + (FLO - v);
-        if (v > FHI) v = FHI - (v - FHI);
-        return Math.max(FLO, Math.min(FHI, v));
-      };
-      let x = FLO + Math.random() * (FHI - FLO);
-      let y = FLO + Math.random() * (FHI - FLO);
-      let ang = Math.random() * Math.PI * 2;
-      for (let i = 0; i < chainOrder.length; i++) {
-        if (i > 0) {
-          let nx = x;
-          let ny = y;
-          for (let t = 0; t < 16; t++) {
-            const a = ang + (Math.random() * 2 - 1) * 1.3;
-            const step = 0.2 + Math.random() * 0.24;
-            nx = clampReflect(x + Math.cos(a) * step);
-            ny = clampReflect(y + Math.sin(a) * step);
-            ang = a;
-            const ok = placed.every(
-              (p) => Math.hypot(p.x - nx, p.y - ny) > 0.16
-            );
-            if (ok || t === 15) break;
-          }
-          x = nx;
-          y = ny;
-        }
-        placed.push({ x, y });
-        chainOrder[i].frac = { x, y };
+      const rect = root.getBoundingClientRect();
+      const landscape = rect.width > rect.height * 1.15;
+      const n = chainOrder.length;
+      // Spine direction: along the dominant axis, tilted by up to ±20°.
+      const base = landscape ? 0 : Math.PI / 2;
+      const ang = base + (Math.random() * 2 - 1) * (20 * Math.PI) / 180;
+      const dx = Math.cos(ang);
+      const dy = Math.sin(ang);
+      const ox = -dy; // perpendicular
+      const oy = dx;
+      const half = 0.4; // along-axis half-extent
+      let o = (Math.random() * 2 - 1) * 0.06; // perpendicular meander
+      let vel = 0;
+      for (let i = 0; i < n; i++) {
+        const s = (n === 1 ? 0 : i / (n - 1) - 0.5) * 2 * half;
+        vel += (Math.random() * 2 - 1) * 0.06;
+        vel *= 0.72;
+        o += vel;
+        o = Math.max(-0.18, Math.min(0.18, o));
+        const jit = (Math.random() * 2 - 1) * 0.015;
+        const fx = Math.max(0.08, Math.min(0.92, 0.5 + dx * s + ox * o + dx * jit));
+        const fy = Math.max(0.08, Math.min(0.92, 0.5 + dy * s + oy * o + dy * jit));
+        chainOrder[i].frac = { x: fx, y: fy };
       }
     }
 
-    // Each connector gets a random style — straight, sine-wave, or zig-zag —
-    // refreshed alongside the layout so reloads/resets feel different.
+    // Each connector gets a calm style — straight, a single gentle wave, or a
+    // clean right-angled elbow (one corner 'L' or a centred jog 'Z'), echoing
+    // the routed look of the reference. Re-rolled with each new layout.
     function generateEdgeShapes() {
       for (const e of edges) {
         const r = Math.random();
-        if (r < 0.15) {
-          e.shape = { kind: 'straight', amp: 0, waves: 1, phase: 0, segs: 4 };
-        } else if (r < 0.6) {
+        if (r < 0.3) {
+          e.shape = { kind: 'straight', amp: 0, waves: 1, phase: 0, f: 0.5, style: 'Z' };
+        } else if (r < 0.62) {
           e.shape = {
             kind: 'wave',
-            amp: 24 + Math.random() * 34,
-            waves: 1 + Math.floor(Math.random() * 3),
-            phase: Math.random() * Math.PI * 2,
-            segs: 30,
+            amp: 7 + Math.random() * 11,
+            waves: 1,
+            phase: Math.random() < 0.5 ? 0 : Math.PI,
+            f: 0.5,
+            style: 'Z',
           };
         } else {
           e.shape = {
-            kind: 'zig',
-            amp: 18 + Math.random() * 30,
+            kind: 'elbow',
+            amp: 0,
             waves: 1,
             phase: 0,
-            segs: 3 + Math.floor(Math.random() * 4),
+            f: 0.4 + Math.random() * 0.2,
+            style: Math.random() < 0.5 ? 'L' : 'Z',
           };
         }
       }
@@ -681,29 +719,38 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
       const len = Math.hypot(dx, dy) || 1;
       const s = e.shape;
       if (s.kind === 'straight' || len < 4) return `M ${ax} ${ay} L ${bx} ${by}`;
-      const nx = -dy / len; // unit perpendicular
-      const ny = dx / len;
-      let d = `M ${ax} ${ay}`;
+
       if (s.kind === 'wave') {
-        for (let i = 1; i <= s.segs; i++) {
-          const t = i / s.segs;
-          // Taper to 0 at both ends so the curve meets the nodes cleanly.
-          const off =
-            Math.sin(t * Math.PI * s.waves + s.phase) * s.amp * Math.sin(t * Math.PI);
+        const nx = -dy / len;
+        const ny = dx / len;
+        const segs = 24;
+        let d = `M ${ax} ${ay}`;
+        for (let i = 1; i <= segs; i++) {
+          const t = i / segs;
+          // Single gentle hump, tapered to meet the nodes cleanly.
+          const off = Math.sin(t * Math.PI + s.phase) * s.amp;
           const x = ax + dx * t + nx * off;
           const y = ay + dy * t + ny * off;
           d += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
         }
-      } else {
-        for (let i = 1; i <= s.segs; i++) {
-          const t = i / s.segs;
-          const off = i === s.segs ? 0 : (i % 2 ? 1 : -1) * s.amp;
-          const x = ax + dx * t + nx * off;
-          const y = ay + dy * t + ny * off;
-          d += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
-        }
+        return d;
       }
-      return d;
+
+      // Elbow: clean right-angled routing on screen axes (like the reference).
+      const horiz = Math.abs(dx) >= Math.abs(dy);
+      const r2 = (v: number) => v.toFixed(1);
+      if (s.style === 'L') {
+        const cx = horiz ? bx : ax;
+        const cy = horiz ? ay : by;
+        return `M ${r2(ax)} ${r2(ay)} L ${r2(cx)} ${r2(cy)} L ${r2(bx)} ${r2(by)}`;
+      }
+      // 'Z' jog: travel, step across at fraction f, continue.
+      if (horiz) {
+        const mx = ax + dx * s.f;
+        return `M ${r2(ax)} ${r2(ay)} L ${r2(mx)} ${r2(ay)} L ${r2(mx)} ${r2(by)} L ${r2(bx)} ${r2(by)}`;
+      }
+      const my = ay + dy * s.f;
+      return `M ${r2(ax)} ${r2(ay)} L ${r2(ax)} ${r2(my)} L ${r2(bx)} ${r2(my)} L ${r2(bx)} ${r2(by)}`;
     }
 
     function recomputeRests() {

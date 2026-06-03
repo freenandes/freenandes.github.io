@@ -32,12 +32,18 @@ export interface DiagramLink {
 
 export type NodeKind = 'identity' | 'about' | 'contact' | 'project';
 
+/** Polygon used to draw the node "point". No circles. Assigned per node
+   (not randomized) so it can be hand-tweaked later. */
+export type NodeShape = 'triangle' | 'square' | 'pentagon' | 'hexagon';
+
 export interface DiagramNode {
   id: string;
   label: string;
   kind: NodeKind;
   /** Visual weight of the node dot. */
   size?: 'lg' | 'md' | 'sm';
+  /** Polygon drawn as the node point. */
+  shape?: NodeShape;
   /** Which way the reveal panel opens, so it stays on-canvas. */
   place?: 'top' | 'bottom' | 'left' | 'right';
   /** Small mono caption shown above the panel title (role · year, etc.). */
@@ -64,6 +70,7 @@ export const diagramNodes: DiagramNode[] = [
     label: 'Pedro MC Fernandes',
     kind: 'identity',
     size: 'lg',
+    shape: 'hexagon',
     place: 'bottom',
     tagline:
       'Systems-thinking product designer. I fix the system, not just the screen — at the boundary between strategy and execution, shipping the code too.',
@@ -80,6 +87,7 @@ export const diagramNodes: DiagramNode[] = [
     label: 'About',
     kind: 'about',
     size: 'md',
+    shape: 'triangle',
     place: 'right',
     tagline: 'I design and build — fixing the system, not just the screen.',
     lines: [
@@ -94,6 +102,7 @@ export const diagramNodes: DiagramNode[] = [
     label: 'Contact',
     kind: 'contact',
     size: 'md',
+    shape: 'square',
     place: 'left',
     tagline: 'Open to principal / lead product design and design-engineering work.',
     email: 'redacted@example.invalid',
@@ -110,6 +119,7 @@ export const diagramNodes: DiagramNode[] = [
     label: 'Systems-Thinker',
     kind: 'project',
     size: 'md',
+    shape: 'pentagon',
     place: 'right',
     meta: 'Percona · 2022—present',
     tagline:
@@ -127,6 +137,7 @@ export const diagramNodes: DiagramNode[] = [
     label: 'Design at Scale',
     kind: 'project',
     size: 'md',
+    shape: 'hexagon',
     place: 'left',
     meta: 'TUI · 2019—2021',
     tagline:
@@ -144,6 +155,7 @@ export const diagramNodes: DiagramNode[] = [
     label: 'Visionary',
     kind: 'project',
     size: 'md',
+    shape: 'triangle',
     place: 'top',
     meta: 'Smartidiom · 2016—2019',
     tagline:

@@ -661,21 +661,21 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
       const n = chainOrder.length;
       // Spine direction: along the dominant axis, tilted by up to ±20°.
       const base = landscape ? 0 : Math.PI / 2;
-      const ang = base + (Math.random() * 2 - 1) * (20 * Math.PI) / 180;
+      const ang = base + (Math.random() * 2 - 1) * (34 * Math.PI) / 180;
       const dx = Math.cos(ang);
       const dy = Math.sin(ang);
       const ox = -dy; // perpendicular
       const oy = dx;
       const half = 0.4; // along-axis half-extent
-      let o = (Math.random() * 2 - 1) * 0.06; // perpendicular meander
+      let o = (Math.random() * 2 - 1) * 0.1; // perpendicular meander
       let vel = 0;
       for (let i = 0; i < n; i++) {
         const s = (n === 1 ? 0 : i / (n - 1) - 0.5) * 2 * half;
-        vel += (Math.random() * 2 - 1) * 0.06;
-        vel *= 0.72;
+        vel += (Math.random() * 2 - 1) * 0.12;
+        vel *= 0.74;
         o += vel;
-        o = Math.max(-0.18, Math.min(0.18, o));
-        const jit = (Math.random() * 2 - 1) * 0.015;
+        o = Math.max(-0.32, Math.min(0.32, o));
+        const jit = (Math.random() * 2 - 1) * 0.035;
         const fx = Math.max(0.08, Math.min(0.92, 0.5 + dx * s + ox * o + dx * jit));
         const fy = Math.max(0.08, Math.min(0.92, 0.5 + dy * s + oy * o + dy * jit));
         chainOrder[i].frac = { x: fx, y: fy };
@@ -688,13 +688,14 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
     function generateEdgeShapes() {
       for (const e of edges) {
         const r = Math.random();
-        if (r < 0.3) {
+        if (r < 0.22) {
           e.shape = { kind: 'straight', amp: 0, waves: 1, phase: 0, f: 0.5, style: 'Z' };
-        } else if (r < 0.62) {
+        } else if (r < 0.58) {
           e.shape = {
             kind: 'wave',
-            amp: 7 + Math.random() * 11,
-            waves: 1,
+            amp: 14 + Math.random() * 18,
+            // Mostly a single hump; sometimes a gentle S-curve.
+            waves: Math.random() < 0.3 ? 2 : 1,
             phase: Math.random() < 0.5 ? 0 : Math.PI,
             f: 0.5,
             style: 'Z',
@@ -704,7 +705,7 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
             kind: 'elbow',
             // Signed perpendicular jog height (guaranteed visible regardless of
             // how aligned the two nodes happen to be).
-            amp: (16 + Math.random() * 16) * (Math.random() < 0.5 ? 1 : -1),
+            amp: (22 + Math.random() * 22) * (Math.random() < 0.5 ? 1 : -1),
             waves: 1,
             phase: 0,
             f: 0.4 + Math.random() * 0.2,
@@ -745,8 +746,9 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
         let d = `M ${ax} ${ay}`;
         for (let i = 1; i <= segs; i++) {
           const t = i / segs;
-          // Single gentle hump, tapered to meet the nodes cleanly.
-          const off = Math.sin(t * Math.PI + s.phase) * s.amp;
+          // Gentle hump (waves=1) or a soft S-curve (waves=2); zero at both
+          // ends since waves is an integer and phase is 0 or π.
+          const off = Math.sin(t * Math.PI * s.waves + s.phase) * s.amp;
           const x = ax + dx * t + nx * off;
           const y = ay + dy * t + ny * off;
           d += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;

@@ -538,6 +538,9 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
     fy: number;
     ax: number;
     ay: number;
+    /** Vertical offset from the node's box centre to its polygon point, so
+        connectors attach to the shape rather than crossing the label. */
+    dotDy: number;
     calm: boolean;
     dragging: boolean;
     hover: boolean;
@@ -579,6 +582,7 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
       fy: 0,
       ax: 0,
       ay: 0,
+      dotDy: 0,
       calm: false,
       dragging: false,
       hover: false,
@@ -710,12 +714,24 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
       }
     }
 
+    // Measure each node's polygon-point offset from its box centre (once the
+    // labels are laid out), so connectors meet the shape, not the text.
+    function measureDotOffsets() {
+      for (const n of nodes) {
+        const dot = n.el.querySelector('.node__dot');
+        if (!dot) continue;
+        const nr = n.el.getBoundingClientRect();
+        const dr = dot.getBoundingClientRect();
+        n.dotDy = dr.top + dr.height / 2 - (nr.top + nr.height / 2);
+      }
+    }
+
     // Build the SVG path for an edge from its current endpoints + its shape.
     function edgePath(e: { a: Node; b: Node; shape: EdgeShape }): string {
       const ax = e.a.x;
-      const ay = e.a.y;
+      const ay = e.a.y + e.a.dotDy;
       const bx = e.b.x;
-      const by = e.b.y;
+      const by = e.b.y + e.b.dotDy;
       const dx = bx - ax;
       const dy = by - ay;
       const len = Math.hypot(dx, dy) || 1;
@@ -1086,6 +1102,7 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
       resizeScheduled = true;
       requestAnimationFrame(() => {
         resizeScheduled = false;
+        measureDotOffsets();
         computeAnchors();
         wake();
       });
@@ -1096,6 +1113,8 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
     generateLayout();
     generateEdgeShapes();
     computeAnchors(true);
+    render();
+    measureDotOffsets();
     render();
 
     if (reduce) {

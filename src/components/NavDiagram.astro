@@ -13,9 +13,17 @@
    ========================================================================= */
 import { diagramNodes, diagramEdges } from '../diagram.config';
 import { withBase } from '../lib/base';
+
+// Split the nodes so the markup mirrors the page's real outline: the identity
+// node carries the page <h1>, the remaining single nodes are <h2> landmarks,
+// and the case-study nodes are gathered into one labelled "Selected projects"
+// group. Positioning is unchanged — nodes are absolutely placed by the
+// simulation regardless of DOM nesting.
+const projectNodes = diagramNodes.filter((n) => n.kind === 'project');
+const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
 ---
 
-<section class="diagram" data-diagram aria-label="Pedro MC Fernandes — navigation map">
+<nav class="diagram" data-diagram aria-label="Site map — Pedro MC Fernandes">
   <svg class="diagram__links" data-links aria-hidden="true" focusable="false"></svg>
   <ul class="diagram__edges-data" hidden>
     {
@@ -26,79 +34,125 @@ import { withBase } from '../lib/base';
   </ul>
 
   {
-    diagramNodes.map((node) => (
-      <div
-        class:list={[
-          'node',
-          `node--${node.kind}`,
-          `node--${node.size ?? 'md'}`,
-        ]}
-        data-node
-        data-id={node.id}
-        data-place={node.place ?? 'bottom'}
-        data-px={node.portrait.x}
-        data-py={node.portrait.y}
-        data-lx={node.landscape.x}
-        data-ly={node.landscape.y}
-      >
-        <button
-          class="node__hit"
-          type="button"
-          aria-expanded="false"
-          aria-controls={`panel-${node.id}`}
+    otherNodes.map((node) => {
+      const Heading = node.kind === 'identity' ? 'h1' : 'h2';
+      return (
+        <div
+          class:list={['node', `node--${node.kind}`, `node--${node.size ?? 'md'}`]}
+          data-node
+          data-id={node.id}
+          data-place={node.place ?? 'bottom'}
+          data-px={node.portrait.x}
+          data-py={node.portrait.y}
+          data-lx={node.landscape.x}
+          data-ly={node.landscape.y}
         >
-          <span class="node__dot" aria-hidden="true" />
-          <span class="node__label">{node.label}</span>
-        </button>
-
-        <div class="node__panel" id={`panel-${node.id}`} role="group" aria-label={node.label}>
-          {node.meta && <p class="panel__meta mono">{node.meta}</p>}
-          {node.tagline && <p class="panel__lead">{node.tagline}</p>}
-          {node.lines?.map((line) => <p class="panel__text">{line}</p>)}
-
-          {node.metrics && (
-            <ul class="panel__metrics" role="list">
-              {node.metrics.map((m) => (
-                <li class="panel__metric">
-                  <span class="panel__metric-value">{m.value}</span>
-                  <span class="panel__metric-label">{m.label}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {node.tags && (
-            <ul class="panel__tags" role="list">
-              {node.tags.map((t) => (
-                <li class="panel__chip">{t}</li>
-              ))}
-            </ul>
-          )}
-
-          {node.email && (
-            <a class="panel__link" href={`mailto:${node.email}`}>
-              {node.email}
-            </a>
-          )}
-
-          {node.link && (
-            <a
-              class="panel__link panel__cta"
-              href={node.link.external ? node.link.href : withBase(node.link.href)}
-              {...(node.link.external ? { target: '_blank', rel: 'noopener' } : {})}
+          <Heading class="node__heading">
+            <button
+              class="node__hit"
+              type="button"
+              aria-expanded="false"
+              aria-controls={`panel-${node.id}`}
             >
-              {node.link.label} <span aria-hidden="true">→</span>
-            </a>
-          )}
+              <span class="node__dot" aria-hidden="true" />
+              <span class="node__label">{node.label}</span>
+            </button>
+          </Heading>
+
+          <div class="node__panel" id={`panel-${node.id}`} role="group" aria-label={node.label}>
+            {node.meta && <p class="panel__meta mono">{node.meta}</p>}
+            {node.tagline && <p class="panel__lead">{node.tagline}</p>}
+            {node.lines?.map((line) => <p class="panel__text">{line}</p>)}
+
+            {node.metrics && (
+              <ul class="panel__metrics" role="list">
+                {node.metrics.map((m) => (
+                  <li class="panel__metric">
+                    <span class="panel__metric-value">{m.value}</span>
+                    <span class="panel__metric-label">{m.label}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {node.email && (
+              <a class="panel__link" href={`mailto:${node.email}`}>
+                {node.email}
+              </a>
+            )}
+
+            {node.link && (
+              <a
+                class="panel__link panel__cta"
+                href={node.link.external ? node.link.href : withBase(node.link.href)}
+                {...(node.link.external ? { target: '_blank', rel: 'noopener' } : {})}
+              >
+                {node.link.label} <span aria-hidden="true">→</span>
+              </a>
+            )}
+          </div>
         </div>
-      </div>
-    ))
+      );
+    })
   }
 
+  <div class="node-group" role="group" aria-label="Selected projects">
+    {
+      projectNodes.map((node) => (
+        <div
+          class:list={['node', `node--${node.kind}`, `node--${node.size ?? 'md'}`]}
+          data-node
+          data-id={node.id}
+          data-place={node.place ?? 'bottom'}
+          data-px={node.portrait.x}
+          data-py={node.portrait.y}
+          data-lx={node.landscape.x}
+          data-ly={node.landscape.y}
+        >
+          <h2 class="node__heading">
+            <button
+              class="node__hit"
+              type="button"
+              aria-expanded="false"
+              aria-controls={`panel-${node.id}`}
+            >
+              <span class="node__dot" aria-hidden="true" />
+              <span class="node__label">{node.label}</span>
+            </button>
+          </h2>
+
+          <div class="node__panel" id={`panel-${node.id}`} role="group" aria-label={node.label}>
+            {node.meta && <p class="panel__meta mono">{node.meta}</p>}
+            {node.tagline && <p class="panel__lead">{node.tagline}</p>}
+            {node.lines?.map((line) => <p class="panel__text">{line}</p>)}
+
+            {node.tags && (
+              <ul class="panel__tags" role="list">
+                {node.tags.map((t) => (
+                  <li class="panel__chip">{t}</li>
+                ))}
+              </ul>
+            )}
+
+            {node.link && (
+              <a
+                class="panel__link panel__cta"
+                href={node.link.external ? node.link.href : withBase(node.link.href)}
+                {...(node.link.external ? { target: '_blank', rel: 'noopener' } : {})}
+              >
+                {node.link.label} <span aria-hidden="true">→</span>
+              </a>
+            )}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+
   <p class="diagram__hint mono" data-hint aria-hidden="true">
-    Hover to reveal · drag to feel the give
+    Hover to reveal · drag to feel the give · click your name to reset
   </p>
-</section>
+</nav>
 
 <noscript>
   <style>
@@ -160,6 +214,13 @@ import { withBase } from '../lib/base';
     stroke-linecap: round;
   }
 
+  /* The "Selected projects" wrapper is purely a semantic grouping — it must
+     not create a stacking context or take up layout, so the nodes inside it
+     stay absolutely positioned against the diagram exactly as before. */
+  .node-group {
+    display: contents;
+  }
+
   /* ----------------------------- Nodes ----------------------------- */
   .node {
     position: absolute;
@@ -173,6 +234,17 @@ import { withBase } from '../lib/base';
   .node.is-open,
   .node.is-dragging {
     z-index: 6;
+  }
+
+  /* Heading wrappers give the page a real outline without changing the look:
+     they wrap the existing button and inherit all typography from it. */
+  .node__heading {
+    display: inline-flex;
+    margin: 0;
+    font: inherit;
+    letter-spacing: inherit;
+    line-height: inherit;
+    text-wrap: nowrap;
   }
 
   .node__hit {
@@ -477,6 +549,47 @@ import { withBase } from '../lib/base';
     let W = 0;
     let H = 0;
 
+    // --- User-arranged layout (persisted for the tab session) ----------------
+    // `custom` holds absolute drop positions for nodes the user has dragged.
+    // It survives reloads via sessionStorage, and is wiped when the user clicks
+    // their name (the identity node) or when a resize would crop a kept node.
+    const STORAGE_KEY = 'navdiagram:layout';
+    let custom: Record<string, { x: number; y: number }> = {};
+
+    function loadCustom() {
+      try {
+        const raw = sessionStorage.getItem(STORAGE_KEY);
+        custom = raw ? JSON.parse(raw) : {};
+      } catch {
+        custom = {};
+      }
+    }
+    function saveCustom() {
+      try {
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(custom));
+      } catch {}
+    }
+    function clearCustom() {
+      custom = {};
+      try {
+        sessionStorage.removeItem(STORAGE_KEY);
+      } catch {}
+    }
+
+    // A stored position "fits" when the node (including its label box) stays
+    // fully on-canvas. Used to decide whether a resize should keep or reset.
+    function fits(n: Node, x: number, y: number): boolean {
+      const hw = n.el.offsetWidth / 2 || 40;
+      const hh = n.el.offsetHeight / 2 || 20;
+      return x >= hw && x <= W - hw && y >= hh && y <= H - hh;
+    }
+
+    function recomputeRests() {
+      for (const e of edges) {
+        e.rest = Math.hypot(e.a.ax - e.b.ax, e.a.ay - e.b.ay);
+      }
+    }
+
     function placeFor(n: Node): string {
       const right = W - n.ax;
       const left = n.ax;
@@ -503,19 +616,51 @@ import { withBase } from '../lib/base';
       const landscape = W > H * 1.15;
       const padX = Math.min(0.16 * W, 180);
       const padY = Math.min(0.12 * H, 120);
+
+      // 1) Default layout for the current size.
       for (const n of nodes) {
         const src = landscape ? n.landscape : n.portrait;
         n.ax = padX + src.x * (W - 2 * padX);
         n.ay = padY + src.y * (H - 2 * padY);
+      }
+
+      // 2) Overlay any user-arranged positions. If even one kept node would now
+      //    be cropped, drop the whole custom layout and fall back to default.
+      const customIds = Object.keys(custom);
+      if (customIds.length) {
+        const allFit = customIds.every((id) => {
+          const n = byId.get(id);
+          return !n || fits(n, custom[id].x, custom[id].y);
+        });
+        if (allFit) {
+          for (const id of customIds) {
+            const n = byId.get(id);
+            if (n) {
+              n.ax = custom[id].x;
+              n.ay = custom[id].y;
+            }
+          }
+        } else {
+          clearCustom();
+        }
+      }
+
+      // 3) Seed initial scatter once, then settle into the (custom-or-default)
+      //    anchors. Panel placement and edge rest-lengths follow the anchors.
+      for (const n of nodes) {
         if (first) {
           n.x = n.ax + (Math.random() - 0.5) * 18;
           n.y = n.ay + (Math.random() - 0.5) * 18;
         }
         n.el.dataset.place = placeFor(n);
       }
-      for (const e of edges) {
-        e.rest = Math.hypot(e.a.ax - e.b.ax, e.a.ay - e.b.ay);
-      }
+      recomputeRests();
+    }
+
+    function resetLayout() {
+      clearCustom();
+      computeAnchors();
+      wake();
     }
 
     const pointer = { x: 0, y: 0, active: false };
@@ -743,6 +888,14 @@ import { withBase } from '../lib/base';
         if (n.dragging) {
           n.dragging = false;
           n.el.classList.remove('is-dragging');
+          // Pin the node where it was dropped: its anchor becomes the drop
+          // position, edge rest-lengths re-settle around it, and it persists.
+          n.ax = n.x;
+          n.ay = n.y;
+          custom[n.id] = { x: n.x, y: n.y };
+          saveCustom();
+          recomputeRests();
+          n.el.dataset.place = placeFor(n);
           wake();
         }
       };
@@ -754,6 +907,8 @@ import { withBase } from '../lib/base';
           ev.preventDefault();
           return;
         }
+        // Clicking the identity node resets any user-arranged layout.
+        if (n.id === 'pedro') resetLayout();
         const wasOpen = n.el.classList.contains('is-open');
         closeAll(n);
         setOpen(n, !wasOpen);
@@ -774,6 +929,7 @@ import { withBase } from '../lib/base';
     const ro = new ResizeObserver(onResize);
     ro.observe(root);
 
+    loadCustom();
     computeAnchors(true);
     render();
 

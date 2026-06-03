@@ -6,12 +6,10 @@ import { site } from '../site.config';
 ---
 
 <Base chrome={false} mainClass="home" bare>
-  <div class="home__mark">
+  <div class="home__mark" aria-hidden="true">
     <RegMark size={14} />
     <span class="home__mark-text">{site.mark}</span>
   </div>
-
-  <h1 class="visually-hidden">{site.name} — {site.role}</h1>
 
   <NavDiagram />
 </Base>

@@ -1,39 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
-import RegMark from '../components/RegMark.astro';
 import NavDiagram from '../components/NavDiagram.astro';
-import { site } from '../site.config';
 ---
 
 <Base chrome={false} mainClass="home" bare>
-  <div class="home__mark" aria-hidden="true">
-    <RegMark size={14} />
-    <span class="home__mark-text">{site.mark}</span>
-  </div>
-
   <NavDiagram />
 </Base>
 
 <style>
   :global(main.home) {
     min-height: 100svh;
-  }
-
-  .home__mark {
-    position: fixed;
-    top: clamp(1rem, 3vh, 1.75rem);
-    left: var(--gutter);
-    z-index: var(--z-header);
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-xs);
-    font-family: var(--font-mono);
-    font-weight: 700;
-    letter-spacing: var(--tracking-mono);
-    color: var(--ink);
-    pointer-events: none;
-  }
-  .home__mark-text {
-    font-size: var(--step-0);
   }
 </style>

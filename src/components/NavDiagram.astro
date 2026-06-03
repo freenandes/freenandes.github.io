@@ -6,13 +6,42 @@
    buttons (with links inside their reveal panels), so the diagram is keyboard-
    and screen-reader navigable. A small vanilla-JS spring simulation (below)
    gives the graph its "live molecule" give: edges behave like springs, the
-   pointer gently repels nearby nodes, and you can drag a node to tug the whole
+   nodes repel when too close, and you can drag a node to tug the whole
    structure. Hovering / focusing / tapping a node calms it and reveals its
    panel. Everything degrades to a static, readable list without JS, and the
    simulation is skipped under `prefers-reduced-motion`.
    ========================================================================= */
-import { diagramNodes, diagramEdges } from '../diagram.config';
+import { diagramNodes, diagramEdges, type NodeShape } from '../diagram.config';
 import { withBase } from '../lib/base';
+import { site } from '../site.config';
+
+// Node "points" are polygons (no circles). Compute the points string for a
+// regular n-gon inscribed in a 20×20 viewBox, rotated to sit upright.
+const SHAPE_SIDES: Record<NodeShape, number> = {
+  triangle: 3,
+  square: 4,
+  pentagon: 5,
+  hexagon: 6,
+};
+const SHAPE_ROT: Record<NodeShape, number> = {
+  triangle: -90, // point up
+  square: -45, // flat sides
+  pentagon: -90, // point up
+  hexagon: -90, // point top
+};
+function polygonPoints(shape: NodeShape = 'hexagon'): string {
+  const sides = SHAPE_SIDES[shape] ?? 6;
+  const rot = SHAPE_ROT[shape] ?? -90;
+  const cx = 10;
+  const cy = 10;
+  const r = 8.4;
+  const pts: string[] = [];
+  for (let i = 0; i < sides; i++) {
+    const a = ((rot + (i * 360) / sides) * Math.PI) / 180;
+    pts.push(`${(cx + r * Math.cos(a)).toFixed(2)},${(cy + r * Math.sin(a)).toFixed(2)}`);
+  }
+  return pts.join(' ');
+}
 
 // Split the nodes so the markup mirrors the page's real outline: the identity
 // node carries the page <h1>, the remaining single nodes are <h2> landmarks,
@@ -23,7 +52,7 @@ const projectNodes = diagramNodes.filter((n) => n.kind === 'project');
 const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
 ---
 
-<nav class="diagram" data-diagram aria-label="Site map — Pedro MC Fernandes">
+<nav class="diagram" data-diagram aria-label={`Site map — ${site.name}`}>
   <svg class="diagram__links" data-links aria-hidden="true" focusable="false"></svg>
   <ul class="diagram__edges-data" hidden>
     {
@@ -36,6 +65,7 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
   {
     otherNodes.map((node) => {
       const Heading = node.kind === 'identity' ? 'h1' : 'h2';
+      const hasPanel = node.kind !== 'identity';
       return (
         <div
           class:list={['node', `node--${node.kind}`, `node--${node.size ?? 'md'}`]}
@@ -51,46 +81,52 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
             <button
               class="node__hit"
               type="button"
-              aria-expanded="false"
-              aria-controls={`panel-${node.id}`}
+              {...(hasPanel
+                ? { 'aria-expanded': 'false', 'aria-controls': `panel-${node.id}` }
+                : {})}
             >
-              <span class="node__dot" aria-hidden="true" />
+              <svg class="node__dot" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                <polygon points={polygonPoints(node.shape)} />
+              </svg>
               <span class="node__label">{node.label}</span>
+              {node.subLabel && <span class="node__sublabel mono">{node.subLabel}</span>}
             </button>
           </Heading>
 
-          <div class="node__panel" id={`panel-${node.id}`} role="group" aria-label={node.label}>
-            {node.meta && <p class="panel__meta mono">{node.meta}</p>}
-            {node.tagline && <p class="panel__lead">{node.tagline}</p>}
-            {node.lines?.map((line) => <p class="panel__text">{line}</p>)}
+          {hasPanel && (
+            <div class="node__panel" id={`panel-${node.id}`} role="group" aria-label={node.label}>
+              {node.meta && <p class="panel__meta mono">{node.meta}</p>}
+              {node.tagline && <p class="panel__lead">{node.tagline}</p>}
+              {node.lines?.map((line) => <p class="panel__text">{line}</p>)}
 
-            {node.metrics && (
-              <ul class="panel__metrics" role="list">
-                {node.metrics.map((m) => (
-                  <li class="panel__metric">
-                    <span class="panel__metric-value">{m.value}</span>
-                    <span class="panel__metric-label">{m.label}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+              {node.metrics && (
+                <ul class="panel__metrics" role="list">
+                  {node.metrics.map((m) => (
+                    <li class="panel__metric">
+                      <span class="panel__metric-value">{m.value}</span>
+                      <span class="panel__metric-label">{m.label}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-            {node.email && (
-              <a class="panel__link" href={`mailto:${node.email}`}>
-                {node.email}
-              </a>
-            )}
+              {node.email && (
+                <a class="panel__link" href={`mailto:${node.email}`}>
+                  {node.email}
+                </a>
+              )}
 
-            {node.link && (
-              <a
-                class="panel__link panel__cta"
-                href={node.link.external ? node.link.href : withBase(node.link.href)}
-                {...(node.link.external ? { target: '_blank', rel: 'noopener' } : {})}
-              >
-                {node.link.label} <span aria-hidden="true">→</span>
-              </a>
-            )}
-          </div>
+              {node.link && (
+                <a
+                  class="panel__link panel__cta"
+                  href={node.link.external ? node.link.href : withBase(node.link.href)}
+                  {...(node.link.external ? { target: '_blank', rel: 'noopener' } : {})}
+                >
+                  {node.link.label} <span aria-hidden="true">→</span>
+                </a>
+              )}
+            </div>
+          )}
         </div>
       );
     })
@@ -116,7 +152,9 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
               aria-expanded="false"
               aria-controls={`panel-${node.id}`}
             >
-              <span class="node__dot" aria-hidden="true" />
+              <svg class="node__dot" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                <polygon points={polygonPoints(node.shape)} />
+              </svg>
               <span class="node__label">{node.label}</span>
             </button>
           </h2>
@@ -148,10 +186,6 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
       ))
     }
   </div>
-
-  <p class="diagram__hint mono" data-hint aria-hidden="true">
-    Hover to reveal · drag to feel the give · click your name to reset
-  </p>
 </nav>
 
 <noscript>
@@ -162,8 +196,7 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
       min-height: 0 !important;
       padding: var(--space-xl) var(--gutter) !important;
     }
-    .diagram__links,
-    .diagram__hint {
+    .diagram__links {
       display: none !important;
     }
     .node {
@@ -208,10 +241,12 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
     z-index: 0;
   }
   .diagram__links :global(.link-line) {
+    fill: none;
     stroke: var(--ink);
-    stroke-width: 1;
-    opacity: 0.28;
+    stroke-width: 1.2;
+    opacity: 0.42;
     stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   /* The "Selected projects" wrapper is purely a semantic grouping — it must
@@ -266,32 +301,58 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
   }
 
   .node__dot {
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-    border: 1.5px solid var(--ink);
-    background: var(--paper);
-    transition: transform var(--dur-fast) var(--ease),
-      background var(--dur-fast) var(--ease),
-      border-color var(--dur-fast) var(--ease),
-      box-shadow var(--dur) var(--ease);
+    width: 15px;
+    height: 15px;
+    overflow: visible;
+    flex: none;
+    transition: transform var(--dur-fast) var(--ease);
   }
   .node--lg .node__dot {
-    width: 17px;
-    height: 17px;
-    border-width: 2px;
+    width: 21px;
+    height: 21px;
   }
   .node--sm .node__dot {
-    width: 8px;
-    height: 8px;
+    width: 11px;
+    height: 11px;
+  }
+  .node__dot polygon {
+    fill: var(--paper);
+    stroke: var(--ink);
+    stroke-width: 1.6;
+    vector-effect: non-scaling-stroke;
+    transition: fill var(--dur-fast) var(--ease),
+      stroke var(--dur-fast) var(--ease);
+  }
+  .node--lg .node__dot polygon {
+    stroke-width: 1.9;
   }
   .node__hit:hover .node__dot,
   .node:focus-within .node__dot,
   .node.is-open .node__dot {
-    background: var(--accent);
-    border-color: var(--accent-ink);
-    transform: scale(1.25);
-    box-shadow: 0 0 0 6px color-mix(in oklab, var(--accent) 16%, transparent);
+    transform: scale(1.2);
+  }
+  .node__hit:hover .node__dot polygon,
+  .node:focus-within .node__dot polygon,
+  .node.is-open .node__dot polygon {
+    fill: var(--accent);
+    stroke: var(--accent-ink);
+  }
+
+  /* Knockout plate — a single solid paper-coloured box behind each label so
+     connector lines are masked completely (no per-glyph gaps). Tune the cover
+     with --ko-px / --ko-py (padding) and --ko-radius. --ko is the fill colour. */
+  .node__label,
+  .node__sublabel {
+    --ko: var(--paper);
+    --ko-px: 0.375em;
+    --ko-py: 0;
+    --ko-radius: var(--radius-sm);
+    display: inline-block;
+    padding: var(--ko-py) var(--ko-px);
+    /* Cancel the padding's footprint so spacing/centering is unchanged. */
+    margin: calc(-1 * var(--ko-py)) calc(-1 * var(--ko-px));
+    background-color: var(--ko);
+    border-radius: var(--ko-radius);
   }
 
   .node__label {
@@ -315,6 +376,18 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
     font-size: var(--step-1);
     font-weight: 600;
     color: var(--ink);
+  }
+
+  .node__sublabel {
+    margin-block-start: 0.15rem;
+    font-size: var(--step--1);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+  .node--identity .node__sublabel {
+    color: var(--ink-2);
   }
 
   /* ----------------------------- Panel ----------------------------- */
@@ -458,34 +531,15 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
   .panel__cta:hover span {
     transform: translateX(3px);
   }
-
-  /* ----------------------------- Hint ------------------------------ */
-  .diagram__hint {
-    position: absolute;
-    inset-inline: 0;
-    bottom: clamp(1rem, 4vh, 2.5rem);
-    text-align: center;
-    color: var(--ink-3);
-    transition: opacity var(--dur-slow) var(--ease);
-    z-index: 1;
-  }
-  .diagram[data-touched] .diagram__hint {
-    opacity: 0;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .diagram__hint {
-      display: none;
-    }
-  }
 </style>
 
 <script>
   type Node = {
     el: HTMLElement;
     id: string;
-    portrait: { x: number; y: number };
-    landscape: { x: number; y: number };
+    /** Layout position as a fraction (0..1) of the padded canvas. Regenerated
+        randomly on each load / reset; updated when a node is dragged. */
+    frac: { x: number; y: number };
     x: number;
     y: number;
     vx: number;
@@ -494,11 +548,20 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
     fy: number;
     ax: number;
     ay: number;
-    phase: number;
+    /** Vertical offset from the node's box centre to its polygon point, so
+        connectors attach to the shape rather than crossing the label. */
+    dotDy: number;
     calm: boolean;
     dragging: boolean;
     hover: boolean;
     focus: boolean;
+  };
+
+  type EdgeShape = {
+    kind: 'straight' | 'jagged' | 'wave';
+    /** Perpendicular offsets at fractional positions along the chord (t in 0..1).
+        Endpoints (t=0 and t=1) are always 0 and added at render time. */
+    points: { t: number; off: number }[];
   };
 
   function initDiagram(root: HTMLElement) {
@@ -516,8 +579,7 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
     const nodes: Node[] = nodeEls.map((el) => ({
       el,
       id: el.dataset.id || '',
-      portrait: { x: +(el.dataset.px || 0.5), y: +(el.dataset.py || 0.5) },
-      landscape: { x: +(el.dataset.lx || 0.5), y: +(el.dataset.ly || 0.5) },
+      frac: { x: 0.5, y: 0.5 },
       x: 0,
       y: 0,
       vx: 0,
@@ -526,7 +588,7 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
       fy: 0,
       ax: 0,
       ay: 0,
-      phase: Math.random() * Math.PI * 2,
+      dotDy: 0,
       calm: false,
       dragging: false,
       hover: false,
@@ -539,49 +601,453 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
         const a = byId.get(li.dataset.a || '');
         const b = byId.get(li.dataset.b || '');
         if (!a || !b) return null;
-        const line = document.createElementNS(SVG_NS, 'line');
+        const line = document.createElementNS(SVG_NS, 'path');
         line.setAttribute('class', 'link-line');
+        line.setAttribute('fill', 'none');
         svgEl.appendChild(line);
-        return { a, b, line, rest: 0 };
+        const shape: EdgeShape = { kind: 'straight', points: [] };
+        return { a, b, line, rest: 0, shape };
       })
-      .filter(Boolean) as { a: Node; b: Node; line: SVGLineElement; rest: number }[];
+      .filter(Boolean) as {
+      a: Node;
+      b: Node;
+      line: SVGPathElement;
+      rest: number;
+      shape: EdgeShape;
+    }[];
+
+    // Order the nodes along the chain (the diagram is one open line) so the
+    // random walk lays them out sequentially and the connectors read as a line.
+    const chainOrder: Node[] = (() => {
+      const adj = new Map<string, string[]>();
+      for (const e of edges) {
+        (adj.get(e.a.id) || adj.set(e.a.id, []).get(e.a.id)!).push(e.b.id);
+        (adj.get(e.b.id) || adj.set(e.b.id, []).get(e.b.id)!).push(e.a.id);
+      }
+      const ends = [...adj.keys()].filter((id) => (adj.get(id) || []).length === 1);
+      if (!ends.length) return nodes.slice();
+      const order: Node[] = [];
+      const seen = new Set<string>();
+      let cur: string | undefined = ends[0];
+      while (cur && !seen.has(cur)) {
+        seen.add(cur);
+        const n = byId.get(cur);
+        if (n) order.push(n);
+        cur = (adj.get(cur) || []).find((id) => !seen.has(id));
+      }
+      // Append any stragglers (defensive: not a clean path).
+      for (const n of nodes) if (!seen.has(n.id)) order.push(n);
+      return order;
+    })();
 
     let W = 0;
     let H = 0;
 
-    // --- User-arranged layout (persisted for the tab session) ----------------
-    // `custom` holds absolute drop positions for nodes the user has dragged.
-    // It survives reloads via sessionStorage, and is wiped when the user clicks
-    // their name (the identity node) or when a resize would crop a kept node.
-    const STORAGE_KEY = 'navdiagram:layout';
-    let custom: Record<string, { x: number; y: number }> = {};
+    // --- Dynamic layout ------------------------------------------------------
+    // Fresh random shape on each load / identity reset (Math.random, no seed).
+    // Resize/crowding may nudge toward diagram.config coords only when adapting.
+    /** How constrained the horizontal axis is. Returns a 0..1 value where
+        higher = narrower (phone-portrait territory). Used to decide layout
+        tilt, meander amplitude, label side, etc. */
+    function narrowness() {
+      const aspect = W / Math.max(1, H);
+      // aspect 1.0 → 0 (square), aspect 0.5 → 1 (very tall phone)
+      return Math.max(0, Math.min(1, (1 - aspect) / 0.5));
+    }
 
-    function loadCustom() {
-      try {
-        const raw = sessionStorage.getItem(STORAGE_KEY);
-        custom = raw ? JSON.parse(raw) : {};
-      } catch {
-        custom = {};
+    function inset() {
+      const narrow = narrowness();
+      // Labels are centered under the dot and extend ~110 px to each side, so
+      // the *horizontal* margin must grow on narrow viewports or labels clip
+      // at the screen edge. The vertical margin also gets a small boost so the
+      // bottom-most label has room.
+      const mx = Math.min((0.14 + 0.16 * narrow) * W, 180);
+      const my = Math.min((0.12 + 0.06 * narrow) * H, 160);
+      return { mx, my, iw: Math.max(1, W - 2 * mx), ih: Math.max(1, H - 2 * my) };
+    }
+
+    function configFrac(n: Node, landscape: boolean) {
+      const el = n.el;
+      const x = parseFloat(landscape ? el.dataset.lx || '0.5' : el.dataset.px || '0.5');
+      const y = parseFloat(landscape ? el.dataset.ly || '0.5' : el.dataset.py || '0.5');
+      return { x, y };
+    }
+
+    function clampFrac(x: number, y: number) {
+      return {
+        x: Math.max(0.08, Math.min(0.92, x)),
+        y: Math.max(0.08, Math.min(0.92, y)),
+      };
+    }
+
+    /** Blend spine sample with authored map coords so the graph can breathe. */
+    function blendWithConfig(n: Node, landscape: boolean, spine: { x: number; y: number }, mix: number) {
+      const cfg = configFrac(n, landscape);
+      return clampFrac(spine.x * (1 - mix) + cfg.x * mix, spine.y * (1 - mix) + cfg.y * mix);
+    }
+
+    function generateLayout() {
+      const rect = root.getBoundingClientRect();
+      const landscape = rect.width > rect.height * 1.15;
+      const n = chainOrder.length;
+      // The chain advances monotonically along a spine (that's what keeps it
+      // from folding into sharp switchbacks), but the spine's *direction* is
+      // free: biased toward the dominant axis to use the canvas, with a wide
+      // tilt and a random end-to-end flip so no node sits in the same "zone"
+      // across reloads.
+      const base = landscape ? 0 : Math.PI / 2;
+      // Narrow viewports can't absorb tilt or meander without folding the
+      // chain back on itself, so we shrink both as `narrow` → 1.
+      const narrow = narrowness();
+      const tiltDeg = 42 - 28 * narrow; // 42° → 14° as the viewport narrows
+      const tilt = (Math.random() * 2 - 1) * (tiltDeg * Math.PI) / 180;
+      const flip = Math.random() < 0.5 ? 1 : -1; // run the line either way
+      const ang = base + tilt;
+      const dx = Math.cos(ang) * flip;
+      const dy = Math.sin(ang) * flip;
+      const ox = -dy; // perpendicular axis
+      const oy = dx;
+      const cx = 0.42 + Math.random() * 0.16;
+      const cy = 0.42 + Math.random() * 0.16;
+      const half = 0.34 + Math.random() * 0.12;
+      // Gentle, mean-reverting perpendicular meander: organic waviness around
+      // the spine without ever turning back on itself. Amplitude/clamp shrink
+      // on narrow viewports to keep the chain near the centerline.
+      const meanderMax = 0.2 - 0.12 * narrow; // 0.2 → 0.08
+      const velKick = 0.08 - 0.04 * narrow;
+      const jitMax = 0.05 - 0.025 * narrow;
+      let o = (Math.random() * 2 - 1) * 0.1 * (1 - 0.6 * narrow);
+      let vel = 0;
+      for (let i = 0; i < n; i++) {
+        const s = (n === 1 ? 0 : i / (n - 1) - 0.5) * 2 * half;
+        vel += (Math.random() * 2 - 1) * velKick;
+        vel -= o * 0.22; // pull back toward the spine (mean reversion)
+        vel *= 0.58;
+        o += vel;
+        o = Math.max(-meanderMax, Math.min(meanderMax, o));
+        const alongJit = (Math.random() * 2 - 1) * jitMax;
+        const perpJit = (Math.random() * 2 - 1) * jitMax;
+        const spine = clampFrac(
+          cx + dx * s + ox * (o + perpJit) + dx * alongJit,
+          cy + dy * s + oy * (o + perpJit) + dy * alongJit
+        );
+        // Low config blend: a faint nudge toward the authored map, not a pin —
+        // keeps the form free and varied between loads.
+        chainOrder[i].frac = blendWithConfig(chainOrder[i], landscape, spine, 0.12);
       }
     }
-    function saveCustom() {
-      try {
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(custom));
-      } catch {}
-    }
-    function clearCustom() {
-      custom = {};
-      try {
-        sessionStorage.removeItem(STORAGE_KEY);
-      } catch {}
+
+    // Connectors are straight, jagged, or (1 in 5) a tight wavy line.
+    function generateEdgeShapes() {
+      const kinds = pickKindDistribution(edges.length);
+      shuffleInPlace(kinds);
+      for (let i = 0; i < edges.length; i++) {
+        if (kinds[i] === 'jagged') edges[i].shape = { kind: 'jagged', points: makeJaggedPoints() };
+        else if (kinds[i] === 'wave') edges[i].shape = { kind: 'wave', points: makeWavePoints() };
+        else edges[i].shape = { kind: 'straight', points: [] };
+      }
     }
 
-    // A stored position "fits" when the node (including its label box) stays
-    // fully on-canvas. Used to decide whether a resize should keep or reset.
-    function fits(n: Node, x: number, y: number): boolean {
-      const hw = n.el.offsetWidth / 2 || 40;
-      const hh = n.el.offsetHeight / 2 || 20;
-      return x >= hw && x <= W - hw && y >= hh && y <= H - hh;
+    function shuffleInPlace<T>(arr: T[]) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+
+    /** Pick how many of each kind appear in this layout.
+        For 5 edges: exactly 1 wave, 2–3 jagged, the rest straight. */
+    function pickKindDistribution(n: number): Array<'straight' | 'jagged' | 'wave'> {
+      if (n === 5) {
+        const options: Array<[number, number, number]> = [
+          [2, 2, 1], // 2 straight, 2 jagged, 1 wave
+          [1, 3, 1], // 1 straight, 3 jagged, 1 wave
+        ];
+        const [s, j, w] = options[Math.floor(Math.random() * options.length)];
+        return [
+          ...Array(s).fill('straight' as const),
+          ...Array(j).fill('jagged' as const),
+          ...Array(w).fill('wave' as const),
+        ];
+      }
+      // Generic fallback: ~1-in-5 wave, roughly half jagged, rest straight.
+      const w = Math.max(0, Math.round(n / 5));
+      const j = Math.max(1, Math.min(n - w, Math.round(n * 0.4)));
+      const s = Math.max(0, n - j - w);
+      return [
+        ...Array(s).fill('straight' as const),
+        ...Array(j).fill('jagged' as const),
+        ...Array(w).fill('wave' as const),
+      ];
+    }
+
+    /** A pure-sine wavy line: 3–5 ripples, amplitude 6–14px, perfectly regular.
+        The points array encodes the wave parameters for the renderer:
+        `points.length` = number of humps, `|points[0].off|` = peak amplitude. */
+    function makeWavePoints(): { t: number; off: number }[] {
+      const count = 4 + Math.floor(Math.random() * 3); // No. of humps
+      const amp = 10 + Math.random() * 10; // Width of humps
+      const sign = Math.random() < 0.5 ? 1 : -1;
+      const pts: { t: number; off: number }[] = [];
+      for (let k = 0; k < count; k++) {
+        // Hump centres evenly spaced along the chord with equal amplitude —
+        // the renderer reconstructs the actual sine curve from these values.
+        const t = (k + 0.5) / count;
+        const dir = k % 2 === 0 ? sign : -sign;
+        pts.push({ t, off: dir * amp });
+      }
+      return pts;
+    }
+
+    /** Tight jagged line — 2–3 corners, narrow consistent zig-zag width.
+        Inspired by the diagrammatic line work on andrewtrousdale.com: short
+        amplitude, even spacing, strict alternation, near-uniform peaks so each
+        line reads as a clean pulse rather than a chaotic squiggle. */
+    function makeJaggedPoints(): { t: number; off: number }[] {
+      const count = 2 + Math.floor(Math.random() * 2); // No. of corners
+      const baseAmp = 12 + Math.random() * 14; // Width of the zig-zags
+      let sign = Math.random() < 0.5 ? 1 : -1;
+      const pts: { t: number; off: number }[] = [];
+      for (let k = 0; k < count; k++) {
+        const center = (k + 1) / (count + 1);
+        // Small position jitter so corners aren't perfectly metronomic, but
+        // not enough to look chaotic.
+        const tJit = ((Math.random() * 2 - 1) * 1.25) / (count + 1);
+        // Near-uniform amplitude per spike — keeps the pulse consistent.
+        const ampScale = 0.9 + Math.random() * 0.2; // 0.9..1.1
+        pts.push({
+          t: Math.max(0.08, Math.min(0.92, center + tJit)),
+          off: sign * baseAmp * ampScale,
+        });
+        sign = -sign; // strict alternation — clean back-and-forth
+      }
+      return pts;
+    }
+
+    // Measure each node's polygon-point offset from its box centre (once the
+    // labels are laid out), so connectors meet the shape, not the text.
+    function measureDotOffsets() {
+      for (const n of nodes) {
+        const dot = n.el.querySelector('.node__dot');
+        if (!dot) continue;
+        const nr = n.el.getBoundingClientRect();
+        const dr = dot.getBoundingClientRect();
+        n.dotDy = dr.top + dr.height / 2 - (nr.top + nr.height / 2);
+      }
+    }
+
+    function nodeExtent(n: Node) {
+      const r = n.el.getBoundingClientRect();
+      return Math.max(r.width, r.height, 96) * 0.68;
+    }
+
+    /** Minimum centre-to-centre distance for two nodes to feel uncrowded. */
+    function minSeparation(a: Node, b: Node) {
+      const PAD = 110;
+      return nodeExtent(a) + nodeExtent(b) + PAD;
+    }
+
+    /** Iteratively push anchor fractions apart so initial layout is uncrowded
+        before the sim starts (otherwise a weak repulsion can settle on overlap). */
+    function relaxAnchors(iterations = 80) {
+      const { mx, my, iw, ih } = inset();
+      if (iw < 2 || ih < 2) return;
+      const px = nodes.map((n) => mx + n.frac.x * iw);
+      const py = nodes.map((n) => my + n.frac.y * ih);
+      for (let it = 0; it < iterations; it++) {
+        let moved = 0;
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            let dx = px[j] - px[i];
+            let dy = py[j] - py[i];
+            const d = Math.hypot(dx, dy) || 0.01;
+            const minD = minSeparation(nodes[i], nodes[j]);
+            if (d >= minD) continue;
+            const overlap = (minD - d) * 0.5;
+            const ux = dx / d;
+            const uy = dy / d;
+            px[i] -= ux * overlap;
+            py[i] -= uy * overlap;
+            px[j] += ux * overlap;
+            py[j] += uy * overlap;
+            moved = Math.max(moved, overlap);
+          }
+        }
+        for (let i = 0; i < nodes.length; i++) {
+          px[i] = Math.max(mx + 6, Math.min(mx + iw - 6, px[i]));
+          py[i] = Math.max(my + 6, Math.min(my + ih - 6, py[i]));
+        }
+        if (moved < 0.3) break;
+      }
+      for (let i = 0; i < nodes.length; i++) {
+        nodes[i].frac = clampFrac((px[i] - mx) / iw, (py[i] - my) / ih);
+      }
+    }
+
+    /** Open up acute interior corners in the chain path. For each non-endpoint
+        chain node we compute the angle between the vectors going OUT to its
+        previous and next neighbours. cos = +1 means both legs go the same way
+        (worst, very acute), cos = 0 means a right angle, cos = -1 means
+        a perfectly straight path. We nudge any node whose cos > `cosLimit`
+        toward the midpoint of its neighbours to open the corner. Re-run
+        `relaxAnchors` afterwards to restore separation. */
+    function straightenAngles(iterations = 20, cosLimit = -0.15) {
+      const { mx, my, iw, ih } = inset();
+      if (iw < 2 || ih < 2) return;
+      const order = chainOrder;
+      if (order.length < 3) return;
+      for (let it = 0; it < iterations; it++) {
+        let maxAdj = 0;
+        for (let i = 1; i < order.length - 1; i++) {
+          const p = order[i - 1];
+          const c = order[i];
+          const nx = order[i + 1];
+          const v1x = p.ax - c.ax;
+          const v1y = p.ay - c.ay;
+          const v2x = nx.ax - c.ax;
+          const v2y = nx.ay - c.ay;
+          const len1 = Math.hypot(v1x, v1y) || 1;
+          const len2 = Math.hypot(v2x, v2y) || 1;
+          const cos = (v1x * v2x + v1y * v2y) / (len1 * len2);
+          if (cos <= cosLimit) continue;
+          // Pull `c` toward the midpoint of `p` and `nx` to straighten the bend.
+          const midX = (p.ax + nx.ax) / 2;
+          const midY = (p.ay + nx.ay) / 2;
+          // Stronger pull when the corner is more acute (cos closer to +1).
+          const urgency = Math.min(1, (cos - cosLimit) / (1 - cosLimit));
+          const k = 0.12 + 0.18 * urgency;
+          const newX = Math.max(mx + 6, Math.min(mx + iw - 6, c.ax + (midX - c.ax) * k));
+          const newY = Math.max(my + 6, Math.min(my + ih - 6, c.ay + (midY - c.ay) * k));
+          const adj = Math.hypot(newX - c.ax, newY - c.ay);
+          c.ax = newX;
+          c.ay = newY;
+          c.frac = clampFrac((newX - mx) / iw, (newY - my) / ih);
+          maxAdj = Math.max(maxAdj, adj);
+        }
+        if (maxAdj < 0.5) break;
+      }
+    }
+
+    function isLandscape() {
+      return W > H * 1.15;
+    }
+
+    function layoutIsCrowded() {
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const a = nodes[i];
+          const b = nodes[j];
+          if (Math.hypot(a.ax - b.ax, a.ay - b.ay) < minSeparation(a, b) * 0.92) return true;
+        }
+      }
+      return false;
+    }
+
+    /** Re-space when crowded — random meander; light config hint only on resize. */
+    function adaptLayoutForViewport(landscape: boolean) {
+      const n = chainOrder.length;
+      const margin = 0.08;
+      const narrow = narrowness();
+      const phase = Math.random() * Math.PI * 2;
+      const perpBase = (Math.random() * 2 - 1) * 0.2 * (1 - 0.6 * narrow);
+      const velKick = 0.18 - 0.12 * narrow;
+      const waveAmp = (0.22 + Math.random() * 0.14) * (1 - 0.55 * narrow);
+      const perpClamp = 0.48 - 0.32 * narrow; // 0.48 → 0.16 on narrow
+      let o = perpBase;
+      let vel = 0;
+      for (let i = 0; i < n; i++) {
+        const t = n === 1 ? 0.5 : i / (n - 1);
+        const along = margin + t * (1 - 2 * margin);
+        vel += (Math.random() * 2 - 1) * velKick;
+        vel *= 0.62;
+        o += vel;
+        const wave = Math.sin(t * Math.PI * 1.35 + phase) * waveAmp;
+        const perp = Math.max(-perpClamp, Math.min(perpClamp, o + wave));
+        const spine = landscape
+          ? { x: along, y: 0.5 + perp }
+          : { x: 0.5 + perp, y: along };
+        chainOrder[i].frac = blendWithConfig(chainOrder[i], landscape, spine, 0.18);
+      }
+    }
+
+    function syncAnchorsFromSim() {
+      const { mx, my, iw, ih } = inset();
+      for (const n of nodes) {
+        if (n.dragging) continue;
+        n.ax = n.x;
+        n.ay = n.y;
+        n.frac = {
+          x: Math.max(0, Math.min(1, (n.x - mx) / iw)),
+          y: Math.max(0, Math.min(1, (n.y - my) / ih)),
+        };
+        n.el.dataset.place = placeFor(n);
+      }
+      recomputeRests();
+    }
+
+    // Build the SVG path for an edge from its current endpoints + its shape.
+    function edgePath(e: { a: Node; b: Node; shape: EdgeShape; liveSpikes?: { x: number; y: number; vx: number; vy: number }[] | null }): string {
+      const ax = e.a.x;
+      const ay = e.a.y + e.a.dotDy;
+      const bx = e.b.x;
+      const by = e.b.y + e.b.dotDy;
+      const dx = bx - ax;
+      const dy = by - ay;
+      const len = Math.hypot(dx, dy) || 1;
+      const s = e.shape;
+      if (s.kind === 'straight' || len < 4) return `M ${ax} ${ay} L ${bx} ${by}`;
+
+      const nx = -dy / len;
+      const ny = dx / len;
+      // Build the waypoint list anchored at both ends so the path starts at A
+      // and ends at B regardless of how many humps/spikes it has. Sort by t
+      // defensively — out-of-order points would produce visible kinks.
+      const sorted = s.points.slice().sort((p, q) => p.t - q.t);
+      const wp = [{ t: 0, off: 0 }, ...sorted, { t: 1, off: 0 }];
+
+      if (s.kind === 'wave') {
+        // Pure sine wave along the chord — mathematical and stable. The waypoint
+        // array carries the parameters: count = humps, |off| = amplitude, and
+        // the sign of points[0].off picks the starting side. Endpoints are
+        // exact zeros (sin(0) = sin(N·π) = 0) so the curve meets the nodes
+        // cleanly without phantom-control hacks.
+        const waves = s.points.length;
+        const amp = Math.abs(s.points[0].off);
+        const phase = s.points[0].off >= 0 ? 0 : Math.PI;
+        const segs = Math.max(48, waves * 18);
+        let wd = `M ${ax.toFixed(1)} ${ay.toFixed(1)}`;
+        for (let i = 1; i <= segs; i++) {
+          const t = i / segs;
+          const off = Math.sin(t * Math.PI * waves + phase) * amp;
+          const x = ax + dx * t + nx * off;
+          const y = ay + dy * t + ny * off;
+          wd += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
+        }
+        return wd;
+      }
+
+      // Jagged: sharp corners between waypoints — linear segments only.
+      // Each corner is a live joint (e.liveSpikes), so its position lags the
+      // rest target with damping and the line articulates like an arm.
+      let d = `M ${ax.toFixed(1)} ${ay.toFixed(1)}`;
+      const spikes = e.liveSpikes;
+      if (spikes && spikes.length === s.points.length) {
+        const indexed = s.points
+          .map((p, i) => ({ i, t: p.t }))
+          .sort((p, q) => p.t - q.t);
+        for (const { i } of indexed) {
+          const sp = spikes[i];
+          d += ` L ${sp.x.toFixed(1)} ${sp.y.toFixed(1)}`;
+        }
+      } else {
+        for (let i = 1; i < wp.length - 1; i++) {
+          const x = ax + dx * wp[i].t + nx * wp[i].off;
+          const y = ay + dy * wp[i].t + ny * wp[i].off;
+          d += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
+        }
+      }
+      d += ` L ${bx.toFixed(1)} ${by.toFixed(1)}`;
+      return d;
     }
 
     function recomputeRests() {
@@ -590,96 +1056,230 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
       }
     }
 
+    /** Cheap segment-intersection test for two line segments. */
+    function segmentsCross(
+      ax: number, ay: number, bx: number, by: number,
+      cx: number, cy: number, dx: number, dy: number,
+    ): boolean {
+      const r1 = bx - ax;
+      const r2 = by - ay;
+      const s1 = dx - cx;
+      const s2 = dy - cy;
+      const den = r1 * s2 - r2 * s1;
+      if (Math.abs(den) < 1e-6) return false;
+      const t = ((cx - ax) * s2 - (cy - ay) * s1) / den;
+      const u = ((cx - ax) * r2 - (cy - ay) * r1) / den;
+      return t > 0 && t < 1 && u > 0 && u < 1;
+    }
+
+    /** Swap the anchor positions of two nodes (positions only, not identities)
+        so labels and panels stay tied to the same node — only the layout slot
+        each node occupies changes. */
+    function swapNodeAnchors(a: Node, b: Node) {
+      const tAx = a.ax, tAy = a.ay, tFx = a.frac.x, tFy = a.frac.y;
+      a.ax = b.ax; a.ay = b.ay; a.frac = { x: b.frac.x, y: b.frac.y };
+      b.ax = tAx; b.ay = tAy; b.frac = { x: tFx, y: tFy };
+      a.el.dataset.place = placeFor(a);
+      b.el.dataset.place = placeFor(b);
+    }
+
+    /** Sample an edge as a polyline matching the rendered path, so we can
+        test the actual curve (not just the chord) for crossings. */
+    function edgePolyline(e: { a: Node; b: Node; shape: EdgeShape }): { x: number; y: number }[] {
+      const ax = e.a.ax;
+      const ay = e.a.ay + e.a.dotDy;
+      const bx = e.b.ax;
+      const by = e.b.ay + e.b.dotDy;
+      const dx = bx - ax;
+      const dy = by - ay;
+      const len = Math.hypot(dx, dy) || 1;
+      const nx = -dy / len;
+      const ny = dx / len;
+      const sorted = e.shape.points.slice().sort((p, q) => p.t - q.t);
+      const wp = [{ t: 0, off: 0 }, ...sorted, { t: 1, off: 0 }];
+      const pts: { x: number; y: number }[] = [];
+      if (e.shape.kind === 'straight' || wp.length === 2) {
+        pts.push({ x: ax, y: ay }, { x: bx, y: by });
+        return pts;
+      }
+      for (const p of wp) {
+        pts.push({ x: ax + dx * p.t + nx * p.off, y: ay + dy * p.t + ny * p.off });
+      }
+      return pts;
+    }
+
+    /** Count intersections between two polylines (each a list of points). */
+    function countPolylineCrossings(a: { x: number; y: number }[], b: { x: number; y: number }[]) {
+      let n = 0;
+      for (let i = 0; i < a.length - 1; i++) {
+        for (let j = 0; j < b.length - 1; j++) {
+          if (segmentsCross(
+            a[i].x, a[i].y, a[i + 1].x, a[i + 1].y,
+            b[j].x, b[j].y, b[j + 1].x, b[j + 1].y,
+          )) n++;
+        }
+      }
+      return n;
+    }
+
+    /** Total polyline crossings between all non-adjacent edge pairs. */
+    function totalCurveCrossings(): number {
+      const polys = edges.map(edgePolyline);
+      let n = 0;
+      for (let i = 0; i < edges.length; i++) {
+        for (let j = i + 1; j < edges.length; j++) {
+          const ei = edges[i];
+          const ej = edges[j];
+          if (ei.a === ej.a || ei.a === ej.b || ei.b === ej.a || ei.b === ej.b) continue;
+          n += countPolylineCrossings(polys[i], polys[j]);
+        }
+      }
+      return n;
+    }
+
+    /** For each curvy edge, try flipping its waypoint signs and keep the flip
+        only if it reduces the total crossing count. Catches curve-vs-chord and
+        curve-vs-curve overlaps that the chord-based 2-opt swap can't see. */
+    function refineCurveCrossings() {
+      for (let pass = 0; pass < 3; pass++) {
+        let improved = false;
+        let best = totalCurveCrossings();
+        if (best === 0) return;
+        for (const e of edges) {
+          if (e.shape.points.length === 0) continue;
+          for (const p of e.shape.points) p.off = -p.off;
+          const candidate = totalCurveCrossings();
+          if (candidate < best) {
+            best = candidate;
+            improved = true;
+          } else {
+            for (const p of e.shape.points) p.off = -p.off;
+          }
+          if (best === 0) return;
+        }
+        if (!improved) break;
+      }
+    }
+
+    /** TSP-style 2-opt de-crossing for the chain graph. When non-adjacent
+        edges' chords cross, reverse the anchor positions of the chain segment
+        between them — this provably reduces total crossings on an open chain. */
+    function decrossEdges() {
+      const order = chainOrder;
+      const safety = 12;
+      for (let pass = 0; pass < safety; pass++) {
+        let improved = false;
+        // Edges in chain order: edge i connects order[i] and order[i+1].
+        for (let i = 0; i < order.length - 1; i++) {
+          for (let j = i + 2; j < order.length - 1; j++) {
+            const a1 = order[i];
+            const a2 = order[i + 1];
+            const b1 = order[j];
+            const b2 = order[j + 1];
+            // Share a node? Then they're adjacent — can't cross meaningfully.
+            if (a1 === b1 || a1 === b2 || a2 === b1) continue;
+            if (!segmentsCross(
+              a1.ax, a1.ay, a2.ax, a2.ay,
+              b1.ax, b1.ay, b2.ax, b2.ay,
+            )) continue;
+            // Reverse anchor positions of order[i+1..j]. Edges between them
+            // are unchanged topologically; geometrically they untangle.
+            let lo = i + 1;
+            let hi = j;
+            while (lo < hi) {
+              swapNodeAnchors(order[lo], order[hi]);
+              lo++;
+              hi--;
+            }
+            improved = true;
+          }
+        }
+        if (!improved) break;
+      }
+      recomputeRests();
+    }
+
     function placeFor(n: Node): string {
       const right = W - n.ax;
       const left = n.ax;
       const top = n.ay;
       const bottom = H - n.ay;
-      const needH = 300;
-      const needV = 230;
+      // Approximate label box size we'd like to clear on each side.
+      const needH = 220;
+      const needV = 80;
+      const narrow = narrowness();
+      // On narrow viewports, horizontal placements are likely to crop labels.
+      // Bias scores so top/bottom win unless side has truly generous space.
+      const vBoost = 80 * narrow;
       const opts: [string, number][] = [
         ['right', right - needH],
         ['left', left - needH],
-        ['bottom', bottom - needV],
-        ['top', top - needV],
+        ['bottom', bottom - needV + vBoost],
+        ['top', top - needV + vBoost],
       ];
       opts.sort((p, q) => q[1] - p[1]);
       return opts[0][0];
     }
 
+    // Map the stored fractions to pixel anchors for the current size. A resize
+    // only remaps (no re-randomising), so the chosen shape is preserved.
     function computeAnchors(first = false) {
       const rect = root.getBoundingClientRect();
       W = rect.width;
       H = rect.height;
       svgEl.setAttribute('width', String(W));
       svgEl.setAttribute('height', String(H));
-      const landscape = W > H * 1.15;
-      const padX = Math.min(0.16 * W, 180);
-      const padY = Math.min(0.12 * H, 120);
-
-      // 1) Default layout for the current size.
+      const { mx, my, iw, ih } = inset();
       for (const n of nodes) {
-        const src = landscape ? n.landscape : n.portrait;
-        n.ax = padX + src.x * (W - 2 * padX);
-        n.ay = padY + src.y * (H - 2 * padY);
-      }
-
-      // 2) Overlay any user-arranged positions. If even one kept node would now
-      //    be cropped, drop the whole custom layout and fall back to default.
-      const customIds = Object.keys(custom);
-      if (customIds.length) {
-        const allFit = customIds.every((id) => {
-          const n = byId.get(id);
-          return !n || fits(n, custom[id].x, custom[id].y);
-        });
-        if (allFit) {
-          for (const id of customIds) {
-            const n = byId.get(id);
-            if (n) {
-              n.ax = custom[id].x;
-              n.ay = custom[id].y;
-            }
-          }
-        } else {
-          clearCustom();
-        }
-      }
-
-      // 3) Seed initial scatter once, then settle into the (custom-or-default)
-      //    anchors. Panel placement and edge rest-lengths follow the anchors.
-      for (const n of nodes) {
+        n.ax = mx + n.frac.x * iw;
+        n.ay = my + n.frac.y * ih;
         if (first) {
-          n.x = n.ax + (Math.random() - 0.5) * 18;
-          n.y = n.ay + (Math.random() - 0.5) * 18;
+          n.x = n.ax + (Math.random() - 0.5) * SIM.initialScatter;
+          n.y = n.ay + (Math.random() - 0.5) * SIM.initialScatter;
         }
         n.el.dataset.place = placeFor(n);
       }
       recomputeRests();
     }
 
+    // A fresh random shape: new positions + new connector styles, animated to.
     function resetLayout() {
-      clearCustom();
+      generateLayout();
+      generateEdgeShapes();
       computeAnchors();
+      relaxAnchors();
+      computeAnchors();
+      straightenAngles();
+      relaxAnchors();
+      computeAnchors();
+      decrossEdges();
+      refineCurveCrossings();
       wake();
     }
-
-    const pointer = { x: 0, y: 0, active: false };
 
     function render() {
       for (const n of nodes) {
         n.el.style.transform = `translate(${n.x}px, ${n.y}px) translate(-50%, -50%)`;
       }
       for (const e of edges) {
-        e.line.setAttribute('x1', String(e.a.x));
-        e.line.setAttribute('y1', String(e.a.y));
-        e.line.setAttribute('x2', String(e.b.x));
-        e.line.setAttribute('y2', String(e.b.y));
+        e.line.setAttribute('d', edgePath(e));
       }
     }
 
+    // Soft, overdamped motion — slow drift home, gentle edge give, no bounce.
+    const SIM = {
+      drag: 0.6,
+      anchorPull: 0.05,
+      edge: 0.01,
+      repel: 0.1,
+      calmPull: 0.12,
+      settleMotion: 0.04,
+      settleFrames: 10,
+      initialScatter: 8,
+    };
+
     // The simulation only runs while there is something to resolve — settling
-    // after load, a resize, a drag, or pointer interaction. Once everything is
-    // at rest it sleeps (no rAF), so a stationary diagram is truly static.
+    // after load, a resize, or a drag. Once everything is at rest it sleeps.
     let raf = 0;
     let running = false;
     let settledFrames = 0;
@@ -701,13 +1301,36 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
         const dx = e.b.x - e.a.x;
         const dy = e.b.y - e.a.y;
         const d = Math.hypot(dx, dy) || 1;
-        const f = (d - e.rest) * 0.026;
+        const f = (d - e.rest) * SIM.edge;
         const ux = (dx / d) * f;
         const uy = (dy / d) * f;
         e.a.fx += ux;
         e.a.fy += uy;
         e.b.fx -= ux;
         e.b.fy -= uy;
+      }
+
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const a = nodes[i];
+          const b = nodes[j];
+          let dx = b.x - a.x;
+          let dy = b.y - a.y;
+          const d = Math.hypot(dx, dy) || 1;
+          const minD = minSeparation(a, b);
+          if (d >= minD) continue;
+          const push = ((minD - d) / d) * SIM.repel;
+          dx = (dx / d) * push;
+          dy = (dy / d) * push;
+          if (!a.dragging) {
+            a.fx -= dx;
+            a.fy -= dy;
+          }
+          if (!b.dragging) {
+            b.fx += dx;
+            b.fy += dy;
+          }
+        }
       }
 
       let maxMotion = 0;
@@ -720,38 +1343,31 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
         if (n.calm) {
           const mx = n.ax - n.x;
           const my = n.ay - n.y;
-          n.x += mx * 0.2;
-          n.y += my * 0.2;
+          n.x += mx * SIM.calmPull;
+          n.y += my * SIM.calmPull;
           n.vx = 0;
           n.vy = 0;
           maxMotion = Math.max(maxMotion, Math.abs(mx) + Math.abs(my));
           continue;
         }
-        let tx = n.ax;
-        let ty = n.ay;
-        // Pointer repulsion as a *bounded target offset* (not an accumulating
-        // force), so a node nudges aside near the cursor but never outruns it —
-        // you can always catch it to hover.
-        if (pointer.active) {
-          const dx = n.x - pointer.x;
-          const dy = n.y - pointer.y;
-          const d = Math.hypot(dx, dy);
-          const R = 150;
-          if (d < R && d > 0.01) {
-            const off = (1 - d / R) * 52;
-            tx += (dx / d) * off;
-            ty += (dy / d) * off;
-          }
-        }
-        n.fx += (tx - n.x) * 0.02;
-        n.fy += (ty - n.y) * 0.02;
-        n.vx = (n.vx + n.fx) * 0.9;
-        n.vy = (n.vy + n.fy) * 0.9;
+        const tx = n.ax;
+        const ty = n.ay;
+        const homeX = tx - n.x;
+        const homeY = ty - n.y;
+        // Anchor: direct overdamped drift (no spring overshoot).
+        n.x += homeX * SIM.anchorPull;
+        n.y += homeY * SIM.anchorPull;
+        // Edges / neighbours: low-energy ripple through velocity only.
+        n.vx = (n.vx + n.fx) * SIM.drag;
+        n.vy = (n.vy + n.fy) * SIM.drag;
         n.x += n.vx;
         n.y += n.vy;
         maxMotion = Math.max(
           maxMotion,
-          Math.abs(n.vx) + Math.abs(n.vy) + Math.abs(tx - n.x) + Math.abs(ty - n.y)
+          Math.abs(n.vx) +
+            Math.abs(n.vy) +
+            Math.abs(homeX) * SIM.anchorPull +
+            Math.abs(homeY) * SIM.anchorPull
         );
       }
       render();
@@ -761,20 +1377,14 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
         raf = requestAnimationFrame(frame);
         return;
       }
-      settledFrames = maxMotion < 0.12 ? settledFrames + 1 : 0;
-      if (settledFrames >= 6) {
-        // Fully at rest. Snap to exact anchors (unless the pointer is holding
-        // nodes aside) and stop the loop until the next interaction.
-        if (!pointer.active) {
-          for (const n of nodes) {
-            if (n.dragging) continue;
-            n.x = n.ax;
-            n.y = n.ay;
-            n.vx = 0;
-            n.vy = 0;
-          }
-          render();
+      settledFrames = maxMotion < SIM.settleMotion ? settledFrames + 1 : 0;
+      if (settledFrames >= SIM.settleFrames) {
+        syncAnchorsFromSim();
+        for (const n of nodes) {
+          n.vx = 0;
+          n.vy = 0;
         }
+        render();
         running = false;
         raf = 0;
         return;
@@ -797,22 +1407,8 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
       for (const n of nodes) if (n !== except) setOpen(n, false);
     }
 
-    // Pointer repulsion field.
-    root.addEventListener('pointermove', (ev) => {
-      const r = root.getBoundingClientRect();
-      pointer.x = ev.clientX - r.left;
-      pointer.y = ev.clientY - r.top;
-      pointer.active = true;
-      wake();
-    });
-    root.addEventListener('pointerleave', () => {
-      pointer.active = false;
-      wake();
-    });
-
-    // Close panels when clicking empty canvas; flag first interaction.
+    // Close panels when clicking empty canvas.
     root.addEventListener('pointerdown', (ev) => {
-      root.dataset.touched = '1';
       if (!(ev.target as HTMLElement).closest('[data-node]')) closeAll();
     });
     root.addEventListener('keydown', (ev) => {
@@ -888,14 +1484,19 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
         if (n.dragging) {
           n.dragging = false;
           n.el.classList.remove('is-dragging');
-          // Pin the node where it was dropped: its anchor becomes the drop
-          // position, edge rest-lengths re-settle around it, and it persists.
+          // Pin the node where it was dropped: store it as a fraction so it
+          // settles there and survives resizes, and re-settle edge springs.
+          const { mx, my, iw, ih } = inset();
+          n.frac = {
+            x: Math.max(0, Math.min(1, (n.x - mx) / iw)),
+            y: Math.max(0, Math.min(1, (n.y - my) / ih)),
+          };
           n.ax = n.x;
           n.ay = n.y;
-          custom[n.id] = { x: n.x, y: n.y };
-          saveCustom();
           recomputeRests();
           n.el.dataset.place = placeFor(n);
+          decrossEdges();
+          refineCurveCrossings();
           wake();
         }
       };
@@ -907,30 +1508,62 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
           ev.preventDefault();
           return;
         }
-        // Clicking the identity node resets any user-arranged layout.
-        if (n.id === 'pedro') resetLayout();
+        // Identity node only resets the layout — no reveal panel.
+        if (n.id === 'pedro') {
+          resetLayout();
+          closeAll();
+          return;
+        }
         const wasOpen = n.el.classList.contains('is-open');
         closeAll(n);
         setOpen(n, !wasOpen);
       });
     }
 
-    // Resize handling (debounced to a frame).
+    // Resize: remap anchors; re-space along the dominant axis when crowded or
+    // when the viewport flips between portrait and landscape.
     let resizeScheduled = false;
+    let lastLandscape: boolean | null = null;
     const onResize = () => {
       if (resizeScheduled) return;
       resizeScheduled = true;
       requestAnimationFrame(() => {
         resizeScheduled = false;
         computeAnchors();
+        const landscape = isLandscape();
+        const orientChanged = lastLandscape !== null && lastLandscape !== landscape;
+        lastLandscape = landscape;
+        if (orientChanged || layoutIsCrowded()) {
+          adaptLayoutForViewport(landscape);
+          computeAnchors();
+        }
+        measureDotOffsets();
+        relaxAnchors();
+        computeAnchors();
+        straightenAngles();
+        relaxAnchors();
+        computeAnchors();
+        decrossEdges();
+        refineCurveCrossings();
         wake();
       });
     };
     const ro = new ResizeObserver(onResize);
     ro.observe(root);
 
-    loadCustom();
+    generateLayout();
+    generateEdgeShapes();
     computeAnchors(true);
+    lastLandscape = isLandscape();
+    measureDotOffsets();
+    // After measuring labels, enforce safety distance so anchors start uncrowded.
+    relaxAnchors();
+    computeAnchors();
+    straightenAngles();
+    relaxAnchors();
+    computeAnchors();
+    decrossEdges();
+    refineCurveCrossings();
     render();
 
     if (reduce) {

@@ -1,3 +1,5 @@
+import { site } from './site.config';
+
 /* =========================================================================
    DIAGRAM NAVIGATION CONFIG
    The home page is a kinetic mind-map. Every node and connection below is
@@ -5,12 +7,9 @@
    in that component's client script. Edit content here — positions, labels,
    reveal copy, links — without touching the markup or the simulation.
 
-   Coordinates are normalised (0..1) fractions of the diagram canvas. Two
-   layouts are provided per node:
-     - `portrait`  : narrow / mobile screens (the graph stacks vertically).
-     - `landscape` : wide / desktop screens (the graph spreads horizontally).
-   The component picks one based on the canvas aspect ratio and animates
-   between them on resize.
+   `portrait` / `landscape` are normalised (0..1) hint coords used only when
+   resize adaptation needs a soft nudge toward a readable map — initial layout
+   is random on each load (see NavDiagram `generateLayout`).
    ========================================================================= */
 
 export interface DiagramPoint {
@@ -32,12 +31,21 @@ export interface DiagramLink {
 
 export type NodeKind = 'identity' | 'about' | 'contact' | 'project';
 
+/** Polygon used to draw the node "point". No circles. Assigned per node
+   (not randomized) so it can be hand-tweaked later. */
+export type NodeShape = 'triangle' | 'square' | 'pentagon' | 'hexagon';
+
 export interface DiagramNode {
   id: string;
   label: string;
+  /** Optional secondary line shown directly under the node label
+      (e.g. role/title for the identity node). */
+  subLabel?: string;
   kind: NodeKind;
   /** Visual weight of the node dot. */
   size?: 'lg' | 'md' | 'sm';
+  /** Polygon drawn as the node point. */
+  shape?: NodeShape;
   /** Which way the reveal panel opens, so it stays on-canvas. */
   place?: 'top' | 'bottom' | 'left' | 'right';
   /** Small mono caption shown above the panel title (role · year, etc.). */
@@ -61,17 +69,12 @@ export interface DiagramNode {
 export const diagramNodes: DiagramNode[] = [
   {
     id: 'pedro',
-    label: 'Pedro MC Fernandes',
+    label: site.name,
+    subLabel: site.role,
     kind: 'identity',
     size: 'lg',
+    shape: 'hexagon',
     place: 'bottom',
-    tagline:
-      'Systems-thinking product designer. I fix the system, not just the screen — at the boundary between strategy and execution, shipping the code too.',
-    metrics: [
-      { value: '18+ yrs', label: 'building & scaling products' },
-      { value: '4×', label: 'organic traffic · 100K+ pages' },
-      { value: '~50%', label: 'faster delivery via design systems' },
-    ],
     portrait: { x: 0.5, y: 0.28 },
     landscape: { x: 0.26, y: 0.5 },
   },
@@ -80,6 +83,7 @@ export const diagramNodes: DiagramNode[] = [
     label: 'About',
     kind: 'about',
     size: 'md',
+    shape: 'triangle',
     place: 'right',
     tagline: 'I design and build — fixing the system, not just the screen.',
     lines: [
@@ -94,6 +98,7 @@ export const diagramNodes: DiagramNode[] = [
     label: 'Contact',
     kind: 'contact',
     size: 'md',
+    shape: 'square',
     place: 'left',
     tagline: 'Open to principal / lead product design and design-engineering work.',
     email: 'redacted@example.invalid',
@@ -110,6 +115,7 @@ export const diagramNodes: DiagramNode[] = [
     label: 'Systems-Thinker',
     kind: 'project',
     size: 'md',
+    shape: 'pentagon',
     place: 'right',
     meta: 'Percona · 2022—present',
     tagline:
@@ -127,6 +133,7 @@ export const diagramNodes: DiagramNode[] = [
     label: 'Design at Scale',
     kind: 'project',
     size: 'md',
+    shape: 'hexagon',
     place: 'left',
     meta: 'TUI · 2019—2021',
     tagline:
@@ -144,6 +151,7 @@ export const diagramNodes: DiagramNode[] = [
     label: 'Visionary',
     kind: 'project',
     size: 'md',
+    shape: 'triangle',
     place: 'top',
     meta: 'Smartidiom · 2016—2019',
     tagline:
@@ -158,10 +166,14 @@ export const diagramNodes: DiagramNode[] = [
   },
 ];
 
-/** Connections (the "bonds" between nodes). Order is [from, to]. */
+/** Connections (the "bonds" between nodes). Order is [from, to].
+   A single open chain — contact → about → pedro → systems-thinker →
+   design-at-scale → visionary — so the diagram reads as one continuous line
+   rather than a fork. The home page renders this line in a fresh random shape
+   on every load / identity-node click. */
 export const diagramEdges: Array<[string, string]> = [
+  ['contact', 'about'],
   ['about', 'pedro'],
-  ['contact', 'pedro'],
   ['pedro', 'systems-thinker'],
   ['systems-thinker', 'design-at-scale'],
   ['design-at-scale', 'visionary'],

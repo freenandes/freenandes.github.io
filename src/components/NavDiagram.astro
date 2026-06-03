@@ -45,22 +45,24 @@ function polygonPoints(shape: NodeShape = 'hexagon'): string {
 
 // Floating nodes have no polygon — only a label that wraps around their
 // invisible centre point. Size a circular SVG path so the phrase wraps once
-// around the ring (longer phrases → larger ring, keeping letter spacing even).
-// The text is stretched to the exact circumference at render time so it always
-// closes the loop regardless of how rough this estimate is.
+// around the ring with a small gap before the start (longer phrases → larger
+// ring, keeping letter spacing even). The text is stretched to its natural
+// length at render time — the extra arc stays empty.
 const RING_FONT = 13; // SVG user units (= px, since the viewBox maps 1:1)
+const RING_GAP_CHARS = 3.5; // empty arc between phrase end and start
 function ringGeometry(label: string) {
   // Mono advance (~0.6em) plus the wide tracking applied to the label.
   const advance = RING_FONT * 0.6 + RING_FONT * 0.125;
-  const circumference = Math.max(label.length * advance, 150);
-  const r = circumference / (2 * Math.PI);
+  const textLength = Math.max(label.length * advance, 120);
+  const pathLength = textLength + RING_GAP_CHARS * advance;
+  const r = pathLength / (2 * Math.PI);
   const pad = RING_FONT * 1.25; // room for glyph height outside the path radius
   const size = Math.round(2 * (r + pad));
   const c = size / 2;
   // Start at the top (12 o'clock) and sweep clockwise, so the text reads
   // left-to-right across the top and curves around — matching the reference.
   const d = `M ${c} ${(c - r).toFixed(2)} a ${r.toFixed(2)} ${r.toFixed(2)} 0 1 1 0 ${(2 * r).toFixed(2)} a ${r.toFixed(2)} ${r.toFixed(2)} 0 1 1 0 ${(-2 * r).toFixed(2)}`;
-  return { circumference: circumference.toFixed(2), size, d };
+  return { textLength: textLength.toFixed(2), size, d };
 }
 
 // Split the nodes so the markup mirrors the page's real outline: the identity
@@ -257,7 +259,7 @@ const otherNodes = diagramNodes.filter(
               <textPath
                 href={`#ring-${node.id}`}
                 startOffset="0"
-                textLength={ring.circumference}
+                textLength={ring.textLength}
                 lengthAdjust="spacingAndGlyphs"
               >
                 {node.label}
@@ -483,6 +485,20 @@ const otherNodes = diagramNodes.filter(
   .node__ring {
     display: block;
     overflow: visible;
+    transform-origin: center;
+  }
+  @keyframes ring-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .node--floating .node__ring {
+      animation: ring-spin 55s linear infinite;
+    }
   }
   .node__ring-text {
     font-family: var(--font-mono);

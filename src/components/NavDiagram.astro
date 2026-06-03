@@ -492,12 +492,12 @@ const otherNodes = diagramNodes.filter(
       transform: rotate(0deg);
     }
     to {
-      transform: rotate(360deg);
+      transform: rotate(-360deg);
     }
   }
   @media (prefers-reduced-motion: no-preference) {
     .node--floating .node__ring {
-      animation: ring-spin 55s linear infinite;
+      animation: ring-spin 45s linear infinite;
     }
   }
   .node__ring-text {

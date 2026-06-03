@@ -43,13 +43,36 @@ function polygonPoints(shape: NodeShape = 'hexagon'): string {
   return pts.join(' ');
 }
 
+// Floating nodes have no polygon — only a label that wraps around their
+// invisible centre point. Size a circular SVG path so the phrase wraps once
+// around the ring (longer phrases → larger ring, keeping letter spacing even).
+// The text is stretched to the exact circumference at render time so it always
+// closes the loop regardless of how rough this estimate is.
+const RING_FONT = 13; // SVG user units (= px, since the viewBox maps 1:1)
+function ringGeometry(label: string) {
+  // Mono advance (~0.6em) plus the wide tracking applied to the label.
+  const advance = RING_FONT * 0.6 + RING_FONT * 0.125;
+  const circumference = Math.max(label.length * advance, 150);
+  const r = circumference / (2 * Math.PI);
+  const pad = RING_FONT * 1.25; // room for glyph height outside the path radius
+  const size = Math.round(2 * (r + pad));
+  const c = size / 2;
+  // Start at the top (12 o'clock) and sweep clockwise, so the text reads
+  // left-to-right across the top and curves around — matching the reference.
+  const d = `M ${c} ${(c - r).toFixed(2)} a ${r.toFixed(2)} ${r.toFixed(2)} 0 1 1 0 ${(2 * r).toFixed(2)} a ${r.toFixed(2)} ${r.toFixed(2)} 0 1 1 0 ${(-2 * r).toFixed(2)}`;
+  return { circumference: circumference.toFixed(2), size, d };
+}
+
 // Split the nodes so the markup mirrors the page's real outline: the identity
 // node carries the page <h1>, the remaining single nodes are <h2> landmarks,
 // and the case-study nodes are gathered into one labelled "Selected projects"
 // group. Positioning is unchanged — nodes are absolutely placed by the
 // simulation regardless of DOM nesting.
 const projectNodes = diagramNodes.filter((n) => n.kind === 'project');
-const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
+const floatingNodes = diagramNodes.filter((n) => n.kind === 'floating');
+const otherNodes = diagramNodes.filter(
+  (n) => n.kind !== 'project' && n.kind !== 'floating'
+);
 ---
 
 <nav class="diagram" data-diagram aria-label={`Site map — ${site.name}`}>
@@ -202,6 +225,49 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
       ))
     }
   </div>
+
+  {
+    floatingNodes.map((node) => {
+      const ring = ringGeometry(node.label);
+      return (
+        <div
+          class="node node--floating"
+          data-node
+          data-floating
+          data-id={node.id}
+          data-px={node.portrait.x}
+          data-py={node.portrait.y}
+          data-lx={node.landscape.x}
+          data-ly={node.landscape.y}
+          aria-hidden="true"
+        >
+          <svg
+            class="node__ring"
+            viewBox={`0 0 ${ring.size} ${ring.size}`}
+            width={ring.size}
+            height={ring.size}
+            role="img"
+            aria-label={node.label}
+            focusable="false"
+          >
+            <defs>
+              <path id={`ring-${node.id}`} d={ring.d} fill="none" />
+            </defs>
+            <text class="node__ring-text">
+              <textPath
+                href={`#ring-${node.id}`}
+                startOffset="0"
+                textLength={ring.circumference}
+                lengthAdjust="spacingAndGlyphs"
+              >
+                {node.label}
+              </textPath>
+            </text>
+          </svg>
+        </div>
+      );
+    })
+  }
 </nav>
 
 <noscript>
@@ -406,6 +472,27 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
     color: var(--ink-2);
   }
 
+  /* --------------------------- Floating nodes --------------------------- */
+  /* Shapeless, line-less ambient labels that drift in the whitespace. They are
+     decorative, so they never intercept pointer events (clicks fall through to
+     the canvas) and are hidden from assistive tech at the container level. */
+  .node--floating {
+    pointer-events: none;
+    z-index: 0;
+  }
+  .node__ring {
+    display: block;
+    overflow: visible;
+  }
+  .node__ring-text {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    fill: var(--ink-2);
+  }
+
   /* ----------------------------- Panel ----------------------------- */
   .node__panel {
     --shift: 8px;
@@ -567,6 +654,9 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
     /** Vertical offset from the node's box centre to its polygon point, so
         connectors attach to the shape rather than crossing the label. */
     dotDy: number;
+    /** Floating nodes are unconnected, shapeless ambient labels. They take part
+        in collision / viewport avoidance but never in the chain or edge logic. */
+    floating: boolean;
     calm: boolean;
     dragging: boolean;
     hover: boolean;
@@ -605,6 +695,7 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
       ax: 0,
       ay: 0,
       dotDy: 0,
+      floating: el.dataset.floating !== undefined,
       calm: false,
       dragging: false,
       hover: false,
@@ -651,8 +742,9 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
         if (n) order.push(n);
         cur = (adj.get(cur) || []).find((id) => !seen.has(id));
       }
-      // Append any stragglers (defensive: not a clean path).
-      for (const n of nodes) if (!seen.has(n.id)) order.push(n);
+      // Append any stragglers (defensive: not a clean path). Floating nodes are
+      // never part of the chain — they are laid out independently.
+      for (const n of nodes) if (!seen.has(n.id) && !n.floating) order.push(n);
       return order;
     })();
 
@@ -750,6 +842,14 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
         // Low config blend: a faint nudge toward the authored map, not a pin —
         // keeps the form free and varied between loads.
         chainOrder[i].frac = blendWithConfig(chainOrder[i], landscape, spine, 0.12);
+      }
+      // Floating nodes aren't part of the spine. Scatter them across the canvas
+      // (lightly nudged toward their authored hint) and let relaxAnchors + the
+      // sim's repulsion drift them into open whitespace without overlapping.
+      for (const n of nodes) {
+        if (!n.floating) continue;
+        const rnd = clampFrac(0.1 + Math.random() * 0.8, 0.1 + Math.random() * 0.8);
+        n.frac = blendWithConfig(n, landscape, rnd, 0.25);
       }
     }
 
@@ -1072,6 +1172,81 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
       }
     }
 
+    /** Closest point on segment a→b to point (px,py), plus the distance. */
+    function closestPointOnSeg(
+      px: number, py: number,
+      a: { x: number; y: number }, b: { x: number; y: number },
+    ) {
+      const vx = b.x - a.x;
+      const vy = b.y - a.y;
+      const wx = px - a.x;
+      const wy = py - a.y;
+      const c1 = vx * wx + vy * wy;
+      if (c1 <= 0) return { x: a.x, y: a.y, d: Math.hypot(px - a.x, py - a.y) };
+      const c2 = vx * vx + vy * vy;
+      if (c2 <= c1) return { x: b.x, y: b.y, d: Math.hypot(px - b.x, py - b.y) };
+      const t = c1 / c2;
+      const x = a.x + t * vx;
+      const y = a.y + t * vy;
+      return { x, y, d: Math.hypot(px - x, py - y) };
+    }
+
+    /** Nudge floating-node anchors out of the connector lines (and away from
+        other nodes) so the ambient labels settle in clear whitespace rather than
+        sitting on top of an edge. Edges only depend on the connected nodes'
+        anchors, so the polylines are fixed during this relaxation — run it once
+        the edge routing is final (after de-crossing). */
+    function relaxFloatingFromEdges(iterations = 60) {
+      const floats = nodes.filter((n) => n.floating);
+      if (!floats.length || !edges.length) return;
+      const { mx, my, iw, ih } = inset();
+      if (iw < 2 || ih < 2) return;
+      const polys = edges.map(edgePolyline);
+      for (let it = 0; it < iterations; it++) {
+        let moved = 0;
+        for (const n of floats) {
+          const clear = nodeExtent(n);
+          let pushX = 0;
+          let pushY = 0;
+          let hit = false;
+          for (const poly of polys) {
+            for (let i = 0; i < poly.length - 1; i++) {
+              const c = closestPointOnSeg(n.ax, n.ay, poly[i], poly[i + 1]);
+              if (c.d >= clear) continue;
+              const dx = n.ax - c.x;
+              const dy = n.ay - c.y;
+              const dd = Math.hypot(dx, dy) || 0.01;
+              const overlap = clear - c.d;
+              pushX += (dx / dd) * overlap;
+              pushY += (dy / dd) * overlap;
+              hit = true;
+            }
+          }
+          for (const o of nodes) {
+            if (o === n) continue;
+            const dx = n.ax - o.ax;
+            const dy = n.ay - o.ay;
+            const dd = Math.hypot(dx, dy) || 0.01;
+            const minD = minSeparation(n, o);
+            if (dd >= minD) continue;
+            const overlap = (minD - dd) * 0.5;
+            pushX += (dx / dd) * overlap;
+            pushY += (dy / dd) * overlap;
+            hit = true;
+          }
+          if (!hit) continue;
+          n.ax = Math.max(mx + 6, Math.min(mx + iw - 6, n.ax + pushX * 0.5));
+          n.ay = Math.max(my + 6, Math.min(my + ih - 6, n.ay + pushY * 0.5));
+          moved = Math.max(moved, Math.hypot(pushX, pushY));
+        }
+        if (moved < 0.5) break;
+      }
+      for (const n of floats) {
+        n.frac = clampFrac((n.ax - mx) / iw, (n.ay - my) / ih);
+        n.el.dataset.place = placeFor(n);
+      }
+    }
+
     /** Cheap segment-intersection test for two line segments. */
     function segmentsCross(
       ax: number, ay: number, bx: number, by: number,
@@ -1270,6 +1445,7 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
       computeAnchors();
       decrossEdges();
       refineCurveCrossings();
+      relaxFloatingFromEdges();
       wake();
     }
 
@@ -1561,6 +1737,7 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
         computeAnchors();
         decrossEdges();
         refineCurveCrossings();
+        relaxFloatingFromEdges();
         wake();
       });
     };
@@ -1580,6 +1757,7 @@ const otherNodes = diagramNodes.filter((n) => n.kind !== 'project');
     computeAnchors();
     decrossEdges();
     refineCurveCrossings();
+    relaxFloatingFromEdges();
     render();
 
     if (reduce) {

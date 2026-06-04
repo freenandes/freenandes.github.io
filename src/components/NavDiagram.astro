@@ -778,6 +778,22 @@ const otherNodes = diagramNodes.filter(
     let W = 0;
     let H = 0;
 
+    /** Robust viewport size + orientation. The diagram is full-bleed, so the
+        viewport is the source of truth — and unlike a freshly-mounted element's
+        rect, window dims are always valid even before layout settles. */
+    function safeWidth(rect: DOMRect) {
+      return rect.width > 1 ? rect.width : window.innerWidth;
+    }
+    function safeHeight(rect: DOMRect) {
+      // A not-yet-laid-out element can report a bogus short height; anything
+      // under half the viewport is treated as unreliable and replaced.
+      const vh = window.innerHeight;
+      return rect.height >= vh * 0.5 ? rect.height : vh;
+    }
+    function viewportLandscape() {
+      return window.innerWidth > window.innerHeight * 1.15;
+    }
+
     // --- Dynamic layout ------------------------------------------------------
     // Fresh random shape on each load / identity reset (Math.random, no seed).
     // Resize/crowding may nudge toward diagram.config coords only when adapting.
@@ -881,9 +897,13 @@ const otherNodes = diagramNodes.filter(
       const rect = root.getBoundingClientRect();
       // narrowness()/inset() read the W/H globals, which computeAnchors sets
       // after this on first load — prime them so the spine uses the real aspect.
-      W = rect.width;
-      H = rect.height;
-      const landscape = rect.width > rect.height * 1.15;
+      // Guard against a not-yet-laid-out element: a bogus near-zero/short height
+      // read here would flip the chain to a horizontal spine inside a portrait
+      // canvas and collapse it once mapped to the true size. Fall back to the
+      // viewport (always valid) and take orientation from it.
+      W = safeWidth(rect);
+      H = safeHeight(rect);
+      const landscape = viewportLandscape();
       layoutSpine(landscape, 0.1);
       // Floating nodes aren't part of the spine. Scatter them across the canvas
       // (lightly nudged toward their authored hint); they drift toward open
@@ -1163,6 +1183,24 @@ const otherNodes = diagramNodes.filter(
         }
       }
       return false;
+    }
+
+    /** Has the chain's overall orientation diverged from what the viewport
+        wants? After a resize/orientation flip — or a flaky first layout — the
+        chain can end up running across the short axis (e.g. a horizontal spine
+        squeezed into a portrait canvas), which collapses it. Detect that by
+        comparing the chain's pixel span on each axis against the viewport. */
+    function orientationMismatched() {
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      for (const n of nodes) {
+        if (n.floating) continue;
+        minX = Math.min(minX, n.ax); maxX = Math.max(maxX, n.ax);
+        minY = Math.min(minY, n.ay); maxY = Math.max(maxY, n.ay);
+      }
+      const spanX = maxX - minX;
+      const spanY = maxY - minY;
+      // Want the chain's long span on the viewport's long axis.
+      return viewportLandscape() ? spanY > spanX * 1.1 : spanX > spanY * 1.1;
     }
 
     /** Re-space when crowded or on orientation flip — same near-straight spine
@@ -1607,8 +1645,10 @@ const otherNodes = diagramNodes.filter(
     // only remaps (no re-randomising), so the chosen shape is preserved.
     function computeAnchors(first = false) {
       const rect = root.getBoundingClientRect();
-      W = rect.width;
-      H = rect.height;
+      // Same guard as generateLayout: never let a bogus early rect (zero/short)
+      // squash the canvas — fall back to the viewport.
+      W = safeWidth(rect);
+      H = safeHeight(rect);
       svgEl.setAttribute('width', String(W));
       svgEl.setAttribute('height', String(H));
       const { mx, my, iw, ih } = inset();
@@ -1638,10 +1678,11 @@ const otherNodes = diagramNodes.filter(
       }
     }
 
-    // A fresh random shape: new positions + new connector styles, animated to.
-    function resetLayout() {
-      generateLayout();
-      generateEdgeShapes();
+    /** The full deterministic layout pipeline: lay the spine, separate boxes,
+        open angles, route edges, push floating rings clear. Shared by first
+        load, identity reset, and resize settle so they all converge to the same
+        clean, near-straight, space-filling form. */
+    function relayout() {
       computeAnchors();
       relaxAnchors();
       computeAnchors();
@@ -1649,6 +1690,13 @@ const otherNodes = diagramNodes.filter(
       relaxAnchors();
       computeAnchors();
       routeEdges();
+    }
+
+    // A fresh random shape: new positions + new connector styles, animated to.
+    function resetLayout() {
+      generateLayout();
+      generateEdgeShapes();
+      relayout();
       seedFromAnchors();
       wake();
     }
@@ -2025,17 +2073,13 @@ const otherNodes = diagramNodes.filter(
       const landscape = isLandscape();
       const orientChanged = lastLandscape !== null && lastLandscape !== landscape;
       lastLandscape = landscape;
-      if (orientChanged || layoutIsCrowded()) {
+      // Re-derive the whole spine when the orientation flipped, the chain runs
+      // across the wrong axis, or boxes are crowded — then route + re-settle.
+      if (orientChanged || orientationMismatched() || layoutIsCrowded()) {
         adaptLayoutForViewport(landscape);
-        computeAnchors();
       }
       measureDotOffsets();
-      relaxAnchors();
-      computeAnchors();
-      straightenAngles();
-      relaxAnchors();
-      computeAnchors();
-      routeEdges();
+      relayout();
       clampVisiblePanels();
       wake();
     };
@@ -2057,12 +2101,7 @@ const otherNodes = diagramNodes.filter(
     lastLandscape = isLandscape();
     measureDotOffsets();
     // After measuring labels, enforce safety distance so anchors start uncrowded.
-    relaxAnchors();
-    computeAnchors();
-    straightenAngles();
-    relaxAnchors();
-    computeAnchors();
-    routeEdges();
+    relayout();
     seedFromAnchors();
     render();
 

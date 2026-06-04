@@ -8,11 +8,15 @@ password-locked projects feature (build-time encryption + client-side decrypt).
 
 ### Repository state
 
-- **Stack:** Astro 5 + MDX, self-hosted fonts (`@fontsource`), `marked` for
+- **Stack:** Astro 5 + MDX, system UI fonts (Helvetica/Arial stack), `marked` for
   client-side Markdown of decrypted content.
 - **Remote:** `github.com/freenandes/portfolio` on branch `main`.
-- **Key paths:** `src/site.config.ts` (global content), `src/styles/tokens.css`
-  (design tokens), `src/content/projects/*.mdx` (projects),
+- **Key paths:** `src/site.config.ts` (global content + `/public` asset paths),
+  `src/styles/tokens.css` (design tokens), `src/styles/global.css` (imports +
+  base utilities), `src/styles/shell.css` (wash/grid), `src/styles/accents.css`
+  (project cover palettes), `src/diagram.config.ts` (home map copy),
+  `src/scripts/nav-diagram.ts` (map physics), `src/content/projects/*.mdx`
+  (projects),
   `src/cv.data.json` (About/CV content, generated from LinkedIn),
   `src/cv.config.ts` (CV types + JSON loader), `src/pages/about.astro` (CV
   layout), `scripts/sync-linkedin.mjs` (LinkedIn PDF → CV data),

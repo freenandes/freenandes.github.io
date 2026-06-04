@@ -1,18 +1,36 @@
+/* Design tokens — edit here to re-theme the site. */
+
 :root {
+  /* Color */
   --paper: #ffffff;
   --paper-2: #f7f7f7;
   --ink: #111111;
   --ink-2: #555555;
   --ink-3: #999999;
-
   --line: rgba(0, 0, 0, 0.1);
   --line-strong: rgba(0, 0, 0, 0.2);
+  --accent: #0099ff;
+  --accent-ink: #0055ff;
+  --error: #b4452f;
 
-  --accent: #0099FF;
-  --accent-ink: #0055FF;
+  /* Generative cover + tag chips (accent name → three gradient stops) */
+  --accent-lilac-1: #c9bcff;
+  --accent-lilac-2: #ffd6e6;
+  --accent-lilac-3: #bfe0ff;
+  --accent-mint-1: #b6ecd2;
+  --accent-mint-2: #e8f6c9;
+  --accent-mint-3: #bfeae0;
+  --accent-peach-1: #ffd0bb;
+  --accent-peach-2: #ffe3a8;
+  --accent-peach-3: #ffc6d6;
+  --accent-sky-1: #bfe0ff;
+  --accent-sky-2: #cdedff;
+  --accent-sky-3: #d8d4ff;
+  --accent-butter-1: #ffe7a3;
+  --accent-butter-2: #fff0c4;
+  --accent-butter-3: #ffd8b0;
 
-  /* Shiki — map code highlighting to the palette */
-
+  /* Shiki (code blocks in MDX) */
   --astro-code-foreground: var(--ink);
   --astro-code-background: var(--paper-2);
   --astro-code-token-comment: var(--ink-3);
@@ -25,10 +43,14 @@
   --astro-code-token-string-expression: var(--accent);
   --astro-code-token-link: var(--accent);
 
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "DejaVu Sans Mono", monospace;
+  /* Typography — system fonts only (no webfont downloads) */
+  --font-sans: Helvetica, Arial, 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'Courier New', Courier, ui-monospace, Menlo, Monaco, Consolas, monospace;
 
-  /* Type scale */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
 
   --step--1: 0.8125rem;
   --step-0: 1rem;
@@ -37,45 +59,42 @@
   --step-3: 1.75rem;
   --step-4: 2.0625rem;
   --step-5: 2.5rem;
-
   --leading-tight: 0.9375;
   --leading-snug: 1.125;
   --leading-normal: 1.5;
-  
   --tracking-tight: -0.03125em;
   --tracking-mono: 0.03125em;
   --tracking-wide: 0.125em;
+  --tracking-diagram-label: 0.06em;
 
+  /* Fixed UI sizes (diagram layout; match pre-refactor footprint) */
+  --type-diagram-label: 0.72rem;
+  --type-diagram-ring: 0.625rem;
+  --type-chip: 0.7rem;
+
+  /* Space */
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
   --space-md: 1rem;
   --space-lg: 2rem;
   --space-xl: 4rem;
-
-  /* Ideal reading width */
   --measure: 66ch;
-  /* Outer container */            
-  --content-max: 72rem;       
+  --content-max: 72rem;
   --gutter: clamp(1rem, 0.5rem + 5vw, 4rem);
 
-  /* Radii / depth / motion */
-
+  /* Shape, depth, motion */
   --radius-sm: 0.1875rem;
   --radius-md: 0.5rem;
   --radius-lg: 1.3125rem;
   --radius-pill: 999px;
-
-  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.1),
-    0 8px 24px -12px rgba(0, 0, 0, 0.2);
-  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.1),
-    0 16px 48px -16px rgba(0, 0, 0, 0.3);
-
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.1), 0 8px 24px -12px rgba(0, 0, 0, 0.2);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.1), 0 16px 48px -16px rgba(0, 0, 0, 0.3);
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --dur-fast: 167ms;
   --dur: 333ms;
   --dur-slow: 667ms;
 
+  /* Layers */
   --z-base: 0;
-  --z-header: 50;
   --z-overlay: 100;
 }

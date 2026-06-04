@@ -1,9 +1,4 @@
 ---
-/**
- * Cover — the visual for a project. Uses a supplied image when present,
- * otherwise renders a generative "soft-club × TDR" gradient plate with
- * technical typography. Deterministic per project so it stays stable.
- */
 import RegMark from './RegMark.astro';
 import { withBase } from '../lib/base';
 
@@ -27,9 +22,8 @@ const {
 } = Astro.props;
 
 const num = String(index).padStart(2, '0');
-// Local cover assets live under /public and need the base prefix; leave remote
-// URLs (and data URIs) untouched.
-const coverSrc = cover && /^(https?:|data:)/.test(cover) ? cover : cover ? withBase(cover) : undefined;
+const coverSrc =
+  cover && /^(https?:|data:)/.test(cover) ? cover : cover ? withBase(cover) : undefined;
 ---
 
 <div
@@ -83,7 +77,6 @@ const coverSrc = cover && /^(https?:|data:)/.test(cover) ? cover : cover ? withB
     object-fit: cover;
   }
 
-  /* Generative plate */
   .cover__gen {
     position: absolute;
     inset: 0;
@@ -93,11 +86,7 @@ const coverSrc = cover && /^(https?:|data:)/.test(cover) ? cover : cover ? withB
   .cover__field {
     position: absolute;
     inset: 0;
-    background: radial-gradient(
-        120% 120% at 18% 12%,
-        var(--c1) 0%,
-        transparent 55%
-      ),
+    background: radial-gradient(120% 120% at 18% 12%, var(--c1) 0%, transparent 55%),
       radial-gradient(110% 110% at 88% 18%, var(--c2) 0%, transparent 50%),
       radial-gradient(140% 120% at 70% 100%, var(--c3) 0%, transparent 55%),
       linear-gradient(180deg, var(--paper-2), var(--paper-2));
@@ -126,7 +115,7 @@ const coverSrc = cover && /^(https?:|data:)/.test(cover) ? cover : cover ? withB
     position: absolute;
     top: var(--space-sm);
     left: var(--space-sm);
-    font-weight: 700;
+    font-weight: var(--weight-bold);
     font-size: var(--step-1);
     color: color-mix(in oklab, var(--ink) 70%, transparent);
   }
@@ -137,10 +126,10 @@ const coverSrc = cover && /^(https?:|data:)/.test(cover) ? cover : cover ? withB
     right: var(--space-sm);
     bottom: var(--space-sm);
     font-family: var(--font-mono);
-    font-weight: 700;
+    font-weight: var(--weight-bold);
     font-size: clamp(1.1rem, 0.6rem + 2.4vw, 2.1rem);
     line-height: 1;
-    letter-spacing: -0.01em;
+    letter-spacing: var(--tracking-tight);
     text-transform: uppercase;
     color: var(--ink);
     text-wrap: balance;
@@ -150,7 +139,7 @@ const coverSrc = cover && /^(https?:|data:)/.test(cover) ? cover : cover ? withB
     position: absolute;
     top: var(--space-sm);
     right: var(--space-sm);
-    font-weight: 700;
+    font-weight: var(--weight-bold);
     color: color-mix(in oklab, var(--ink) 55%, transparent);
   }
 
@@ -174,32 +163,5 @@ const coverSrc = cover && /^(https?:|data:)/.test(cover) ? cover : cover ? withB
     padding: 0.25rem 0.6rem;
     border-radius: var(--radius-pill);
     backdrop-filter: blur(4px);
-  }
-
-  /* Accent palettes feed the generative field. */
-  .cover--lilac {
-    --c1: #c9bcff;
-    --c2: #ffd6e6;
-    --c3: #bfe0ff;
-  }
-  .cover--mint {
-    --c1: #b6ecd2;
-    --c2: #e8f6c9;
-    --c3: #bfeae0;
-  }
-  .cover--peach {
-    --c1: #ffd0bb;
-    --c2: #ffe3a8;
-    --c3: #ffc6d6;
-  }
-  .cover--sky {
-    --c1: #bfe0ff;
-    --c2: #cdedff;
-    --c3: #d8d4ff;
-  }
-  .cover--butter {
-    --c1: #ffe7a3;
-    --c2: #fff0c4;
-    --c3: #ffd8b0;
   }
 </style>

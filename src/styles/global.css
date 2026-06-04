@@ -1,4 +1,6 @@
 @import './tokens.css';
+@import './shell.css';
+@import './accents.css';
 
 *,
 *::before,
@@ -31,8 +33,11 @@ body {
   color: var(--ink);
   font-family: var(--font-sans);
   font-size: var(--step-0);
+  font-weight: var(--weight-regular);
   line-height: var(--leading-normal);
   font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 img,
 picture,
@@ -64,19 +69,18 @@ ol[role='list'] {
 :focus-visible {
   outline: 2px dashed var(--accent);
   outline-offset: 2px;
-  border-radius: 0.1875rem;
+  border-radius: var(--radius-sm);
 }
 ::selection {
   color: var(--ink);
 }
 
-/* Headings */
-
 h1,
 h2,
 h3,
 h4 {
-  font-weight: 600;
+  font-family: var(--font-sans);
+  font-weight: var(--weight-semibold);
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tight);
   text-wrap: balance;
@@ -96,8 +100,6 @@ h4 {
 p {
   text-wrap: pretty;
 }
-
-/* Layout primitives */
 
 .container {
   width: 100%;
@@ -166,22 +168,52 @@ p {
   margin-block-start: 0.5em;
 }
 
-/* Mono label */
-
 .mono {
   font-family: var(--font-mono);
   font-size: var(--step--1);
+  font-weight: var(--weight-regular);
   letter-spacing: var(--tracking-mono);
+  font-variant-numeric: tabular-nums;
 }
 .label {
   font-family: var(--font-mono);
   font-size: var(--step--1);
+  font-weight: var(--weight-regular);
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   color: var(--ink-2);
 }
 
-/* Accessibility */
+.back-link {
+  display: inline-block;
+  color: var(--ink-2);
+  margin-block-end: var(--space-lg);
+  transition: color var(--dur-fast) var(--ease);
+}
+.back-link:hover {
+  color: var(--ink);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5ch;
+  border-radius: var(--radius-pill);
+  padding: 0.7rem 1.3rem;
+  background: var(--ink);
+  color: var(--paper);
+  border: 1px solid var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-weight: var(--weight-regular);
+  letter-spacing: var(--tracking-mono);
+  transition: transform var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.btn:hover {
+  transform: translateY(-1px);
+  background: var(--accent-ink);
+  border-color: var(--accent-ink);
+}
 
 .visually-hidden {
   position: absolute;
@@ -208,8 +240,6 @@ p {
 .skip-link:focus {
   top: var(--space-sm);
 }
-
-/* Reveal-on-load motion (progressive enhancement) */
 
 [data-reveal] {
   opacity: 0;

@@ -27,7 +27,7 @@ const dateLabel = data.date.toLocaleDateString('en-US', {
 
 <Base title={data.title} description={data.description}>
   <article class="project container">
-    <a class="back mono" href={withBase('/')}>← Back to map</a>
+    <a class="back-link mono" href={withBase('/')}>← Back to map</a>
 
     <header class="project__head">
       <p class="label project__num">
@@ -90,16 +90,6 @@ const dateLabel = data.date.toLocaleDateString('en-US', {
   .project {
     padding-block: var(--space-xl);
     max-width: 56rem;
-  }
-
-  .back {
-    display: inline-block;
-    color: var(--ink-2);
-    margin-block-end: var(--space-lg);
-    transition: color var(--dur-fast) var(--ease);
-  }
-  .back:hover {
-    color: var(--ink);
   }
 
   .project__num {

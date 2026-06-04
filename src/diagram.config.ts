@@ -1,16 +1,6 @@
 import { site } from './site.config';
 
-/* =========================================================================
-   DIAGRAM NAVIGATION CONFIG
-   The home page is a kinetic mind-map. Every node and connection below is
-   rendered by `src/components/NavDiagram.astro`; the physics simulation lives
-   in that component's client script. Edit content here — positions, labels,
-   reveal copy, links — without touching the markup or the simulation.
-
-   `portrait` / `landscape` are normalised (0..1) hint coords used only when
-   resize adaptation needs a soft nudge toward a readable map — initial layout
-   is random on each load (see NavDiagram `generateLayout`).
-   ========================================================================= */
+/** Home-page mind-map nodes and edges — rendered by NavDiagram.astro. */
 
 export interface DiagramPoint {
   x: number;
@@ -25,43 +15,28 @@ export interface DiagramMetric {
 export interface DiagramLink {
   label: string;
   href: string;
-  /** External links open in a new tab; internal ones use the base path. */
   external?: boolean;
 }
 
 export type NodeKind = 'identity' | 'about' | 'contact' | 'project' | 'floating';
-
-/** Polygon used to draw the node "point". No circles. Assigned per node
-   (not randomized) so it can be hand-tweaked later. */
 export type NodeShape = 'triangle' | 'square' | 'pentagon' | 'hexagon';
 
 export interface DiagramNode {
   id: string;
   label: string;
-  /** Optional secondary line shown directly under the node label
-      (e.g. role/title for the identity node). */
   subLabel?: string;
   kind: NodeKind;
-  /** Visual weight of the node dot. */
   size?: 'lg' | 'md' | 'sm';
-  /** Polygon drawn as the node point. */
   shape?: NodeShape;
-  /** Which way the reveal panel opens, so it stays on-canvas. */
   place?: 'top' | 'bottom' | 'left' | 'right';
-  /** Small mono caption shown above the panel title (role · year, etc.). */
   meta?: string;
-  /** Lead sentence inside the reveal panel. */
   tagline?: string;
-  /** Extra paragraphs (e.g. the About hook headline + subheadline). */
   lines?: string[];
-  /** Identity metrics — keep to three, per the design brief. */
   metrics?: DiagramMetric[];
-  /** Project tags rendered as chips. */
   tags?: string[];
-  /** A mailto address for the contact node. */
   email?: string;
-  /** Optional call-to-action link inside the panel. */
   link?: DiagramLink;
+  /** Hint coords (0..1) when resize adaptation nudges layout toward the authored map. */
   portrait: DiagramPoint;
   landscape: DiagramPoint;
 }
@@ -158,10 +133,6 @@ export const diagramNodes: DiagramNode[] = [
     portrait: { x: 0.5, y: 0.92 },
     landscape: { x: 0.88, y: 0.46 },
   },
-  // Floating nodes — ambient stats that drift in the whitespace around the
-  // diagram. They have no shape and no connecting lines; just a circular text
-  // label wrapped around their (invisible) centre. They still participate in
-  // the collision / viewport-avoidance physics so they find an open spot.
   {
     id: 'float-years',
     label: '18+++ years of this',
@@ -185,11 +156,7 @@ export const diagramNodes: DiagramNode[] = [
   },
 ];
 
-/** Connections (the "bonds" between nodes). Order is [from, to].
-   A single open chain — contact → about → pedro → systems-thinker →
-   design-at-scale → visionary — so the diagram reads as one continuous line
-   rather than a fork. The home page renders this line in a fresh random shape
-   on every load / identity-node click. */
+/** Open chain: contact → about → pedro → systems-thinker → design-at-scale → visionary */
 export const diagramEdges: Array<[string, string]> = [
   ['contact', 'about'],
   ['about', 'pedro'],

@@ -13,9 +13,8 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
   description={`Curriculum vitae of ${cv.name ?? site.name}, ${cv.headline ?? site.role}.`}
 >
   <article class="cv container">
-    <a class="back mono" href={withBase('/')}>← Back to map</a>
+    <a class="back-link mono" href={withBase('/')}>← Back to map</a>
 
-    <!-- Masthead -->
     <header class="cv__head" data-reveal>
       <div class="cv__id">
         <p class="label cv__kicker"><RegMark size={12} /> Curriculum Vitae</p>
@@ -24,9 +23,7 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
       </div>
 
       <div class="cv__actions no-print">
-        <button id="download-pdf" class="btn" type="button">
-          ↓ Download PDF
-        </button>
+        <button id="download-pdf" class="btn" type="button">↓ Download PDF</button>
         <ul role="list" class="cv__contact">
           {
             site.socials.map((s) => (
@@ -43,7 +40,6 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
       {summaryParagraphs.map((para) => <p>{para}</p>)}
     </div>
 
-    <!-- Experience -->
     <section class="cv__section" data-reveal style="--reveal-delay:140ms;">
       <h2 class="cv__section-title"><span class="label">01</span> Experience</h2>
       <div class="cv__list">
@@ -69,7 +65,6 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
       </div>
     </section>
 
-    <!-- Education -->
     <section class="cv__section" data-reveal>
       <h2 class="cv__section-title"><span class="label">02</span> Education</h2>
       <div class="cv__list">
@@ -95,24 +90,13 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
 </Base>
 
 <script>
-  const btn = document.getElementById('download-pdf');
-  btn?.addEventListener('click', () => window.print());
+  document.getElementById('download-pdf')?.addEventListener('click', () => window.print());
 </script>
 
 <style>
   .cv {
     padding-block: var(--space-xl);
     max-width: 54rem;
-  }
-
-  .back {
-    display: inline-block;
-    color: var(--ink-2);
-    margin-block-end: var(--space-lg);
-    transition: color var(--dur-fast) var(--ease);
-  }
-  .back:hover {
-    color: var(--ink);
   }
 
   .cv__head {
@@ -146,27 +130,6 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
     flex-direction: column;
     align-items: flex-end;
     gap: var(--space-sm);
-  }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5ch;
-    border-radius: var(--radius-pill);
-    padding: 0.7rem 1.3rem;
-    background: var(--ink);
-    color: var(--paper);
-    border: 1px solid var(--ink);
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    letter-spacing: var(--tracking-mono);
-    transition: transform var(--dur-fast) var(--ease),
-      background var(--dur-fast) var(--ease);
-  }
-  .btn:hover {
-    transform: translateY(-1px);
-    background: var(--accent-ink);
-    border-color: var(--accent-ink);
   }
 
   .cv__contact {
@@ -268,7 +231,6 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
     color: var(--ink-3);
   }
 
-  /* ============================ PRINT / PDF ============================ */
   @media print {
     .cv {
       padding: 0;
@@ -293,26 +255,6 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
     }
     .no-print {
       display: none !important;
-    }
-  }
-</style>
-
-<style is:global>
-  @media print {
-    /* Strip site chrome + backgrounds for a clean résumé. */
-    .site-footer,
-    .wash,
-    .grid-overlay,
-    .skip-link {
-      display: none !important;
-    }
-    html,
-    body {
-      background: #fff !important;
-      color: #000 !important;
-    }
-    @page {
-      margin: 14mm;
     }
   }
 </style>

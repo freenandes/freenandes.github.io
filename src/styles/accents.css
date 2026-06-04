@@ -1,0 +1,27 @@
+/* Project accent palettes — used by generative covers. */
+
+.cover--lilac {
+  --c1: var(--accent-lilac-1);
+  --c2: var(--accent-lilac-2);
+  --c3: var(--accent-lilac-3);
+}
+.cover--mint {
+  --c1: var(--accent-mint-1);
+  --c2: var(--accent-mint-2);
+  --c3: var(--accent-mint-3);
+}
+.cover--peach {
+  --c1: var(--accent-peach-1);
+  --c2: var(--accent-peach-2);
+  --c3: var(--accent-peach-3);
+}
+.cover--sky {
+  --c1: var(--accent-sky-1);
+  --c2: var(--accent-sky-2);
+  --c3: var(--accent-sky-3);
+}
+.cover--butter {
+  --c1: var(--accent-butter-1);
+  --c2: var(--accent-butter-2);
+  --c3: var(--accent-butter-3);
+}

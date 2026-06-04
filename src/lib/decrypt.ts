@@ -1,9 +1,6 @@
-/* =========================================================================
-   Client-side decryption for locked projects.
-   Mirrors scripts/encrypt-projects.mjs: PBKDF2(SHA-256) → AES-GCM.
-   The password never leaves the browser; only the derived key decrypts the
-   ciphertext fetched from /locked/<slug>.json.
-   ========================================================================= */
+/** Client-side decrypt for locked projects (PBKDF2 + AES-GCM; mirrors scripts/encrypt-projects.mjs). */
+
+import { withBase } from './base';
 
 export interface LockedPayload {
   v: number;
@@ -16,7 +13,6 @@ export interface LockedPayload {
   ct: string;
 }
 
-/** Decode base64 into a fresh ArrayBuffer-backed Uint8Array (BufferSource). */
 const fromB64 = (b64: string): Uint8Array<ArrayBuffer> => {
   const bin = atob(b64);
   const out = new Uint8Array(bin.length);
@@ -24,7 +20,6 @@ const fromB64 = (b64: string): Uint8Array<ArrayBuffer> => {
   return out;
 };
 
-/** Encode a string into a fresh ArrayBuffer-backed Uint8Array. */
 const toBytes = (s: string): Uint8Array<ArrayBuffer> => {
   const encoded = new TextEncoder().encode(s);
   const out = new Uint8Array(encoded.length);
@@ -37,13 +32,9 @@ async function deriveKey(
   salt: Uint8Array<ArrayBuffer>,
   iterations: number
 ): Promise<CryptoKey> {
-  const baseKey = await crypto.subtle.importKey(
-    'raw',
-    toBytes(password),
-    'PBKDF2',
-    false,
-    ['deriveKey']
-  );
+  const baseKey = await crypto.subtle.importKey('raw', toBytes(password), 'PBKDF2', false, [
+    'deriveKey',
+  ]);
   return crypto.subtle.deriveKey(
     { name: 'PBKDF2', salt, iterations, hash: 'SHA-256' },
     baseKey,
@@ -53,18 +44,12 @@ async function deriveKey(
   );
 }
 
-import { withBase } from './base';
-
 export async function fetchPayload(slug: string): Promise<LockedPayload> {
   const res = await fetch(withBase(`/locked/${slug}.json`), { cache: 'no-store' });
   if (!res.ok) throw new Error(`Locked content not found for "${slug}".`);
   return res.json() as Promise<LockedPayload>;
 }
 
-/**
- * Decrypts a locked payload with the given password.
- * Throws if the password is wrong (AES-GCM auth tag fails to verify).
- */
 export async function decryptMarkdown(
   payload: LockedPayload,
   password: string

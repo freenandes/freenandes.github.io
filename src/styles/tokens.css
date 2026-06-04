@@ -43,11 +43,15 @@
   --astro-code-token-string-expression: var(--accent);
   --astro-code-token-link: var(--accent);
 
-  /* Typography */
-  --font-sans: 'Space Grotesk Variable', system-ui, -apple-system, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-  --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas,
-    'Liberation Mono', 'DejaVu Sans Mono', monospace;
+  /* Typography — system fonts only (no webfont downloads) */
+  --font-sans: Helvetica, Arial, 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'Courier New', Courier, ui-monospace, Menlo, Monaco, Consolas, monospace;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
   --step--1: 0.8125rem;
   --step-0: 1rem;
   --step-1: 1.1875rem;
@@ -61,6 +65,12 @@
   --tracking-tight: -0.03125em;
   --tracking-mono: 0.03125em;
   --tracking-wide: 0.125em;
+  --tracking-diagram-label: 0.06em;
+
+  /* Fixed UI sizes (diagram layout; match pre-refactor footprint) */
+  --type-diagram-label: 0.72rem;
+  --type-diagram-ring: 0.625rem;
+  --type-chip: 0.7rem;
 
   /* Space */
   --space-xs: 0.25rem;

@@ -419,8 +419,9 @@ const otherNodes = diagramNodes.filter(
      larger screens where the old fluid type ran needlessly large. */
   .node__label {
     font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.06em;
+    font-size: var(--type-diagram-label);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-diagram-label);
     text-transform: uppercase;
     color: var(--ink-2);
     white-space: nowrap;
@@ -436,14 +437,15 @@ const otherNodes = diagramNodes.filter(
     text-transform: none;
     letter-spacing: var(--tracking-tight);
     font-size: var(--step-0);
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     color: var(--ink);
   }
 
   .node__sublabel {
     margin-block-start: 0.15rem;
-    font-size: 0.72rem;
-    letter-spacing: 0.06em;
+    font-size: var(--type-diagram-label);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-diagram-label);
     text-transform: uppercase;
     color: var(--ink-3);
     white-space: nowrap;
@@ -480,8 +482,8 @@ const otherNodes = diagramNodes.filter(
   }
   .node__ring-text {
     font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 500;
+    font-size: var(--type-diagram-ring);
+    font-weight: var(--weight-medium);
     letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
     /* Decorative ambient labels recede behind the diagram in a soft grey so the
@@ -558,7 +560,7 @@ const otherNodes = diagramNodes.filter(
   }
   .node--about .panel__lead {
     font-size: var(--step-1);
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     letter-spacing: var(--tracking-tight);
     line-height: 1.15;
   }
@@ -583,7 +585,7 @@ const otherNodes = diagramNodes.filter(
   }
   .panel__metric-value {
     font-family: var(--font-mono);
-    font-weight: 700;
+    font-weight: var(--weight-bold);
     color: var(--accent-ink);
     min-width: 4.2ch;
   }
@@ -600,7 +602,8 @@ const otherNodes = diagramNodes.filter(
   }
   .panel__chip {
     font-family: var(--font-mono);
-    font-size: 0.7rem;
+    font-size: var(--type-chip);
+    font-weight: var(--weight-regular);
     letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
     padding: 0.15rem 0.55rem;

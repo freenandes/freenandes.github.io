@@ -8,7 +8,7 @@ password-locked projects feature (build-time encryption + client-side decrypt).
 
 ### Repository state
 
-- **Stack:** Astro 5 + MDX, self-hosted fonts (`@fontsource`), `marked` for
+- **Stack:** Astro 5 + MDX, system UI fonts (Helvetica/Arial stack), `marked` for
   client-side Markdown of decrypted content.
 - **Remote:** `github.com/freenandes/portfolio` on branch `main`.
 - **Key paths:** `src/site.config.ts` (global content + `/public` asset paths),

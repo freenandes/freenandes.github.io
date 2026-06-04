@@ -798,8 +798,8 @@ const otherNodes = diagramNodes.filter(
     // Fresh random shape on each load / identity reset (Math.random, no seed).
     // Resize/crowding may nudge toward diagram.config coords only when adapting.
     /** How constrained the horizontal axis is. Returns a 0..1 value where
-        higher = narrower (phone-portrait territory). Used to decide layout
-        tilt, meander amplitude, label side, etc. */
+        higher = narrower (phone-portrait territory). Used to decide meander
+        amplitude, label side, etc. */
     function narrowness() {
       const aspect = W / Math.max(1, H);
       // aspect 1.0 → 0 (square), aspect 0.5 → 1 (very tall phone)
@@ -808,13 +808,9 @@ const otherNodes = diagramNodes.filter(
 
     function inset() {
       const narrow = narrowness();
-      // Labels are centered under the dot and extend ~110 px to each side, so
-      // the *horizontal* margin must grow on narrow viewports or labels clip
-      // at the screen edge. The vertical margin also gets a small boost so the
-      // bottom-most label has room.
-      // With the smaller phone label type, the horizontal margin no longer
-      // needs to balloon to avoid clipping, so narrow viewports keep more usable
-      // width for the chain. Vertical margin is trimmed too for more room.
+      // Labels are centered under the dot and extend to each side, so the
+      // horizontal margin grows a little on narrow viewports. The vertical
+      // margin gets a small boost so the end labels have room.
       const mx = Math.min((0.12 + 0.1 * narrow) * W, 160);
       const my = Math.min((0.08 + 0.04 * narrow) * H, 150);
       return { mx, my, iw: Math.max(1, W - 2 * mx), ih: Math.max(1, H - 2 * my) };
@@ -959,17 +955,12 @@ const otherNodes = diagramNodes.filter(
       ];
     }
 
-    /** A pure-sine wavy line: 3–5 ripples, amplitude 6–14px, perfectly regular.
-        The points array encodes the wave parameters for the renderer:
-        `points.length` = number of humps, `|points[0].off|` = peak amplitude. */
     function makeWavePoints(): { t: number; off: number }[] {
-      const count = 4 + Math.floor(Math.random() * 3); // No. of humps
-      const amp = 10 + Math.random() * 10; // Width of humps
+      const count = 4 + Math.floor(Math.random() * 3);
+      const amp = 10 + Math.random() * 10;
       const sign = Math.random() < 0.5 ? 1 : -1;
       const pts: { t: number; off: number }[] = [];
       for (let k = 0; k < count; k++) {
-        // Hump centres evenly spaced along the chord with equal amplitude —
-        // the renderer reconstructs the actual sine curve from these values.
         const t = (k + 0.5) / count;
         const dir = k % 2 === 0 ? sign : -sign;
         pts.push({ t, off: dir * amp });
@@ -977,47 +968,27 @@ const otherNodes = diagramNodes.filter(
       return pts;
     }
 
-    /** Tight jagged line — 2–3 corners, narrow consistent zig-zag width.
-        Inspired by the diagrammatic line work on andrewtrousdale.com: short
-        amplitude, even spacing, strict alternation, near-uniform peaks so each
-        line reads as a clean pulse rather than a chaotic squiggle. */
     function makeJaggedPoints(): { t: number; off: number }[] {
-      const count = 2 + Math.floor(Math.random() * 2); // No. of corners
-      // Amplitude is a FRACTION of the chord length (resolved at render time),
-      // not a fixed pixel width. A fixed-pixel deflection collapses to a near-
-      // flat, ambiguous "soft" joint on long lines; a length-relative amplitude
-      // keeps every corner's bend angle expressive regardless of edge length.
-      const baseAmp = 0.05 + Math.random() * 0.03; // 0.05..0.08 of the chord
-      // Keep the corners clustered around the middle of the chord so the line
-      // stays straight as it leaves each node and only articulates mid-span.
-      // SPREAD = how much of the chord the corners may occupy (0.5 = central
-      // half). Squeezing toward 0.5 avoids joints right next to the nodes.
+      const count = 2 + Math.floor(Math.random() * 2);
+      const baseAmp = 0.05 + Math.random() * 0.03;
       const SPREAD = 0.5;
-      // 1. Evenly spaced corner positions in the central band.
       const centers: number[] = [];
       for (let k = 0; k < count; k++) {
         const even = count === 1 ? 0.5 : (k + 1) / (count + 1);
         centers.push(0.5 + (even - 0.5) * SPREAD);
       }
       const gap = count > 1 ? centers[1] - centers[0] : 1;
-      // 2. Jitter for organic spacing, but capped to a quarter of the gap so
-      //    corners never reorder or bunch into each other.
       const jitMax = Math.min(0.035, gap * 0.25);
       const ts = centers
         .map((c) => Math.max(0.3, Math.min(0.7, c + (Math.random() * 2 - 1) * jitMax)))
         .sort((a, b) => a - b);
-      // 3. Guarantee a minimum separation between adjacent corners so two
-      //    joints can't sit on top of each other.
       const MIN_GAP = Math.min(gap * 0.6, 0.12);
       for (let k = 1; k < ts.length; k++) {
         if (ts[k] - ts[k - 1] < MIN_GAP) ts[k] = Math.min(0.7, ts[k - 1] + MIN_GAP);
       }
-      // 4. Assign alternating sides in POSITION order (not generation order) so
-      //    consecutive corners always fall on opposite sides of the chord — a
-      //    clean back-and-forth pulse with no shallow same-side double-joints.
       let sign = Math.random() < 0.5 ? 1 : -1;
       const pts = ts.map((t) => {
-        const ampScale = 0.9 + Math.random() * 0.2; // 0.9..1.1 — near-uniform
+        const ampScale = 0.9 + Math.random() * 0.2;
         const p = { t, off: sign * baseAmp * ampScale };
         sign = -sign;
         return p;
@@ -1025,8 +996,6 @@ const otherNodes = diagramNodes.filter(
       return pts;
     }
 
-    // Measure each node's polygon-point offset from its box centre (once the
-    // labels are laid out), so connectors meet the shape, not the text.
     function measureDotOffsets() {
       for (const n of nodes) {
         const dot = n.el.querySelector('.node__dot');
@@ -1048,23 +1017,17 @@ const otherNodes = diagramNodes.filter(
       return { x: Math.max(r.width, 48) / 2, y: Math.max(r.height, 40) / 2 };
     }
 
-    /** Per-axis breathing room between node boxes. Crucially this is
-        anisotropic: a wide label only needs horizontal clearance, so the
-        vertical pad stays small. That lets a portrait chain stack compactly
-        instead of the old circular rule, which forced every node ~2× the
-        widest label apart and blew the chain across the whole screen. Pads
-        ease down further on narrow viewports to tighten the path. */
+    /** Per-axis breathing room between node boxes. Anisotropic: a wide label
+        only needs horizontal clearance, so the vertical pad stays small, letting
+        a portrait chain stack compactly. Pads ease down on narrow viewports. */
     function sepPad() {
       const narrow = narrowness();
       return {
-        x: 34 - 12 * narrow, // 34 → 22
-        y: 30 - 16 * narrow, // 30 → 14
+        x: 34 - 12 * narrow,
+        y: 30 - 16 * narrow,
       };
     }
 
-    /** Minimal-translation vector that separates two node boxes (AABB) given
-        their positions. Returns the push to apply to B (negate for A) along the
-        least-penetration axis, plus whether they currently overlap. */
     function separationPush(
       a: Node, b: Node,
       ax: number, ay: number, bx: number, by: number,
@@ -1079,23 +1042,15 @@ const otherNodes = diagramNodes.filter(
       const ox = needX - Math.abs(dx);
       const oy = needY - Math.abs(dy);
       if (ox <= 0 || oy <= 0) return { x: 0, y: 0, hit: false };
-      // Push the short way out — vertically when labels overlap horizontally
-      // (the common case in a portrait chain), horizontally otherwise.
       if (ox < oy) return { x: dx < 0 ? -ox : ox, y: 0, hit: true };
       return { x: 0, y: dy < 0 ? -oy : oy, hit: true };
     }
 
-    /** Iteratively push anchor fractions apart so initial layout is uncrowded
-        before the sim starts (otherwise a weak repulsion can settle on overlap). */
     function relaxAnchors(iterations = 80) {
       const { mx, my, iw, ih } = inset();
       if (iw < 2 || ih < 2) return;
       const px = nodes.map((n) => mx + n.frac.x * iw);
       const py = nodes.map((n) => my + n.frac.y * ih);
-      // Only the chain nodes shape the layout here. The big ambient rings are
-      // placed afterwards by relaxFloatingFromEdges (they yield to the chain),
-      // so letting them push chain anchors here would shove the chain apart —
-      // a ring landing in the spine's column tears a void and bunches the rest.
       for (let it = 0; it < iterations; it++) {
         let moved = 0;
         for (let i = 0; i < nodes.length; i++) {
@@ -1125,13 +1080,6 @@ const otherNodes = diagramNodes.filter(
       }
     }
 
-    /** Open up acute interior corners in the chain path. For each non-endpoint
-        chain node we compute the angle between the vectors going OUT to its
-        previous and next neighbours. cos = +1 means both legs go the same way
-        (worst, very acute), cos = 0 means a right angle, cos = -1 means
-        a perfectly straight path. We nudge any node whose cos > `cosLimit`
-        toward the midpoint of its neighbours to open the corner. Re-run
-        `relaxAnchors` afterwards to restore separation. */
     function straightenAngles(iterations = 20, cosLimit = -0.15) {
       const { mx, my, iw, ih } = inset();
       if (iw < 2 || ih < 2) return;
@@ -1151,10 +1099,8 @@ const otherNodes = diagramNodes.filter(
           const len2 = Math.hypot(v2x, v2y) || 1;
           const cos = (v1x * v2x + v1y * v2y) / (len1 * len2);
           if (cos <= cosLimit) continue;
-          // Pull `c` toward the midpoint of `p` and `nx` to straighten the bend.
           const midX = (p.ax + nx.ax) / 2;
           const midY = (p.ay + nx.ay) / 2;
-          // Stronger pull when the corner is more acute (cos closer to +1).
           const urgency = Math.min(1, (cos - cosLimit) / (1 - cosLimit));
           const k = 0.12 + 0.18 * urgency;
           const newX = Math.max(mx + 6, Math.min(mx + iw - 6, c.ax + (midX - c.ax) * k));
@@ -1178,6 +1124,7 @@ const otherNodes = diagramNodes.filter(
         for (let j = i + 1; j < nodes.length; j++) {
           const a = nodes[i];
           const b = nodes[j];
+          if (a.floating || b.floating) continue;
           const s = separationPush(a, b, a.ax, a.ay, b.ax, b.ay);
           if (s.hit && Math.hypot(s.x, s.y) > 10) return true;
         }
@@ -1186,10 +1133,9 @@ const otherNodes = diagramNodes.filter(
     }
 
     /** Has the chain's overall orientation diverged from what the viewport
-        wants? After a resize/orientation flip — or a flaky first layout — the
-        chain can end up running across the short axis (e.g. a horizontal spine
-        squeezed into a portrait canvas), which collapses it. Detect that by
-        comparing the chain's pixel span on each axis against the viewport. */
+        wants? Detect a chain that ends up running across the short axis (e.g. a
+        horizontal spine squeezed into a portrait canvas) so the settle can
+        re-derive a correctly-oriented spine. */
     function orientationMismatched() {
       let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
       for (const n of nodes) {
@@ -1199,13 +1145,9 @@ const otherNodes = diagramNodes.filter(
       }
       const spanX = maxX - minX;
       const spanY = maxY - minY;
-      // Want the chain's long span on the viewport's long axis.
       return viewportLandscape() ? spanY > spanX * 1.1 : spanX > spanY * 1.1;
     }
 
-    /** Re-space when crowded or on orientation flip — same near-straight spine
-        as the initial layout, with a slightly stronger config hint so a resize
-        settles toward the intended composition. */
     function adaptLayoutForViewport(landscape: boolean) {
       layoutSpine(landscape, 0.15);
     }
@@ -1225,17 +1167,13 @@ const otherNodes = diagramNodes.filter(
       recomputeRests();
     }
 
-    /** Resolve a jagged corner's length-relative offset to pixels. Clamped so
-        the zig-zag stays visible on short edges and doesn't balloon on very
-        long ones, while preserving an expressive bend angle in between. */
     function jaggedOffPx(off: number, len: number): number {
-      if (off === 0) return 0; // endpoints sit exactly on the node
+      if (off === 0) return 0;
       const px = off * len;
       const mag = Math.min(60, Math.max(16, Math.abs(px)));
       return px < 0 ? -mag : mag;
     }
 
-    // Build the SVG path for an edge from its current endpoints + its shape.
     function edgePath(e: { a: Node; b: Node; shape: EdgeShape; liveSpikes?: { x: number; y: number; vx: number; vy: number }[] | null }): string {
       const ax = e.a.x;
       const ay = e.a.y + e.a.dotDy;
@@ -1249,18 +1187,10 @@ const otherNodes = diagramNodes.filter(
 
       const nx = -dy / len;
       const ny = dx / len;
-      // Build the waypoint list anchored at both ends so the path starts at A
-      // and ends at B regardless of how many humps/spikes it has. Sort by t
-      // defensively — out-of-order points would produce visible kinks.
       const sorted = s.points.slice().sort((p, q) => p.t - q.t);
       const wp = [{ t: 0, off: 0 }, ...sorted, { t: 1, off: 0 }];
 
       if (s.kind === 'wave') {
-        // Pure sine wave along the chord — mathematical and stable. The waypoint
-        // array carries the parameters: count = humps, |off| = amplitude, and
-        // the sign of points[0].off picks the starting side. Endpoints are
-        // exact zeros (sin(0) = sin(N·π) = 0) so the curve meets the nodes
-        // cleanly without phantom-control hacks.
         const waves = s.points.length;
         const amp = Math.abs(s.points[0].off);
         const phase = s.points[0].off >= 0 ? 0 : Math.PI;
@@ -1276,9 +1206,6 @@ const otherNodes = diagramNodes.filter(
         return wd;
       }
 
-      // Jagged: sharp corners between waypoints — linear segments only.
-      // Each corner is a live joint (e.liveSpikes), so its position lags the
-      // rest target with damping and the line articulates like an arm.
       let d = `M ${ax.toFixed(1)} ${ay.toFixed(1)}`;
       const spikes = e.liveSpikes;
       if (spikes && spikes.length === s.points.length) {
@@ -1307,7 +1234,6 @@ const otherNodes = diagramNodes.filter(
       }
     }
 
-    /** Closest point on segment a→b to point (px,py), plus the distance. */
     function closestPointOnSeg(
       px: number, py: number,
       a: { x: number; y: number }, b: { x: number; y: number },
@@ -1326,11 +1252,6 @@ const otherNodes = diagramNodes.filter(
       return { x, y, d: Math.hypot(px - x, py - y) };
     }
 
-    /** Nudge floating-node anchors out of the connector lines (and away from
-        other nodes) so the ambient labels settle in clear whitespace rather than
-        sitting on top of an edge. Edges only depend on the connected nodes'
-        anchors, so the polylines are fixed during this relaxation — run it once
-        the edge routing is final (after de-crossing). */
     function relaxFloatingFromEdges(iterations = 60) {
       const floats = nodes.filter((n) => n.floating);
       if (!floats.length || !edges.length) return;
@@ -1378,7 +1299,6 @@ const otherNodes = diagramNodes.filter(
       }
     }
 
-    /** Cheap segment-intersection test for two line segments. */
     function segmentsCross(
       ax: number, ay: number, bx: number, by: number,
       cx: number, cy: number, dx: number, dy: number,
@@ -1394,9 +1314,6 @@ const otherNodes = diagramNodes.filter(
       return t > 0 && t < 1 && u > 0 && u < 1;
     }
 
-    /** Swap the anchor positions of two nodes (positions only, not identities)
-        so labels and panels stay tied to the same node — only the layout slot
-        each node occupies changes. */
     function swapNodeAnchors(a: Node, b: Node) {
       const tAx = a.ax, tAy = a.ay, tFx = a.frac.x, tFy = a.frac.y;
       a.ax = b.ax; a.ay = b.ay; a.frac = { x: b.frac.x, y: b.frac.y };
@@ -1405,8 +1322,6 @@ const otherNodes = diagramNodes.filter(
       b.el.dataset.place = placeFor(b);
     }
 
-    /** Sample an edge as a polyline matching the rendered path, so we can
-        test the actual curve (not just the chord) for crossings. */
     function edgePolyline(e: { a: Node; b: Node; shape: EdgeShape }): { x: number; y: number }[] {
       const ax = e.a.ax;
       const ay = e.a.ay + e.a.dotDy;
@@ -1432,7 +1347,6 @@ const otherNodes = diagramNodes.filter(
       return pts;
     }
 
-    /** Count intersections between two polylines (each a list of points). */
     function countPolylineCrossings(a: { x: number; y: number }[], b: { x: number; y: number }[]) {
       let n = 0;
       for (let i = 0; i < a.length - 1; i++) {
@@ -1446,7 +1360,6 @@ const otherNodes = diagramNodes.filter(
       return n;
     }
 
-    /** Total polyline crossings between all non-adjacent edge pairs. */
     function totalCurveCrossings(): number {
       const polys = edges.map(edgePolyline);
       let n = 0;
@@ -1461,9 +1374,6 @@ const otherNodes = diagramNodes.filter(
       return n;
     }
 
-    /** For each curvy edge, try flipping its waypoint signs and keep the flip
-        only if it reduces the total crossing count. Catches curve-vs-chord and
-        curve-vs-curve overlaps that the chord-based 2-opt swap can't see. */
     function refineCurveCrossings() {
       for (let pass = 0; pass < 3; pass++) {
         let improved = false;
@@ -1485,29 +1395,22 @@ const otherNodes = diagramNodes.filter(
       }
     }
 
-    /** TSP-style 2-opt de-crossing for the chain graph. When non-adjacent
-        edges' chords cross, reverse the anchor positions of the chain segment
-        between them — this provably reduces total crossings on an open chain. */
     function decrossEdges() {
       const order = chainOrder;
       const safety = 12;
       for (let pass = 0; pass < safety; pass++) {
         let improved = false;
-        // Edges in chain order: edge i connects order[i] and order[i+1].
         for (let i = 0; i < order.length - 1; i++) {
           for (let j = i + 2; j < order.length - 1; j++) {
             const a1 = order[i];
             const a2 = order[i + 1];
             const b1 = order[j];
             const b2 = order[j + 1];
-            // Share a node? Then they're adjacent — can't cross meaningfully.
             if (a1 === b1 || a1 === b2 || a2 === b1) continue;
             if (!segmentsCross(
               a1.ax, a1.ay, a2.ax, a2.ay,
               b1.ax, b1.ay, b2.ax, b2.ay,
             )) continue;
-            // Reverse anchor positions of order[i+1..j]. Edges between them
-            // are unchanged topologically; geometrically they untangle.
             let lo = i + 1;
             let hi = j;
             while (lo < hi) {
@@ -1523,8 +1426,6 @@ const otherNodes = diagramNodes.filter(
       recomputeRests();
     }
 
-    /** Closest approach between two sampled polylines: returns the minimum
-        distance and the pair of closest points (one on each curve). */
     function polylineMinDist(
       A: { x: number; y: number }[],
       B: { x: number; y: number }[],
@@ -1546,23 +1447,14 @@ const otherNodes = diagramNodes.filter(
       return { d, ax, ay, bx, by };
     }
 
-    /** Translate an edge (both its chain-node anchors) by a vector. */
     function nudgeEdge(e: { a: Node; b: Node }, dx: number, dy: number) {
       e.a.ax += dx; e.a.ay += dy;
       e.b.ax += dx; e.b.ay += dy;
     }
 
-    /** Widen near-overlapping connector lines. `decrossEdges` only resolves
-        actual crossings; this catches non-adjacent edges that run close and
-        nearly parallel — the thin acute wedge where two lines almost touch.
-        It measures the true clearance between each non-adjacent edge pair and,
-        when they're tighter than `CLEAR`, pushes the two edges apart so the
-        connections open wider. Re-run decross + relax afterwards to clean up. */
     function openNearMisses(iterations = 32) {
       const { mx, my, iw, ih } = inset();
       if (iw < 2 || ih < 2 || edges.length < 2) return;
-      // Desired clearance between non-adjacent lines. Eased down on narrow
-      // viewports so the layout stays compact rather than forced apart.
       const CLEAR = 54 - 20 * narrowness();
       for (let it = 0; it < iterations; it++) {
         let maxPush = 0;
@@ -1571,8 +1463,6 @@ const otherNodes = diagramNodes.filter(
           for (let j = i + 1; j < edges.length; j++) {
             const ei = edges[i];
             const ej = edges[j];
-            // Adjacent edges share a node — their wedge is handled by
-            // straightenAngles, and they legitimately meet, so skip them.
             if (ei.a === ej.a || ei.a === ej.b || ei.b === ej.a || ei.b === ej.b) continue;
             const m = polylineMinDist(polys[i], polys[j]);
             if (m.d >= CLEAR) continue;
@@ -1580,7 +1470,6 @@ const otherNodes = diagramNodes.filter(
             let uy = m.ay - m.by;
             let dd = Math.hypot(ux, uy);
             if (dd < 0.01) {
-              // Lines effectively touch: separate along edge i's perpendicular.
               const cdx = ei.b.ax - ei.a.ax;
               const cdy = ei.b.ay - ei.a.ay;
               const cl = Math.hypot(cdx, cdy) || 1;
@@ -1605,9 +1494,6 @@ const otherNodes = diagramNodes.filter(
       recomputeRests();
     }
 
-    /** Final edge-routing pass shared by reset / resize / first layout:
-        resolve crossings, open near-misses, then re-resolve crossings and
-        re-settle node and floating-label separation. */
     function routeEdges() {
       decrossEdges();
       refineCurveCrossings();
@@ -1624,12 +1510,9 @@ const otherNodes = diagramNodes.filter(
       const left = n.ax;
       const top = n.ay;
       const bottom = H - n.ay;
-      // Approximate label box size we'd like to clear on each side.
       const needH = 220;
       const needV = 80;
       const narrow = narrowness();
-      // On narrow viewports, horizontal placements are likely to crop labels.
-      // Bias scores so top/bottom win unless side has truly generous space.
       const vBoost = 80 * narrow;
       const opts: [string, number][] = [
         ['right', right - needH],
@@ -1641,8 +1524,6 @@ const otherNodes = diagramNodes.filter(
       return opts[0][0];
     }
 
-    // Map the stored fractions to pixel anchors for the current size. A resize
-    // only remaps (no re-randomising), so the chosen shape is preserved.
     function computeAnchors(first = false) {
       const rect = root.getBoundingClientRect();
       // Same guard as generateLayout: never let a bogus early rect (zero/short)
@@ -1666,9 +1547,8 @@ const otherNodes = diagramNodes.filter(
 
     /** Seed the live positions onto the freshly-computed anchors (with a little
         scatter for life). The anchors are already de-crossed and separated, so
-        starting there means the settle is a gentle relax — not a long transit
-        across the canvas where a node can get wedged behind the big identity
-        node and lock into an overlap. */
+        the settle is a gentle relax from a known-good spread layout — never a
+        long transit where the spring sim can fold the chain into the centre. */
     function seedFromAnchors() {
       for (const n of nodes) {
         n.x = n.ax + (Math.random() - 0.5) * SIM.initialScatter;
@@ -1692,7 +1572,6 @@ const otherNodes = diagramNodes.filter(
       routeEdges();
     }
 
-    // A fresh random shape: new positions + new connector styles, animated to.
     function resetLayout() {
       generateLayout();
       generateEdgeShapes();
@@ -1710,12 +1589,8 @@ const otherNodes = diagramNodes.filter(
       }
     }
 
-    // Soft, overdamped motion — slow drift home, gentle edge give, no bounce.
     const SIM = {
       drag: 0.6,
-      // Anchor pull dominates repulsion so nodes reliably travel to their
-      // (already de-crossed, already separated) anchors instead of getting
-      // wedged against the large identity node during the morph.
       anchorPull: 0.085,
       edge: 0.01,
       repel: 0.06,
@@ -1725,9 +1600,6 @@ const otherNodes = diagramNodes.filter(
       initialScatter: 8,
     };
 
-    /** Pure box separation on the live positions — no anchor pull to fight it,
-        so unlike the live simulation it cannot settle into a standoff. Used as
-        a final pass so the resting layout is always overlap-free. */
     function resolveOverlaps(iterations = 50) {
       for (let it = 0; it < iterations; it++) {
         let moved = 0;
@@ -1751,8 +1623,6 @@ const otherNodes = diagramNodes.filter(
       }
     }
 
-    // The simulation only runs while there is something to resolve — settling
-    // after load, a resize, or a drag. Once everything is at rest it sleeps.
     let raf = 0;
     let running = false;
     let settledFrames = 0;
@@ -1789,8 +1659,6 @@ const otherNodes = diagramNodes.filter(
           const b = nodes[j];
           const s = separationPush(a, b, a.x, a.y, b.x, b.y);
           if (!s.hit) continue;
-          // A floating ring must never push a chain node out of its slot — when
-          // a float meets a chain node, only the float yields (full push).
           if (a.floating !== b.floating) {
             const fl = a.floating ? a : b;
             const sign = a.floating ? -1 : 1;
@@ -1834,10 +1702,8 @@ const otherNodes = diagramNodes.filter(
         const ty = n.ay;
         const homeX = tx - n.x;
         const homeY = ty - n.y;
-        // Anchor: direct overdamped drift (no spring overshoot).
         n.x += homeX * SIM.anchorPull;
         n.y += homeY * SIM.anchorPull;
-        // Edges / neighbours: low-energy ripple through velocity only.
         n.vx = (n.vx + n.fx) * SIM.drag;
         n.vy = (n.vy + n.fy) * SIM.drag;
         n.x += n.vx;
@@ -1859,9 +1725,6 @@ const otherNodes = diagramNodes.filter(
       }
       settledFrames = maxMotion < SIM.settleMotion ? settledFrames + 1 : 0;
       if (settledFrames >= SIM.settleFrames) {
-        // Final guarantee: untangle any residual overlap the spring settle left
-        // (a node trapped against the big identity node). Pure separation has no
-        // opposing anchor force, so it can't deadlock the way the live sim can.
         resolveOverlaps();
         syncAnchorsFromSim();
         for (const n of nodes) {
@@ -1879,11 +1742,6 @@ const otherNodes = diagramNodes.filter(
     function setCalm(n: Node) {
       n.calm = n.hover || n.focus || n.el.classList.contains('is-open');
     }
-    /** Keep a node's reveal card inside the viewport. The card is anchored to
-        its node and centred on the cross-axis, so a node near an edge would
-        otherwise let the card bleed off-screen. We measure it (with the nudge
-        zeroed and transitions suppressed so the read is exact) and set
-        --panel-nudge-x/y to slide it back within a margin of the viewport. */
     function clampPanel(n: Node) {
       const panel = n.el.querySelector<HTMLElement>('.node__panel');
       if (!panel) return;
@@ -1892,7 +1750,7 @@ const otherNodes = diagramNodes.filter(
       panel.style.setProperty('--panel-nudge-x', '0px');
       panel.style.setProperty('--panel-nudge-y', '0px');
       const r = panel.getBoundingClientRect();
-      const M = 12; // breathing room from the viewport edge
+      const M = 12;
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       let nx = 0;
@@ -1903,12 +1761,10 @@ const otherNodes = diagramNodes.filter(
       else if (r.bottom > vh - M) ny = (vh - M) - r.bottom;
       panel.style.setProperty('--panel-nudge-x', `${Math.round(nx)}px`);
       panel.style.setProperty('--panel-nudge-y', `${Math.round(ny)}px`);
-      // Reflow so the corrected position is current, then restore transitions.
       void panel.getBoundingClientRect();
       panel.style.transition = prevTransition;
     }
 
-    /** Re-clamp every card that is currently revealed (open/hover/focus). */
     function clampVisiblePanels() {
       for (const n of nodes) {
         if (n.el.classList.contains('is-open') || n.hover || n.focus) clampPanel(n);
@@ -1928,7 +1784,6 @@ const otherNodes = diagramNodes.filter(
       for (const n of nodes) if (n !== except) setOpen(n, false);
     }
 
-    // Close panels when clicking empty canvas.
     root.addEventListener('pointerdown', (ev) => {
       if (!(ev.target as HTMLElement).closest('[data-node]')) closeAll();
     });
@@ -1936,7 +1791,6 @@ const otherNodes = diagramNodes.filter(
       if (ev.key === 'Escape') closeAll();
     });
 
-    // Per-node interaction: hover/focus calming, drag, and tap-to-toggle.
     for (const n of nodes) {
       const hit = n.el.querySelector<HTMLButtonElement>('.node__hit');
       if (!hit) continue;
@@ -2007,8 +1861,6 @@ const otherNodes = diagramNodes.filter(
         if (n.dragging) {
           n.dragging = false;
           n.el.classList.remove('is-dragging');
-          // Pin the node where it was dropped: store it as a fraction so it
-          // settles there and survives resizes, and re-settle edge springs.
           const { mx, my, iw, ih } = inset();
           n.frac = {
             x: Math.max(0, Math.min(1, (n.x - mx) / iw)),
@@ -2031,7 +1883,6 @@ const otherNodes = diagramNodes.filter(
           ev.preventDefault();
           return;
         }
-        // Identity node only resets the layout — no reveal panel.
         if (n.id === 'pedro') {
           resetLayout();
           closeAll();
@@ -2050,11 +1901,11 @@ const otherNodes = diagramNodes.filter(
     // stable for a beat — i.e. after the resize handle is released.
     let resizeScheduled = false;
     let lastLandscape: boolean | null = null;
+    let lastObsW = 0;
+    let lastObsH = 0;
     let settleTimer: ReturnType<typeof setTimeout> | null = null;
     const SETTLE_DELAY = 220; // ms of quiet before the heavy re-layout runs
 
-    // Per-frame, lightweight: keep anchors mapped to the current viewport so
-    // the existing shape scales proportionally without any rearrangement.
     const remapToViewport = () => {
       if (resizeScheduled) return;
       resizeScheduled = true;
@@ -2066,25 +1917,38 @@ const otherNodes = diagramNodes.filter(
       });
     };
 
-    // Heavy: re-space when crowded or when orientation flipped, then re-route.
-    // Only runs once the viewport has settled.
+    // Heavy re-layout once the viewport has settled. Re-derive the spine when
+    // the orientation flipped / the chain runs across the wrong axis / boxes are
+    // crowded, then RESEED the live positions onto the freshly separated anchors
+    // before waking the sim. Seeding is essential: without it the sim would
+    // transit from the old positions to the new anchors and could fold the chain
+    // into the centre — the exact "collapse" this layout is designed to avoid.
     const settleLayout = () => {
       computeAnchors();
       const landscape = isLandscape();
       const orientChanged = lastLandscape !== null && lastLandscape !== landscape;
       lastLandscape = landscape;
-      // Re-derive the whole spine when the orientation flipped, the chain runs
-      // across the wrong axis, or boxes are crowded — then route + re-settle.
       if (orientChanged || orientationMismatched() || layoutIsCrowded()) {
         adaptLayoutForViewport(landscape);
       }
       measureDotOffsets();
       relayout();
+      seedFromAnchors();
       clampVisiblePanels();
       wake();
     };
 
+    // Only react to genuine size changes. A ResizeObserver always fires once on
+    // observe, and font swaps / sub-pixel jitter can fire it again — running the
+    // heavy settle on those no-op fires needlessly re-randomises (and could
+    // disturb) a layout that is already correct, so we ignore them.
     const onResize = () => {
+      const rect = root.getBoundingClientRect();
+      const w = safeWidth(rect);
+      const h = safeHeight(rect);
+      if (Math.abs(w - lastObsW) < 1 && Math.abs(h - lastObsH) < 1) return;
+      lastObsW = w;
+      lastObsH = h;
       remapToViewport();
       if (settleTimer !== null) clearTimeout(settleTimer);
       settleTimer = setTimeout(() => {
@@ -2099,8 +1963,9 @@ const otherNodes = diagramNodes.filter(
     generateEdgeShapes();
     computeAnchors(true);
     lastLandscape = isLandscape();
+    lastObsW = W;
+    lastObsH = H;
     measureDotOffsets();
-    // After measuring labels, enforce safety distance so anchors start uncrowded.
     relayout();
     seedFromAnchors();
     render();
@@ -2114,7 +1979,6 @@ const otherNodes = diagramNodes.filter(
       return;
     }
 
-    // Settle from the initial scattered positions, then sleep.
     wake();
 
     document.addEventListener('visibilitychange', () => {

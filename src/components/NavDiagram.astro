@@ -439,10 +439,14 @@ const otherNodes = diagramNodes.filter(
     border-radius: var(--ko-radius);
   }
 
+  /* Labels use one small, fixed size on every viewport. Keeping the type
+     identical across breakpoints makes the layout's footprint maths stable
+     (the chain spacing is computed from these boxes) and frees whitespace on
+     larger screens where the old fluid type ran needlessly large. */
   .node__label {
     font-family: var(--font-mono);
-    font-size: var(--step--1);
-    letter-spacing: var(--tracking-wide);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--ink-2);
     white-space: nowrap;
@@ -457,36 +461,21 @@ const otherNodes = diagramNodes.filter(
     font-family: var(--font-sans);
     text-transform: none;
     letter-spacing: var(--tracking-tight);
-    font-size: var(--step-1);
+    font-size: var(--step-0);
     font-weight: 600;
     color: var(--ink);
   }
 
   .node__sublabel {
     margin-block-start: 0.15rem;
-    font-size: var(--step--1);
-    letter-spacing: var(--tracking-wide);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--ink-3);
     white-space: nowrap;
   }
   .node--identity .node__sublabel {
     color: var(--ink-2);
-  }
-
-  /* On phones the labels are the dominant footprint and the wide mono tracking
-     makes them eat the narrow width. Tighten the type so nodes can pack closer
-     and the path stays legible (paired with the anisotropic box separation and
-     compact chain span in the simulation). */
-  @media (max-width: 560px) {
-    .node__label,
-    .node__sublabel {
-      font-size: 0.7rem;
-      letter-spacing: 0.05em;
-    }
-    .node--identity .node__label {
-      font-size: var(--step-0);
-    }
   }
 
   /* --------------------------- Floating nodes --------------------------- */
@@ -521,7 +510,10 @@ const otherNodes = diagramNodes.filter(
     font-weight: 500;
     letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
-    fill: var(--ink-2);
+    /* Decorative ambient labels recede behind the diagram in a soft grey so the
+       chain can overlap them freely when whitespace is tight. */
+    fill: var(--ink-3);
+    opacity: 0.7;
   }
 
   /* ----------------------------- Panel ----------------------------- */
@@ -832,66 +824,70 @@ const otherNodes = diagramNodes.filter(
       return clampFrac(spine.x * (1 - mix) + cfg.x * mix, spine.y * (1 - mix) + cfg.y * mix);
     }
 
+    /** Lay the chain along a near-straight spine that runs the dominant axis
+        (vertical in portrait, horizontal in landscape) and is spread evenly
+        across nearly the full usable extent. Two properties fall out of this
+        and directly satisfy the design rules:
+
+          • Even spread along the long axis → every edge is a generous,
+            clearly-readable length (no 5–10 px stubs) and the diagram fills
+            the available whitespace instead of bunching in the centre.
+          • A single, gently-bounded perpendicular lobe (never a switchback) →
+            the path reads as an almost-straight line and every interior angle
+            between three consecutive nodes stays wide/obtuse, never an acute
+            hairpin.
+
+        Crucially the meander amplitude is expressed as a fraction of the
+        *along* axis (then converted to the cross axis), NOT of the cross axis
+        directly. That holds the per-step sideways drift to a small fraction of
+        the per-step forward step, so the bend angle stays obtuse regardless of
+        how tall or wide the canvas is — a cross-axis amplitude blows up on
+        tall-ish landscape canvases and folds the path into acute corners.
+
+        `configMix` faintly biases nodes toward the authored map coordinates so
+        the form still nods to the intended composition without pinning it. */
+    function layoutSpine(landscape: boolean, configMix: number) {
+      const n = chainOrder.length;
+      const narrow = narrowness();
+      const { iw, ih } = inset();
+      const alongPx = landscape ? iw : ih;
+      const crossPx = landscape ? ih : iw;
+      // A small, random breathing margin at each end varies where the chain
+      // starts/stops without ever bunching the nodes together.
+      const endPad = 0.03 + Math.random() * 0.05;
+      const flip = Math.random() < 0.5; // run the chain either direction
+      const lobes = 0.5 + Math.random(); // 0.5..1.5 — one gentle bend, no S-folds
+      // Meander as a fraction of the along axis. Landscape gets a touch more
+      // swing for life; narrow portrait stays almost ruler-straight (its labels
+      // already fill the width). Kept small enough that worst-case corners stay
+      // comfortably obtuse.
+      const mAlong = landscape
+        ? 0.08 + Math.random() * 0.05 // 0.08..0.13 of the width
+        : 0.035 + 0.045 * (1 - narrow) * Math.random(); // ~0.035..0.08, very straight
+      const perpAmp = Math.min(0.4, (mAlong * alongPx) / Math.max(1, crossPx));
+      const phase = Math.random() * Math.PI * 2;
+      const bias = (Math.random() * 2 - 1) * perpAmp * 0.5;
+      for (let i = 0; i < n; i++) {
+        let t = n === 1 ? 0.5 : i / (n - 1);
+        if (flip) t = 1 - t;
+        const along = endPad + t * (1 - 2 * endPad);
+        const perp = 0.5 + bias + Math.sin(t * Math.PI * lobes + phase) * perpAmp;
+        const spine = landscape ? { x: along, y: perp } : { x: perp, y: along };
+        chainOrder[i].frac = blendWithConfig(chainOrder[i], landscape, spine, configMix);
+      }
+    }
+
     function generateLayout() {
       const rect = root.getBoundingClientRect();
+      // narrowness()/inset() read the W/H globals, which computeAnchors sets
+      // after this on first load — prime them so the spine uses the real aspect.
+      W = rect.width;
+      H = rect.height;
       const landscape = rect.width > rect.height * 1.15;
-      const n = chainOrder.length;
-      // The chain advances monotonically along a spine (that's what keeps it
-      // from folding into sharp switchbacks), but the spine's *direction* is
-      // free: biased toward the dominant axis to use the canvas, with a wide
-      // tilt and a random end-to-end flip so no node sits in the same "zone"
-      // across reloads.
-      const base = landscape ? 0 : Math.PI / 2;
-      // Narrow viewports can't absorb tilt or meander without folding the
-      // chain back on itself, so we shrink both as `narrow` → 1.
-      const narrow = narrowness();
-      const tiltDeg = 42 - 28 * narrow; // 42° → 14° as the viewport narrows
-      const tilt = (Math.random() * 2 - 1) * (tiltDeg * Math.PI) / 180;
-      const flip = Math.random() < 0.5 ? 1 : -1; // run the line either way
-      const ang = base + tilt;
-      const dx = Math.cos(ang) * flip;
-      const dy = Math.sin(ang) * flip;
-      const ox = -dy; // perpendicular axis
-      const oy = dx;
-      // Centre the chain, tightening the centre's wobble on narrow viewports so
-      // the span stays symmetric and both ends reach into the top/bottom
-      // whitespace evenly rather than clipping one side.
-      const cSpread = 0.16 - 0.1 * narrow; // 0.16 wide → 0.06 narrow
-      const cx = (0.5 - cSpread / 2) + Math.random() * cSpread;
-      const cy = (0.5 - cSpread / 2) + Math.random() * cSpread;
-      // Span of the chain along the spine (fraction of the canvas). A tall phone
-      // has lots of vertical whitespace, so the chain GROWS its span as the
-      // viewport narrows to fill it — the anisotropic box separation keeps the
-      // nodes from crowding, so spreading no longer risks dramatic long edges.
-      const half = Math.min(0.46, 0.3 + Math.random() * 0.08 + 0.14 * narrow);
-      // Gentle, mean-reverting perpendicular meander: organic waviness around
-      // the spine without ever turning back on itself. Kept lively (not flat) on
-      // narrow viewports so the path can "zig" into the side whitespace.
-      const meanderMax = 0.2 - 0.07 * narrow; // 0.2 → 0.13
-      const velKick = 0.08 - 0.025 * narrow;
-      const jitMax = 0.05 - 0.02 * narrow;
-      let o = (Math.random() * 2 - 1) * 0.1 * (1 - 0.6 * narrow);
-      let vel = 0;
-      for (let i = 0; i < n; i++) {
-        const s = (n === 1 ? 0 : i / (n - 1) - 0.5) * 2 * half;
-        vel += (Math.random() * 2 - 1) * velKick;
-        vel -= o * 0.22; // pull back toward the spine (mean reversion)
-        vel *= 0.58;
-        o += vel;
-        o = Math.max(-meanderMax, Math.min(meanderMax, o));
-        const alongJit = (Math.random() * 2 - 1) * jitMax;
-        const perpJit = (Math.random() * 2 - 1) * jitMax;
-        const spine = clampFrac(
-          cx + dx * s + ox * (o + perpJit) + dx * alongJit,
-          cy + dy * s + oy * (o + perpJit) + dy * alongJit
-        );
-        // Low config blend: a faint nudge toward the authored map, not a pin —
-        // keeps the form free and varied between loads.
-        chainOrder[i].frac = blendWithConfig(chainOrder[i], landscape, spine, 0.12);
-      }
+      layoutSpine(landscape, 0.1);
       // Floating nodes aren't part of the spine. Scatter them across the canvas
-      // (lightly nudged toward their authored hint) and let relaxAnchors + the
-      // sim's repulsion drift them into open whitespace without overlapping.
+      // (lightly nudged toward their authored hint); they drift toward open
+      // space but are allowed to slip behind the chain since they're decorative.
       for (const n of nodes) {
         if (!n.floating) continue;
         const rnd = clampFrac(0.1 + Math.random() * 0.8, 0.1 + Math.random() * 0.8);
@@ -1169,31 +1165,11 @@ const otherNodes = diagramNodes.filter(
       return false;
     }
 
-    /** Re-space when crowded — random meander; light config hint only on resize. */
+    /** Re-space when crowded or on orientation flip — same near-straight spine
+        as the initial layout, with a slightly stronger config hint so a resize
+        settles toward the intended composition. */
     function adaptLayoutForViewport(landscape: boolean) {
-      const n = chainOrder.length;
-      const margin = 0.08;
-      const narrow = narrowness();
-      const phase = Math.random() * Math.PI * 2;
-      const perpBase = (Math.random() * 2 - 1) * 0.2 * (1 - 0.6 * narrow);
-      const velKick = 0.18 - 0.12 * narrow;
-      const waveAmp = (0.22 + Math.random() * 0.14) * (1 - 0.55 * narrow);
-      const perpClamp = 0.48 - 0.32 * narrow; // 0.48 → 0.16 on narrow
-      let o = perpBase;
-      let vel = 0;
-      for (let i = 0; i < n; i++) {
-        const t = n === 1 ? 0.5 : i / (n - 1);
-        const along = margin + t * (1 - 2 * margin);
-        vel += (Math.random() * 2 - 1) * velKick;
-        vel *= 0.62;
-        o += vel;
-        const wave = Math.sin(t * Math.PI * 1.35 + phase) * waveAmp;
-        const perp = Math.max(-perpClamp, Math.min(perpClamp, o + wave));
-        const spine = landscape
-          ? { x: along, y: 0.5 + perp }
-          : { x: 0.5 + perp, y: along };
-        chainOrder[i].frac = blendWithConfig(chainOrder[i], landscape, spine, 0.18);
-      }
+      layoutSpine(landscape, 0.15);
     }
 
     function syncAnchorsFromSim() {

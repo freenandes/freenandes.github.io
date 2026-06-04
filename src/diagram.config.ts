@@ -29,7 +29,7 @@ export interface DiagramLink {
   external?: boolean;
 }
 
-export type NodeKind = 'identity' | 'about' | 'contact' | 'project';
+export type NodeKind = 'identity' | 'about' | 'contact' | 'project' | 'floating';
 
 /** Polygon used to draw the node "point". No circles. Assigned per node
    (not randomized) so it can be hand-tweaked later. */
@@ -157,6 +157,31 @@ export const diagramNodes: DiagramNode[] = [
     link: { label: 'Open case study', href: '/projects/visionary/' },
     portrait: { x: 0.5, y: 0.92 },
     landscape: { x: 0.88, y: 0.46 },
+  },
+  // Floating nodes — ambient stats that drift in the whitespace around the
+  // diagram. They have no shape and no connecting lines; just a circular text
+  // label wrapped around their (invisible) centre. They still participate in
+  // the collision / viewport-avoidance physics so they find an open spot.
+  {
+    id: 'float-years',
+    label: '18+++ years of this',
+    kind: 'floating',
+    portrait: { x: 0.16, y: 0.5 },
+    landscape: { x: 0.2, y: 0.82 },
+  },
+  {
+    id: 'float-ai',
+    label: '2x faster development + AI',
+    kind: 'floating',
+    portrait: { x: 0.84, y: 0.62 },
+    landscape: { x: 0.78, y: 0.18 },
+  },
+  {
+    id: 'float-merch',
+    label: 'Flushed $4.2B in merch',
+    kind: 'floating',
+    portrait: { x: 0.7, y: 0.88 },
+    landscape: { x: 0.5, y: 0.85 },
   },
 ];
 

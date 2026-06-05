@@ -22,6 +22,7 @@ const {
 const pageTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site.role}`;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString();
 const ogImage = new URL(withBase(site.ogImage), Astro.site ?? Astro.url).toString();
+const topoPattern = mainClass === 'home' ? withBase('/topo-low.svg') : null;
 ---
 
 <!doctype html>
@@ -58,9 +59,11 @@ const ogImage = new URL(withBase(site.ogImage), Astro.site ?? Astro.url).toStrin
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
-    <div class="grid-overlay" aria-hidden="true"></div>
-
-    <main id="main" class:list={[mainClass]}>
+    <main
+      id="main"
+      class:list={[mainClass]}
+      style={topoPattern ? `--topo-pattern: url('${topoPattern}')` : undefined}
+    >
       <slot />
     </main>
 

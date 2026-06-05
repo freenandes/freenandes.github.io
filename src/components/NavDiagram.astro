@@ -1,5 +1,7 @@
 ---
-/** Kinetic site map — content from `src/diagram.config.ts`, physics in `src/scripts/nav-diagram.ts`. */
+
+/** Site map */
+
 import { diagramNodes, diagramEdges, type NodeShape } from '../diagram.config';
 import { withBase } from '../lib/base';
 import { site } from '../site.config';
@@ -29,9 +31,8 @@ function polygonPoints(shape: NodeShape = 'hexagon'): string {
   }
   return pts.join(' ');
 }
-
-const RING_FONT = 10;
-const RING_GAP_CHARS = 3.5;
+const RING_FONT = 12;
+const RING_GAP_CHARS = 4;
 function ringGeometry(label: string) {
   const advance = RING_FONT * 0.6 + RING_FONT * 0.125;
   const textLength = Math.max(label.length * advance, 90);
@@ -43,12 +44,12 @@ function ringGeometry(label: string) {
   const d = `M ${c} ${(c - r).toFixed(2)} a ${r.toFixed(2)} ${r.toFixed(2)} 0 1 1 0 ${(2 * r).toFixed(2)} a ${r.toFixed(2)} ${r.toFixed(2)} 0 1 1 0 ${(-2 * r).toFixed(2)}`;
   return { textLength: textLength.toFixed(2), size, d };
 }
-
 const projectNodes = diagramNodes.filter((n) => n.kind === 'project');
 const floatingNodes = diagramNodes.filter((n) => n.kind === 'floating');
 const otherNodes = diagramNodes.filter(
   (n) => n.kind !== 'project' && n.kind !== 'floating'
 );
+
 ---
 
 <nav class="diagram" data-diagram aria-label={`Site map — ${site.name}`}>
@@ -60,7 +61,6 @@ const otherNodes = diagramNodes.filter(
       ))
     }
   </ul>
-
   {
     otherNodes.map((node) => {
       const Heading = node.kind === 'identity' ? 'h1' : 'h2';
@@ -91,13 +91,11 @@ const otherNodes = diagramNodes.filter(
               {node.subLabel && <span class="node__sublabel mono">{node.subLabel}</span>}
             </button>
           </Heading>
-
           {hasPanel && (
             <div class="node__panel" id={`panel-${node.id}`} role="group" aria-label={node.label}>
               {node.meta && <p class="panel__meta mono">{node.meta}</p>}
               {node.tagline && <p class="panel__lead">{node.tagline}</p>}
               {node.lines?.map((line) => <p class="panel__text">{line}</p>)}
-
               {node.metrics && (
                 <ul class="panel__metrics" role="list">
                   {node.metrics.map((m) => (
@@ -108,7 +106,6 @@ const otherNodes = diagramNodes.filter(
                   ))}
                 </ul>
               )}
-
               {node.kind === 'contact' && (
                 <ul class="panel__socials" role="list">
                   {site.socials.map((s) => (
@@ -124,20 +121,18 @@ const otherNodes = diagramNodes.filter(
                   ))}
                 </ul>
               )}
-
               {node.email && (
                 <a class="panel__link" href={`mailto:${node.email}`}>
                   {node.email}
                 </a>
               )}
-
               {node.link && (
                 <a
                   class="panel__link panel__cta"
                   href={node.link.external ? node.link.href : withBase(node.link.href)}
                   {...(node.link.external ? { target: '_blank', rel: 'noopener' } : {})}
                 >
-                  {node.link.label} <span aria-hidden="true">→</span>
+                  {node.link.label}
                 </a>
               )}
             </div>
@@ -146,7 +141,6 @@ const otherNodes = diagramNodes.filter(
       );
     })
   }
-
   <div class="node-group" role="group" aria-label="Selected projects">
     {
       projectNodes.map((node) => (
@@ -173,12 +167,10 @@ const otherNodes = diagramNodes.filter(
               <span class="node__label">{node.label}</span>
             </button>
           </h2>
-
           <div class="node__panel" id={`panel-${node.id}`} role="group" aria-label={node.label}>
-            {node.meta && <p class="panel__meta mono">{node.meta}</p>}
+            {node.meta && <p class="panel__meta">{node.meta}</p>}
             {node.tagline && <p class="panel__lead">{node.tagline}</p>}
             {node.lines?.map((line) => <p class="panel__text">{line}</p>)}
-
             {node.tags && (
               <ul class="panel__tags" role="list">
                 {node.tags.map((t) => (
@@ -186,14 +178,13 @@ const otherNodes = diagramNodes.filter(
                 ))}
               </ul>
             )}
-
             {node.link && (
               <a
                 class="panel__link panel__cta"
                 href={node.link.external ? node.link.href : withBase(node.link.href)}
                 {...(node.link.external ? { target: '_blank', rel: 'noopener' } : {})}
               >
-                {node.link.label} <span aria-hidden="true">→</span>
+                {node.link.label}
               </a>
             )}
           </div>
@@ -201,7 +192,6 @@ const otherNodes = diagramNodes.filter(
       ))
     }
   </div>
-
   {
     floatingNodes.map((node) => {
       const ring = ringGeometry(node.label);
@@ -245,7 +235,6 @@ const otherNodes = diagramNodes.filter(
     })
   }
 </nav>
-
 <noscript>
   <style>
     /* No-JS fallback: collapse the simulation into a plain, readable list. */
@@ -275,7 +264,6 @@ const otherNodes = diagramNodes.filter(
     }
   </style>
 </noscript>
-
 <style>
   .diagram {
     position: relative;
@@ -285,11 +273,9 @@ const otherNodes = diagramNodes.filter(
     overflow: hidden;
     touch-action: pan-y;
   }
-
   .diagram__edges-data {
     display: none;
   }
-
   .diagram__links {
     position: absolute;
     inset: 0;
@@ -300,21 +286,20 @@ const otherNodes = diagramNodes.filter(
   }
   .diagram__links :global(.link-line) {
     fill: none;
-    stroke: var(--ink);
-    stroke-width: 1.2;
-    opacity: 0.42;
+    stroke: var(--ink-3);
+    stroke-width: 1.375;
     stroke-linecap: round;
     stroke-linejoin: round;
   }
 
-  /* The "Selected projects" wrapper is purely a semantic grouping — it must
-     not create a stacking context or take up layout, so the nodes inside it
-     stay absolutely positioned against the diagram exactly as before. */
+  /* The "Selected projects" wrapper is purely a semantic grouping — it must not create a stacking context or take up layout, so the nodes inside it stay absolutely positioned against the diagram exactly as before. */
+
   .node-group {
     display: contents;
   }
 
-  /* ----------------------------- Nodes ----------------------------- */
+  /* Nodes */
+
   .node {
     position: absolute;
     top: 0;
@@ -329,8 +314,8 @@ const otherNodes = diagramNodes.filter(
     z-index: 6;
   }
 
-  /* Heading wrappers give the page a real outline without changing the look:
-     they wrap the existing button and inherit all typography from it. */
+  /* Heading wrappers give the page a real outline without changing the look: they wrap the existing button and inherit all typography from it. */
+
   .node__heading {
     display: inline-flex;
     margin: 0;
@@ -339,13 +324,12 @@ const otherNodes = diagramNodes.filter(
     line-height: inherit;
     text-wrap: nowrap;
   }
-
   .node__hit {
     display: inline-flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 0.8rem;
+    gap: 0.375rem;
+    padding: 0.375rem;
     background: none;
     border: 0;
     color: var(--ink);
@@ -357,37 +341,36 @@ const otherNodes = diagramNodes.filter(
   .node.is-dragging .node__hit {
     cursor: grabbing;
   }
-
   .node__dot {
-    width: 15px;
-    height: 15px;
+    width: 1rem;
+    height: 1rem;
     overflow: visible;
     flex: none;
     transition: transform var(--dur-fast) var(--ease);
   }
   .node--lg .node__dot {
-    width: 21px;
-    height: 21px;
+    width: 1.25rem;
+    height: 1.25rem;
   }
   .node--sm .node__dot {
-    width: 11px;
-    height: 11px;
+    width: 0.875rem;
+    height: 0.875rem;
   }
   .node__dot polygon {
     fill: var(--paper);
     stroke: var(--ink);
-    stroke-width: 1.6;
+    stroke-width: 1.75;
     vector-effect: non-scaling-stroke;
     transition: fill var(--dur-fast) var(--ease),
       stroke var(--dur-fast) var(--ease);
   }
   .node--lg .node__dot polygon {
-    stroke-width: 1.9;
+    stroke-width: 2;
   }
   .node__hit:hover .node__dot,
   .node:focus-within .node__dot,
   .node.is-open .node__dot {
-    transform: scale(1.2);
+    transform: scale(1.25);
   }
   .node__hit:hover .node__dot polygon,
   .node:focus-within .node__dot polygon,
@@ -396,38 +379,37 @@ const otherNodes = diagramNodes.filter(
     stroke: var(--accent-ink);
   }
 
-  /* Knockout plate — a single solid paper-coloured box behind each label so
-     connector lines are masked completely (no per-glyph gaps). Tune the cover
-     with --ko-px / --ko-py (padding) and --ko-radius. --ko is the fill colour. */
+  /* Knockout plate — a single solid paper-coloured box behind each label so connector lines are masked completely. */
+
   .node__label,
   .node__sublabel {
     --ko: var(--paper);
-    --ko-px: 0.375em;
+    --ko-px: 0.25em;
     --ko-py: 0;
     --ko-radius: var(--radius-sm);
     display: inline-block;
     padding: var(--ko-py) var(--ko-px);
-    /* Cancel the padding's footprint so spacing/centering is unchanged. */
     margin: calc(-1 * var(--ko-py)) calc(-1 * var(--ko-px));
     background-color: var(--ko);
     border-radius: var(--ko-radius);
   }
 
-  /* Labels use one small, fixed size on every viewport. Keeping the type
-     identical across breakpoints makes the layout's footprint maths stable
-     (the chain spacing is computed from these boxes) and frees whitespace on
-     larger screens where the old fluid type ran needlessly large. */
-  .node__label {
+  /* Labels */
+
+  .node__label,
+  .node__sublabel {
     font-family: var(--font-mono);
-    font-size: var(--type-diagram-label);
-    font-weight: var(--weight-regular);
-    letter-spacing: var(--tracking-diagram-label);
+    font-size: var(--step--2);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
     color: var(--ink-2);
     white-space: nowrap;
     transition: color var(--dur-fast) var(--ease);
   }
   .node__hit:hover .node__label,
+  .node__hit:hover .node__sublabel,
   .node:focus-within .node__label,
   .node.is-open .node__label {
     color: var(--ink);
@@ -437,27 +419,12 @@ const otherNodes = diagramNodes.filter(
     text-transform: none;
     letter-spacing: var(--tracking-tight);
     font-size: var(--step-0);
-    font-weight: var(--weight-semibold);
-    color: var(--ink);
-  }
-
-  .node__sublabel {
-    margin-block-start: 0.15rem;
-    font-size: var(--type-diagram-label);
-    font-weight: var(--weight-regular);
-    letter-spacing: var(--tracking-diagram-label);
-    text-transform: uppercase;
-    color: var(--ink-3);
-    white-space: nowrap;
-  }
-  .node--identity .node__sublabel {
+    font-weight: var(--weight-bold);
     color: var(--ink-2);
   }
 
-  /* --------------------------- Floating nodes --------------------------- */
-  /* Shapeless, line-less ambient labels that drift in the whitespace. They are
-     decorative, so they never intercept pointer events (clicks fall through to
-     the canvas) and are hidden from assistive tech at the container level. */
+  /* Floating nodes */
+  
   .node--floating {
     pointer-events: none;
     z-index: 0;
@@ -477,69 +444,59 @@ const otherNodes = diagramNodes.filter(
   }
   @media (prefers-reduced-motion: no-preference) {
     .node--floating .node__ring {
-      animation: ring-spin 45s linear infinite;
+      animation: ring-spin 30s linear infinite;
     }
   }
   .node__ring-text {
     font-family: var(--font-mono);
-    font-size: var(--type-diagram-ring);
+    font-size: var(--step--2);
     font-weight: var(--weight-medium);
     letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
-    /* Decorative ambient labels recede behind the diagram in a soft grey so the
-       chain can overlap them freely when whitespace is tight. */
     fill: var(--ink-3);
-    opacity: 0.7;
   }
 
-  /* ----------------------------- Panel ----------------------------- */
+  /* Node's panel */
+
   .node__panel {
-    --shift: 8px;
-    /* JS sets these to pull a card back inside the viewport when its node sits
-       near an edge (see clampPanel). 0 = no correction needed. */
+    --shift: 0.5rem;
+    /* JS sets these to pull a card back inside the viewport when its node sits near an edge (see clampPanel). 0 = no correction needed. */
     --panel-nudge-x: 0px;
     --panel-nudge-y: 0px;
     position: absolute;
     width: max-content;
-    max-width: min(74vw, 19rem);
-    padding: 0.85rem 1rem;
-    background: color-mix(in oklab, var(--paper) 92%, transparent);
-    backdrop-filter: saturate(1.2) blur(8px);
-    -webkit-backdrop-filter: saturate(1.2) blur(8px);
-    border: 1px solid var(--line-strong);
+    max-width: min(90vw, 20rem);
+    padding: 0.875rem 1rem;
+    background: var(--paper);
+    outline: 1px solid var(--line-soft);
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-soft);
+    box-shadow: var(--shadow-lift);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
     transition: opacity var(--dur) var(--ease),
       visibility var(--dur) var(--ease), transform var(--dur) var(--ease);
   }
-  .node--identity .node__panel {
-    max-width: min(80vw, 22rem);
-  }
-
   .node[data-place='bottom'] .node__panel {
-    top: calc(100% + 6px);
+    top: calc(100% + 0.5rem);
     left: 50%;
     transform: translateX(calc(-50% + var(--panel-nudge-x))) translateY(calc(var(--shift) + var(--panel-nudge-y)));
   }
   .node[data-place='top'] .node__panel {
-    bottom: calc(100% + 6px);
+    bottom: calc(100% + 0.5rem);
     left: 50%;
     transform: translateX(calc(-50% + var(--panel-nudge-x))) translateY(calc(-1 * var(--shift) + var(--panel-nudge-y)));
   }
   .node[data-place='right'] .node__panel {
-    left: calc(100% + 8px);
+    left: calc(100% + 0.5rem);
     top: 50%;
     transform: translateY(calc(-50% + var(--panel-nudge-y))) translateX(calc(var(--shift) + var(--panel-nudge-x)));
   }
   .node[data-place='left'] .node__panel {
-    right: calc(100% + 8px);
+    right: calc(100% + 0.5rem);
     top: 50%;
     transform: translateY(calc(-50% + var(--panel-nudge-y))) translateX(calc(-1 * var(--shift) + var(--panel-nudge-x)));
   }
-
   .node:hover .node__panel,
   .node:focus-within .node__panel,
   .node.is-open .node__panel {
@@ -548,119 +505,76 @@ const otherNodes = diagramNodes.filter(
     visibility: visible;
     pointer-events: auto;
   }
-
   .panel__meta {
+    margin-block-end: 0.75rem;
     color: var(--ink-3);
-    margin-block-end: 0.35rem;
   }
-  .panel__lead {
-    font-size: var(--step-0);
-    line-height: var(--leading-snug);
-    color: var(--ink);
-  }
+  .panel__lead,
   .node--about .panel__lead {
-    font-size: var(--step-1);
     font-weight: var(--weight-semibold);
-    letter-spacing: var(--tracking-tight);
-    line-height: 1.15;
+    margin-block-end: 0.75rem;
   }
-  .panel__text {
-    margin-block-start: 0.5rem;
-    font-size: var(--step--1);
+  .panel__meta,
+  .panel__text,
+  .panel__lead,
+  .node--about .panel__lead {
+    font-size: var(--step-0);
     line-height: var(--leading-normal);
-    color: var(--ink-2);
   }
-
-  .panel__metrics {
-    display: grid;
-    gap: 0.5rem;
-    margin-block-start: 0.75rem;
-    padding-block-start: 0.6rem;
-    border-block-start: 1px solid var(--line);
+  .panel__meta,
+  .panel__text {
+    font-weight: var(--weight-regular);
   }
-  .panel__metric {
-    display: flex;
-    align-items: baseline;
-    gap: 0.6ch;
-  }
-  .panel__metric-value {
-    font-family: var(--font-mono);
-    font-weight: var(--weight-bold);
-    color: var(--accent-ink);
-    min-width: 4.2ch;
-  }
-  .panel__metric-label {
-    font-size: var(--step--1);
-    color: var(--ink-2);
-  }
-
   .panel__tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.35rem;
+    gap: 0.375em 1em;
     margin-block-start: 0.75rem;
   }
   .panel__chip {
     font-family: var(--font-mono);
-    font-size: var(--type-chip);
-    font-weight: var(--weight-regular);
-    letter-spacing: var(--tracking-mono);
+    font-size: var(--step--2);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
-    padding: 0.15rem 0.55rem;
-    border-radius: var(--radius-pill);
-    border: 1px solid var(--line);
-    background: var(--paper-2);
-    color: var(--ink-2);
+    color: var(--ink-3);
   }
-
   .panel__link {
     display: inline-flex;
-    align-items: center;
-    gap: 0.5ch;
     margin-block-start: 0.75rem;
+    margin-block-end: 0.375rem;
+  }
+  .panel__social,
+  .panel__link {
     font-family: var(--font-mono);
     font-size: var(--step--1);
-    color: var(--accent-ink);
+    line-height: var(--leading-tight);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
     text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-  .panel__link:hover {
-    color: var(--accent);
+    text-underline-offset: 0.25em;
+    text-decoration-thickness: 0.125em;
+    color: var(--accent-ink);
   }
   .panel__socials {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.35rem 0.75rem;
+    gap: 0.375em 1em;
     margin-block-start: 0.75rem;
-    padding: 0;
-    list-style: none;
+    margin-block-end: 0.375rem;
+    list-style-type: none;
   }
-  .panel__social {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    color: var(--accent-ink);
-    text-decoration: underline;
-    text-underline-offset: 3px;
+  .panel__socials li {
+    line-height: var(--leading-tight);
   }
+  .panel__link:hover,
   .panel__social:hover {
     color: var(--accent);
   }
-  .panel__cta {
-    text-decoration: none;
-    text-transform: uppercase;
-    letter-spacing: var(--tracking-mono);
-  }
-  .panel__cta span {
-    transition: transform var(--dur) var(--ease);
-  }
-  .panel__cta:hover span {
-    transform: translateX(3px);
-  }
 </style>
-
 <script>
   import { initDiagram } from '../scripts/nav-diagram';
-
   const root = document.querySelector<HTMLElement>('[data-diagram]');
   if (root) initDiagram(root);
 </script>

@@ -16,8 +16,8 @@ export interface SiteConfig {
 }
 
 export const site: SiteConfig = {
-  name: 'Pedro Fernandes',
-  role: 'Senior Product Designer',
+  name: 'Pedro M.C. Fernandes',
+  role: 'Lead Product Designer',
   description:
     'Systems-thinking product designer turning stagnating products into growth engines — fixing ecosystems, not just interfaces, and shipping the code to prove it.',
   socials: [

@@ -1,14 +1,4 @@
-/* Site chrome: background wash, grid, main stacking. */
-
-.wash {
-  position: fixed;
-  inset: -20vmax -10vmax auto -10vmax;
-  height: 80vmax;
-  filter: blur(40px) saturate(1.1);
-  opacity: 0.5;
-  z-index: -2;
-  pointer-events: none;
-}
+/* Site chrome: grid overlay, main stacking. */
 
 .grid-overlay {
   position: fixed;
@@ -42,7 +32,6 @@ main.home {
 
 @media print {
   .site-footer,
-  .wash,
   .grid-overlay,
   .skip-link {
     display: none !important;

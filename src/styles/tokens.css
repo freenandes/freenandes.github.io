@@ -1,34 +1,16 @@
-/* Design tokens — edit here to re-theme the site. */
-
 :root {
   /* Color */
-  --paper: #ffffff;
+  --paper: #fff;
   --paper-2: #f7f7f7;
-  --ink: #111111;
-  --ink-2: #555555;
-  --ink-3: #999999;
+  --ink: #111;
+  --ink-2: #555;
+  --ink-3: #aaa;
+  --line-soft: rgba(0, 0, 0, 0.05);
   --line: rgba(0, 0, 0, 0.1);
   --line-strong: rgba(0, 0, 0, 0.2);
   --accent: #0099ff;
   --accent-ink: #0055ff;
-  --error: #b4452f;
-
-  /* Generative cover + tag chips (accent name → three gradient stops) */
-  --accent-lilac-1: #c9bcff;
-  --accent-lilac-2: #ffd6e6;
-  --accent-lilac-3: #bfe0ff;
-  --accent-mint-1: #b6ecd2;
-  --accent-mint-2: #e8f6c9;
-  --accent-mint-3: #bfeae0;
-  --accent-peach-1: #ffd0bb;
-  --accent-peach-2: #ffe3a8;
-  --accent-peach-3: #ffc6d6;
-  --accent-sky-1: #bfe0ff;
-  --accent-sky-2: #cdedff;
-  --accent-sky-3: #d8d4ff;
-  --accent-butter-1: #ffe7a3;
-  --accent-butter-2: #fff0c4;
-  --accent-butter-3: #ffd8b0;
+  --error: #dd0000;
 
   /* Shiki (code blocks in MDX) */
   --astro-code-foreground: var(--ink);
@@ -43,15 +25,16 @@
   --astro-code-token-string-expression: var(--accent);
   --astro-code-token-link: var(--accent);
 
-  /* Typography — system fonts only (no webfont downloads) */
-  --font-sans: Helvetica, Arial, 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
-  --font-mono: 'Courier New', Courier, ui-monospace, Menlo, Monaco, Consolas, monospace;
+  /* Typography — variable webfonts + stable local fallbacks */
+  --font-sans: 'Inclusive Sans', 'Helvetica Neue', Helvetica, Arial, Roboto, sans-serif;
+  --font-mono: 'Atkinson Hyperlegible Mono', Monaco, Consolas, Menlo, 'Roboto Mono', monospace;
 
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
 
+  --step--2: 0.75rem;
   --step--1: 0.8125rem;
   --step-0: 1rem;
   --step-1: 1.1875rem;
@@ -64,13 +47,11 @@
   --leading-normal: 1.5;
   --tracking-tight: -0.03125em;
   --tracking-mono: 0.03125em;
-  --tracking-wide: 0.125em;
-  --tracking-diagram-label: 0.06em;
+  --tracking-wide: 0.0625em;
 
   /* Fixed UI sizes (diagram layout; match pre-refactor footprint) */
-  --type-diagram-label: 0.72rem;
-  --type-diagram-ring: 0.625rem;
-  --type-chip: 0.7rem;
+  --type-diagram-label: var(--step--2);
+  --type-diagram-ring: var(--step--2);
 
   /* Space */
   --space-xs: 0.25rem;

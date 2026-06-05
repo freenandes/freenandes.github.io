@@ -48,7 +48,7 @@ export const diagramNodes: DiagramNode[] = [
     subLabel: site.role,
     kind: 'identity',
     size: 'lg',
-    shape: 'hexagon',
+    shape: 'pentagon',
     place: 'bottom',
     portrait: { x: 0.5, y: 0.28 },
     landscape: { x: 0.26, y: 0.5 },
@@ -58,7 +58,7 @@ export const diagramNodes: DiagramNode[] = [
     label: 'About',
     kind: 'about',
     size: 'md',
-    shape: 'triangle',
+    shape: 'hexagon',
     place: 'right',
     tagline: 'I design and build — fixing the system, not just the screen.',
     lines: [
@@ -84,9 +84,9 @@ export const diagramNodes: DiagramNode[] = [
     label: 'Systems-Thinker',
     kind: 'project',
     size: 'md',
-    shape: 'pentagon',
+    shape: 'triangle',
     place: 'right',
-    meta: 'Percona · 2022—present',
+    meta: '',
     tagline:
       'The complexity piece. Untangling messy, highly technical ecosystems into systems that scale.',
     lines: [
@@ -102,9 +102,9 @@ export const diagramNodes: DiagramNode[] = [
     label: 'Design at Scale',
     kind: 'project',
     size: 'md',
-    shape: 'hexagon',
+    shape: 'triangle',
     place: 'left',
-    meta: 'TUI · 2019—2021',
+    meta: '',
     tagline:
       'The scale piece. Data-driven systems generating massive global business.',
     lines: [
@@ -122,7 +122,7 @@ export const diagramNodes: DiagramNode[] = [
     size: 'md',
     shape: 'triangle',
     place: 'top',
-    meta: 'Smartidiom · 2016—2019',
+    meta: '',
     tagline:
       'The zero-to-one piece. Visionary product definition, rapid prototyping, and creative execution.',
     lines: [
@@ -135,14 +135,14 @@ export const diagramNodes: DiagramNode[] = [
   },
   {
     id: 'float-years',
-    label: '18+++ years of this',
+    label: '18+++ years of design',
     kind: 'floating',
     portrait: { x: 0.16, y: 0.5 },
     landscape: { x: 0.2, y: 0.82 },
   },
   {
     id: 'float-ai',
-    label: '2x faster development + AI',
+    label: '2x faster dev + A.I.',
     kind: 'floating',
     portrait: { x: 0.84, y: 0.62 },
     landscape: { x: 0.78, y: 0.18 },

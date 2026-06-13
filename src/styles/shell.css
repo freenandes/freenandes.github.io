@@ -18,12 +18,16 @@ main.home::before {
   pointer-events: none;
   background-image: var(--topo-pattern);
   background-repeat: repeat;
-  background-position: center;
+  background-position: top center;
   background-size: 150rem auto;
   opacity: 0.075;
 }
 
 @media print {
+  :root {
+    --line: #000;
+    --line-strong: #000;
+  }
   .site-footer,
   main.home::before,
   .skip-link {
@@ -34,7 +38,13 @@ main.home::before {
     background: #fff !important;
     color: #000 !important;
   }
+  .print-only {
+    display: block;
+  }
+  .no-print {
+    display: none !important;
+  }
   @page {
-    margin: 14mm;
+    margin: 1.4cm 3.8cm;
   }
 }

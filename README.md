@@ -54,3 +54,5 @@ For confidential pages share a passphrase instead of publishing it.
 ## To do
 
 - [ ] Review `<noscript>` at `src/components/NavDiagram.astro`
+   - [ ] And About and project pages
+- [ ] Create a solution to avoid exposing the email

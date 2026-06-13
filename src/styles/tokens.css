@@ -5,10 +5,10 @@
   --ink: #111;
   --ink-2: #555;
   --ink-3: #aaa;
-  --line-soft: rgba(0, 0, 0, 0.05);
-  --line: rgba(0, 0, 0, 0.1);
-  --line-strong: rgba(0, 0, 0, 0.2);
-  --accent: #0099ff;
+  --line-soft: rgba(0, 0, 0, 0.04);
+  --line: rgba(0, 0, 0, 0.08);
+  --line-strong: rgba(0, 0, 0, 0.16);
+  --accent: #0088ff;
   --accent-ink: #0055ff;
   --error: #dd0000;
 
@@ -26,26 +26,26 @@
   --astro-code-token-link: var(--accent);
 
   /* Typography — variable webfonts + stable local fallbacks */
-  --font-sans: 'Inclusive Sans', 'Helvetica Neue', Helvetica, Arial, Roboto, sans-serif;
-  --font-mono: 'Atkinson Hyperlegible Mono', Monaco, Consolas, Menlo, 'Roboto Mono', monospace;
+  --font-sans: 'Atkinson Hyperlegible Next', Roboto, Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  --font-mono: 'Atkinson Hyperlegible Mono', Menlo, 'Roboto Mono', Monaco, monospace;
 
-  --weight-regular: 400;
-  --weight-medium: 500;
-  --weight-semibold: 600;
-  --weight-bold: 700;
+  --weight-regular: 380;
+  --weight-medium: 480;
+  --weight-semibold: 580;
+  --weight-bold: 680;
 
-  --step--2: 0.75rem;
-  --step--1: 0.8125rem;
-  --step-0: 1rem;
-  --step-1: 1.1875rem;
-  --step-2: 1.4375rem;
-  --step-3: 1.75rem;
-  --step-4: 2.0625rem;
-  --step-5: 2.5rem;
-  --leading-tight: 0.9375;
-  --leading-snug: 1.125;
+  --step--2: 0.75em;
+  --step--1: 0.8125em;
+  --step-0: 1em;
+  --step-1: 1.1875em;
+  --step-2: 1.4375em;
+  --step-3: 1.75em;
+  --step-4: 2.0625em;
+  --step-5: 2.5em;
+  --leading-tight: 1.125;
+  --leading-snug: 1.3125;
   --leading-normal: 1.5;
-  --tracking-tight: -0.03125em;
+  --tracking-tight: -0.015625em;
   --tracking-mono: 0.03125em;
   --tracking-wide: 0.0625em;
 
@@ -60,16 +60,14 @@
   --space-lg: 2rem;
   --space-xl: 4rem;
   --measure: 66ch;
-  --content-max: 72rem;
-  --gutter: clamp(1rem, 0.5rem + 5vw, 4rem);
+  --gutter: clamp(1rem, 0.75rem + 3vw, 4rem);
 
   /* Shape, depth, motion */
   --radius-sm: 0.1875rem;
   --radius-md: 0.5rem;
   --radius-lg: 1.3125rem;
   --radius-pill: 999px;
-  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.1), 0 8px 24px -12px rgba(0, 0, 0, 0.2);
-  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.1), 0 16px 48px -16px rgba(0, 0, 0, 0.3);
+  --shadow-lift: 0 0.5rem 1rem 0.125rem rgba(0, 0, 0, 0.2);
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --dur-fast: 167ms;
   --dur: 333ms;

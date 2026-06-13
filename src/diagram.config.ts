@@ -39,6 +39,8 @@ export interface DiagramNode {
   /** Hint coords (0..1) when resize adaptation nudges layout toward the authored map. */
   portrait: DiagramPoint;
   landscape: DiagramPoint;
+  /** Floating rings only — initial rotation in degrees (0–360). */
+  ringStart?: number;
 }
 
 export const diagramNodes: DiagramNode[] = [
@@ -137,6 +139,7 @@ export const diagramNodes: DiagramNode[] = [
     id: 'float-years',
     label: '18+++ years of design',
     kind: 'floating',
+    ringStart: 0,
     portrait: { x: 0.16, y: 0.5 },
     landscape: { x: 0.2, y: 0.82 },
   },
@@ -144,6 +147,7 @@ export const diagramNodes: DiagramNode[] = [
     id: 'float-ai',
     label: '2x faster dev + A.I.',
     kind: 'floating',
+    ringStart: 120,
     portrait: { x: 0.84, y: 0.62 },
     landscape: { x: 0.78, y: 0.18 },
   },
@@ -151,6 +155,7 @@ export const diagramNodes: DiagramNode[] = [
     id: 'float-merch',
     label: 'Flushed $4.2B in merch',
     kind: 'floating',
+    ringStart: 240,
     portrait: { x: 0.7, y: 0.88 },
     landscape: { x: 0.5, y: 0.85 },
   },

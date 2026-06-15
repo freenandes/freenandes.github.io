@@ -2,140 +2,149 @@
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PasswordGate from '../../components/PasswordGate.astro';
-import RegMark from '../../components/RegMark.astro';
 import { getProjects, projectYear } from '../../lib/projects';
 import { withBase } from '../../lib/base';
 
 export async function getStaticPaths() {
   const projects = await getProjects();
-  return projects.map((entry, i) => ({
+  return projects.map((entry) => ({
     params: { slug: entry.id },
-    props: { entry, index: i + 1 },
+    props: { entry },
   }));
 }
 
-const { entry, index } = Astro.props;
+const { entry } = Astro.props;
 const { data } = entry;
 const { Content } = await render(entry);
 const year = projectYear(entry);
+const byline = [data.role, data.client].filter(Boolean).join(', ');
 ---
 
 <Base title={data.title} description={data.description}>
   <article class="project container">
-    <a class="back-link mono" href={withBase('/')}>← Back to map</a>
+    <ul class="project__nav link-row" role="list">
+      <li>
+        <a class="link" href={withBase('/')}>Back to map</a>
+      </li>
+    </ul>
 
-    <header class="project__head">
-      <p class="label project__num">
-        <RegMark size={12} /> Project / {String(index).padStart(2, '0')}
-      </p>
+    <header class="project__head" data-reveal>
       <h1 class="project__title">{data.title}</h1>
-      <p class="project__desc">{data.description}</p>
-
-      <dl class="project__meta">
-        {data.role && (
-          <div><dt class="label">Role</dt><dd>{data.role}</dd></div>
-        )}
-        {data.client && (
-          <div><dt class="label">Client</dt><dd>{data.client}</dd></div>
-        )}
-        <div><dt class="label">Year</dt><dd>{year}</dd></div>
-        {data.tags.length > 0 && (
-          <div class="project__meta-tags">
-            <dt class="label">Stack</dt>
-            <dd>{data.tags.join(' · ')}</dd>
-          </div>
-        )}
-      </dl>
-
+      {byline && <p class="project__byline">{byline}</p>}
+      <p class="project__year">{year}</p>
+      <div class="project__summary">
+        <p>{data.description}</p>
+      </div>
+      {
+        data.tags.length > 0 && (
+          <p class="project__tags">{data.tags.join(' · ')}</p>
+        )
+      }
       {
         data.links.length > 0 && (
-          <p class="project__links">
+          <ul class="project__links link-row" role="list">
             {data.links.map((l) => (
-              <a class="project__link" href={l.href} rel="noopener" target="_blank">
-                {l.label} ↗
-              </a>
+              <li>
+                <a class="link" href={l.href} rel="noopener" target="_blank">
+                  {l.label}
+                </a>
+              </li>
             ))}
-          </p>
+          </ul>
         )
       }
     </header>
 
-    <div class="project__body prose">
+    <div class="project__body prose" data-reveal style="--reveal-delay:80ms;">
       <Content />
     </div>
 
     {data.locked && <PasswordGate slug={entry.id} />}
+
+    <ul class="project__nav project__nav--foot link-row" role="list">
+      <li>
+        <a class="link" href={withBase('/')}>Back to map</a>
+      </li>
+    </ul>
   </article>
 </Base>
 
 <style>
   .project {
-    padding-block: var(--space-xl);
-    max-width: 56rem;
+    max-width: var(--measure);
+    padding-block: var(--space-lg);
   }
-
-  .project__num {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6ch;
-    color: var(--ink-2);
+  .project__nav {
+    margin-block-end: var(--space-lg);
   }
-
+  .project__nav--foot {
+    margin-block-end: 0;
+    margin-block-start: calc(var(--space-lg) * 3);
+  }
   .project__title {
-    margin-block-start: var(--space-sm);
-    font-size: var(--step-4);
+    margin-block-end: var(--space-sm);
+    font-size: var(--step-2);
+    font-weight: var(--weight-bold);
   }
-
-  .project__desc {
-    margin-block-start: var(--space-sm);
-    font-size: var(--step-1);
+  .project__byline {
     color: var(--ink-2);
-    max-width: 46ch;
   }
-
-  .project__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-md) var(--space-xl);
-    margin-block-start: var(--space-lg);
-    padding-block: var(--space-md);
-    border-block: 1px solid var(--line);
-  }
-  .project__meta dt {
-    margin-block-end: 0.2rem;
-  }
-  .project__meta dd {
-    font-size: var(--step-0);
-  }
-  .project__meta-tags dd {
+  .project__year {
+    margin-block-start: var(--space-sm);
     font-family: var(--font-mono);
     font-size: var(--step--1);
-  }
-
-  .project__links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-sm);
-    margin-block-start: var(--space-md);
-  }
-  .project__link {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
+    font-weight: var(--weight-semibold);
     letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius-pill);
-    padding: 0.4rem 0.9rem;
-    transition: border-color var(--dur-fast) var(--ease),
-      color var(--dur-fast) var(--ease);
+    line-height: var(--leading-tight);
+    color: var(--ink-3);
   }
-  .project__link:hover {
-    border-color: var(--ink);
-    color: var(--accent-ink);
+  .project__summary {
+    margin-block-start: var(--space-lg);
   }
-
+  .project__tags {
+    margin-block-start: var(--space-md);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .project__links {
+    margin-block-start: var(--space-md);
+  }
   .project__body {
     margin-block-start: var(--space-xl);
-    font-size: var(--step-1);
+  }
+  .project__body :global(h2) {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: var(--weight-bold);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-mono);
+    padding-block-end: var(--space-sm);
+    margin-block-start: var(--space-xl);
+    margin-block-end: var(--space-lg);
+    border-block-end: 1px solid var(--line-strong);
+  }
+  .project__body :global(> *:first-child) {
+    margin-block-start: 0;
+  }
+  .project__body :global(h2:first-child) {
+    margin-block-start: 0;
+  }
+  .project__body :global(ul) {
+    display: grid;
+    gap: var(--space-sm);
+    list-style: square;
+    padding-inline-start: 1.25em;
+  }
+  .project__body :global(ul li::marker) {
+    font-size: var(--step--1);
+    color: var(--ink-3);
+  }
+  .project__body :global(p + p) {
+    margin-block-start: var(--space-md);
   }
 </style>

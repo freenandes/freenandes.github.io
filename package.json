@@ -9,6 +9,8 @@
     "sync:linkedin": "node scripts/sync-linkedin.mjs",
     "encrypt": "node scripts/encrypt-projects.mjs",
     "check": "astro check",
+    "lint:css": "stylelint \"src/**/*.{css,astro}\"",
+    "lint:css:fix": "stylelint \"src/**/*.{css,astro}\" --fix",
     "prebuild": "node scripts/encrypt-projects.mjs",
     "build": "astro build",
     "preview": "astro preview",
@@ -22,6 +24,10 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
+    "postcss-html": "^1.8.1",
+    "stylelint": "^17.13.0",
+    "stylelint-config-html": "^1.1.0",
+    "stylelint-config-standard": "^40.0.0",
     "typescript": "^5.9.3",
     "unpdf": "^1.6.2"
   }

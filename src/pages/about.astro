@@ -50,11 +50,15 @@ function contactPrintText(href: string): string {
       </div>
     </header>
 
-    <div class="cv__summary" data-reveal style="--reveal-delay:80ms;">
+    <div class="cv__summary" data-reveal style="
+
+--reveal-delay:80ms;">
       {summaryParagraphs.map((para) => <p>{para}</p>)}
     </div>
 
-    <section class="cv__section" data-reveal style="--reveal-delay:140ms;">
+    <section class="cv__section" data-reveal style="
+
+--reveal-delay:140ms;">
       <h2 class="cv__section-title">Experience</h2>
       <div class="cv__list">
         {
@@ -119,37 +123,45 @@ function contactPrintText(href: string): string {
     max-width: var(--measure);
     padding-block: var(--space-lg);
   }
+
   .cv__nav {
     margin-block-end: var(--space-lg);
   }
+
   .cv__nav--foot {
-    margin-block-end: 0;
-    margin-block-start: var(--space-xl);
+    margin-block: calc(var(--space-lg) * 3) 0;
   }
+
   .cv__head {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-lg);
   }
+
   .cv__name {
     margin-block-end: var(--space-sm);
     font-size: var(--step-2);
     font-weight: var(--weight-bold);
   }
+
   .cv__actions {
     display: flex;
     flex-direction: column;
     gap: var(--space-sm) var(--space-md);
   }
+
   .cv__summary {
     margin-block-start: var(--space-lg);
   }
+
   .cv__summary p + p {
     margin-block-start: var(--space-md);
   }
+
   .cv__section {
     margin-block-start: var(--space-xl);
   }
+
   .cv__section-title {
     font-family: var(--font-mono);
     font-size: var(--step--1);
@@ -160,21 +172,25 @@ function contactPrintText(href: string): string {
     margin-block-end: var(--space-lg);
     border-block-end: 1px solid var(--line-strong);
   }
+
   .cv__list {
     display: grid;
     gap: var(--space-lg);
   }
+
   .entry {
     display: grid;
     grid-template-columns: 9rem 1fr;
     gap: var(--space-lg);
   }
-  @media (max-width: 640px) {
+
+  @media (width <= 640px) {
     .entry {
       grid-template-columns: 1fr;
       gap: var(--space-sm);
     }
   }
+
   .entry__period {
     font-family: var(--font-mono);
     font-size: var(--step--1);
@@ -186,39 +202,38 @@ function contactPrintText(href: string): string {
     padding-block-start: 0.4375rem;
     text-wrap: balance;
   }
+
   .entry__role {
     font-size: var(--step-2);
     font-weight: var(--weight-bold);
   }
+
   .entry__points {
     margin-block-start: var(--space-sm);
     display: grid;
     gap: var(--space-sm);
-    padding-inline-start: -1em;
     list-style: square;
   }
+
   .entry__points li::marker {
     font-size: var(--step--1);
     color: var(--ink-3);
   }
-  .cv__foot {
-    margin-block-start: var(--space-xl);
-    color: var(--ink-3);
-  }
-  .cv__nav--foot {
-    margin-block-start: calc(var(--space-lg) * 3);
-  }
+
   .print-only {
     display: none;
   }
+
   @media print {
     .cv {
       max-width: none;
       font-size: 12pt;
     }
+
     .container {
       padding: 0;
     }
+
     .cv__contact-print {
       display: block;
       font-size: 12pt;
@@ -227,41 +242,51 @@ function contactPrintText(href: string): string {
       border-block-start: 1px solid #000;
       border-block-end: 1px solid #000;
     }
+
     .cv__summary {
       margin-block-start: 5mm;
     }
+
     .cv__section,
     .cv__list {
       break-inside: auto;
     }
+
     .cv__list {
       display: block;
     }
+
     .cv__list .entry + .entry {
       margin-block-start: var(--space-lg);
     }
+
     .entry {
       display: block;
       break-inside: auto;
     }
+
     .entry__period {
       margin-block-end: 0.25em;
     }
+
     .entry__main {
       break-inside: auto;
     }
+
     .entry__points {
       display: block;
       break-inside: auto;
       padding-inline-start: 1em;
     }
+
     .entry__points li + li {
       margin-block-start: var(--space-sm);
     }
+
     .entry__points li {
       break-inside: avoid;
-      page-break-inside: avoid;
     }
+
     .entry__points li::marker {
       color: #000;
     }

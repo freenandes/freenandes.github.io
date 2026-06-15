@@ -55,7 +55,9 @@ const byline = [data.role, data.client].filter(Boolean).join(', ');
       }
     </header>
 
-    <div class="project__body prose" data-reveal style="--reveal-delay:80ms;">
+    <div class="project__body prose" data-reveal style="
+
+--reveal-delay:80ms;">
       <Content />
     </div>
 
@@ -74,21 +76,25 @@ const byline = [data.role, data.client].filter(Boolean).join(', ');
     max-width: var(--measure);
     padding-block: var(--space-lg);
   }
+
   .project__nav {
     margin-block-end: var(--space-lg);
   }
+
   .project__nav--foot {
-    margin-block-end: 0;
-    margin-block-start: calc(var(--space-lg) * 3);
+    margin-block: calc(var(--space-lg) * 3) 0;
   }
+
   .project__title {
     margin-block-end: var(--space-sm);
     font-size: var(--step-2);
     font-weight: var(--weight-bold);
   }
+
   .project__byline {
     color: var(--ink-2);
   }
+
   .project__year {
     margin-block-start: var(--space-sm);
     font-family: var(--font-mono);
@@ -99,9 +105,11 @@ const byline = [data.role, data.client].filter(Boolean).join(', ');
     line-height: var(--leading-tight);
     color: var(--ink-3);
   }
+
   .project__summary {
     margin-block-start: var(--space-lg);
   }
+
   .project__tags {
     margin-block-start: var(--space-md);
     font-family: var(--font-mono);
@@ -111,12 +119,15 @@ const byline = [data.role, data.client].filter(Boolean).join(', ');
     text-transform: uppercase;
     color: var(--ink-3);
   }
+
   .project__links {
     margin-block-start: var(--space-md);
   }
+
   .project__body {
     margin-block-start: var(--space-xl);
   }
+
   .project__body :global(h2) {
     font-family: var(--font-mono);
     font-size: var(--step--1);
@@ -124,26 +135,30 @@ const byline = [data.role, data.client].filter(Boolean).join(', ');
     text-transform: uppercase;
     letter-spacing: var(--tracking-mono);
     padding-block-end: var(--space-sm);
-    margin-block-start: var(--space-xl);
-    margin-block-end: var(--space-lg);
+    margin-block: var(--space-xl) var(--space-lg);
     border-block-end: 1px solid var(--line-strong);
   }
+
   .project__body :global(> *:first-child) {
     margin-block-start: 0;
   }
+
   .project__body :global(h2:first-child) {
     margin-block-start: 0;
   }
+
   .project__body :global(ul) {
     display: grid;
     gap: var(--space-sm);
     list-style: square;
     padding-inline-start: 1.25em;
   }
+
   .project__body :global(ul li::marker) {
     font-size: var(--step--1);
     color: var(--ink-3);
   }
+
   .project__body :global(p + p) {
     margin-block-start: var(--space-md);
   }

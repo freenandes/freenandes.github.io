@@ -5,12 +5,12 @@
   --ink: #111;
   --ink-2: #555;
   --ink-3: #aaa;
-  --line-soft: rgba(0, 0, 0, 0.04);
-  --line: rgba(0, 0, 0, 0.08);
-  --line-strong: rgba(0, 0, 0, 0.16);
-  --accent: #0088ff;
-  --accent-ink: #0055ff;
-  --error: #dd0000;
+  --line-soft: rgb(0 0 0 / 4%);
+  --line: rgb(0 0 0 / 8%);
+  --line-strong: rgb(0 0 0 / 16%);
+  --accent: #08f;
+  --accent-ink: #05f;
+  --error: #d00;
 
   /* Shiki (code blocks in MDX) */
   --astro-code-foreground: var(--ink);
@@ -26,14 +26,12 @@
   --astro-code-token-link: var(--accent);
 
   /* Typography — variable webfonts + stable local fallbacks */
-  --font-sans: 'Atkinson Hyperlegible Next', Roboto, Arial, 'Helvetica Neue', Helvetica, sans-serif;
-  --font-mono: 'Atkinson Hyperlegible Mono', Menlo, 'Roboto Mono', Monaco, monospace;
-
+  --font-sans: 'Atkinson Hyperlegible Next', roboto, arial, 'Helvetica Neue', helvetica, sans-serif;
+  --font-mono: 'Atkinson Hyperlegible Mono', menlo, 'Roboto Mono', monaco, monospace;
   --weight-regular: 380;
   --weight-medium: 480;
   --weight-semibold: 580;
   --weight-bold: 680;
-
   --step--2: 0.75em;
   --step--1: 0.8125em;
   --step-0: 1em;
@@ -67,7 +65,7 @@
   --radius-md: 0.5rem;
   --radius-lg: 1.3125rem;
   --radius-pill: 999px;
-  --shadow-lift: 0 0.5rem 1rem 0.125rem rgba(0, 0, 0, 0.2);
+  --shadow-lift: 0 0.5rem 1rem 0.125rem rgb(0 0 0 / 20%);
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --dur-fast: 167ms;
   --dur: 333ms;

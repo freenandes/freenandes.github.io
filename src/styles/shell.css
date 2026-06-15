@@ -28,22 +28,27 @@ main.home::before {
     --line: #000;
     --line-strong: #000;
   }
+
   .site-footer,
   main.home::before,
   .skip-link {
     display: none !important;
   }
+
   html,
   body {
     background: #fff !important;
     color: #000 !important;
   }
+
   .print-only {
     display: block;
   }
+
   .no-print {
     display: none !important;
   }
+
   @page {
     margin: 1.4cm 3.8cm;
   }

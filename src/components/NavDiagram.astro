@@ -246,9 +246,11 @@ const otherNodes = diagramNodes.filter(
       min-height: 0 !important;
       padding: var(--space-md) var(--space-md) !important;
     }
+
     .diagram__links {
       display: none !important;
     }
+
     .node {
       position: static !important;
       transform: none !important;
@@ -260,6 +262,7 @@ const otherNodes = diagramNodes.filter(
       margin-inline: auto;
       margin-block-end: var(--space-lg);
     }
+
     .node__panel {
       position: static !important;
       opacity: 1 !important;
@@ -279,9 +282,11 @@ const otherNodes = diagramNodes.filter(
     overflow: hidden;
     touch-action: pan-y;
   }
+
   .diagram__edges-data {
     display: none;
   }
+
   .diagram__links {
     position: absolute;
     inset: 0;
@@ -290,6 +295,7 @@ const otherNodes = diagramNodes.filter(
     pointer-events: none;
     z-index: 0;
   }
+
   .diagram__links :global(.link-line) {
     fill: none;
     stroke: var(--ink-3);
@@ -313,6 +319,7 @@ const otherNodes = diagramNodes.filter(
     z-index: 1;
     will-change: transform;
   }
+
   .node:hover,
   .node:focus-within,
   .node.is-open,
@@ -330,6 +337,7 @@ const otherNodes = diagramNodes.filter(
     line-height: inherit;
     text-wrap: nowrap;
   }
+
   .node__hit {
     display: inline-flex;
     flex-direction: column;
@@ -344,9 +352,11 @@ const otherNodes = diagramNodes.filter(
     -webkit-user-select: none;
     user-select: none;
   }
+
   .node.is-dragging .node__hit {
     cursor: grabbing;
   }
+
   .node__dot {
     width: 1rem;
     height: 1rem;
@@ -354,14 +364,17 @@ const otherNodes = diagramNodes.filter(
     flex: none;
     transition: transform var(--dur-fast) var(--ease);
   }
+
   .node--lg .node__dot {
     width: 1.25rem;
     height: 1.25rem;
   }
+
   .node--sm .node__dot {
     width: 0.875rem;
     height: 0.875rem;
   }
+
   .node__dot polygon {
     fill: var(--paper);
     stroke: var(--ink);
@@ -370,14 +383,17 @@ const otherNodes = diagramNodes.filter(
     transition: fill var(--dur-fast) var(--ease),
       stroke var(--dur-fast) var(--ease);
   }
+
   .node--lg .node__dot polygon {
     stroke-width: 2;
   }
+
   .node__hit:hover .node__dot,
   .node:focus-within .node__dot,
   .node.is-open .node__dot {
     transform: scale(1.25);
   }
+
   .node__hit:hover .node__dot polygon,
   .node:focus-within .node__dot polygon,
   .node.is-open .node__dot polygon {
@@ -385,25 +401,21 @@ const otherNodes = diagramNodes.filter(
     stroke: var(--accent-ink);
   }
 
-  /* Knockout plate — a single solid paper-coloured box behind each label so connector lines are masked completely. */
-
   .node__label,
   .node__sublabel {
+    /* Knockout plate — a single solid paper-coloured box behind each label so connector lines are masked completely. */
     --ko: var(--paper);
     --ko-px: 0.25em;
     --ko-py: 0;
     --ko-radius: var(--radius-sm);
+
     display: inline-block;
     padding: var(--ko-py) var(--ko-px);
     margin: calc(-1 * var(--ko-py)) calc(-1 * var(--ko-px));
     background-color: var(--ko);
     border-radius: var(--ko-radius);
-  }
 
-  /* Labels */
-
-  .node__label,
-  .node__sublabel {
+    /* Labels */
     font-family: var(--font-mono);
     font-size: var(--step--2);
     font-weight: var(--weight-semibold);
@@ -413,13 +425,16 @@ const otherNodes = diagramNodes.filter(
     color: var(--ink-2);
     white-space: nowrap;
     transition: color var(--dur-fast) var(--ease);
+
   }
+
   .node__hit:hover .node__label,
   .node__hit:hover .node__sublabel,
   .node:focus-within .node__label,
   .node.is-open .node__label {
     color: var(--ink);
   }
+
   .node--identity .node__label {
     font-family: var(--font-sans);
     text-transform: none;
@@ -435,25 +450,30 @@ const otherNodes = diagramNodes.filter(
     pointer-events: none;
     z-index: 0;
   }
+
   .node__ring {
     display: block;
     overflow: visible;
     transform-origin: center;
     transform: rotate(var(--ring-start, 0deg));
   }
+
   @keyframes ring-spin {
     from {
       transform: rotate(var(--ring-start, 0deg));
     }
+
     to {
       transform: rotate(calc(var(--ring-start, 0deg) - 360deg));
     }
   }
+
   @media (prefers-reduced-motion: no-preference) {
     .node--floating .node__ring {
       animation: ring-spin 30s linear infinite;
     }
   }
+
   .node__ring-text {
     font-family: var(--font-mono);
     font-size: var(--step--2);
@@ -467,9 +487,11 @@ const otherNodes = diagramNodes.filter(
 
   .node__panel {
     --shift: 0.5rem;
+
     /* JS sets these to pull a card back inside the viewport when its node sits near an edge (see clampPanel). 0 = no correction needed. */
     --panel-nudge-x: 0px;
     --panel-nudge-y: 0px;
+
     position: absolute;
     width: max-content;
     max-width: min(90vw, 20rem);
@@ -484,43 +506,52 @@ const otherNodes = diagramNodes.filter(
     transition: opacity var(--dur) var(--ease),
       visibility var(--dur) var(--ease), transform var(--dur) var(--ease);
   }
+
   .node[data-place='bottom'] .node__panel {
     top: 100%;
     left: 50%;
     transform: translateX(calc(-50% + var(--panel-nudge-x))) translateY(calc(var(--shift) + var(--panel-nudge-y)));
   }
+
   .node[data-place='top'] .node__panel {
     bottom: 100%;
     left: 50%;
     transform: translateX(calc(-50% + var(--panel-nudge-x))) translateY(calc(-1 * var(--shift) + var(--panel-nudge-y)));
   }
+
   .node[data-place='right'] .node__panel {
     left: 100%;
     top: 50%;
     transform: translateY(calc(-50% + var(--panel-nudge-y))) translateX(calc(var(--shift) + var(--panel-nudge-x)));
   }
+
   .node[data-place='left'] .node__panel {
     right: 100%;
     top: 50%;
     transform: translateY(calc(-50% + var(--panel-nudge-y))) translateX(calc(-1 * var(--shift) + var(--panel-nudge-x)));
   }
+
   .node:hover .node__panel,
   .node:focus-within .node__panel,
   .node.is-open .node__panel {
     --shift: 0px;
+
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
   }
+
   .panel__meta {
     margin-block-end: var(--space-md);
     color: var(--ink-3);
   }
+
   .panel__lead,
   .node--about .panel__lead {
     font-weight: var(--weight-semibold);
     margin-block-end: var(--space-md);
   }
+
   .panel__meta,
   .panel__text,
   .panel__lead,
@@ -528,14 +559,20 @@ const otherNodes = diagramNodes.filter(
     font-size: var(--step-0);
     line-height: var(--leading-snug);
   }
+
   .panel__meta,
   .panel__text {
     font-weight: var(--weight-regular);
   }
+
   .panel__tags {
-    margin-block-start: var(--space-md);
-    margin-block-end: var(--space-xs);
+    margin-block: var(--space-md) var(--space-xs);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm) var(--space-md);
+    list-style-type: none;
   }
+
   .panel__chip {
     font-family: var(--font-mono);
     font-size: var(--step--2);
@@ -545,22 +582,18 @@ const otherNodes = diagramNodes.filter(
     text-transform: uppercase;
     color: var(--ink-3);
   }
+
   .panel__chip:not(:last-child)::after {
     content: ',';
   }
+
   .panel__link {
     display: inline-flex;
   }
+
   .panel__link,
   .panel__socials {
-    margin-block-start: var(--space-md);
-    margin-block-end: var(--space-xs);
-  }
-  .panel__tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-sm) var(--space-md);
-    list-style-type: none;
+    margin-block: var(--space-md) var(--space-xs);
   }
 </style>
 <script>

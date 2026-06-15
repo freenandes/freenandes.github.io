@@ -10,6 +10,10 @@ interface Props {
   mainClass?: string;
   /** Off on the diagram home — the map is the navigation. */
   footer?: boolean;
+  /** Open Graph type for this page (e.g. "website", "profile", "article"). */
+  ogType?: string;
+  /** Extra schema.org nodes appended to the page's JSON-LD @graph. */
+  jsonLd?: Record<string, unknown>[];
 }
 
 const {
@@ -17,31 +21,97 @@ const {
   description = site.description,
   mainClass,
   footer = true,
+  ogType = 'website',
+  jsonLd = [],
 } = Astro.props;
 
 const pageTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site.role}`;
-const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString();
-const ogImage = new URL(withBase(site.ogImage), Astro.site ?? Astro.url).toString();
+const origin = Astro.site ?? Astro.url;
+const canonical = new URL(Astro.url.pathname, origin).toString();
+const siteBase = new URL(withBase('/'), origin).toString();
+const ogImage = new URL(withBase(site.ogImage), origin).toString();
+const ogImageAlt = site.ogImageAlt;
 const topoPattern = mainClass === 'home' ? withBase('/topo-low.svg') : null;
+
+// Profiles the site owner can be cross-referenced by (schema.org sameAs).
+const sameAs = site.socials
+  .filter((s) => /^https?:/.test(s.href))
+  .map((s) => s.href);
+
+// Site-wide JSON-LD. Page-specific nodes (ProfilePage, CreativeWork,
+// BreadcrumbList…) are appended via the `jsonLd` prop and share these @ids.
+const graph: Record<string, unknown>[] = [
+  {
+    '@type': 'WebSite',
+    '@id': `${siteBase}#website`,
+    url: siteBase,
+    name: site.name,
+    description: site.description,
+    inLanguage: site.locale,
+    publisher: { '@id': `${siteBase}#person` },
+  },
+  {
+    '@type': 'Person',
+    '@id': `${siteBase}#person`,
+    name: site.name,
+    jobTitle: site.role,
+    description: site.description,
+    url: siteBase,
+    image: ogImage,
+    ...(sameAs.length ? { sameAs } : {}),
+  },
+  ...jsonLd,
+];
+const structuredData = { '@context': 'https://schema.org', '@graph': graph };
+
+// Static-site CSP delivered via <meta>. Note: frame-ancestors, sandbox and
+// report-uri are header-only and are intentionally omitted here (see
+// SPEC-COMPLIANCE.md). 'unsafe-inline' is required for style only because the
+// theme relies on inline `style="--…"` custom-property attributes; scripts stay
+// strict ('self' + the single hashed inline bootstrap below).
+const csp = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "script-src 'self' 'sha256-cQIjBvINUx8JPRPwnyaDZ+zhrirMLmBo3t9eW4bmbSU='",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com",
+  "img-src 'self' data:",
+  "connect-src 'self'",
+  "form-action 'self'",
+  "manifest-src 'self'",
+  'upgrade-insecure-requests',
+].join('; ');
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={site.locale}>
   <head>
     <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content={csp} />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="color-scheme" content="light" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="robots" content="index, follow" />
 
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
 
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content={site.ogLocale} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={ogImageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
 
     <meta name="theme-color" content="#f2efe7" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#14130f" media="(prefers-color-scheme: dark)" />
@@ -54,7 +124,10 @@ const topoPattern = mainClass === 'home' ? withBase('/topo-low.svg') : null;
     />
 
     <link rel="icon" href={withBase(site.favicon)} type="image/svg+xml" />
+    <link rel="manifest" href={withBase('/manifest.webmanifest')} />
     <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)} />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>

@@ -73,7 +73,7 @@ const csp = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
-  "script-src 'self' 'sha256-cQIjBvINUx8JPRPwnyaDZ+zhrirMLmBo3t9eW4bmbSU='",
+  "script-src 'self' 'sha256-LhQiOHdaqOlR0vDzQ0GHrCxI0XCFMZmiltsRU27enOI='",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data:",
@@ -142,8 +142,14 @@ const csp = [
 
     {footer && <Footer />}
 
+    {/* Single inline bootstrap, allow-listed by hash in the CSP above. If you
+        change this script, update the script-src sha256 to match the emitted
+        (minified) source. */}
     <script>
       document.documentElement.classList.add('is-ready');
+      document
+        .querySelectorAll('.js-download-pdf')
+        .forEach((b) => b.addEventListener('click', () => window.print()));
     </script>
   </body>
 </html>

@@ -7,8 +7,6 @@ import Footer from '../components/Footer.astro';
 interface Props {
   title?: string;
   description?: string;
-  /** Hide background wash (e.g. print-focused pages). */
-  bare?: boolean;
   mainClass?: string;
   /** Off on the diagram home — the map is the navigation. */
   footer?: boolean;
@@ -17,7 +15,6 @@ interface Props {
 const {
   title,
   description = site.description,
-  bare = false,
   mainClass,
   footer = true,
 } = Astro.props;
@@ -25,6 +22,7 @@ const {
 const pageTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site.role}`;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString();
 const ogImage = new URL(withBase(site.ogImage), Astro.site ?? Astro.url).toString();
+const topoPattern = mainClass === 'home' ? withBase('/topo-low.svg') : null;
 ---
 
 <!doctype html>
@@ -48,16 +46,24 @@ const ogImage = new URL(withBase(site.ogImage), Astro.site ?? Astro.url).toStrin
     <meta name="theme-color" content="#f2efe7" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#14130f" media="(prefers-color-scheme: dark)" />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:ital,wght@0,200..800;1,200..800&family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800&display=swap"
+    />
+
     <link rel="icon" href={withBase(site.favicon)} type="image/svg+xml" />
     <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
-    {!bare && <div class="wash" aria-hidden="true"></div>}
-    <div class="grid-overlay" aria-hidden="true"></div>
-
-    <main id="main" class:list={[mainClass]}>
+    <main
+      id="main"
+      class:list={[mainClass]}
+      style={topoPattern ? `--topo-pattern: url('${topoPattern}')` : undefined}
+    >
       <slot />
     </main>
 

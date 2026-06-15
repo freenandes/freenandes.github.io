@@ -4,66 +4,35 @@ import { site } from '../site.config';
 const year = new Date().getFullYear();
 ---
 
-<footer class="site-footer">
-  <div class="container site-footer__bar">
-    <ul role="list" class="site-footer__links">
+<footer class="site-footer container">
+  <div class="site-footer__bar">
+    <ul role="list" class="link-row">
       {
         site.socials.map((s) => (
           <li>
-            <a
-              class="site-footer__link"
-              href={s.href}
-              rel={s.href.startsWith('http') ? 'me noopener' : undefined}
-            >
-              {s.label}
-            </a>
+            <a href={s.href} class="link">{s.label}</a>
           </li>
         ))
       }
     </ul>
-
-    <p class="site-footer__meta mono">© {year} {site.name}</p>
+    <p class="site-footer__meta">© {year} {site.name}</p>
   </div>
 </footer>
 
 <style>
   .site-footer {
-    margin-block-start: var(--space-xl);
-    border-block-start: 1px solid var(--line);
+    max-width: var(--measure);
   }
-
   .site-footer__bar {
+    border-block-start: 1px solid var(--line-strong);
     display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-sm) var(--space-lg);
-    padding-block: var(--space-md);
+    flex-direction: column;
+    gap: var(--space-md);
+    padding-block: var(--space-lg);
   }
-
-  .site-footer__links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-sm) var(--space-lg);
-    margin: 0;
-  }
-
-  .site-footer__link {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    font-weight: var(--weight-regular);
-    letter-spacing: var(--tracking-mono);
-    text-transform: uppercase;
-    color: var(--ink-2);
-    transition: color var(--dur-fast) var(--ease);
-  }
-  .site-footer__link:hover {
-    color: var(--ink);
-  }
-
   .site-footer__meta {
     font-size: var(--step--1);
-    color: var(--ink-3);
-    letter-spacing: var(--tracking-mono);
+    font-weight: var(--weight-medium);
+    color: var(--ink-2);
   }
 </style>

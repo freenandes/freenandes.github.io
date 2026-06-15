@@ -119,7 +119,7 @@ export function initDiagram(root: HTMLElement) {
     return rect.height >= vh * 0.5 ? rect.height : vh;
   }
   function viewportLandscape() {
-    return window.innerWidth > window.innerHeight * 1.15;
+    return window.innerWidth > window.innerHeight * 1.1;
   }
 
   
@@ -415,7 +415,7 @@ export function initDiagram(root: HTMLElement) {
   }
 
   function isLandscape() {
-    return W > H * 1.15;
+    return W > H * 1.1;
   }
 
   function layoutIsCrowded() {

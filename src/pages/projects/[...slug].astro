@@ -1,7 +1,6 @@
 ---
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import Cover from '../../components/Cover.astro';
 import PasswordGate from '../../components/PasswordGate.astro';
 import RegMark from '../../components/RegMark.astro';
 import { getProjects, projectYear } from '../../lib/projects';
@@ -19,10 +18,6 @@ const { entry, index } = Astro.props;
 const { data } = entry;
 const { Content } = await render(entry);
 const year = projectYear(entry);
-const dateLabel = data.date.toLocaleDateString('en-US', {
-  year: 'numeric',
-  month: 'short',
-});
 ---
 
 <Base title={data.title} description={data.description}>
@@ -64,19 +59,6 @@ const dateLabel = data.date.toLocaleDateString('en-US', {
         )
       }
     </header>
-
-    <div class="project__cover">
-      <Cover
-        title={data.title}
-        accent={data.accent}
-        index={index}
-        cover={data.cover}
-        coverAlt={data.coverAlt}
-        locked={data.locked}
-        ratio="16 / 9"
-      />
-      <p class="mono project__caption">{dateLabel} — {data.accent.toUpperCase()} ®</p>
-    </div>
 
     <div class="project__body prose">
       <Content />
@@ -150,15 +132,6 @@ const dateLabel = data.date.toLocaleDateString('en-US', {
   .project__link:hover {
     border-color: var(--ink);
     color: var(--accent-ink);
-  }
-
-  .project__cover {
-    margin-block-start: var(--space-xl);
-  }
-  .project__caption {
-    margin-block-start: var(--space-xs);
-    color: var(--ink-3);
-    text-align: right;
   }
 
   .project__body {

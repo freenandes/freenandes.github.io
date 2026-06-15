@@ -6,6 +6,10 @@ import { cv } from '../cv.config';
 import { withBase } from '../lib/base';
 
 const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
+
+function contactPrintText(href: string): string {
+  return href.startsWith('mailto:') ? href.slice('mailto:'.length) : href;
+}
 ---
 
 <Base
@@ -13,22 +17,32 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
   description={`Curriculum vitae of ${cv.name ?? site.name}, ${cv.headline ?? site.role}.`}
 >
   <article class="cv container">
-    <a class="back-link mono" href={withBase('/')}>← Back to map</a>
+    <ul class="cv__nav link-row no-print" role="list">
+      <li>
+        <a class="link" href={withBase('/')}>Back to map</a>
+      </li>
+      <li>
+        <button class="link js-download-pdf" type="button">Download PDF</button>
+      </li>
+    </ul>
 
     <header class="cv__head" data-reveal>
       <div class="cv__id">
-        <p class="label cv__kicker"><RegMark size={12} /> Curriculum Vitae</p>
         <h1 class="cv__name">{cv.name ?? site.name}</h1>
         <p class="cv__role">{cv.headline ?? site.role}</p>
+        <div class="cv__contact-print print-only">
+          {site.socials.map((s) => (
+            <p>{contactPrintText(s.href)}</p>
+          ))}
+        </div>
       </div>
 
       <div class="cv__actions no-print">
-        <button id="download-pdf" class="btn" type="button">↓ Download PDF</button>
-        <ul role="list" class="cv__contact">
+        <ul role="list" class="cv__contact link-row">
           {
             site.socials.map((s) => (
               <li>
-                <a href={s.href} class="cv__contact-link">{s.label}</a>
+                <a href={s.href} class="link">{s.label}</a>
               </li>
             ))
           }
@@ -41,17 +55,17 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
     </div>
 
     <section class="cv__section" data-reveal style="--reveal-delay:140ms;">
-      <h2 class="cv__section-title"><span class="label">01</span> Experience</h2>
+      <h2 class="cv__section-title">Experience</h2>
       <div class="cv__list">
         {
           cv.experience.map((job) => (
             <div class="entry">
-              <div class="entry__period mono">{job.period}</div>
+              <div class="entry__period">{job.period}</div>
               <div class="entry__main">
                 <h3 class="entry__role">
-                  {job.role} <span class="entry__org">— {job.org}</span>
+                  {job.role}, {job.org}
                 </h3>
-                {job.location && <p class="entry__loc mono">{job.location}</p>}
+                {/* {job.location && <p class="entry__loc mono">{job.location}</p>} */}
                 {job.summary && <p class="entry__summary">{job.summary}</p>}
                 <ul role="list" class="entry__points">
                   {job.points.map((pt) => (
@@ -66,12 +80,12 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
     </section>
 
     <section class="cv__section" data-reveal>
-      <h2 class="cv__section-title"><span class="label">02</span> Education</h2>
+      <h2 class="cv__section-title">Education</h2>
       <div class="cv__list">
         {
           cv.education.map((e) => (
             <div class="entry">
-              <div class="entry__period mono">{e.period}</div>
+              <div class="entry__period">{e.period}</div>
               <div class="entry__main">
                 <h3 class="entry__role">{e.title}</h3>
                 <p class="entry__org-line">{e.org}</p>
@@ -83,178 +97,173 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
       </div>
     </section>
 
-    <p class="cv__foot mono no-print">
-      Tip: in the print dialog choose “Save as PDF” for a pixel-clean résumé.
-    </p>
+    <ul class="cv__nav cv__nav--foot link-row no-print" role="list">
+      <li>
+        <a class="link" href={withBase('/')}>Back to map</a>
+      </li>
+      <li>
+        <button class="link js-download-pdf" type="button">Download PDF</button>
+      </li>
+    </ul>
   </article>
 </Base>
 
 <script>
-  document.getElementById('download-pdf')?.addEventListener('click', () => window.print());
+  document.querySelectorAll('.js-download-pdf').forEach((btn) => {
+    btn.addEventListener('click', () => window.print());
+  });
 </script>
 
 <style>
   .cv {
-    padding-block: var(--space-xl);
-    max-width: 54rem;
+    max-width: var(--measure);
+    padding-block: var(--space-lg);
   }
-
+  .cv__nav {
+    margin-block-end: var(--space-lg);
+  }
+  .cv__nav--foot {
+    margin-block-end: 0;
+    margin-block-start: var(--space-xl);
+  }
   .cv__head {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-md);
-    justify-content: space-between;
-    align-items: end;
-    padding-block-end: var(--space-md);
-    border-block-end: 2px solid var(--ink);
-  }
-
-  .cv__kicker {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6ch;
+    gap: var(--space-lg);
   }
   .cv__name {
-    margin-block-start: var(--space-xs);
-    font-size: var(--step-4);
+    margin-block-end: var(--space-sm);
+    font-size: var(--step-2);
+    font-weight: var(--weight-bold);
   }
-  .cv__role {
-    font-family: var(--font-mono);
-    color: var(--ink-2);
-    letter-spacing: var(--tracking-mono);
-    max-width: 48ch;
-  }
-
   .cv__actions {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: var(--space-sm);
+    gap: var(--space-sm) var(--space-md);
   }
-
-  .cv__contact {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-sm);
-    justify-content: flex-end;
-  }
-  .cv__contact-link {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    color: var(--ink-2);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-  .cv__contact-link:hover {
-    color: var(--accent-ink);
-  }
-
   .cv__summary {
     margin-block-start: var(--space-lg);
-    font-size: var(--step-1);
-    max-width: 60ch;
-    color: var(--ink);
   }
   .cv__summary p + p {
-    margin-block-start: var(--space-sm);
+    margin-block-start: var(--space-md);
   }
-
   .cv__section {
     margin-block-start: var(--space-xl);
   }
   .cv__section-title {
-    display: flex;
-    align-items: baseline;
-    gap: var(--space-sm);
-    font-size: var(--step-2);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: var(--weight-bold);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-mono);
     padding-block-end: var(--space-sm);
-    border-block-end: 1px solid var(--line);
-    margin-block-end: var(--space-md);
+    margin-block-end: var(--space-lg);
+    border-block-end: 1px solid var(--line-strong);
   }
-  .cv__section-title .label {
-    color: var(--ink-3);
-  }
-
   .cv__list {
     display: grid;
     gap: var(--space-lg);
   }
-
   .entry {
     display: grid;
     grid-template-columns: 9rem 1fr;
-    gap: var(--space-md);
+    gap: var(--space-lg);
   }
   @media (max-width: 640px) {
     .entry {
       grid-template-columns: 1fr;
-      gap: var(--space-xs);
+      gap: var(--space-sm);
     }
   }
   .entry__period {
-    color: var(--ink-2);
-    padding-block-start: 0.2rem;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    line-height: var(--leading-tight);
+    color: var(--ink-3);
+    padding-block-start: 0.4375rem;
+    text-wrap: balance;
   }
   .entry__role {
-    font-size: var(--step-1);
-    font-weight: var(--weight-semibold);
-  }
-  .entry__org {
-    color: var(--ink-2);
-    font-weight: var(--weight-regular);
-  }
-  .entry__org-line {
-    color: var(--ink-2);
-  }
-  .entry__loc {
-    color: var(--ink-3);
-    margin-block-start: 0.1rem;
-  }
-  .entry__summary {
-    margin-block-start: var(--space-xs);
-    color: var(--ink-2);
+    font-size: var(--step-2);
+    font-weight: var(--weight-bold);
   }
   .entry__points {
-    margin-block-start: var(--space-xs);
+    margin-block-start: var(--space-sm);
     display: grid;
-    gap: var(--space-xs);
-    padding-inline-start: 1.1em;
+    gap: var(--space-sm);
+    padding-inline-start: -1em;
     list-style: square;
-    color: var(--ink);
   }
   .entry__points li::marker {
-    color: var(--accent);
+    font-size: var(--step--1);
+    color: var(--ink-3);
   }
-
   .cv__foot {
     margin-block-start: var(--space-xl);
     color: var(--ink-3);
   }
-
+  .cv__nav--foot {
+    margin-block-start: calc(var(--space-lg) * 3);
+  }
+  .print-only {
+    display: none;
+  }
   @media print {
     .cv {
-      padding: 0;
       max-width: none;
-      font-size: 10.5pt;
-    }
-    .cv__name {
-      font-size: 22pt;
-    }
-    .cv__section {
-      margin-block-start: 14pt;
-      break-inside: avoid;
-    }
-    .cv__section-title {
       font-size: 12pt;
     }
-    .entry {
-      break-inside: avoid;
+    .container {
+      padding: 0;
+    }
+    .cv__contact-print {
+      display: block;
+      font-size: 12pt;
+      padding-block: 5mm;
+      margin-block-start: 5mm;
+      border-block-start: 1px solid #000;
+      border-block-end: 1px solid #000;
     }
     .cv__summary {
-      font-size: 11pt;
+      margin-block-start: 5mm;
     }
-    .no-print {
-      display: none !important;
+    .cv__section,
+    .cv__list {
+      break-inside: auto;
+    }
+    .cv__list {
+      display: block;
+    }
+    .cv__list .entry + .entry {
+      margin-block-start: var(--space-lg);
+    }
+    .entry {
+      display: block;
+      break-inside: auto;
+    }
+    .entry__period {
+      margin-block-end: 0.25em;
+    }
+    .entry__main {
+      break-inside: auto;
+    }
+    .entry__points {
+      display: block;
+      break-inside: auto;
+      padding-inline-start: 1em;
+    }
+    .entry__points li + li {
+      margin-block-start: var(--space-sm);
+    }
+    .entry__points li {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .entry__points li::marker {
+      color: #000;
     }
   }
 </style>

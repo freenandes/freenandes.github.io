@@ -1,35 +1,4 @@
-/* Site chrome: background wash, grid, main stacking. */
-
-.wash {
-  position: fixed;
-  inset: -20vmax -10vmax auto -10vmax;
-  height: 80vmax;
-  filter: blur(40px) saturate(1.1);
-  opacity: 0.5;
-  z-index: -2;
-  pointer-events: none;
-}
-
-.grid-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: linear-gradient(
-      to right,
-      color-mix(in oklab, var(--line) 55%, transparent) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      to bottom,
-      color-mix(in oklab, var(--line) 55%, transparent) 1px,
-      transparent 1px
-    );
-  background-size: clamp(48px, 8vw, 96px) clamp(48px, 8vw, 96px);
-  opacity: 0.35;
-  -webkit-mask-image: radial-gradient(120% 90% at 50% 0%, #000 30%, transparent 80%);
-  mask-image: radial-gradient(120% 90% at 50% 0%, #000 30%, transparent 80%);
-}
+/* Site chrome: home background, main stacking. */
 
 main {
   position: relative;
@@ -38,12 +7,29 @@ main {
 
 main.home {
   min-height: 100svh;
+  isolation: isolate;
+}
+
+main.home::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--topo-pattern);
+  background-repeat: repeat;
+  background-position: top center;
+  background-size: 150rem auto;
+  opacity: 0.075;
 }
 
 @media print {
+  :root {
+    --line: #000;
+    --line-strong: #000;
+  }
   .site-footer,
-  .wash,
-  .grid-overlay,
+  main.home::before,
   .skip-link {
     display: none !important;
   }
@@ -52,7 +38,13 @@ main.home {
     background: #fff !important;
     color: #000 !important;
   }
+  .print-only {
+    display: block;
+  }
+  .no-print {
+    display: none !important;
+  }
   @page {
-    margin: 14mm;
+    margin: 1.4cm 3.8cm;
   }
 }

@@ -1,79 +1,27 @@
-# Portfolio
+# Portfolio website
 
-Personal portfolio website built with the **Astro** framework. Plain HTML/CSS
-driven by design tokens, content authored in Markdown/MDX, with a
-password-locked projects feature (build-time encryption + client-side decrypt).
+About this website at README.md.
 
-## Cursor Cloud specific instructions
+## State
 
-### Repository state
+- **Stack:** Astro 5 + MDX, `marked` for client-side Markdown of decrypted content
+- **Remote:** `github.com/freenandes/portfolio` on branch `main`
+- The site is served from the `/portfolio/` sub-path on GitHub Pages, so both dev and preview mount under that base. Internal links must use `withBase()` from `src/lib/base.ts`
+  - `astro.config.mjs` reads `SITE`/`BASE_PATH` env vars
+  - defaults `https://freenandes.github.io` and `/portfolio`
 
-- **Stack:** Astro 5 + MDX, system UI fonts (Helvetica/Arial stack), `marked` for
-  client-side Markdown of decrypted content.
-- **Remote:** `github.com/freenandes/portfolio` on branch `main`.
-- **Key paths:** `src/site.config.ts` (global content + `/public` asset paths),
-  `src/styles/tokens.css` (design tokens), `src/styles/global.css` (imports +
-  base utilities), `src/styles/shell.css` (wash/grid), `src/styles/accents.css`
-  (project cover palettes), `src/diagram.config.ts` (home map copy),
-  `src/scripts/nav-diagram.ts` (map physics), `src/content/projects/*.mdx`
-  (projects),
-  `src/cv.data.json` (About/CV content, generated from LinkedIn),
-  `src/cv.config.ts` (CV types + JSON loader), `src/pages/about.astro` (CV
-  layout), `scripts/sync-linkedin.mjs` (LinkedIn PDF → CV data),
-  `scripts/encrypt-projects.mjs` (lock encryption).
-
-### LinkedIn sync (About page)
-
-- The About page renders from `src/cv.data.json`, generated from
-  `sources/linkedin-profile.pdf` by `npm run sync:linkedin`. Edit content on
-  LinkedIn (Save to PDF → replace the file → run the script), not by hand —
-  a sync overwrites the JSON.
-- `.github/workflows/sync-linkedin.yml` auto-regenerates and commits
-  `cv.data.json` on push when the PDF changes.
-
-### Services
-
-| Service | Required | Notes |
-|---------|----------|-------|
-| Astro dev server | for local dev | `npm run dev` → http://localhost:4321/portfolio/ |
-| Astro preview | to test prod build | `npm run preview` (serves `dist/` at the base path) |
-
-The site is served from the `/portfolio/` sub-path on GitHub Pages, so both dev
-and preview mount under that base. Internal links must use `withBase()` from
-`src/lib/base.ts`; `astro.config.mjs` reads `SITE`/`BASE_PATH` env vars
-(defaults `https://freenandes.github.io` and `/portfolio`).
-
-### Lint / test / build / run
+## Lint / test / build / run / etc.
 
 - **Install:** `npm install`
 - **Dev:** `npm run dev` (serves on port 4321)
-- **Build:** `npm run build` (runs `npm run encrypt` first via `prebuild`, then
-  `astro build` → `./dist`)
+- **Build:** `npm run build` (runs `npm run encrypt` first via `prebuild`, then `astro build` → `./dist`)
 - **Preview:** `npm run preview`
 - **Type/diagnostics:** `npx astro check`
 - **Encrypt locked projects:** `npm run encrypt`
-- **Sync About page from LinkedIn:** `npm run sync:linkedin` (parses
-  `sources/linkedin-profile.pdf` → `src/cv.data.json`)
+- **Sync About page from LinkedIn:** `npm run sync:linkedin` (parses `sources/linkedin-profile.pdf` → `src/cv.data.json`)
 
-No separate test runner or linter is configured yet.
+## Locked projects
 
-### Locked projects (secrets)
-
-- Plaintext protected content (`src/protected/*.md`) and `passwords.json` are
-  **git-ignored**. Only ciphertext (`public/locked/*.json`) is committed.
+- Plaintext protected content (`src/protected/*.md`) and `passwords.json` are **git-ignored**. Only ciphertext (`public/locked/*.json`) is committed.
 - Demo locked project `halcyon` uses passphrase `soft-club`.
-- On a fresh checkout without the plaintext sources, `npm run encrypt` skips
-  missing projects and the committed ciphertext is used as-is.
-
-### Deployment (GitHub Pages)
-
-- CI workflow: `.github/workflows/deploy.yml` builds and deploys on push to
-  `main` (and via manual `workflow_dispatch`).
-- One-time GitHub setup: **Settings → Pages → Source = GitHub Actions**.
-- Live URL: `https://freenandes.github.io/portfolio/`.
-- `prebuild` (encryption) no-ops safely without secrets, so CI builds succeed
-  using the committed `public/locked/*.json` ciphertext.
-
-### VM update script
-
-Use `npm ci` (or `npm install`) to restore dependencies on VM startup.
+- On a fresh checkout without the plaintext sources, `npm run encrypt` skips missing projects and the committed ciphertext is used as-is.

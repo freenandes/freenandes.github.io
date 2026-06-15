@@ -1,6 +1,5 @@
 @import './tokens.css';
 @import './shell.css';
-@import './accents.css';
 
 *,
 *::before,
@@ -53,9 +52,12 @@ textarea,
 select {
   font: inherit;
   color: inherit;
+  line-height: var(--leading-tight);
 }
 button {
   cursor: pointer;
+  text-align: left;
+  line-height: var(--leading-tight);
 }
 a {
   color: inherit;
@@ -72,7 +74,8 @@ ol[role='list'] {
   border-radius: var(--radius-sm);
 }
 ::selection {
-  color: var(--ink);
+  background-color: var(--accent-ink);
+  color: var(--paper);
 }
 
 h1,
@@ -103,7 +106,6 @@ p {
 
 .container {
   width: 100%;
-  max-width: var(--content-max);
   margin-inline: auto;
   padding-inline: var(--gutter);
 }
@@ -183,38 +185,42 @@ p {
   text-transform: uppercase;
   color: var(--ink-2);
 }
-
-.back-link {
-  display: inline-block;
-  color: var(--ink-2);
-  margin-block-end: var(--space-lg);
-  transition: color var(--dur-fast) var(--ease);
-}
-.back-link:hover {
-  color: var(--ink);
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5ch;
-  border-radius: var(--radius-pill);
-  padding: 0.7rem 1.3rem;
-  background: var(--ink);
-  color: var(--paper);
-  border: 1px solid var(--ink);
+.link {
   font-family: var(--font-mono);
   font-size: var(--step--1);
-  font-weight: var(--weight-regular);
+  line-height: var(--leading-snug);
+  font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-mono);
-  transition: transform var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  text-decoration-thickness: 0.125em;
+  color: var(--accent-ink);
+  transition: color var(--dur-fast) var(--ease);
 }
-.btn:hover {
-  transform: translateY(-1px);
-  background: var(--accent-ink);
-  border-color: var(--accent-ink);
+.link:hover {
+  color: var(--accent);
 }
-
+button.link {
+  background: none;
+  border: none;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline;
+}
+.link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-md);
+}
+.link-row li {
+  line-height: var(--leading-snug);
+}
+.link-row .link {
+  display: inline-block;
+  vertical-align: baseline;
+}
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -240,7 +246,6 @@ p {
 .skip-link:focus {
   top: var(--space-sm);
 }
-
 [data-reveal] {
   opacity: 0;
   transform: translateY(16px);

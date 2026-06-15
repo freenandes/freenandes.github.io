@@ -1,34 +1,16 @@
-/* Design tokens — edit here to re-theme the site. */
-
 :root {
   /* Color */
-  --paper: #ffffff;
+  --paper: #fff;
   --paper-2: #f7f7f7;
-  --ink: #111111;
-  --ink-2: #555555;
-  --ink-3: #999999;
-  --line: rgba(0, 0, 0, 0.1);
-  --line-strong: rgba(0, 0, 0, 0.2);
-  --accent: #0099ff;
+  --ink: #111;
+  --ink-2: #555;
+  --ink-3: #aaa;
+  --line-soft: rgba(0, 0, 0, 0.04);
+  --line: rgba(0, 0, 0, 0.08);
+  --line-strong: rgba(0, 0, 0, 0.16);
+  --accent: #0088ff;
   --accent-ink: #0055ff;
-  --error: #b4452f;
-
-  /* Generative cover + tag chips (accent name → three gradient stops) */
-  --accent-lilac-1: #c9bcff;
-  --accent-lilac-2: #ffd6e6;
-  --accent-lilac-3: #bfe0ff;
-  --accent-mint-1: #b6ecd2;
-  --accent-mint-2: #e8f6c9;
-  --accent-mint-3: #bfeae0;
-  --accent-peach-1: #ffd0bb;
-  --accent-peach-2: #ffe3a8;
-  --accent-peach-3: #ffc6d6;
-  --accent-sky-1: #bfe0ff;
-  --accent-sky-2: #cdedff;
-  --accent-sky-3: #d8d4ff;
-  --accent-butter-1: #ffe7a3;
-  --accent-butter-2: #fff0c4;
-  --accent-butter-3: #ffd8b0;
+  --error: #dd0000;
 
   /* Shiki (code blocks in MDX) */
   --astro-code-foreground: var(--ink);
@@ -43,34 +25,33 @@
   --astro-code-token-string-expression: var(--accent);
   --astro-code-token-link: var(--accent);
 
-  /* Typography — system fonts only (no webfont downloads) */
-  --font-sans: Helvetica, Arial, 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
-  --font-mono: 'Courier New', Courier, ui-monospace, Menlo, Monaco, Consolas, monospace;
+  /* Typography — variable webfonts + stable local fallbacks */
+  --font-sans: 'Atkinson Hyperlegible Next', Roboto, Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  --font-mono: 'Atkinson Hyperlegible Mono', Menlo, 'Roboto Mono', Monaco, monospace;
 
-  --weight-regular: 400;
-  --weight-medium: 500;
-  --weight-semibold: 600;
-  --weight-bold: 700;
+  --weight-regular: 380;
+  --weight-medium: 480;
+  --weight-semibold: 580;
+  --weight-bold: 680;
 
-  --step--1: 0.8125rem;
-  --step-0: 1rem;
-  --step-1: 1.1875rem;
-  --step-2: 1.4375rem;
-  --step-3: 1.75rem;
-  --step-4: 2.0625rem;
-  --step-5: 2.5rem;
-  --leading-tight: 0.9375;
-  --leading-snug: 1.125;
+  --step--2: 0.75em;
+  --step--1: 0.8125em;
+  --step-0: 1em;
+  --step-1: 1.1875em;
+  --step-2: 1.4375em;
+  --step-3: 1.75em;
+  --step-4: 2.0625em;
+  --step-5: 2.5em;
+  --leading-tight: 1.125;
+  --leading-snug: 1.3125;
   --leading-normal: 1.5;
-  --tracking-tight: -0.03125em;
+  --tracking-tight: -0.015625em;
   --tracking-mono: 0.03125em;
-  --tracking-wide: 0.125em;
-  --tracking-diagram-label: 0.06em;
+  --tracking-wide: 0.0625em;
 
   /* Fixed UI sizes (diagram layout; match pre-refactor footprint) */
-  --type-diagram-label: 0.72rem;
-  --type-diagram-ring: 0.625rem;
-  --type-chip: 0.7rem;
+  --type-diagram-label: var(--step--2);
+  --type-diagram-ring: var(--step--2);
 
   /* Space */
   --space-xs: 0.25rem;
@@ -79,16 +60,14 @@
   --space-lg: 2rem;
   --space-xl: 4rem;
   --measure: 66ch;
-  --content-max: 72rem;
-  --gutter: clamp(1rem, 0.5rem + 5vw, 4rem);
+  --gutter: clamp(1rem, 0.75rem + 3vw, 4rem);
 
   /* Shape, depth, motion */
   --radius-sm: 0.1875rem;
   --radius-md: 0.5rem;
   --radius-lg: 1.3125rem;
   --radius-pill: 999px;
-  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.1), 0 8px 24px -12px rgba(0, 0, 0, 0.2);
-  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.1), 0 16px 48px -16px rgba(0, 0, 0, 0.3);
+  --shadow-lift: 0 0.5rem 1rem 0.125rem rgba(0, 0, 0, 0.2);
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --dur-fast: 167ms;
   --dur: 333ms;

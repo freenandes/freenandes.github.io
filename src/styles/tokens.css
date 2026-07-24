@@ -4,7 +4,12 @@
   --paper-2: #f7f7f7;
   --ink: #111;
   --ink-2: #555;
-  --ink-3: #aaa;
+
+  /* Tertiary text — darkened from #aaa to meet WCAG AA (≈5:1 on paper). */
+  --ink-3: #6f6f6f;
+
+  /* Faint, decorative-only ink (rings, register mark); not used for text. */
+  --ink-faint: #aaa;
   --line-soft: rgb(0 0 0 / 4%);
   --line: rgb(0 0 0 / 8%);
   --line-strong: rgb(0 0 0 / 16%);
@@ -73,5 +78,6 @@
 
   /* Layers */
   --z-base: 0;
+  --z-sticky: 50;
   --z-overlay: 100;
 }

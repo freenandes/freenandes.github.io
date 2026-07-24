@@ -1,0 +1,56 @@
+---
+import Base from '../layouts/Base.astro';
+import { withBase } from '../lib/base';
+---
+
+<Base
+  title="Page not found"
+  description="The page you were looking for doesn't exist or has moved."
+  mainClass="error"
+>
+  <section class="error container">
+    <p class="error__code mono">404</p>
+    <h1 class="error__title">This page wandered off the map</h1>
+    <p class="error__copy">
+      The page you were looking for doesn't exist, or it has moved. Head back to the map and pick a
+      node to continue.
+    </p>
+    <ul class="error__nav link-row" role="list">
+      <li><a class="link" href={withBase('/')}>Back to map</a></li>
+      <li><a class="link" href={withBase('/about')}>About / CV</a></li>
+    </ul>
+  </section>
+</Base>
+
+<style>
+  .error {
+    max-width: var(--measure);
+    min-height: 60svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: var(--space-xl);
+  }
+
+  .error__code {
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .error__title {
+    margin-block: var(--space-sm) var(--space-md);
+    font-size: var(--step-3);
+    font-weight: var(--weight-bold);
+  }
+
+  .error__copy {
+    max-width: 48ch;
+    color: var(--ink-2);
+  }
+
+  .error__nav {
+    margin-block-start: var(--space-lg);
+  }
+</style>

@@ -1,9 +1,11 @@
 ---
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import PageNav from '../../components/PageNav.astro';
 import PasswordGate from '../../components/PasswordGate.astro';
 import { getProjects, projectYear } from '../../lib/projects';
 import { withBase } from '../../lib/base';
+import { site } from '../../site.config';
 
 export async function getStaticPaths() {
   const projects = await getProjects();
@@ -18,15 +20,46 @@ const { data } = entry;
 const { Content } = await render(entry);
 const year = projectYear(entry);
 const byline = [data.role, data.client].filter(Boolean).join(', ');
+
+const origin = Astro.site ?? Astro.url;
+const abs = (path: string) => new URL(withBase(path), origin).toString();
+const pageUrl = new URL(Astro.url.pathname, origin).toString();
+const personId = `${abs('/')}#person`;
+const websiteId = `${abs('/')}#website`;
+
+const jsonLd = [
+  {
+    '@type': 'CreativeWork',
+    '@id': `${pageUrl}#work`,
+    name: data.title,
+    headline: data.title,
+    description: data.description,
+    url: pageUrl,
+    datePublished: data.date.toISOString(),
+    inLanguage: site.locale,
+    isPartOf: { '@id': websiteId },
+    author: { '@id': personId },
+    creator: { '@id': personId },
+    ...(data.tags.length ? { keywords: data.tags.join(', ') } : {}),
+    ...(data.client ? { sourceOrganization: { '@type': 'Organization', name: data.client } } : {}),
+  },
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Map', item: abs('/') },
+      { '@type': 'ListItem', position: 2, name: data.title, item: pageUrl },
+    ],
+  },
+];
 ---
 
-<Base title={data.title} description={data.description}>
+<Base title={data.title} description={data.description} ogType="article" jsonLd={jsonLd}>
   <article class="project container">
-    <ul class="project__nav link-row" role="list">
+    <PageNav>
       <li>
         <a class="link" href={withBase('/')}>Back to map</a>
       </li>
-    </ul>
+    </PageNav>
 
     <header class="project__head" data-reveal>
       <h1 class="project__title">{data.title}</h1>
@@ -62,12 +95,6 @@ const byline = [data.role, data.client].filter(Boolean).join(', ');
     </div>
 
     {data.locked && <PasswordGate slug={entry.id} />}
-
-    <ul class="project__nav project__nav--foot link-row" role="list">
-      <li>
-        <a class="link" href={withBase('/')}>Back to map</a>
-      </li>
-    </ul>
   </article>
 </Base>
 
@@ -75,14 +102,6 @@ const byline = [data.role, data.client].filter(Boolean).join(', ');
   .project {
     max-width: var(--measure);
     padding-block: var(--space-lg);
-  }
-
-  .project__nav {
-    margin-block-end: var(--space-lg);
-  }
-
-  .project__nav--foot {
-    margin-block: calc(var(--space-lg) * 3) 0;
   }
 
   .project__title {

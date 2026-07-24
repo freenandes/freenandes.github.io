@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import RegMark from '../components/RegMark.astro';
+import PageNav from '../components/PageNav.astro';
 import { site } from '../site.config';
 import { cv } from '../cv.config';
 import { withBase } from '../lib/base';
@@ -10,21 +10,66 @@ const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
 function contactPrintText(href: string): string {
   return href.startsWith('mailto:') ? href.slice('mailto:'.length) : href;
 }
+
+const origin = Astro.site ?? Astro.url;
+const abs = (path: string) => new URL(withBase(path), origin).toString();
+const pageUrl = new URL(Astro.url.pathname, origin).toString();
+const personId = `${abs('/')}#person`;
+const websiteId = `${abs('/')}#website`;
+
+const languageGroup = cv.skills.find((g) => /languages/i.test(g.label));
+const knowsLanguage = languageGroup?.items.map((item) => item.replace(/\s*\(.*\)\s*$/, '').trim());
+const topSkills = cv.skills.find((g) => /skills/i.test(g.label))?.items ?? [];
+
+// Enrich the shared Person node (merged by @id) with CV facts, and describe the
+// page itself as a ProfilePage.
+const jsonLd = [
+  {
+    '@type': 'Person',
+    '@id': personId,
+    ...(cv.experience[0]?.org
+      ? { worksFor: { '@type': 'Organization', name: cv.experience[0].org } }
+      : {}),
+    alumniOf: cv.education
+      .filter((e) => e.org)
+      .map((e) => ({ '@type': 'EducationalOrganization', name: e.org })),
+    ...(cv.contact?.location
+      ? { address: { '@type': 'PostalAddress', addressLocality: cv.contact.location } }
+      : {}),
+    ...(knowsLanguage?.length ? { knowsLanguage } : {}),
+    ...(topSkills.length ? { knowsAbout: topSkills } : {}),
+  },
+  {
+    '@type': 'ProfilePage',
+    '@id': `${pageUrl}#profilepage`,
+    url: pageUrl,
+    name: `About / CV — ${cv.name ?? site.name}`,
+    isPartOf: { '@id': websiteId },
+    mainEntity: { '@id': personId },
+  },
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Map', item: abs('/') },
+      { '@type': 'ListItem', position: 2, name: 'About / CV', item: pageUrl },
+    ],
+  },
+];
 ---
 
 <Base
   title="About / CV"
   description={`Curriculum vitae of ${cv.name ?? site.name}, ${cv.headline ?? site.role}.`}
+  ogType="profile"
+  jsonLd={jsonLd}
 >
   <article class="cv container">
-    <ul class="cv__nav link-row no-print" role="list">
+    <PageNav>
       <li>
         <a class="link" href={withBase('/')}>Back to map</a>
       </li>
-      <li>
-        <button class="link js-download-pdf" type="button">Download PDF</button>
-      </li>
-    </ul>
+      <button slot="at-rest" class="link js-download-pdf" type="button">Download PDF</button>
+    </PageNav>
 
     <header class="cv__head" data-reveal>
       <div class="cv__id">
@@ -101,22 +146,11 @@ function contactPrintText(href: string): string {
       </div>
     </section>
 
-    <ul class="cv__nav cv__nav--foot link-row no-print" role="list">
-      <li>
-        <a class="link" href={withBase('/')}>Back to map</a>
-      </li>
-      <li>
-        <button class="link js-download-pdf" type="button">Download PDF</button>
-      </li>
-    </ul>
+    <div class="cv__foot no-print">
+      <button class="link js-download-pdf" type="button">Download PDF</button>
+    </div>
   </article>
 </Base>
-
-<script>
-  document.querySelectorAll('.js-download-pdf').forEach((btn) => {
-    btn.addEventListener('click', () => window.print());
-  });
-</script>
 
 <style>
   .cv {
@@ -124,12 +158,8 @@ function contactPrintText(href: string): string {
     padding-block: var(--space-lg);
   }
 
-  .cv__nav {
-    margin-block-end: var(--space-lg);
-  }
-
-  .cv__nav--foot {
-    margin-block: calc(var(--space-lg) * 3) 0;
+  .cv__foot {
+    margin-block-start: calc(var(--space-lg) * 3);
   }
 
   .cv__head {

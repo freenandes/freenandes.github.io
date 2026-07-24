@@ -51,8 +51,18 @@ For confidential pages share a passphrase instead of publishing it.
 4. Run `npm run encrypt` (also runs automatically on `npm run build`). This writes ciphertext to `public/locked/<slug>.json`.
 5. Hand the passphrase to your client. They enter it on the project page; the content is decrypted in their browser with the Web Crypto API.
 
+## Website Specification compliance
+
+This site is audited against [The Website Specification](https://specification.website). See
+[`SPEC-COMPLIANCE.md`](./SPEC-COMPLIANCE.md) for the full status: what's implemented (CSP, JSON-LD
+structured data, manifest, robots/llms/security.txt, custom 404, contrast fixes, …), what the
+GitHub Pages platform already provides, and what's still **pending** (notably an `og.png` social
+image, raster app icons, and self-hosted fonts).
+
 ## To do
 
-- [ ] Review `<noscript>` at `src/components/NavDiagram.astro`
-   - [ ] And About and project pages
-- [ ] Create a solution to avoid exposing the email
+- [ ] Add `public/og.png` (1200×630) — `og:image` is wired up but the asset is missing.
+- [ ] Add raster app icons (`favicon.ico`, `apple-touch-icon.png`, maskable PWA icon).
+- [ ] Self-host the web fonts (drops the Google Fonts third-party request, enables SRI).
+- [ ] Create a solution to avoid exposing the email.
+- [ ] See [`SPEC-COMPLIANCE.md`](./SPEC-COMPLIANCE.md) for the complete pending list.

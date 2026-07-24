@@ -1,6 +1,7 @@
 ---
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import PageNav from '../../components/PageNav.astro';
 import PasswordGate from '../../components/PasswordGate.astro';
 import { getProjects, projectYear } from '../../lib/projects';
 import { withBase } from '../../lib/base';
@@ -54,11 +55,11 @@ const jsonLd = [
 
 <Base title={data.title} description={data.description} ogType="article" jsonLd={jsonLd}>
   <article class="project container">
-    <ul class="project__nav link-row" role="list">
+    <PageNav>
       <li>
         <a class="link" href={withBase('/')}>Back to map</a>
       </li>
-    </ul>
+    </PageNav>
 
     <header class="project__head" data-reveal>
       <h1 class="project__title">{data.title}</h1>
@@ -94,12 +95,6 @@ const jsonLd = [
     </div>
 
     {data.locked && <PasswordGate slug={entry.id} />}
-
-    <ul class="project__nav project__nav--foot link-row" role="list">
-      <li>
-        <a class="link" href={withBase('/')}>Back to map</a>
-      </li>
-    </ul>
   </article>
 </Base>
 
@@ -107,14 +102,6 @@ const jsonLd = [
   .project {
     max-width: var(--measure);
     padding-block: var(--space-lg);
-  }
-
-  .project__nav {
-    margin-block-end: var(--space-lg);
-  }
-
-  .project__nav--foot {
-    margin-block: calc(var(--space-lg) * 3) 0;
   }
 
   .project__title {

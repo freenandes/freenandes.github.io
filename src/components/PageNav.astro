@@ -1,0 +1,85 @@
+---
+
+/** Page navigation. Sits at the top of the article in normal flow, pins itself
+    to the viewport when the reader scrolls back up, and slides away while they
+    read downwards. Children are the `<li>` items of the row; the `at-rest`
+    slot takes a secondary action that only shows while the bar is in the flow,
+    so the pinned bar stays down to its primary link. */
+
+---
+
+<div class="page-nav__sentinel" data-page-nav-sentinel></div>
+<ul class="page-nav link-row no-print" role="list" data-page-nav>
+  <slot />
+  {
+    Astro.slots.has('at-rest') && (
+      <li class="page-nav__at-rest">
+        <slot name="at-rest" />
+      </li>
+    )
+  }
+</ul>
+
+<style>
+  /* Marks the bar's resting place so the script can tell when it is pinned;
+     the negative margin keeps it out of the page's vertical rhythm. */
+
+  .page-nav__sentinel {
+    height: 1px;
+    margin-block-end: -1px;
+  }
+
+  .page-nav {
+    /* Breathing room that exists only while pinned: `top` is a sticky offset,
+       so it stays out of the layout when the bar sits in the flow. */
+    position: sticky;
+    top: var(--space-sm);
+    z-index: var(--z-sticky);
+    margin-block-end: var(--space-lg);
+    transition: transform var(--dur) var(--ease), visibility 0s;
+  }
+
+  /* Paper plate so page content scrolls out of sight under the pinned bar. */
+
+  .page-nav::before {
+    content: '';
+    position: absolute;
+    inset: calc(-1 * var(--space-md)) 0;
+    z-index: -1;
+    background: var(--paper);
+    border-block-end: 1px solid var(--line-strong);
+    opacity: 0;
+    transition: opacity var(--dur) var(--ease);
+  }
+
+  .page-nav.is-pinned::before {
+    opacity: 1;
+  }
+
+  /* Fading rather than removing keeps the row from reflowing: this is the last
+     item, so the space it leaves behind reads as empty. */
+
+  .page-nav__at-rest {
+    transition: opacity var(--dur) var(--ease), visibility 0s;
+  }
+
+  .page-nav.is-pinned .page-nav__at-rest {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity var(--dur) var(--ease), visibility 0s linear var(--dur);
+  }
+
+  .page-nav.is-hidden {
+    visibility: hidden;
+    transform: translateY(calc(-100% - var(--space-md) * 2 - 1px));
+    transition: transform var(--dur) var(--ease), visibility 0s linear var(--dur);
+  }
+</style>
+
+<script>
+  import { initPageNav } from '../scripts/page-nav';
+
+  const nav = document.querySelector<HTMLElement>('[data-page-nav]');
+  const sentinel = document.querySelector('[data-page-nav-sentinel]');
+  if (nav) initPageNav(nav, sentinel);
+</script>

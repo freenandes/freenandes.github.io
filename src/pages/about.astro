@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import PageNav from '../components/PageNav.astro';
 import { site } from '../site.config';
 import { cv } from '../cv.config';
 import { withBase } from '../lib/base';
@@ -63,14 +64,12 @@ const jsonLd = [
   jsonLd={jsonLd}
 >
   <article class="cv container">
-    <ul class="cv__nav link-row no-print" role="list">
+    <PageNav>
       <li>
         <a class="link" href={withBase('/')}>Back to map</a>
       </li>
-      <li>
-        <button class="link js-download-pdf" type="button">Download PDF</button>
-      </li>
-    </ul>
+      <button slot="at-rest" class="link js-download-pdf" type="button">Download PDF</button>
+    </PageNav>
 
     <header class="cv__head" data-reveal>
       <div class="cv__id">
@@ -147,14 +146,9 @@ const jsonLd = [
       </div>
     </section>
 
-    <ul class="cv__nav cv__nav--foot link-row no-print" role="list">
-      <li>
-        <a class="link" href={withBase('/')}>Back to map</a>
-      </li>
-      <li>
-        <button class="link js-download-pdf" type="button">Download PDF</button>
-      </li>
-    </ul>
+    <div class="cv__foot no-print">
+      <button class="link js-download-pdf" type="button">Download PDF</button>
+    </div>
   </article>
 </Base>
 
@@ -164,12 +158,8 @@ const jsonLd = [
     padding-block: var(--space-lg);
   }
 
-  .cv__nav {
-    margin-block-end: var(--space-lg);
-  }
-
-  .cv__nav--foot {
-    margin-block: calc(var(--space-lg) * 3) 0;
+  .cv__foot {
+    margin-block-start: calc(var(--space-lg) * 3);
   }
 
   .cv__head {

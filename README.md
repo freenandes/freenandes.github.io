@@ -97,6 +97,7 @@ image, raster app icons, and self-hosted fonts).
 
 ## To do
 
+- [ ] Add map texture to 404 page
 - [ ] Add `public/og.png` (1200×630) — `og:image` is wired up but the asset is missing.
 - [ ] Add raster app icons (`favicon.ico`, `apple-touch-icon.png`, maskable PWA icon).
 - [ ] Self-host the web fonts (drops the Google Fonts third-party request, enables SRI).

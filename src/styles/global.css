@@ -314,7 +314,7 @@ button.link {
   border-color: var(--ink-faint);
 }
 
-.input__box:focus {
+.input__box:focus-visible {
   border-color: var(--ink);
 }
 

@@ -9,17 +9,15 @@ import { withBase } from '../lib/base';
   mainClass="error"
 >
   <section class="error container">
-    <p class="error__code mono" data-reveal>404</p>
-    <h1 class="error__title" data-reveal style="--reveal-delay: 60ms;">
-      This page wandered off the map
-    </h1>
+    <h1 class="error__code" data-reveal>Page not found</h1>
+    <h2 class="error__title" data-reveal style="--reveal-delay: 60ms;">
+      You've wandered off the map
+    </h2>
     <p class="error__copy" data-reveal style="--reveal-delay: 110ms;">
-      The page you were looking for doesn't exist, or it has moved. Head back to the map and pick a
-      node to continue.
+      The page you were looking for doesn't exist, or it has moved. Head back to the map and pick another page to continue.
     </p>
     <ul class="error__nav link-row" role="list" data-reveal style="--reveal-delay: 160ms;">
       <li><a class="link" href={withBase('/')}>Back to map</a></li>
-      <li><a class="link" href={withBase('/about')}>About / CV</a></li>
     </ul>
   </section>
 </Base>
@@ -27,32 +25,29 @@ import { withBase } from '../lib/base';
 <style>
   .error {
     max-width: var(--measure);
-    min-height: 60svh;
+    min-height: 50svh;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-block: var(--space-xl);
+    padding-block: var(--space-lg);
   }
 
   .error__code {
-    font-weight: var(--weight-bold);
-    letter-spacing: var(--tracking-mono);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
     color: var(--ink-3);
   }
 
   .error__title {
-    margin-block: var(--space-sm) var(--space-md);
-    font-size: var(--step-3);
-    font-weight: var(--weight-bold);
-  }
-
-  .error__copy {
-    max-width: 48ch;
-    color: var(--ink-2);
+    margin-block: var(--space-sm);
+    font-size: var(--step-2);
   }
 
   .error__nav {
-    margin-block-start: var(--space-lg);
+    margin-block-start: var(--space-md);
   }
 </style>

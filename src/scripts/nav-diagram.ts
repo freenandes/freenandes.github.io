@@ -870,6 +870,40 @@ export function initDiagram(root: HTMLElement) {
     wake();
   }
 
+  /**
+   * Times the one-off entrance and releases it (see the `is-mounted` rules in
+   * NavDiagram.astro). Markers land in chain order, each connector follows the
+   * later of the two it joins, and the decorative rings come in last.
+   */
+  function startEntrance() {
+    const NODE_BASE = 40;
+    const NODE_STEP = 50;
+    const EDGE_LAG = 40;
+    const RING_STEP = 90;
+    const delays = new Map<Node, number>();
+
+    chainOrder.forEach((n, i) => {
+      const delay = NODE_BASE + i * NODE_STEP;
+      delays.set(n, delay);
+      n.el.style.setProperty('--enter-delay', `${delay}ms`);
+    });
+
+    const ringBase = NODE_BASE + chainOrder.length * NODE_STEP;
+    let ring = 0;
+    for (const n of nodes) {
+      if (!n.floating) continue;
+      n.el.style.setProperty('--enter-delay', `${ringBase + ring++ * RING_STEP}ms`);
+    }
+
+    for (const e of edges) {
+      const after = Math.max(delays.get(e.a) ?? 0, delays.get(e.b) ?? 0);
+      e.line.style.setProperty('--enter-delay', `${after + EDGE_LAG}ms`);
+      e.line.setAttribute('pathLength', '1');
+    }
+
+    root.classList.add('is-mounted');
+  }
+
   function render() {
     for (const n of nodes) {
       n.el.style.transform = `translate(${n.x}px, ${n.y}px) translate(-50%, -50%)`;
@@ -1259,6 +1293,7 @@ export function initDiagram(root: HTMLElement) {
   relayout();
   seedFromAnchors();
   render();
+  startEntrance();
 
   if (reduce) {
     for (const n of nodes) {

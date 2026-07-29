@@ -271,6 +271,15 @@ const otherNodes = diagramNodes.filter(
       pointer-events: auto !important;
       margin-block-start: var(--space-sm);
     }
+
+    /* The entrance is held until the script has placed the map, so without
+       scripting there is nothing to wait for. */
+
+    .node,
+    .node__dot,
+    .link-line {
+      animation: none !important;
+    }
   </style>
 </noscript>
 <style>
@@ -302,6 +311,58 @@ const otherNodes = diagramNodes.filter(
     stroke-width: 1.375;
     stroke-linecap: round;
     stroke-linejoin: round;
+  }
+
+  /* Entrance — the map draws itself once: markers land along the chain, then
+     each connector is traced between the two it joins. The script sets the
+     per-element delay and releases the hold only after it has solved the
+     layout, so nothing animates in from a spot it is about to leave. */
+
+  @media (prefers-reduced-motion: no-preference) {
+    .node {
+      animation: node-in var(--dur) var(--ease) var(--enter-delay, 0ms) backwards paused;
+    }
+
+    .node__dot {
+      animation: dot-in var(--dur) var(--ease) var(--enter-delay, 0ms) backwards paused;
+    }
+
+    .diagram__links :global(.link-line) {
+      animation: edge-draw var(--dur-slow) var(--ease) var(--enter-delay, 0ms) backwards paused;
+    }
+
+    .diagram.is-mounted .node,
+    .diagram.is-mounted .node__dot,
+    .diagram.is-mounted .diagram__links :global(.link-line) {
+      animation-play-state: running;
+    }
+  }
+
+  @keyframes node-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes dot-in {
+    from {
+      transform: scale(0.7);
+    }
+  }
+
+  /* `pathLength="1"` (set by the script) makes these normalised units, so the
+     trace holds up while the simulation is still nudging the endpoints. */
+
+  @keyframes edge-draw {
+    from {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+
+    to {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 0;
+    }
   }
 
   /* The "Selected projects" wrapper is purely a semantic grouping — it must not create a stacking context or take up layout, so the nodes inside it stay absolutely positioned against the diagram exactly as before. */
@@ -503,8 +564,11 @@ const otherNodes = diagramNodes.filter(
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: opacity var(--dur) var(--ease),
-      visibility var(--dur) var(--ease), transform var(--dur) var(--ease);
+
+    /* Leaving is quicker than arriving: a card you have moved away from should
+       get out of the way, a card you asked for should settle. */
+    transition: opacity var(--dur-fast) var(--ease),
+      visibility var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
   }
 
   .node[data-place='bottom'] .node__panel {
@@ -539,6 +603,19 @@ const otherNodes = diagramNodes.filter(
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
+    transition-duration: var(--dur);
+  }
+
+  /* Hover intent: a pointer crossing the map shouldn't trip every card on the
+     way. Deliberate opens — click, or keyboard focus — never wait. */
+
+  .node:hover .node__panel {
+    transition-delay: var(--delay-hover);
+  }
+
+  .node:focus-within .node__panel,
+  .node.is-open .node__panel {
+    transition-delay: 0s;
   }
 
   .panel__meta {

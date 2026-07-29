@@ -74,9 +74,7 @@ const jsonLd = [
       </div>
     </header>
 
-    <div class="project__body prose" data-reveal style="
-
---reveal-delay:80ms;">
+    <div class="project__body prose" data-reveal style="--reveal-delay: 80ms;">
       <Content />
     </div>
 
@@ -84,7 +82,7 @@ const jsonLd = [
 
     {
       data.links.length > 0 && (
-        <ul class="project__links link-row" role="list">
+        <ul class="project__links link-row" role="list" data-reveal style="--reveal-delay: 200ms;">
           {data.links.map((l) => (
             <li>
               <a class="link" href={l.href} rel="noopener" target="_blank">

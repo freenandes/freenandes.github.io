@@ -34,5 +34,10 @@ export default {
     'import-notation': null,
     // Token values use exact fractions; browsers round at computed-value time.
     'number-max-precision': null,
+    // Inline `style="--reveal-delay: …"` attributes are parsed as their own
+    // stylesheet, so this rule would demand a blank line inside an HTML
+    // attribute. Consecutive custom properties are exempt anyway, which is all
+    // tokens.css has.
+    'custom-property-empty-line-before': null,
   },
 };

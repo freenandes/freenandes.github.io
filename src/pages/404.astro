@@ -9,13 +9,15 @@ import { withBase } from '../lib/base';
   mainClass="error"
 >
   <section class="error container">
-    <p class="error__code mono">404</p>
-    <h1 class="error__title">This page wandered off the map</h1>
-    <p class="error__copy">
+    <p class="error__code mono" data-reveal>404</p>
+    <h1 class="error__title" data-reveal style="--reveal-delay: 60ms;">
+      This page wandered off the map
+    </h1>
+    <p class="error__copy" data-reveal style="--reveal-delay: 110ms;">
       The page you were looking for doesn't exist, or it has moved. Head back to the map and pick a
       node to continue.
     </p>
-    <ul class="error__nav link-row" role="list">
+    <ul class="error__nav link-row" role="list" data-reveal style="--reveal-delay: 160ms;">
       <li><a class="link" href={withBase('/')}>Back to map</a></li>
       <li><a class="link" href={withBase('/about')}>About / CV</a></li>
     </ul>

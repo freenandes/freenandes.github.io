@@ -21,6 +21,42 @@ npm run build     # outputs to ./dist (runs encryption first)
 npm run preview   # preview the build
 ```
 
+## Checking you haven't changed the look
+
+```bash
+npm run visual                    # this working tree vs origin/main
+npm run visual -- --base HEAD~1
+npm run visual -- --only about    # just the scenarios named like "about"
+npm run visual -- --keep          # keep both builds in .visual/ to poke at
+```
+
+It builds the reference commit in a throwaway git worktree and the current
+working tree (uncommitted changes included), serves both, and photographs the
+same list of pages and states in each — home, the map with a card open, the CV
+at three scroll positions, a case study, the locked project before/refused/after
+unlocking, and the 404 — at desktop and phone sizes. It then compares the
+screenshots pixel by pixel **and** compares computed styles, which catches
+changes a screenshot can't see.
+
+Anything that differs is written to `.visual/<scenario>.png` as a highlighted
+diff, and the run exits `1`. That exit code means "there are differences to
+review", not "something is broken": if the change was the point, the run is your
+evidence for it.
+
+Two things to know:
+
+- **Chrome does the photography.** `puppeteer-core` drives whatever Chrome is
+  already installed; set `CHROME_PATH` if it lives somewhere unusual.
+- **The home page drifts.** Its layout comes out of a randomised physics
+  simulation, so two captures of the *same* build land within a few tenths of a
+  percent. `Math.random` is seeded and looping animations are rewound and paused
+  to keep that as small as possible; what's left is absorbed by the per-scenario
+  `drift` budget in `scripts/visual/scenarios.mjs`, and shows up as `drift`
+  rather than `CHANGED`.
+
+Pages, states and probed selectors all live in `scripts/visual/scenarios.mjs` —
+add a page there and both builds get it.
+
 ## Syncing the About page from LinkedIn
 
 The About page renders from `src/cv.data.json`, which is generated from a LinkedIn profile's PDF. To update:

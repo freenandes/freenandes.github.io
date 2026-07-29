@@ -17,6 +17,14 @@ About this website at README.md.
 - **Build:** `npm run build` (runs `npm run encrypt` first via `prebuild`, then `astro build` → `./dist`)
 - **Preview:** `npm run preview`
 - **Type/diagnostics:** `npx astro check`
+- **Visual regression:** `npm run visual` — builds this working tree *and* the
+  reference commit (`origin/main` by default, `--base <ref>` to change it),
+  screenshots the same pages and states in both, and diffs pixels plus computed
+  styles. Exits `1` when anything differs, with highlighted diffs in `.visual/`.
+  Needs a local Chrome (`CHROME_PATH` overrides the lookup). Run it whenever a
+  change is *not* meant to alter the look, and quote the result as evidence.
+  Scenarios live in `scripts/visual/scenarios.mjs`; the home page carries a small
+  `drift` budget because its layout is a randomised simulation.
 - **Encrypt locked projects:** `npm run encrypt`
 - **Sync About page from LinkedIn:** `npm run sync:linkedin` (parses `sources/linkedin-profile.pdf` → `src/cv.data.json`)
 

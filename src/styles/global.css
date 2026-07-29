@@ -366,7 +366,7 @@ button.link {
   color: var(--paper);
   padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-sm);
-  transform: translateY(calc(-100% - var(--space-sm)));
+  transform: translateY(calc(-100% - var(--space-md)));
   transition: transform var(--dur) var(--ease);
 }
 

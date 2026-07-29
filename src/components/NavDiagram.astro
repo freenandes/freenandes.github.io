@@ -565,6 +565,11 @@ const otherNodes = diagramNodes.filter(
     visibility: hidden;
     pointer-events: none;
 
+    /* The viewport correction rides on `translate`, which is left out of the
+       transition below: it must land instantly, or a card near an edge would
+       appear to slide in from the wrong place. */
+    translate: var(--panel-nudge-x) var(--panel-nudge-y);
+
     /* Leaving is quicker than arriving: a card you have moved away from should
        get out of the way, a card you asked for should settle. */
     transition: opacity var(--dur-fast) var(--ease),
@@ -574,25 +579,25 @@ const otherNodes = diagramNodes.filter(
   .node[data-place='bottom'] .node__panel {
     top: 100%;
     left: 50%;
-    transform: translateX(calc(-50% + var(--panel-nudge-x))) translateY(calc(var(--shift) + var(--panel-nudge-y)));
+    transform: translateX(-50%) translateY(var(--shift));
   }
 
   .node[data-place='top'] .node__panel {
     bottom: 100%;
     left: 50%;
-    transform: translateX(calc(-50% + var(--panel-nudge-x))) translateY(calc(-1 * var(--shift) + var(--panel-nudge-y)));
+    transform: translateX(-50%) translateY(calc(-1 * var(--shift)));
   }
 
   .node[data-place='right'] .node__panel {
     left: 100%;
     top: 50%;
-    transform: translateY(calc(-50% + var(--panel-nudge-y))) translateX(calc(var(--shift) + var(--panel-nudge-x)));
+    transform: translateY(-50%) translateX(var(--shift));
   }
 
   .node[data-place='left'] .node__panel {
     right: 100%;
     top: 50%;
-    transform: translateY(calc(-50% + var(--panel-nudge-y))) translateX(calc(-1 * var(--shift) + var(--panel-nudge-x)));
+    transform: translateY(-50%) translateX(calc(-1 * var(--shift)));
   }
 
   .node:hover .node__panel,

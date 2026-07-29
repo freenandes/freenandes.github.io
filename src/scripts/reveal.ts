@@ -1,8 +1,8 @@
 /** Held blocks carry this until the reader reaches them (see global.css). */
 const WAIT = 'data-reveal-wait';
 
-/** Release a block once its top has passed this share of the viewport. */
-const TRIGGER = 0.12;
+/** Release a block once its top has come this far inside the viewport. */
+const TRIGGER = '-12%';
 
 /**
  * Defers the load reveal of any `[data-reveal]` block that starts below the
@@ -32,7 +32,7 @@ export function initReveal() {
         observer.unobserve(entry.target);
       }
     },
-    { rootMargin: `0px 0px ${-TRIGGER * 100}% 0px` }
+    { rootMargin: `0px 0px ${TRIGGER} 0px` }
   );
 
   for (const el of held) {

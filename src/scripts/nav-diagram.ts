@@ -1066,27 +1066,44 @@ export function initDiagram(root: HTMLElement) {
   function setCalm(n: Node) {
     n.calm = n.hover || n.focus || n.el.classList.contains('is-open');
   }
+  /**
+   * Pulls a card back inside the viewport when its node sits near an edge.
+   *
+   * This runs at the moment a card is asked for, which is also the moment its
+   * fade begins — so it must not touch the card's transition. Instead of
+   * neutralising it to get a clean measurement, the resting position is derived
+   * from the panel's layout box (the live rect with its `transform` matrix taken
+   * back out), which reads the same whether or not a transition is in flight.
+   * The correction is written to `translate`, which isn't transitioned, so it
+   * lands in one frame.
+   */
   function clampPanel(n: Node) {
     const panel = n.el.querySelector<HTMLElement>('.node__panel');
     if (!panel) return;
-    const prevTransition = panel.style.transition;
-    panel.style.transition = 'none';
     panel.style.setProperty('--panel-nudge-x', '0px');
     panel.style.setProperty('--panel-nudge-y', '0px');
-    const r = panel.getBoundingClientRect();
+    const rect = panel.getBoundingClientRect();
+    const matrix = getComputedStyle(panel).transform;
+    const placement =
+      matrix && matrix !== 'none' ? new DOMMatrixReadOnly(matrix) : null;
+    const boxX = rect.left - (placement ? placement.m41 : 0);
+    const boxY = rect.top - (placement ? placement.m42 : 0);
+    // Once open, the placement transform is only the centring half-step
+    // (`--shift` is 0), so that is all that goes back on.
+    const acrossNode = n.el.dataset.place === 'bottom' || n.el.dataset.place === 'top';
+    const left = boxX - (acrossNode ? rect.width / 2 : 0);
+    const top = boxY - (acrossNode ? 0 : rect.height / 2);
     const M = 12;
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     let nx = 0;
     let ny = 0;
-    if (r.left < M) nx = M - r.left;
-    else if (r.right > vw - M) nx = (vw - M) - r.right;
-    if (r.top < M) ny = M - r.top;
-    else if (r.bottom > vh - M) ny = (vh - M) - r.bottom;
+    if (left < M) nx = M - left;
+    else if (left + rect.width > vw - M) nx = (vw - M) - (left + rect.width);
+    if (top < M) ny = M - top;
+    else if (top + rect.height > vh - M) ny = (vh - M) - (top + rect.height);
     panel.style.setProperty('--panel-nudge-x', `${Math.round(nx)}px`);
     panel.style.setProperty('--panel-nudge-y', `${Math.round(ny)}px`);
-    void panel.getBoundingClientRect();
-    panel.style.transition = prevTransition;
   }
 
   function clampVisiblePanels() {

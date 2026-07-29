@@ -1,19 +1,17 @@
 ---
-
 /** Page navigation. Sits at the top of the article in normal flow, pins itself
     to the viewport when the reader scrolls back up, and slides away while they
     read downwards. Children are the `<li>` items of the row; the `at-rest`
     slot takes a secondary action that only shows while the bar is in the flow,
     so the pinned bar stays down to its primary link. */
-
 ---
 
-<div class="page-nav__sentinel" data-page-nav-sentinel></div>
-<ul class="page-nav link-row no-print" role="list" data-page-nav>
+<div class="sentinel"></div>
+<ul class="page-nav" role="list">
   <slot />
   {
     Astro.slots.has('at-rest') && (
-      <li class="page-nav__at-rest">
+      <li class="at-rest">
         <slot name="at-rest" />
       </li>
     )
@@ -24,7 +22,7 @@
   /* Marks the bar's resting place so the script can tell when it is pinned;
      the negative margin keeps it out of the page's vertical rhythm. */
 
-  .page-nav__sentinel {
+  .sentinel {
     height: 1px;
     margin-block-end: -1px;
   }
@@ -60,11 +58,11 @@
   /* Fading rather than removing keeps the row from reflowing: this is the last
      item, so the space it leaves behind reads as empty. */
 
-  .page-nav__at-rest {
+  .at-rest {
     transition: opacity var(--dur) var(--ease), visibility 0s;
   }
 
-  .page-nav.is-pinned .page-nav__at-rest {
+  .page-nav.is-pinned .at-rest {
     visibility: hidden;
     opacity: 0;
     transition: opacity var(--dur) var(--ease), visibility 0s linear var(--dur);
@@ -80,12 +78,59 @@
     transition: transform var(--dur) var(--ease), opacity var(--dur-fast) var(--ease),
       visibility 0s linear var(--dur);
   }
+
+  @media print {
+    .sentinel,
+    .page-nav {
+      display: none !important;
+    }
+  }
 </style>
 
 <script>
-  import { initPageNav } from '../scripts/page-nav';
+  /** Movement under this many pixels is treated as jitter, not a direction. */
+  const DELTA = 8;
 
-  const nav = document.querySelector<HTMLElement>('[data-page-nav]');
-  const sentinel = document.querySelector('[data-page-nav-sentinel]');
-  if (nav) initPageNav(nav, sentinel);
+  const nav = document.querySelector<HTMLElement>('.page-nav');
+  const sentinel = nav?.previousElementSibling;
+
+  if (nav) {
+    let pinned = false;
+    let hidden = false;
+    let lastY = Math.max(window.scrollY, 0);
+
+    function setHidden(next: boolean) {
+      if (next === hidden) return;
+      hidden = next;
+      nav!.classList.toggle('is-hidden', next);
+    }
+
+    function setPinned(next: boolean) {
+      if (next === pinned) return;
+      pinned = next;
+      nav!.classList.toggle('is-pinned', next);
+      if (!next) setHidden(false);
+    }
+
+    // The sentinel stays put at the bar's resting position, so it remains
+    // measurable while the bar itself is transformed away.
+    if (sentinel) {
+      const observer = new IntersectionObserver(([entry]) => {
+        setPinned(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+      });
+      observer.observe(sentinel);
+    }
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        const y = Math.max(window.scrollY, 0);
+        const delta = y - lastY;
+        if (Math.abs(delta) < DELTA) return;
+        lastY = y;
+        setHidden(pinned && delta > 0);
+      },
+      { passive: true }
+    );
+  }
 </script>

@@ -1,9 +1,46 @@
 /** Behaviour every page loads: print-to-PDF buttons and the reveal deferral. */
 
-import { initReveal } from './reveal';
-
-for (const button of document.querySelectorAll('.js-download-pdf')) {
+for (const button of document.querySelectorAll('[data-print]')) {
   button.addEventListener('click', () => window.print());
 }
 
-initReveal();
+/** Release a held block once its top has come this far inside the viewport. */
+const TRIGGER = '-12%';
+
+/**
+ * Defers the load reveal of any `[data-reveal]` block that starts below the
+ * fold so it plays when the reader actually gets there. Blocks already on
+ * screen keep the staggered entrance CSS gives them.
+ *
+ * Nothing here hides content: it only pauses an animation that is already
+ * running off-screen, so a failure (or no JavaScript at all) degrades to every
+ * block revealing on load, as before.
+ */
+function deferOffscreenReveals() {
+  if (!('IntersectionObserver' in window)) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const fold = window.innerHeight;
+  const held = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]')).filter(
+    (el) => el.getBoundingClientRect().top > fold
+  );
+  if (!held.length) return;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.removeAttribute('data-reveal-wait');
+        observer.unobserve(entry.target);
+      }
+    },
+    { rootMargin: `0px 0px ${TRIGGER} 0px` }
+  );
+
+  for (const el of held) {
+    el.setAttribute('data-reveal-wait', '');
+    observer.observe(el);
+  }
+}
+
+deferOffscreenReveals();

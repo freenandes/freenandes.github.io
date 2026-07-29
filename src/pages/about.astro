@@ -1,24 +1,36 @@
 ---
+/** About / CV. Content comes from `src/cv.data.json` — regenerate it with
+    `npm run sync:linkedin`; everything about how it looks is in this file. */
+
 import Base from '../layouts/Base.astro';
 import PageNav from '../components/PageNav.astro';
 import { site } from '../site.config';
-import { cv } from '../cv.config';
 import { withBase } from '../lib/base';
+import cvData from '../cv.data.json';
 
-const summaryParagraphs = cv.summary.split(/\n{2,}/).filter(Boolean);
-
-function contactPrintText(href: string): string {
-  return href.startsWith('mailto:') ? href.slice('mailto:'.length) : href;
+interface CV {
+  name?: string;
+  headline?: string;
+  summary: string;
+  experience: { role: string; org: string; period: string; summary?: string; points: string[] }[];
+  education: { title: string; org?: string; period?: string; note?: string }[];
+  skills: { label: string; items: string[] }[];
+  contact?: { location?: string };
 }
+
+const cv = cvData as CV;
+const name = cv.name ?? site.name;
+const headline = cv.headline ?? site.role;
+const summary = cv.summary.split(/\n{2,}/).filter(Boolean);
 
 const origin = Astro.site ?? Astro.url;
 const abs = (path: string) => new URL(withBase(path), origin).toString();
 const pageUrl = new URL(Astro.url.pathname, origin).toString();
 const personId = `${abs('/')}#person`;
-const websiteId = `${abs('/')}#website`;
 
-const languageGroup = cv.skills.find((g) => /languages/i.test(g.label));
-const knowsLanguage = languageGroup?.items.map((item) => item.replace(/\s*\(.*\)\s*$/, '').trim());
+const languages = cv.skills
+  .find((g) => /languages/i.test(g.label))
+  ?.items.map((item) => item.replace(/\s*\(.*\)\s*$/, '').trim());
 const topSkills = cv.skills.find((g) => /skills/i.test(g.label))?.items ?? [];
 
 // Enrich the shared Person node (merged by @id) with CV facts, and describe the
@@ -36,15 +48,15 @@ const jsonLd = [
     ...(cv.contact?.location
       ? { address: { '@type': 'PostalAddress', addressLocality: cv.contact.location } }
       : {}),
-    ...(knowsLanguage?.length ? { knowsLanguage } : {}),
+    ...(languages?.length ? { knowsLanguage: languages } : {}),
     ...(topSkills.length ? { knowsAbout: topSkills } : {}),
   },
   {
     '@type': 'ProfilePage',
     '@id': `${pageUrl}#profilepage`,
     url: pageUrl,
-    name: `About / CV — ${cv.name ?? site.name}`,
-    isPartOf: { '@id': websiteId },
+    name: `About / CV — ${name}`,
+    isPartOf: { '@id': `${abs('/')}#website` },
     mainEntity: { '@id': personId },
   },
   {
@@ -59,139 +71,101 @@ const jsonLd = [
 
 <Base
   title="About / CV"
-  description={`Curriculum vitae of ${cv.name ?? site.name}, ${cv.headline ?? site.role}.`}
+  description={`Curriculum vitae of ${name}, ${headline}.`}
   ogType="profile"
   jsonLd={jsonLd}
 >
-  <article class="cv container">
+  <article>
     <PageNav>
-      <li>
-        <a class="link" href={withBase('/')}>Back to map</a>
-      </li>
-      <button slot="at-rest" class="link js-download-pdf" type="button">Download PDF</button>
+      <li><a href={withBase('/')}>Back to map</a></li>
+      <button slot="at-rest" class="link" type="button" data-print>Download PDF</button>
     </PageNav>
 
-    <header class="cv__head" data-reveal>
-      <div class="cv__id">
-        <h1 class="cv__name">{cv.name ?? site.name}</h1>
-        <p class="cv__role">{cv.headline ?? site.role}</p>
-        <div class="cv__contact-print print-only">
-          {site.socials.map((s) => (
-            <p>{contactPrintText(s.href)}</p>
-          ))}
+    <header data-reveal>
+      <div>
+        <h1>{name}</h1>
+        <p>{headline}</p>
+        {/* On paper there are no links to click, so the addresses are spelled out. */}
+        <div class="print-only">
+          {site.socials.map((s) => <p>{s.href.replace(/^mailto:/, '')}</p>)}
         </div>
       </div>
 
-      <div class="cv__actions no-print">
-        <ul role="list" class="cv__contact link-row">
-          {
-            site.socials.map((s) => (
-              <li>
-                <a href={s.href} class="link">{s.label}</a>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
+      <ul class="no-print" role="list">
+        {site.socials.map((s) => <li><a href={s.href}>{s.label}</a></li>)}
+      </ul>
     </header>
 
-    <div class="cv__summary" data-reveal style="--reveal-delay: 80ms;">
-      {summaryParagraphs.map((para) => <p>{para}</p>)}
+    <div class="summary" data-reveal style="--reveal-step: 1">
+      {summary.map((para) => <p>{para}</p>)}
     </div>
 
-    <section class="cv__section" data-reveal style="--reveal-delay: 140ms;">
-      <h2 class="cv__section-title">Experience</h2>
-      <div class="cv__list">
-        {
-          cv.experience.map((job) => (
-            <div class="entry">
-              <div class="entry__period">{job.period}</div>
-              <div class="entry__main">
-                <h3 class="entry__role">
-                  {job.role}, {job.org}
-                </h3>
-                {/* {job.location && <p class="entry__loc mono">{job.location}</p>} */}
-                {job.summary && <p class="entry__summary">{job.summary}</p>}
-                <ul role="list" class="entry__points">
-                  {job.points.map((pt) => (
-                    <li>{pt}</li>
-                  ))}
-                </ul>
-              </div>
+    <section data-reveal style="--reveal-step: 2">
+      <h2>Experience</h2>
+      {
+        cv.experience.map((job) => (
+          <div class="entry">
+            <p class="period">{job.period}</p>
+            <div>
+              <h3>{job.role}, {job.org}</h3>
+              {job.summary && <p>{job.summary}</p>}
+              <ul>
+                {job.points.map((point) => <li>{point}</li>)}
+              </ul>
             </div>
-          ))
-        }
-      </div>
+          </div>
+        ))
+      }
     </section>
 
-    <section class="cv__section" data-reveal>
-      <h2 class="cv__section-title">Education</h2>
-      <div class="cv__list">
-        {
-          cv.education.map((e) => (
-            <div class="entry">
-              <div class="entry__period">{e.period}</div>
-              <div class="entry__main">
-                <h3 class="entry__role">{e.title}</h3>
-                <p class="entry__org-line">{e.org}</p>
-                {e.note && <p class="entry__summary">{e.note}</p>}
-              </div>
+    <section data-reveal>
+      <h2>Education</h2>
+      {
+        cv.education.map((entry) => (
+          <div class="entry">
+            <p class="period">{entry.period}</p>
+            <div>
+              <h3>{entry.title}</h3>
+              <p>{entry.org}</p>
+              {entry.note && <p>{entry.note}</p>}
             </div>
-          ))
-        }
-      </div>
+          </div>
+        ))
+      }
     </section>
 
-    <div class="cv__foot no-print" data-reveal>
-      <button class="link js-download-pdf" type="button">Download PDF</button>
+    <div class="download no-print" data-reveal>
+      <button class="link" type="button" data-print>Download PDF</button>
     </div>
   </article>
 </Base>
 
 <style>
-  .cv {
-    max-width: var(--measure);
-    padding-block: var(--space-lg);
-  }
-
-  .cv__foot {
-    margin-block-start: var(--space-xl);
-  }
-
-  .cv__head {
+  header {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-lg);
   }
 
-  .cv__name {
+  h1 {
     margin-block-end: var(--space-sm);
-    font-size: var(--step-2);
-    font-weight: var(--weight-bold);
   }
 
-  .cv__actions {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm) var(--space-md);
-  }
-
-  .cv__summary {
+  .summary {
     margin-block-start: var(--space-lg);
   }
 
-  .cv__summary p + p {
+  .summary p + p {
     margin-block-start: var(--space-md);
   }
 
-  .cv__section {
+  section {
     margin-block-start: var(--space-xl);
   }
 
-  .cv__section-title {
+  h2 {
     font-family: var(--font-mono);
     font-size: var(--step--1);
-    font-weight: var(--weight-bold);
     text-transform: uppercase;
     letter-spacing: var(--tracking-mono);
     padding-block-end: var(--space-sm);
@@ -199,15 +173,16 @@ const jsonLd = [
     border-block-end: 1px solid var(--line-strong);
   }
 
-  .cv__list {
-    display: grid;
-    gap: var(--space-lg);
-  }
+  /* Dates in a fixed column, the job beside them. */
 
   .entry {
     display: grid;
     grid-template-columns: 9rem 1fr;
     gap: var(--space-lg);
+  }
+
+  .entry + .entry {
+    margin-block-start: var(--space-lg);
   }
 
   @media (width <= 640px) {
@@ -217,7 +192,7 @@ const jsonLd = [
     }
   }
 
-  .entry__period {
+  .period {
     font-family: var(--font-mono);
     font-size: var(--step--1);
     font-weight: var(--weight-semibold);
@@ -229,91 +204,71 @@ const jsonLd = [
     text-wrap: balance;
   }
 
-  .entry__role {
-    font-size: var(--step-2);
-    font-weight: var(--weight-bold);
-  }
-
-  .entry__points {
+  .entry ul {
     margin-block-start: var(--space-sm);
     display: grid;
     gap: var(--space-sm);
+    padding: 0;
     list-style: square;
   }
 
-  .entry__points li::marker {
+  .entry li::marker {
     font-size: var(--step--1);
     color: var(--ink-3);
   }
 
-  .print-only {
-    display: none;
+  .download {
+    margin-block-start: var(--space-xl);
   }
 
+  /* This page is the CV, so it has to fall onto A4 cleanly: no column limit, a
+     printable contact block, and page breaks that never split a bullet. */
+
   @media print {
-    .cv {
-      max-width: none;
+    article {
       font-size: 12pt;
     }
 
-    .container {
-      padding: 0;
-    }
-
-    .cv__contact-print {
-      display: block;
+    .print-only {
       font-size: 12pt;
       padding-block: 5mm;
       margin-block-start: 5mm;
-      border-block-start: 1px solid #000;
-      border-block-end: 1px solid #000;
+      border-block: 1px solid #000;
     }
 
-    .cv__summary {
+    .summary {
       margin-block-start: 5mm;
     }
 
-    .cv__section,
-    .cv__list {
+    section,
+    .entry,
+    .entry > div,
+    .entry ul {
       break-inside: auto;
-    }
-
-    .cv__list {
-      display: block;
-    }
-
-    .cv__list .entry + .entry {
-      margin-block-start: var(--space-lg);
     }
 
     .entry {
       display: block;
-      break-inside: auto;
     }
 
-    .entry__period {
+    .period {
       margin-block-end: 0.25em;
     }
 
-    .entry__main {
-      break-inside: auto;
-    }
-
-    .entry__points {
+    .entry ul {
       display: block;
-      break-inside: auto;
       padding-inline-start: 1em;
     }
 
-    .entry__points li + li {
-      margin-block-start: var(--space-sm);
-    }
-
-    .entry__points li {
+    .entry li {
       break-inside: avoid;
     }
 
-    .entry__points li::marker {
+    .entry li + li {
+      margin-block-start: var(--space-sm);
+    }
+
+    .entry li::marker {
       color: #000;
     }
   }

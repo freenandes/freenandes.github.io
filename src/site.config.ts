@@ -1,24 +1,22 @@
-/** Global site copy, links, and static asset paths (files live in /public). */
-
-export interface SocialLink {
-  label: string;
-  href: string;
-}
+/** Everything about the site that isn't a page: name, links, metadata, assets. */
 
 export interface SiteConfig {
   name: string;
   role: string;
   description: string;
-  socials: SocialLink[];
+  /** Shown in link rows, the footer, the contact card and /llms.txt. */
+  socials: { label: string; href: string }[];
   /** BCP 47 language tag for the document (matches <html lang>). */
   locale: string;
   /** Open Graph locale (underscore form, e.g. en_US). */
   ogLocale: string;
-  /** Path under /public */
+  /** Paths under /public */
   ogImage: string;
-  /** Alt text describing the Open Graph image. */
   ogImageAlt: string;
   favicon: string;
+  /** Home-screen name, and the tint browsers paint their own UI with. */
+  shortName: string;
+  themeColor: string;
 }
 
 export const site: SiteConfig = {
@@ -28,7 +26,6 @@ export const site: SiteConfig = {
     'Systems-thinking product designer turning stagnating products into growth engines — fixing ecosystems, not just interfaces, and shipping the code to prove it.',
   socials: [
     { label: 'Email', href: 'mailto:redacted@example.invalid' },
-    // { label: 'Website', href: 'https://pmcf.xyz' },
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/pmcfernandes' },
     { label: 'GitHub', href: 'https://github.com/freenandes' },
   ],
@@ -37,4 +34,6 @@ export const site: SiteConfig = {
   ogImage: '/og.png',
   ogImageAlt: 'Pedro MC Fernandes — Lead Product Designer',
   favicon: '/favicon.svg',
+  shortName: 'PMCF',
+  themeColor: '#ffffff',
 };

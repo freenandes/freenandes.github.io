@@ -1,22 +1,9 @@
 import { site } from './site.config';
 
-/** Home-page mind-map nodes and edges — rendered by NavDiagram.astro. */
-
-export interface DiagramPoint {
-  x: number;
-  y: number;
-}
-
-export interface DiagramMetric {
-  value: string;
-  label: string;
-}
-
-export interface DiagramLink {
-  label: string;
-  href: string;
-  external?: boolean;
-}
+/**
+ * The home page: every marker on the map and the order they connect in.
+ * Rendered by `src/pages/index.astro`, laid out by `src/scripts/nav-diagram.ts`.
+ */
 
 export type NodeKind = 'identity' | 'about' | 'contact' | 'project' | 'floating';
 export type NodeShape = 'triangle' | 'square' | 'pentagon' | 'hexagon';
@@ -24,21 +11,23 @@ export type NodeShape = 'triangle' | 'square' | 'pentagon' | 'hexagon';
 export interface DiagramNode {
   id: string;
   label: string;
-  subLabel?: string;
   kind: NodeKind;
-  size?: 'lg' | 'md' | 'sm';
+  /** Marker outline. Floating rings don't have one. */
   shape?: NodeShape;
-  place?: 'top' | 'bottom' | 'left' | 'right';
-  meta?: string;
+  /** Second line under the label — the identity marker's job title. */
+  subLabel?: string;
+  /** Card contents: a bold opening line, then a paragraph each. */
   tagline?: string;
   lines?: string[];
-  metrics?: DiagramMetric[];
   tags?: string[];
-  email?: string;
-  link?: DiagramLink;
-  /** Hint coords (0..1) when resize adaptation nudges layout toward the authored map. */
-  portrait: DiagramPoint;
-  landscape: DiagramPoint;
+  link?: { label: string; href: string; external?: boolean };
+  /**
+   * Where the marker would like to sit, as a fraction (0..1) of the canvas.
+   * The layout starts from a random walk and leans back toward these, so they
+   * are a preference, not a position.
+   */
+  portrait: { x: number; y: number };
+  landscape: { x: number; y: number };
   /** Floating rings only — initial rotation in degrees (0–360). */
   ringStart?: number;
 }
@@ -49,9 +38,7 @@ export const diagramNodes: DiagramNode[] = [
     label: site.name,
     subLabel: site.role,
     kind: 'identity',
-    size: 'lg',
     shape: 'pentagon',
-    place: 'bottom',
     portrait: { x: 0.5, y: 0.28 },
     landscape: { x: 0.26, y: 0.5 },
   },
@@ -59,9 +46,7 @@ export const diagramNodes: DiagramNode[] = [
     id: 'about',
     label: 'About',
     kind: 'about',
-    size: 'md',
     shape: 'hexagon',
-    place: 'right',
     tagline: 'I design and build — fixing the system, not just the screen.',
     lines: [
       'I react against stagnation and look forward to a sustainable growth path by fixing ecosystems, not just interfaces. At the boundary between strategy and execution, I will be there shipping the code as well.',
@@ -74,9 +59,7 @@ export const diagramNodes: DiagramNode[] = [
     id: 'contact',
     label: 'Contact',
     kind: 'contact',
-    size: 'md',
     shape: 'square',
-    place: 'left',
     tagline: 'Open to principal / lead product design and design-engineering work.',
     portrait: { x: 0.76, y: 0.16 },
     landscape: { x: 0.12, y: 0.74 },
@@ -85,10 +68,7 @@ export const diagramNodes: DiagramNode[] = [
     id: 'systems-thinker',
     label: 'Systems-Thinker',
     kind: 'project',
-    size: 'md',
     shape: 'triangle',
-    place: 'right',
-    meta: '',
     tagline:
       'The complexity piece. Untangling messy, highly technical ecosystems into systems that scale.',
     lines: [
@@ -103,12 +83,8 @@ export const diagramNodes: DiagramNode[] = [
     id: 'design-at-scale',
     label: 'Design at Scale',
     kind: 'project',
-    size: 'md',
     shape: 'triangle',
-    place: 'left',
-    meta: '',
-    tagline:
-      'The scale piece. Data-driven systems generating massive global business.',
+    tagline: 'The scale piece. Data-driven systems generating massive global business.',
     lines: [
       'Designed the PageBuilder system that generated 100K+ destination pages and 4× organic traffic, and the Tagus design system unifying experiences across 5 global markets.',
     ],
@@ -121,10 +97,7 @@ export const diagramNodes: DiagramNode[] = [
     id: 'visionary',
     label: 'Visionary',
     kind: 'project',
-    size: 'md',
     shape: 'triangle',
-    place: 'top',
-    meta: '',
     tagline:
       'The zero-to-one piece. Visionary product definition, rapid prototyping, and creative execution.',
     lines: [
@@ -161,11 +134,15 @@ export const diagramNodes: DiagramNode[] = [
   },
 ];
 
-/** Open chain: contact → about → pedro → systems-thinker → design-at-scale → visionary */
-export const diagramEdges: Array<[string, string]> = [
-  ['contact', 'about'],
-  ['about', 'pedro'],
-  ['pedro', 'systems-thinker'],
-  ['systems-thinker', 'design-at-scale'],
-  ['design-at-scale', 'visionary'],
+/**
+ * The line the connectors draw, marker to marker. One open chain: reorder the
+ * ids to reroute it, drop one to leave that marker unconnected.
+ */
+export const diagramChain = [
+  'contact',
+  'about',
+  'pedro',
+  'systems-thinker',
+  'design-at-scale',
+  'visionary',
 ];

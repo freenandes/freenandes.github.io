@@ -36,7 +36,8 @@
     top: var(--space-sm);
     z-index: var(--z-sticky);
     margin-block-end: var(--space-lg);
-    transition: transform var(--dur) var(--ease), visibility 0s;
+    transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease),
+      visibility 0s;
   }
 
   /* Paper plate so page content scrolls out of sight under the pinned bar. */
@@ -69,10 +70,15 @@
     transition: opacity var(--dur) var(--ease), visibility 0s linear var(--dur);
   }
 
+  /* Fading as it lifts keeps the bar from reading as a shutter slamming shut,
+     and covers the moment its paper plate stops overlapping the text. */
+
   .page-nav.is-hidden {
     visibility: hidden;
+    opacity: 0;
     transform: translateY(calc(-100% - var(--space-md) * 2 - 1px));
-    transition: transform var(--dur) var(--ease), visibility 0s linear var(--dur);
+    transition: transform var(--dur) var(--ease), opacity var(--dur-fast) var(--ease),
+      visibility 0s linear var(--dur);
   }
 </style>
 

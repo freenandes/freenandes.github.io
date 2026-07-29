@@ -95,15 +95,11 @@ const jsonLd = [
       </div>
     </header>
 
-    <div class="cv__summary" data-reveal style="
-
---reveal-delay:80ms;">
+    <div class="cv__summary" data-reveal style="--reveal-delay: 80ms;">
       {summaryParagraphs.map((para) => <p>{para}</p>)}
     </div>
 
-    <section class="cv__section" data-reveal style="
-
---reveal-delay:140ms;">
+    <section class="cv__section" data-reveal style="--reveal-delay: 140ms;">
       <h2 class="cv__section-title">Experience</h2>
       <div class="cv__list">
         {
@@ -146,7 +142,7 @@ const jsonLd = [
       </div>
     </section>
 
-    <div class="cv__foot no-print">
+    <div class="cv__foot no-print" data-reveal>
       <button class="link js-download-pdf" type="button">Download PDF</button>
     </div>
   </article>

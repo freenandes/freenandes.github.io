@@ -61,6 +61,7 @@ export async function capture(browser, site, scenario, viewport, probes) {
   try {
     await page.setViewport(viewport);
     await page.evaluateOnNewDocument(SEED_RANDOM);
+    if (scenario.media) await page.emulateMediaType(scenario.media);
     await page.goto(`${site.origin}${site.base}${scenario.path}`, { waitUntil: 'load' });
     await page.addStyleTag({ content: HIDE_CARET });
     await page.evaluate(() =>
@@ -85,7 +86,7 @@ export async function capture(browser, site, scenario, viewport, probes) {
     });
     await sleep(120);
 
-    const png = await page.screenshot({ type: 'png' });
+    const png = await page.screenshot({ type: 'png', fullPage: Boolean(scenario.fullPage) });
     const styles = await page.evaluate(
       (selectors, properties) => {
         const out = {};

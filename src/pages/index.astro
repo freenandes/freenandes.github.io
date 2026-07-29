@@ -35,6 +35,11 @@ function ring(label: string) {
   };
 }
 
+// Two kinds of marker look different from the rest — the name at the centre of
+// the map, and the decorative rings. Add a kind here to give it its own class.
+const variant = (node: DiagramNode) =>
+  node.kind === 'identity' || node.kind === 'floating' ? `node--${node.kind}` : undefined;
+
 // Markers render in three runs so the case studies can be announced as a set.
 // The wrappers are `display: contents` — they group, they don't lay out.
 const pick = (...kinds: NodeKind[]) => diagramNodes.filter((n) => kinds.includes(n.kind));
@@ -57,7 +62,7 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
             const circle = node.kind === 'floating' ? ring(node.label) : null;
             return (
               <div
-                class:list={['node', `node--${node.kind}`]}
+                class:list={['node', variant(node)]}
                 data-id={node.id}
                 aria-hidden={circle ? 'true' : undefined}
               >

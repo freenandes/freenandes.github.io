@@ -35,6 +35,10 @@ const unlock = (password) =>
  * counts as changed — only the home page needs it, because its layout comes out
  * of a randomised physics simulation whose settling path is never bit-identical
  * (two captures of the *same* build land within ~0.5%).
+ *
+ * `media: 'print'` photographs the page as a printer would see it, and
+ * `fullPage: true` takes the whole document rather than one screenful — the two
+ * together are how the CV's print stylesheet gets checked.
  */
 export const scenarios = [
   { name: 'home', path: '/', drift: 0.01 },
@@ -45,6 +49,7 @@ export const scenarios = [
     act: (page) => page.evaluate(() => document.querySelector('[data-id="about"] button').click()),
   },
   { name: 'about', path: '/about/' },
+  { name: 'about-print', path: '/about/', media: 'print', fullPage: true },
   { name: 'about-scrolled', path: '/about/', act: scrollTo(1200) },
   { name: 'about-nav-pinned', path: '/about/', act: scrollTo(1200, 900) },
   { name: 'project', path: '/projects/systems-thinker/' },

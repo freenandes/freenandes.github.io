@@ -14,6 +14,7 @@ export default defineConfig({
   markdown: {
     shikiConfig: {
       theme: 'css-variables',
+      wrap: true,
     },
   },
 });

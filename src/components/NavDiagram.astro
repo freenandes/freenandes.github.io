@@ -172,9 +172,9 @@ const otherNodes = diagramNodes.filter(
             {node.tagline && <p class="panel__lead">{node.tagline}</p>}
             {node.lines?.map((line) => <p class="panel__text">{line}</p>)}
             {node.tags && (
-              <ul class="panel__tags" role="list">
+              <ul class="panel__tags meta-row" role="list">
                 {node.tags.map((t) => (
-                  <li class="panel__chip">{t}</li>
+                  <li class="meta">{t}</li>
                 ))}
               </ul>
             )}
@@ -567,24 +567,6 @@ const otherNodes = diagramNodes.filter(
 
   .panel__tags {
     margin-block: var(--space-md) var(--space-xs);
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-sm) var(--space-md);
-    list-style-type: none;
-  }
-
-  .panel__chip {
-    font-family: var(--font-mono);
-    font-size: var(--step--2);
-    font-weight: var(--weight-semibold);
-    line-height: var(--leading-tight);
-    letter-spacing: var(--tracking-wide);
-    text-transform: uppercase;
-    color: var(--ink-3);
-  }
-
-  .panel__chip:not(:last-child)::after {
-    content: ',';
   }
 
   .panel__link {

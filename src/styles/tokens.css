@@ -63,7 +63,7 @@
   --space-lg: 2rem;
   --space-xl: 4rem;
   --measure: 66ch;
-  --gutter: clamp(1rem, 0.75rem + 3vw, 4rem);
+  --gutter: 1rem;
 
   /* Shape, depth, motion */
   --radius-sm: 0.1875rem;

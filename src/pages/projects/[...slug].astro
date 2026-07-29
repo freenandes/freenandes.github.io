@@ -19,7 +19,8 @@ const { entry } = Astro.props;
 const { data } = entry;
 const { Content } = await render(entry);
 const year = projectYear(entry);
-const byline = [data.role, data.client].filter(Boolean).join(', ');
+const client = data.client && data.client !== data.title ? data.client : undefined;
+const heading = client ? `${data.title} at ${client}` : data.title;
 
 const origin = Astro.site ?? Astro.url;
 const abs = (path: string) => new URL(withBase(path), origin).toString();
@@ -62,30 +63,15 @@ const jsonLd = [
     </PageNav>
 
     <header class="project__head" data-reveal>
-      <h1 class="project__title">{data.title}</h1>
-      {byline && <p class="project__byline">{byline}</p>}
-      <p class="project__year">{year}</p>
+      <h1 class="project__title">{heading}</h1>
+      <p>{data.description}</p>
       <div class="project__summary">
-        <p>{data.description}</p>
+        <ul class="project__meta meta-row" role="list">
+          {data.role && <li class="meta">{data.role}</li>}
+          <li class="meta"><time datetime={data.date.toISOString()}>{year}</time></li>
+          {data.tags.map((t) => <li class="meta">{t}</li>)}
+        </ul>
       </div>
-      {
-        data.tags.length > 0 && (
-          <p class="project__tags">{data.tags.join(' · ')}</p>
-        )
-      }
-      {
-        data.links.length > 0 && (
-          <ul class="project__links link-row" role="list">
-            {data.links.map((l) => (
-              <li>
-                <a class="link" href={l.href} rel="noopener" target="_blank">
-                  {l.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        )
-      }
     </header>
 
     <div class="project__body prose" data-reveal style="
@@ -95,6 +81,20 @@ const jsonLd = [
     </div>
 
     {data.locked && <PasswordGate slug={entry.id} />}
+
+    {
+      data.links.length > 0 && (
+        <ul class="project__links link-row" role="list">
+          {data.links.map((l) => (
+            <li>
+              <a class="link" href={l.href} rel="noopener" target="_blank">
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
   </article>
 </Base>
 
@@ -110,75 +110,12 @@ const jsonLd = [
     font-weight: var(--weight-bold);
   }
 
-  .project__byline {
-    color: var(--ink-2);
-  }
-
-  .project__year {
-    margin-block-start: var(--space-sm);
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    font-weight: var(--weight-semibold);
-    letter-spacing: var(--tracking-mono);
-    text-transform: uppercase;
-    line-height: var(--leading-tight);
-    color: var(--ink-3);
-  }
-
   .project__summary {
-    margin-block-start: var(--space-lg);
-  }
-
-  .project__tags {
-    margin-block-start: var(--space-md);
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    font-weight: var(--weight-semibold);
-    letter-spacing: var(--tracking-mono);
-    text-transform: uppercase;
-    color: var(--ink-3);
+    margin: var(--space-lg) 0;
   }
 
   .project__links {
-    margin-block-start: var(--space-md);
-  }
-
-  .project__body {
     margin-block-start: var(--space-xl);
   }
 
-  .project__body :global(h2) {
-    font-family: var(--font-mono);
-    font-size: var(--step--1);
-    font-weight: var(--weight-bold);
-    text-transform: uppercase;
-    letter-spacing: var(--tracking-mono);
-    padding-block-end: var(--space-sm);
-    margin-block: var(--space-xl) var(--space-lg);
-    border-block-end: 1px solid var(--line-strong);
-  }
-
-  .project__body :global(> *:first-child) {
-    margin-block-start: 0;
-  }
-
-  .project__body :global(h2:first-child) {
-    margin-block-start: 0;
-  }
-
-  .project__body :global(ul) {
-    display: grid;
-    gap: var(--space-sm);
-    list-style: square;
-    padding-inline-start: 1.25em;
-  }
-
-  .project__body :global(ul li::marker) {
-    font-size: var(--step--1);
-    color: var(--ink-3);
-  }
-
-  .project__body :global(p + p) {
-    margin-block-start: var(--space-md);
-  }
 </style>

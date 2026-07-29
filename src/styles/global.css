@@ -150,13 +150,9 @@ button.link {
    nav, socials, tags, case-study links. Lists that keep their markers (prose,
    the CV's bullet points) are plain <ul> and style themselves. */
 
-ul[role='list'],
-ol[role='list'] {
+ul[role='list'] {
   list-style: none;
   padding: 0;
-}
-
-ul[role='list'] {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-xs) var(--space-md);

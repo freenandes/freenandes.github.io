@@ -17,4 +17,13 @@ export default defineConfig({
       wrap: true,
     },
   },
+  vite: {
+    build: {
+      // Astro inlines small bundled scripts by default, which the strict
+      // `script-src 'self'` CSP then blocks (only the hand-written bootstrap in
+      // Base.astro is hash-allow-listed). Keep every bundled script as its own
+      // file; other assets keep Vite's default inlining.
+      assetsInlineLimit: (filePath) => (filePath.endsWith('.js') ? false : undefined),
+    },
+  },
 });

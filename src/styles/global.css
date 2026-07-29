@@ -152,6 +152,8 @@ p {
   text-underline-offset: 0.125em;
   text-decoration-thickness: 0.125em;
   text-decoration-color: var(--accent-ink);
+  transition: color var(--dur-fast) var(--ease),
+    text-decoration-color var(--dur-fast) var(--ease);
 }
 
 .prose a:hover {
@@ -305,6 +307,7 @@ button.link {
   padding: var(--space-xs) var(--space-sm);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-md);
+  transition: border-color var(--dur-fast) var(--ease);
 }
 
 .input__box:hover {
@@ -323,11 +326,20 @@ button.link {
   padding: var(--space-xs) var(--space-md);
   border: 1px solid var(--ink);
   border-radius: var(--radius-pill);
+  transition: background-color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    transform var(--dur-micro) var(--ease);
 }
 
 .button__pad:hover {
   background: var(--accent-ink);
   border-color: var(--accent-ink);
+}
+
+/* Press feedback: small enough to read as give, not as a bounce. */
+
+.button__pad:active {
+  transform: scale(0.98);
 }
 
 .visually-hidden {
@@ -342,28 +354,41 @@ button.link {
   border: 0;
 }
 
+/* Parked off-canvas with a transform rather than `top` so revealing it is a
+   compositor-only move. */
+
 .skip-link {
   position: absolute;
   left: var(--space-sm);
-  top: -100%;
+  top: var(--space-sm);
   z-index: var(--z-overlay);
   background: var(--ink);
   color: var(--paper);
   padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-sm);
-  transition: top var(--dur) var(--ease);
+  transform: translateY(calc(-100% - var(--space-sm)));
+  transition: transform var(--dur) var(--ease);
 }
 
 .skip-link:focus {
-  top: var(--space-sm);
+  transform: none;
 }
 
-/* Reveal is a progressive enhancement: content is fully visible by default so
-   it stays readable when JavaScript (which adds `.is-ready`) is unavailable or
-   blocked. When ready, it animates in from a slight offset. */
-.is-ready [data-reveal] {
+/* Reveal runs off CSS alone, so it can never leave content stuck invisible: the
+   animation always plays to its end whether or not any script loads. The
+   no-script fallback in Base.astro switches it off entirely. */
+[data-reveal] {
   animation: reveal var(--dur-slow) var(--ease) backwards;
   animation-delay: var(--reveal-delay, 0ms);
+}
+
+/* Blocks that start below the fold are held at the first frame instead of
+   playing to an empty room; `src/scripts/reveal.ts` releases them as the reader
+   arrives. Holding (rather than re-triggering) keeps this a pause, so nothing
+   can flash or double-animate. */
+
+[data-reveal][data-reveal-wait] {
+  animation-play-state: paused;
 }
 
 @keyframes reveal {
@@ -379,7 +404,37 @@ button.link {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .is-ready [data-reveal] {
+  [data-reveal] {
+    animation: none;
+  }
+}
+
+/* A print can be triggered mid-reveal (the About page's "Download PDF"), and a
+   held block may never have played at all — neither may reach paper faded. */
+
+@media print {
+  [data-reveal] {
+    animation: none !important;
+  }
+}
+
+/* Cross-document page transitions: a brief cross-fade in browsers that support
+   them, using the user agent's own root animation so only the timing changes.
+   No JavaScript, and non-supporting browsers simply navigate as before. */
+
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--dur-fast);
+  animation-timing-function: var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
     animation: none;
   }
 }

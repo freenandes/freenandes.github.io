@@ -21,11 +21,11 @@ Legend: ✅ done · 🟙 platform-provided · ⏳ pending · ➖ not applicable
 | robots.txt | seo / agent-readiness | Generated with sitemap reference and explicit allow rules for named AI crawlers (GPTBot, ClaudeBot, PerplexityBot, …). *See sub-path caveat below.* |
 | `/llms.txt` | agent-readiness | Curated markdown index of pages + case studies. *See sub-path caveat below.* |
 | `/.well-known/security.txt` | security / well-known | RFC 9116 disclosure contacts + expiry. *See sub-path caveat below.* |
-| Content Security Policy | security | Delivered via `<meta http-equiv>`: strict `script-src 'self'` + a single hashed inline bootstrap; `default-src 'self'`, `object-src 'none'`, `base-uri 'self'`, `upgrade-insecure-requests`, scoped font/style allowances. |
+| Content Security Policy | security | Delivered via `<meta http-equiv>`: strict `script-src 'self'` with **no** inline-script allowance (every bundled script is emitted as its own file — see `assetsInlineLimit` in `astro.config.mjs`); `default-src 'self'`, `object-src 'none'`, `base-uri 'self'`, `upgrade-insecure-requests`, scoped font/style allowances. |
 | Referrer-Policy | security | `strict-origin-when-cross-origin` via `<meta name="referrer">`. |
 | Colour contrast | accessibility | Tertiary text token darkened `#aaa → #6f6f6f` (≈5:1 on paper, WCAG AA). Decorative-only ink kept faint via a separate `--ink-faint`. |
 | Custom error page (404) | resilience | `/404.html` with plain-language copy and routes back into the site. |
-| Graceful degradation | resilience | Reveal animations are now visible-by-default; content no longer depends on JS (or an un-blocked inline script) to appear. |
+| Graceful degradation | resilience | Reveal animations run off CSS alone and always play to completion, so content never depends on JS to appear; a `<noscript>` style block switches the motion off entirely when scripting is unavailable. |
 | Scrollbar gutter | performance | `scrollbar-gutter: stable` to remove cross-page horizontal shift. |
 
 ---

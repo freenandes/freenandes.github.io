@@ -67,13 +67,14 @@ const structuredData = { '@context': 'https://schema.org', '@graph': graph };
 // Static-site CSP delivered via <meta>. Note: frame-ancestors, sandbox and
 // report-uri are header-only and are intentionally omitted here (see
 // SPEC-COMPLIANCE.md). 'unsafe-inline' is required for style only because the
-// theme relies on inline `style="--…"` custom-property attributes; scripts stay
-// strict ('self' + the single hashed inline bootstrap below).
+// theme relies on inline `style="--…"` custom-property attributes; scripts are
+// all bundled to files (see the assetsInlineLimit note in astro.config.mjs), so
+// script-src needs nothing but 'self'.
 const csp = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
-  "script-src 'self' 'sha256-LhQiOHdaqOlR0vDzQ0GHrCxI0XCFMZmiltsRU27enOI='",
+  "script-src 'self'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data:",
@@ -128,6 +129,16 @@ const csp = [
     <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
 
     <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)} />
+
+    <noscript>
+      <style>
+        /* Entrance motion is a progressive enhancement. Without scripting the
+           page is served as-is: nothing waits to be revealed. */
+        [data-reveal] {
+          animation: none !important;
+        }
+      </style>
+    </noscript>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -142,14 +153,8 @@ const csp = [
 
     {footer && <Footer />}
 
-    {/* Single inline bootstrap, allow-listed by hash in the CSP above. If you
-        change this script, update the script-src sha256 to match the emitted
-        (minified) source. */}
     <script>
-      document.documentElement.classList.add('is-ready');
-      document
-        .querySelectorAll('.js-download-pdf')
-        .forEach((b) => b.addEventListener('click', () => window.print()));
+      import '../scripts/site';
     </script>
   </body>
 </html>

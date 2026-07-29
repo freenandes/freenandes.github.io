@@ -33,3 +33,9 @@ About this website at README.md.
 - Plaintext protected content (`src/protected/*.md`) and `passwords.json` are **git-ignored**. Only ciphertext (`public/locked/*.json`) is committed.
 - Demo locked project `halcyon` uses passphrase `soft-club`.
 - On a fresh checkout without the plaintext sources, `npm run encrypt` skips missing projects and the committed ciphertext is used as-is.
+
+## Cursor Cloud specific instructions
+
+- Dev/preview serve under the `/portfolio/` base path, so browse `http://localhost:4321/portfolio/` (a bare `/` 404s).
+- Dependencies are baked into the snapshot via the `npm ci` startup script, so `node_modules` is present without an install step.
+- `npm run visual` uses `puppeteer-core` against the system Chrome. The base image ships Chrome at `/usr/bin/google-chrome-stable`, which is in the script's candidate list (`scripts/visual/capture.mjs`), so it works with **no `CHROME_PATH`**. Do not install a browser via puppeteer/playwright downloads. The check builds `origin/main` in a throwaway worktree, so `origin/main` must be fetched first (`git fetch origin main`). `ffmpeg` and `Xvfb` are present for demo recordings.

@@ -37,4 +37,5 @@ About this website at README.md.
 ## Cursor Cloud specific instructions
 
 - Dev/preview serve under the `/portfolio/` base path, so browse `http://localhost:4321/portfolio/` (a bare `/` 404s).
-- `npm run visual` uses `puppeteer-core` against a system Chrome. On the cloud VM Chrome is at `/usr/local/bin/google-chrome`, which is **not** in the script's candidate list (it only probes `/usr/bin/...`), so run it as `CHROME_PATH=/usr/local/bin/google-chrome npm run visual`. It also builds `origin/main` in a throwaway worktree, so `origin/main` must be fetched.
+- Dependencies are baked into the snapshot via the `npm ci` startup script, so `node_modules` is present without an install step.
+- `npm run visual` uses `puppeteer-core` against the system Chrome. The base image ships Chrome at `/usr/bin/google-chrome-stable`, which is in the script's candidate list (`scripts/visual/capture.mjs`), so it works with **no `CHROME_PATH`**. Do not install a browser via puppeteer/playwright downloads. The check builds `origin/main` in a throwaway worktree, so `origin/main` must be fetched first (`git fetch origin main`). `ffmpeg` and `Xvfb` are present for demo recordings.

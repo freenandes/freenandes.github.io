@@ -1,4 +1,7 @@
 ---
+/** A case study. Body copy lives in `src/content/projects/<slug>.mdx`; locked
+    projects add the passphrase gate below the public teaser. */
+
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PageNav from '../../components/PageNav.astro';
@@ -9,16 +12,12 @@ import { site } from '../../site.config';
 
 export async function getStaticPaths() {
   const projects = await getProjects();
-  return projects.map((entry) => ({
-    params: { slug: entry.id },
-    props: { entry },
-  }));
+  return projects.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
 }
 
 const { entry } = Astro.props;
 const { data } = entry;
 const { Content } = await render(entry);
-const year = projectYear(entry);
 const client = data.client && data.client !== data.title ? data.client : undefined;
 const heading = client ? `${data.title} at ${client}` : data.title;
 
@@ -26,7 +25,6 @@ const origin = Astro.site ?? Astro.url;
 const abs = (path: string) => new URL(withBase(path), origin).toString();
 const pageUrl = new URL(Astro.url.pathname, origin).toString();
 const personId = `${abs('/')}#person`;
-const websiteId = `${abs('/')}#website`;
 
 const jsonLd = [
   {
@@ -38,7 +36,7 @@ const jsonLd = [
     url: pageUrl,
     datePublished: data.date.toISOString(),
     inLanguage: site.locale,
-    isPartOf: { '@id': websiteId },
+    isPartOf: { '@id': `${abs('/')}#website` },
     author: { '@id': personId },
     creator: { '@id': personId },
     ...(data.tags.length ? { keywords: data.tags.join(', ') } : {}),
@@ -55,26 +53,22 @@ const jsonLd = [
 ---
 
 <Base title={data.title} description={data.description} ogType="article" jsonLd={jsonLd}>
-  <article class="project container">
+  <article>
     <PageNav>
-      <li>
-        <a class="link" href={withBase('/')}>Back to map</a>
-      </li>
+      <li><a href={withBase('/')}>Back to map</a></li>
     </PageNav>
 
-    <header class="project__head" data-reveal>
-      <h1 class="project__title">{heading}</h1>
+    <header data-reveal>
+      <h1>{heading}</h1>
       <p>{data.description}</p>
-      <div class="project__summary">
-        <ul class="project__meta meta-row" role="list">
-          {data.role && <li class="meta">{data.role}</li>}
-          <li class="meta"><time datetime={data.date.toISOString()}>{year}</time></li>
-          {data.tags.map((t) => <li class="meta">{t}</li>)}
-        </ul>
-      </div>
+      <ul class="meta-row" role="list">
+        {data.role && <li class="meta">{data.role}</li>}
+        <li class="meta"><time datetime={data.date.toISOString()}>{projectYear(entry)}</time></li>
+        {data.tags.map((tag) => <li class="meta">{tag}</li>)}
+      </ul>
     </header>
 
-    <div class="project__body prose" data-reveal style="--reveal-delay: 80ms;">
+    <div class="prose" data-reveal style="--reveal-step: 1">
       <Content />
     </div>
 
@@ -82,12 +76,10 @@ const jsonLd = [
 
     {
       data.links.length > 0 && (
-        <ul class="project__links link-row" role="list" data-reveal style="--reveal-delay: 200ms;">
-          {data.links.map((l) => (
+        <ul role="list" data-reveal style="--reveal-step: 3">
+          {data.links.map((link) => (
             <li>
-              <a class="link" href={l.href} rel="noopener" target="_blank">
-                {l.label}
-              </a>
+              <a href={link.href} rel="noopener" target="_blank">{link.label}</a>
             </li>
           ))}
         </ul>
@@ -97,23 +89,15 @@ const jsonLd = [
 </Base>
 
 <style>
-  .project {
-    max-width: var(--measure);
-    padding-block: var(--space-lg);
-  }
-
-  .project__title {
+  h1 {
     margin-block-end: var(--space-sm);
-    font-size: var(--step-2);
-    font-weight: var(--weight-bold);
   }
 
-  .project__summary {
-    margin: var(--space-lg) 0;
+  header ul {
+    margin-block: var(--space-lg);
   }
 
-  .project__links {
+  article > ul {
     margin-block-start: var(--space-xl);
   }
-
 </style>

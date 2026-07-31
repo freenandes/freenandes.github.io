@@ -1,5 +1,17 @@
+/* ===========================================================================
+   The whole site's shared styling. Plain elements are styled as themselves;
+   a class only appears where an element needs to look unlike its own kind
+   (`button.link`) or where there is no element for the job (`.prose`, `.meta`).
+
+   Anything page-specific lives in that page's own <style> block.
+
+   Sections: reset · text · links · lists · layout · prose · utilities ·
+             motion · print
+   =========================================================================== */
+
 @import './tokens.css';
-@import './shell.css';
+
+/* --- Reset ---------------------------------------------------------------- */
 
 *,
 *::before,
@@ -16,20 +28,6 @@ html {
   /* Reserve the scrollbar track so width doesn't shift between pages that
      scroll and pages that don't. */
   scrollbar-gutter: stable;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-  }
 }
 
 body {
@@ -66,18 +64,6 @@ select {
 button {
   cursor: pointer;
   text-align: left;
-  line-height: var(--leading-tight);
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-ul[role='list'],
-ol[role='list'] {
-  list-style: none;
-  padding: 0;
 }
 
 :focus-visible {
@@ -91,42 +77,152 @@ ol[role='list'] {
   color: var(--paper);
 }
 
+/* --- Text ---------------------------------------------------------------- */
+
+/* One heading size for the whole site: rank is structure, not scale. Prose
+   steps its subheadings down again. */
+
 h1,
 h2,
 h3,
 h4 {
-  font-family: var(--font-sans);
+  font-size: var(--step-2);
   font-weight: var(--weight-bold);
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tight);
   text-wrap: balance;
 }
 
-h1 {
-  font-size: var(--step-5);
-}
-
-h2 {
-  font-size: var(--step-4);
-}
-
-h3 {
-  font-size: var(--step-3);
-}
-
-h4 {
-  font-size: var(--step-2);
-}
-
 p {
   text-wrap: pretty;
 }
 
-.container {
+/* Small caps-and-mono print: dates, tags, the 404's kicker. */
+
+.meta {
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* --- Links ---------------------------------------------------------------- */
+
+/* The site's links are chrome: mono, uppercase, underlined. Links inside
+   running text look different — see `.prose a` below. A button that acts like
+   a link (print, unlock-and-read) opts in with `class="link"`. */
+
+a,
+button.link {
+  color: var(--accent-ink);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  text-decoration-thickness: 0.125em;
+  transition: color var(--dur-fast) var(--ease);
+}
+
+a:hover,
+button.link:hover {
+  color: var(--accent);
+}
+
+button.link {
+  display: inline;
+  padding: 0;
+  background: none;
+  border: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* --- Lists --------------------------------------------------------------- */
+
+/* `role="list"` is how this site says "a row of things, not a bulleted list":
+   nav, socials, tags, case-study links. Lists that keep their markers (prose,
+   the CV's bullet points) are plain <ul> and style themselves. */
+
+ul[role='list'] {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-md);
+  line-height: var(--leading-snug);
+}
+
+ul[role='list'] a,
+ul[role='list'] button {
+  display: inline-block;
+}
+
+/* Comma-separated run of `.meta` items, with a little more air between rows. */
+
+ul.meta-row {
+  row-gap: var(--space-sm);
+}
+
+.meta-row .meta:not(:last-child)::after {
+  content: ',';
+}
+
+/* --- Layout -------------------------------------------------------------- */
+
+/* Every page is one column of `--measure`, and the footer lines up with it.
+   The home page opts out: its map is full-bleed. */
+
+main,
+body > footer {
   width: 100%;
+  max-width: var(--measure);
   margin-inline: auto;
   padding-inline: var(--gutter);
 }
+
+main {
+  position: relative;
+  z-index: var(--z-base);
+}
+
+main > article,
+main > section {
+  padding-block: var(--space-lg);
+}
+
+main.home {
+  max-width: none;
+  min-height: 100svh;
+  padding-inline: 0;
+  isolation: isolate;
+}
+
+/* Contour texture behind the map. `--topo-pattern` is set on `main` by the
+   layout so the asset path can respect the site's base path. */
+
+main.home::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--topo-pattern);
+  background-repeat: repeat;
+  background-position: top center;
+  background-size: 150rem auto;
+  opacity: 0.075;
+}
+
+/* --- Prose --------------------------------------------------------------- */
+
+/* Rendered Markdown: case-study bodies and decrypted write-ups. */
 
 .prose {
   max-width: var(--measure);
@@ -138,7 +234,6 @@ p {
 
 .prose h2 {
   margin-block-start: var(--step-2);
-  font-size: var(--step-2);
 }
 
 .prose h3 {
@@ -147,6 +242,9 @@ p {
 }
 
 .prose a {
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: none;
   color: var(--accent-ink);
   text-decoration: underline;
   text-underline-offset: 0.125em;
@@ -212,135 +310,7 @@ p {
   color: var(--ink-3);
 }
 
-.mono {
-  font-family: var(--font-mono);
-  font-size: var(--step--1);
-  font-weight: var(--weight-regular);
-  letter-spacing: var(--tracking-mono);
-  font-variant-numeric: tabular-nums;
-}
-
-.label {
-  font-family: var(--font-mono);
-  font-size: var(--step--1);
-  font-weight: var(--weight-regular);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--ink-2);
-}
-
-.meta {
-  font-family: var(--font-mono);
-  font-size: var(--step--2);
-  font-weight: var(--weight-semibold);
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-
-.meta-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm) var(--space-md);
-}
-
-.meta-row .meta:not(:last-child)::after {
-  content: ',';
-}
-
-.link {
-  font-family: var(--font-mono);
-  font-size: var(--step--1);
-  line-height: var(--leading-snug);
-  font-weight: var(--weight-bold);
-  letter-spacing: var(--tracking-mono);
-  text-transform: uppercase;
-  text-decoration: underline;
-  text-underline-offset: 0.25em;
-  text-decoration-thickness: 0.125em;
-  color: var(--accent-ink);
-  transition: color var(--dur-fast) var(--ease);
-}
-
-.link:hover {
-  color: var(--accent);
-}
-
-button.link {
-  background: none;
-  border: none;
-  padding: 0;
-  appearance: none;
-  -webkit-appearance: none;
-  display: inline;
-}
-
-.link-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs) var(--space-md);
-}
-
-.link-row li {
-  line-height: var(--leading-snug);
-}
-
-.link-row .link {
-  display: inline-block;
-  vertical-align: baseline;
-}
-
-.input__box,
-.button__pad {
-  font-family: var(--font-mono);
-  font-weight: var(--weight-medium);
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-wide);
-  min-height: 3rem;
-}
-
-.input__box {
-  font-size: 0.9375em;
-  color: var(--ink);
-  background-color: var(--paper);
-  padding: var(--space-xs) var(--space-sm);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-md);
-  transition: border-color var(--dur-fast) var(--ease);
-}
-
-.input__box:hover {
-  border-color: var(--ink-faint);
-}
-
-.input__box:focus-visible {
-  border-color: var(--ink);
-}
-
-.button__pad {
-  font-size:  var(--step--1);
-  text-transform: uppercase;
-  background: var(--ink);
-  color: var(--paper);
-  padding: var(--space-xs) var(--space-md);
-  border: 1px solid var(--ink);
-  border-radius: var(--radius-pill);
-  transition: background-color var(--dur-fast) var(--ease),
-    border-color var(--dur-fast) var(--ease),
-    transform var(--dur-micro) var(--ease);
-}
-
-.button__pad:hover {
-  background: var(--accent-ink);
-  border-color: var(--accent-ink);
-}
-
-/* Press feedback: small enough to read as give, not as a bounce. */
-
-.button__pad:active {
-  transform: scale(0.98);
-}
+/* --- Utilities ----------------------------------------------------------- */
 
 .visually-hidden {
   position: absolute;
@@ -354,36 +324,24 @@ button.link {
   border: 0;
 }
 
-/* Parked off-canvas with a transform rather than `top` so revealing it is a
-   compositor-only move. */
-
-.skip-link {
-  position: absolute;
-  left: var(--space-sm);
-  top: var(--space-sm);
-  z-index: var(--z-overlay);
-  background: var(--ink);
-  color: var(--paper);
-  padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-sm);
-  transform: translateY(calc(-100% - var(--space-md)));
-  transition: transform var(--dur) var(--ease);
+.print-only {
+  display: none;
 }
 
-.skip-link:focus {
-  transform: none;
-}
+/* --- Motion -------------------------------------------------------------- */
 
-/* Reveal runs off CSS alone, so it can never leave content stuck invisible: the
-   animation always plays to its end whether or not any script loads. The
-   no-script fallback in Base.astro switches it off entirely. */
+/* Reveal runs off CSS alone, so it can never leave content stuck invisible:
+   the animation always plays to its end whether or not any script loads.
+   Stagger a block by giving it its place in the queue:
+   `data-reveal style="--reveal-step: 2"`. */
+
 [data-reveal] {
   animation: reveal var(--dur-slow) var(--ease) backwards;
-  animation-delay: var(--reveal-delay, 0ms);
+  animation-delay: calc(var(--reveal-step, 0) * var(--reveal-stagger));
 }
 
 /* Blocks that start below the fold are held at the first frame instead of
-   playing to an empty room; `src/scripts/reveal.ts` releases them as the reader
+   playing to an empty room; `src/scripts/site.ts` releases them as the reader
    arrives. Holding (rather than re-triggering) keeps this a pause, so nothing
    can flash or double-animate. */
 
@@ -403,21 +361,6 @@ button.link {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [data-reveal] {
-    animation: none;
-  }
-}
-
-/* A print can be triggered mid-reveal (the About page's "Download PDF"), and a
-   held block may never have played at all — neither may reach paper faded. */
-
-@media print {
-  [data-reveal] {
-    animation: none !important;
-  }
-}
-
 /* Cross-document page transitions: a brief cross-fade in browsers that support
    them, using the user agent's own root animation so only the timing changes.
    No JavaScript, and non-supporting browsers simply navigate as before. */
@@ -433,8 +376,76 @@ button.link {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  [data-reveal] {
+    animation: none;
+  }
+
   ::view-transition-old(root),
   ::view-transition-new(root) {
     animation: none;
+  }
+}
+
+/* --- Print --------------------------------------------------------------- */
+
+/* The About page is also the CV: it has to come out of a printer clean. */
+
+@media print {
+  :root {
+    --line: #000;
+    --line-strong: #000;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  main {
+    max-width: none;
+    padding: 0;
+  }
+
+  main > article,
+  main > section {
+    padding-block: 0;
+  }
+
+  main.home::before,
+  body > footer {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  /* A print can be triggered mid-reveal (the About page's "Download PDF"), and
+     a held block may never have played at all — neither may reach paper
+     faded. */
+
+  [data-reveal] {
+    animation: none !important;
+  }
+
+  @page {
+    margin: 1.4cm 3.8cm;
   }
 }

@@ -1,7 +1,19 @@
+/* =============================================================================
+   The home page's map: a small force layout that scatters the markers, keeps
+   them from colliding, and routes the connectors between them without crossings.
+
+   The markers, their copy and the chain they connect in are authored in
+   `src/diagram.config.ts` — the same file the page renders from, so the layout
+   and the markup can never disagree. This file only decides where things go.
+   ============================================================================= */
+
+import { diagramNodes, diagramChain, type DiagramNode } from '../diagram.config';
+
 type Node = {
   el: HTMLElement;
+  cfg: DiagramNode;
   id: string;
-  
+
   frac: { x: number; y: number };
   x: number;
   y: number;
@@ -11,9 +23,9 @@ type Node = {
   fy: number;
   ax: number;
   ay: number;
-  
+
   dotDy: number;
-  
+
   floating: boolean;
   calm: boolean;
   dragging: boolean;
@@ -23,92 +35,73 @@ type Node = {
 
 type EdgeShape = {
   kind: 'straight' | 'jagged' | 'wave';
-  
+
   points: { t: number; off: number }[];
 };
 
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
 export function initDiagram(root: HTMLElement) {
-  const svg = root.querySelector<SVGSVGElement>('[data-links]');
-  const edgeData = Array.from(
-    root.querySelectorAll<HTMLElement>('.diagram__edges-data > li')
-  );
-  const nodeEls = Array.from(root.querySelectorAll<HTMLElement>('[data-node]'));
-  if (!svg || !nodeEls.length) return;
-  const svgEl: SVGSVGElement = svg;
+  const links = root.querySelector<SVGSVGElement>('.links');
+  if (!links) return;
+  const svgEl: SVGSVGElement = links;
 
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const SVG_NS = 'http://www.w3.org/2000/svg';
 
-  const nodes: Node[] = nodeEls.map((el) => ({
-    el,
-    id: el.dataset.id || '',
-    frac: { x: 0.5, y: 0.5 },
-    x: 0,
-    y: 0,
-    vx: 0,
-    vy: 0,
-    fx: 0,
-    fy: 0,
-    ax: 0,
-    ay: 0,
-    dotDy: 0,
-    floating: el.dataset.floating !== undefined,
-    calm: false,
-    dragging: false,
-    hover: false,
-    focus: false,
-  }));
+  const nodes: Node[] = [];
+  for (const cfg of diagramNodes) {
+    const el = root.querySelector<HTMLElement>(`[data-id="${cfg.id}"]`);
+    if (!el) continue;
+    nodes.push({
+      el,
+      cfg,
+      id: cfg.id,
+      frac: { x: 0.5, y: 0.5 },
+      x: 0,
+      y: 0,
+      vx: 0,
+      vy: 0,
+      fx: 0,
+      fy: 0,
+      ax: 0,
+      ay: 0,
+      dotDy: 0,
+      floating: cfg.kind === 'floating',
+      calm: false,
+      dragging: false,
+      hover: false,
+      focus: false,
+    });
+  }
+  if (!nodes.length) return;
   const byId = new Map(nodes.map((n) => [n.id, n]));
 
-  const edges = edgeData
-    .map((li) => {
-      const a = byId.get(li.dataset.a || '');
-      const b = byId.get(li.dataset.b || '');
-      if (!a || !b) return null;
-      const line = document.createElementNS(SVG_NS, 'path');
-      line.setAttribute('class', 'link-line');
-      line.setAttribute('fill', 'none');
-      svgEl.appendChild(line);
-      const shape: EdgeShape = { kind: 'straight', points: [] };
-      return { a, b, line, rest: 0, shape };
-    })
-    .filter(Boolean) as {
-    a: Node;
-    b: Node;
-    line: SVGPathElement;
-    rest: number;
-    shape: EdgeShape;
-  }[];
+  // One connector per link in the authored chain.
+  const chain = diagramChain
+    .map((id) => byId.get(id))
+    .filter((n): n is Node => n !== undefined);
 
-  // Order the nodes along the chain (the diagram is one open line) so the
-  // random walk lays them out sequentially and the connectors read as a line.
-  const chainOrder: Node[] = (() => {
-    const adj = new Map<string, string[]>();
-    for (const e of edges) {
-      (adj.get(e.a.id) || adj.set(e.a.id, []).get(e.a.id)!).push(e.b.id);
-      (adj.get(e.b.id) || adj.set(e.b.id, []).get(e.b.id)!).push(e.a.id);
-    }
-    const ends = [...adj.keys()].filter((id) => (adj.get(id) || []).length === 1);
-    if (!ends.length) return nodes.slice();
-    const order: Node[] = [];
-    const seen = new Set<string>();
-    let cur: string | undefined = ends[0];
-    while (cur && !seen.has(cur)) {
-      seen.add(cur);
-      const n = byId.get(cur);
-      if (n) order.push(n);
-      cur = (adj.get(cur) || []).find((id) => !seen.has(id));
-    }
-    // Append any stragglers (defensive: not a clean path). Floating nodes are
-    // never part of the chain — they are laid out independently.
-    for (const n of nodes) if (!seen.has(n.id) && !n.floating) order.push(n);
-    return order;
-  })();
+  const edges = chain.slice(0, -1).map((a, i) => {
+    const line = document.createElementNS(SVG_NS, 'path');
+    line.setAttribute('class', 'link-line');
+    line.setAttribute('fill', 'none');
+    svgEl.appendChild(line);
+    const shape: EdgeShape = { kind: 'straight', points: [] };
+    return { a, b: chain[i + 1], line, rest: 0, shape };
+  });
+
+  // The chain doubles as the layout order, so the random walk lays the markers
+  // out sequentially and the connectors read as one line. Anything left out of
+  // the chain still needs a place; floating rings are laid out separately.
+  const chainOrder: Node[] = [
+    ...chain,
+    ...nodes.filter((n) => !n.floating && !chain.includes(n)),
+  ];
 
   let W = 0;
   let H = 0;
 
-  
+
   function safeWidth(rect: DOMRect) {
     return rect.width > 1 ? rect.width : window.innerWidth;
   }
@@ -122,7 +115,7 @@ export function initDiagram(root: HTMLElement) {
     return window.innerWidth > window.innerHeight * 1.1;
   }
 
-  
+
   function narrowness() {
     const aspect = W / Math.max(1, H);
     // aspect 1.0 → 0 (square), aspect 0.5 → 1 (very tall phone)
@@ -139,11 +132,9 @@ export function initDiagram(root: HTMLElement) {
     return { mx, my, iw: Math.max(1, W - 2 * mx), ih: Math.max(1, H - 2 * my) };
   }
 
+  /** The spot this marker was authored to prefer, for this orientation. */
   function configFrac(n: Node, landscape: boolean) {
-    const el = n.el;
-    const x = parseFloat(landscape ? el.dataset.lx || '0.5' : el.dataset.px || '0.5');
-    const y = parseFloat(landscape ? el.dataset.ly || '0.5' : el.dataset.py || '0.5');
-    return { x, y };
+    return landscape ? n.cfg.landscape : n.cfg.portrait;
   }
 
   function clampFrac(x: number, y: number) {
@@ -159,7 +150,7 @@ export function initDiagram(root: HTMLElement) {
     return clampFrac(spine.x * (1 - mix) + cfg.x * mix, spine.y * (1 - mix) + cfg.y * mix);
   }
 
-  
+
   function layoutSpine(landscape: boolean, configMix: number) {
     const n = chainOrder.length;
     const narrow = narrowness();
@@ -231,7 +222,7 @@ export function initDiagram(root: HTMLElement) {
     }
   }
 
-  
+
   function pickKindDistribution(n: number): Array<'straight' | 'jagged' | 'wave'> {
     if (n === 5) {
       const options: Array<[number, number, number]> = [
@@ -299,7 +290,7 @@ export function initDiagram(root: HTMLElement) {
 
   function measureDotOffsets() {
     for (const n of nodes) {
-      const dot = n.el.querySelector('.node__dot');
+      const dot = n.el.querySelector('button svg');
       if (!dot) continue;
       const nr = n.el.getBoundingClientRect();
       const dr = dot.getBoundingClientRect();
@@ -318,7 +309,7 @@ export function initDiagram(root: HTMLElement) {
     return { x: Math.max(r.width, 48) / 2, y: Math.max(r.height, 40) / 2 };
   }
 
-  
+
   function sepPad() {
     const narrow = narrowness();
     return {
@@ -431,7 +422,7 @@ export function initDiagram(root: HTMLElement) {
     return false;
   }
 
-  
+
   function orientationMismatched() {
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
     for (const n of nodes) {
@@ -442,10 +433,6 @@ export function initDiagram(root: HTMLElement) {
     const spanX = maxX - minX;
     const spanY = maxY - minY;
     return viewportLandscape() ? spanY > spanX * 1.1 : spanX > spanY * 1.1;
-  }
-
-  function adaptLayoutForViewport(landscape: boolean) {
-    layoutSpine(landscape, 0.15);
   }
 
   function syncAnchorsFromSim() {
@@ -470,7 +457,7 @@ export function initDiagram(root: HTMLElement) {
     return px < 0 ? -mag : mag;
   }
 
-  function edgePath(e: { a: Node; b: Node; shape: EdgeShape; liveSpikes?: { x: number; y: number; vx: number; vy: number }[] | null }): string {
+  function edgePath(e: { a: Node; b: Node; shape: EdgeShape }): string {
     const ax = e.a.x;
     const ay = e.a.y + e.a.dotDy;
     const bx = e.b.x;
@@ -503,22 +490,11 @@ export function initDiagram(root: HTMLElement) {
     }
 
     let d = `M ${ax.toFixed(1)} ${ay.toFixed(1)}`;
-    const spikes = e.liveSpikes;
-    if (spikes && spikes.length === s.points.length) {
-      const indexed = s.points
-        .map((p, i) => ({ i, t: p.t }))
-        .sort((p, q) => p.t - q.t);
-      for (const { i } of indexed) {
-        const sp = spikes[i];
-        d += ` L ${sp.x.toFixed(1)} ${sp.y.toFixed(1)}`;
-      }
-    } else {
-      for (let i = 1; i < wp.length - 1; i++) {
-        const off = jaggedOffPx(wp[i].off, len);
-        const x = ax + dx * wp[i].t + nx * off;
-        const y = ay + dy * wp[i].t + ny * off;
-        d += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
-      }
+    for (let i = 1; i < wp.length - 1; i++) {
+      const off = jaggedOffPx(wp[i].off, len);
+      const x = ax + dx * wp[i].t + nx * off;
+      const y = ay + dy * wp[i].t + ny * off;
+      d += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
     }
     d += ` L ${bx.toFixed(1)} ${by.toFixed(1)}`;
     return d;
@@ -841,7 +817,7 @@ export function initDiagram(root: HTMLElement) {
     recomputeRests();
   }
 
-  
+
   function seedFromAnchors() {
     for (const n of nodes) {
       n.x = n.ax + (Math.random() - 0.5) * SIM.initialScatter;
@@ -851,7 +827,7 @@ export function initDiagram(root: HTMLElement) {
     }
   }
 
-  
+
   function relayout() {
     computeAnchors();
     relaxAnchors();
@@ -872,7 +848,7 @@ export function initDiagram(root: HTMLElement) {
 
   /**
    * Times the one-off entrance and releases it (see the `is-mounted` rules in
-   * NavDiagram.astro). Markers land in chain order, each connector follows the
+   * index.astro). Markers land in chain order, each connector follows the
    * later of the two it joins, and the decorative rings come in last.
    */
   function startEntrance() {
@@ -1078,7 +1054,7 @@ export function initDiagram(root: HTMLElement) {
    * lands in one frame.
    */
   function clampPanel(n: Node) {
-    const panel = n.el.querySelector<HTMLElement>('.node__panel');
+    const panel = n.el.querySelector<HTMLElement>('.panel');
     if (!panel) return;
     panel.style.setProperty('--panel-nudge-x', '0px');
     panel.style.setProperty('--panel-nudge-y', '0px');
@@ -1114,9 +1090,7 @@ export function initDiagram(root: HTMLElement) {
 
   function setOpen(n: Node, open: boolean) {
     n.el.classList.toggle('is-open', open);
-    n.el
-      .querySelector('.node__hit')
-      ?.setAttribute('aria-expanded', open ? 'true' : 'false');
+    n.el.querySelector('button')?.setAttribute('aria-expanded', open ? 'true' : 'false');
     if (open) clampPanel(n);
     setCalm(n);
     wake();
@@ -1126,14 +1100,14 @@ export function initDiagram(root: HTMLElement) {
   }
 
   root.addEventListener('pointerdown', (ev) => {
-    if (!(ev.target as HTMLElement).closest('[data-node]')) closeAll();
+    if (!(ev.target as HTMLElement).closest('[data-id]')) closeAll();
   });
   root.addEventListener('keydown', (ev) => {
     if (ev.key === 'Escape') closeAll();
   });
 
   for (const n of nodes) {
-    const hit = n.el.querySelector<HTMLButtonElement>('.node__hit');
+    const hit = n.el.querySelector<HTMLButtonElement>('button');
     if (!hit) continue;
 
     n.el.addEventListener('pointerenter', () => {
@@ -1270,7 +1244,7 @@ export function initDiagram(root: HTMLElement) {
     const orientChanged = lastLandscape !== null && lastLandscape !== landscape;
     lastLandscape = landscape;
     if (orientChanged || orientationMismatched() || layoutIsCrowded()) {
-      adaptLayoutForViewport(landscape);
+      layoutSpine(landscape, 0.15);
     }
     measureDotOffsets();
     relayout();

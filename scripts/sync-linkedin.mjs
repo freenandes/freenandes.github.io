@@ -10,7 +10,7 @@
      1. On LinkedIn → your profile → "Resources" → "Save to PDF".
      2. Drop the file in  sources/linkedin-profile.pdf  (overwrite the old one).
      3. Run  `npm run sync:linkedin`  (or let the GitHub Action do it on push).
-        → writes  src/cv.data.json , which src/cv.config.ts feeds to the page.
+        → writes  src/cv.data.json , which src/pages/about.astro renders.
 
    How it works:
      LinkedIn's PDF is a two-column layout. We read the PDF with pdf.js (via

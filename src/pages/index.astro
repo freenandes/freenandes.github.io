@@ -1,8 +1,557 @@
 ---
+/** Home: an interactive map of the site. Markers, copy and connections are all
+    in `src/diagram.config.ts`; the physics that places them is in
+    `src/scripts/nav-diagram.ts`. */
+
 import Base from '../layouts/Base.astro';
-import NavDiagram from '../components/NavDiagram.astro';
+import { diagramNodes, type DiagramNode, type NodeKind, type NodeShape } from '../diagram.config';
+import { withBase } from '../lib/base';
+import { site } from '../site.config';
+
+/** Marker outline: a regular polygon in a 20×20 box, point up (square: flat). */
+const SIDES: Record<NodeShape, number> = { triangle: 3, square: 4, pentagon: 5, hexagon: 6 };
+
+function polygon(shape: NodeShape = 'hexagon'): string {
+  const sides = SIDES[shape];
+  const start = shape === 'square' ? -45 : -90;
+  return Array.from({ length: sides }, (_, i) => {
+    const angle = ((start + (i * 360) / sides) * Math.PI) / 180;
+    return `${(10 + 8.4 * Math.cos(angle)).toFixed(2)},${(10 + 8.4 * Math.sin(angle)).toFixed(2)}`;
+  }).join(' ');
+}
+
+/** Circle just big enough to carry `label` once around, with a gap. */
+function ring(label: string) {
+  const FONT = 12;
+  const advance = FONT * 0.725;
+  const textLength = Math.max(label.length * advance, 90);
+  const r = (textLength + 4 * advance) / (2 * Math.PI);
+  const size = Math.round(2 * (r + FONT * 1.25));
+  const c = size / 2;
+  return {
+    textLength: textLength.toFixed(2),
+    size,
+    d: `M ${c} ${(c - r).toFixed(2)} a ${r.toFixed(2)} ${r.toFixed(2)} 0 1 1 0 ${(2 * r).toFixed(2)} a ${r.toFixed(2)} ${r.toFixed(2)} 0 1 1 0 ${(-2 * r).toFixed(2)}`,
+  };
+}
+
+// Two kinds of marker look different from the rest — the name at the centre of
+// the map, and the decorative rings. Add a kind here to give it its own class.
+const variant = (node: DiagramNode) =>
+  node.kind === 'identity' || node.kind === 'floating' ? `node--${node.kind}` : undefined;
+
+// Markers render in three runs so the case studies can be announced as a set.
+// The wrappers are `display: contents` — they group, they don't lay out.
+const pick = (...kinds: NodeKind[]) => diagramNodes.filter((n) => kinds.includes(n.kind));
+const runs: { label?: string; nodes: DiagramNode[] }[] = [
+  { nodes: pick('identity', 'about', 'contact') },
+  { label: 'Selected projects', nodes: pick('project') },
+  { nodes: pick('floating') },
+];
 ---
 
 <Base footer={false} mainClass="home">
-  <NavDiagram />
+  <nav class="diagram" aria-label={`Site map — ${site.name}`}>
+    <svg class="links" aria-hidden="true" focusable="false"></svg>
+    {
+      runs.map((run) => (
+        <div class="run" role={run.label ? 'group' : undefined} aria-label={run.label}>
+          {run.nodes.map((node) => {
+            const Heading = node.kind === 'identity' ? 'h1' : 'h2';
+            const panelId = `panel-${node.id}`;
+            const circle = node.kind === 'floating' ? ring(node.label) : null;
+            return (
+              <div
+                class:list={['node', variant(node)]}
+                data-id={node.id}
+                aria-hidden={circle ? 'true' : undefined}
+              >
+                {circle ? (
+                  <svg
+                    style={`--ring-start: ${node.ringStart ?? 0}deg`}
+                    viewBox={`0 0 ${circle.size} ${circle.size}`}
+                    width={circle.size}
+                    height={circle.size}
+                    role="img"
+                    aria-label={node.label}
+                    focusable="false"
+                  >
+                    <defs>
+                      <path id={`ring-${node.id}`} d={circle.d} fill="none" />
+                    </defs>
+                    <text>
+                      <textPath
+                        href={`#ring-${node.id}`}
+                        startOffset="0"
+                        textLength={circle.textLength}
+                        lengthAdjust="spacingAndGlyphs"
+                      >
+                        {node.label}
+                      </textPath>
+                    </text>
+                  </svg>
+                ) : (
+                  <Heading>
+                    <button
+                      type="button"
+                      aria-expanded={node.kind === 'identity' ? undefined : 'false'}
+                      aria-controls={node.kind === 'identity' ? undefined : panelId}
+                    >
+                      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                        <polygon points={polygon(node.shape)} />
+                      </svg>
+                      <span>{node.label}</span>
+                      {node.subLabel && <span>{node.subLabel}</span>}
+                    </button>
+                  </Heading>
+                )}
+
+                {node.kind !== 'identity' && !circle && (
+                  <div class="panel" id={panelId} role="group" aria-label={node.label}>
+                    {node.tagline && <p class="lead">{node.tagline}</p>}
+                    {node.lines?.map((line) => <p>{line}</p>)}
+                    {node.tags && (
+                      <ul class="meta-row" role="list">
+                        {node.tags.map((tag) => <li class="meta">{tag}</li>)}
+                      </ul>
+                    )}
+                    {node.kind === 'contact' && (
+                      <ul role="list">
+                        {site.socials.map((s) => (
+                          <li>
+                            <a
+                              href={s.href}
+                              rel={s.href.startsWith('http') ? 'me noopener' : undefined}
+                            >
+                              {s.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {node.link && (
+                      <a
+                        href={node.link.external ? node.link.href : withBase(node.link.href)}
+                        {...(node.link.external ? { target: '_blank', rel: 'noopener' } : {})}
+                      >
+                        {node.link.label}
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      ))
+    }
+  </nav>
 </Base>
+
+<noscript>
+  <style>
+    /* No-JS fallback: collapse the simulation into a plain, readable list. */
+    .diagram {
+      display: flex;
+      flex-direction: column;
+      height: auto !important;
+      min-height: 0 !important;
+      padding: var(--space-md) !important;
+    }
+
+    .links {
+      display: none !important;
+    }
+
+    .node {
+      position: static !important;
+      transform: none !important;
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 40rem;
+      margin-inline: auto;
+      margin-block-end: var(--space-lg);
+    }
+
+    .panel {
+      position: static !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: none !important;
+      pointer-events: auto !important;
+      margin-block-start: var(--space-sm);
+    }
+
+    /* The entrance is held until the script has placed the map, so without
+       scripting there is nothing to wait for. */
+
+    .node,
+    .node button svg {
+      animation: none !important;
+    }
+  </style>
+</noscript>
+
+<style>
+  /* --- The canvas ------------------------------------------------------- */
+
+  .diagram {
+    position: relative;
+    width: 100%;
+    height: 100svh;
+    min-height: 34rem;
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+
+  .links {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Connectors are drawn by the script, so they are outside this scope. */
+
+  .links :global(.link-line) {
+    fill: none;
+    stroke: var(--ink-3);
+    stroke-width: 1.375;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Grouping only: no box, so markers still position against `.diagram`. */
+
+  .run {
+    display: contents;
+  }
+
+  /* --- Entrance --------------------------------------------------------- */
+
+  /* The map draws itself once: markers land along the chain, then each
+     connector is traced between the two it joins. The script sets the
+     per-element delay and releases the hold only after it has solved the
+     layout, so nothing animates in from a spot it is about to leave. */
+
+  @media (prefers-reduced-motion: no-preference) {
+    .node {
+      animation: node-in var(--dur) var(--ease) var(--enter-delay, 0ms) backwards paused;
+    }
+
+    .node button svg {
+      animation: dot-in var(--dur) var(--ease) var(--enter-delay, 0ms) backwards paused;
+    }
+
+    .links :global(.link-line) {
+      animation: edge-draw var(--dur-slow) var(--ease) var(--enter-delay, 0ms) backwards paused;
+    }
+
+    .diagram.is-mounted .node,
+    .diagram.is-mounted .node button svg,
+    .diagram.is-mounted .links :global(.link-line) {
+      animation-play-state: running;
+    }
+  }
+
+  @keyframes node-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes dot-in {
+    from {
+      transform: scale(0.7);
+    }
+  }
+
+  /* `pathLength="1"` (set by the script) makes these normalised units, so the
+     trace holds up while the simulation is still nudging the endpoints. */
+
+  @keyframes edge-draw {
+    from {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+
+    to {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* --- Markers ---------------------------------------------------------- */
+
+  .node {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    will-change: transform;
+  }
+
+  .node:hover,
+  .node:focus-within,
+  .node.is-open,
+  .node.is-dragging {
+    z-index: 6;
+  }
+
+  /* The headings give the page a real outline without changing the look: they
+     wrap the existing button and inherit all typography from it. */
+
+  h1,
+  h2 {
+    display: inline-flex;
+    font: inherit;
+    letter-spacing: inherit;
+    text-wrap: nowrap;
+  }
+
+  .node button {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+    background: none;
+    border: 0;
+    color: var(--ink);
+    cursor: grab;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .node.is-dragging button {
+    cursor: grabbing;
+  }
+
+  .node button svg {
+    width: 1rem;
+    height: 1rem;
+    overflow: visible;
+    flex: none;
+    transition: transform var(--dur-fast) var(--ease);
+  }
+
+  .node button polygon {
+    fill: var(--paper);
+    stroke: var(--ink);
+    stroke-width: 1.75;
+    vector-effect: non-scaling-stroke;
+    transition: fill var(--dur-fast) var(--ease), stroke var(--dur-fast) var(--ease);
+  }
+
+  .node--identity button svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .node--identity button polygon {
+    stroke-width: 2;
+  }
+
+  .node button:hover svg,
+  .node:focus-within button svg,
+  .node.is-open button svg {
+    transform: scale(1.25);
+  }
+
+  .node button:hover polygon,
+  .node:focus-within button polygon,
+  .node.is-open button polygon {
+    fill: var(--accent);
+    stroke: var(--accent-ink);
+  }
+
+  /* Each label sits on a solid paper plate so connector lines are masked
+     completely where they pass behind it. */
+
+  .node button span {
+    display: inline-block;
+    padding-inline: 0.25em;
+    background-color: var(--paper);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--ink-2);
+    white-space: nowrap;
+    transition: color var(--dur-fast) var(--ease);
+  }
+
+  .node button:hover span,
+  .node:focus-within button span,
+  .node.is-open button span {
+    color: var(--ink);
+  }
+
+  /* The name itself is set in the body face, not the label mono. Its second
+     line (the job title) stays a label, so this targets the first span only. */
+
+  .node--identity button span:first-of-type {
+    font-family: var(--font-sans);
+    font-size: var(--step-0);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+    text-transform: none;
+    color: var(--ink-2);
+  }
+
+  /* --- Floating rings --------------------------------------------------- */
+
+  .node--floating {
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .node--floating svg {
+    display: block;
+    overflow: visible;
+    transform-origin: center;
+    transform: rotate(var(--ring-start, 0deg));
+  }
+
+  .node--floating text {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    fill: var(--ink-faint);
+  }
+
+  @keyframes ring-spin {
+    from {
+      transform: rotate(var(--ring-start, 0deg));
+    }
+
+    to {
+      transform: rotate(calc(var(--ring-start, 0deg) - 360deg));
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .node--floating svg {
+      animation: ring-spin 30s linear infinite;
+    }
+  }
+
+  /* --- Cards ------------------------------------------------------------ */
+
+  .panel {
+    /* How far the card sits from its marker before it is asked for. */
+    --shift: 0.5rem;
+
+    /* The script sets these to pull a card back inside the viewport when its
+       marker sits near an edge (see clampPanel). 0 = no correction needed. */
+    --panel-nudge-x: 0px;
+    --panel-nudge-y: 0px;
+
+    position: absolute;
+    width: max-content;
+    max-width: min(90vw, 20rem);
+    padding: 0.875rem 1rem;
+    background: var(--paper);
+    outline: 1px solid var(--line-soft);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lift);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    /* The viewport correction rides on `translate`, which is left out of the
+       transition below: it must land instantly, or a card near an edge would
+       appear to slide in from the wrong place. */
+    translate: var(--panel-nudge-x) var(--panel-nudge-y);
+
+    /* Leaving is quicker than arriving: a card you have moved away from should
+       get out of the way, a card you asked for should settle. */
+    transition: opacity var(--dur-fast) var(--ease),
+      visibility var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+  }
+
+  /* `data-place` is set by the script, on whichever side has the most room. */
+
+  .node[data-place='bottom'] .panel {
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(var(--shift));
+  }
+
+  .node[data-place='top'] .panel {
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(calc(-1 * var(--shift)));
+  }
+
+  .node[data-place='right'] .panel {
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%) translateX(var(--shift));
+  }
+
+  .node[data-place='left'] .panel {
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%) translateX(calc(-1 * var(--shift)));
+  }
+
+  .node:hover .panel,
+  .node:focus-within .panel,
+  .node.is-open .panel {
+    --shift: 0px;
+
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition-duration: var(--dur);
+  }
+
+  /* Hover intent: a pointer crossing the map shouldn't trip every card on the
+     way. Deliberate opens — click, or keyboard focus — never wait. */
+
+  .node:hover .panel {
+    transition-delay: var(--delay-hover);
+  }
+
+  .node:focus-within .panel,
+  .node.is-open .panel {
+    transition-delay: 0s;
+  }
+
+  .panel p {
+    font-size: var(--step-0);
+    line-height: var(--leading-snug);
+  }
+
+  .panel .lead {
+    font-weight: var(--weight-semibold);
+    margin-block-end: var(--space-md);
+  }
+
+  .panel > ul,
+  .panel > a {
+    margin-block: var(--space-md) var(--space-xs);
+  }
+
+  .panel > a {
+    display: inline-flex;
+  }
+</style>
+
+<script>
+  import { initDiagram } from '../scripts/nav-diagram';
+
+  const root = document.querySelector<HTMLElement>('.diagram');
+  if (root) initDiagram(root);
+</script>

@@ -6,48 +6,34 @@ import { withBase } from '../lib/base';
 <Base
   title="Page not found"
   description="The page you were looking for doesn't exist or has moved."
-  mainClass="error"
 >
-  <section class="error container">
-    <h1 class="error__code" data-reveal>Page not found</h1>
-    <h2 class="error__title" data-reveal style="--reveal-delay: 60ms;">
-      You've wandered off the map
-    </h2>
-    <p class="error__copy" data-reveal style="--reveal-delay: 110ms;">
+  <section>
+    <h1 class="meta" data-reveal>Page not found</h1>
+    <h2 data-reveal style="--reveal-step: 1">You've wandered off the map</h2>
+    <p data-reveal style="--reveal-step: 2">
       The page you were looking for doesn't exist, or it has moved. Head back to the map and pick another page to continue.
     </p>
-    <ul class="error__nav link-row" role="list" data-reveal style="--reveal-delay: 160ms;">
-      <li><a class="link" href={withBase('/')}>Back to map</a></li>
+    <ul role="list" data-reveal style="--reveal-step: 3">
+      <li><a href={withBase('/')}>Back to map</a></li>
     </ul>
   </section>
 </Base>
 
 <style>
-  .error {
-    max-width: var(--measure);
+  /* Short page: hold it near the middle of the viewport rather than the top. */
+
+  section {
     min-height: 50svh;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-block: var(--space-lg);
   }
 
-  .error__code {
-    font-family: var(--font-mono);
-    font-size: var(--step--2);
-    font-weight: var(--weight-semibold);
-    line-height: var(--leading-tight);
-    letter-spacing: var(--tracking-wide);
-    text-transform: uppercase;
-    color: var(--ink-3);
-  }
-
-  .error__title {
+  h2 {
     margin-block: var(--space-sm);
-    font-size: var(--step-2);
   }
 
-  .error__nav {
+  ul {
     margin-block-start: var(--space-md);
   }
 </style>

@@ -1,30 +1,21 @@
 ---
 import { site } from '../site.config';
-
-const year = new Date().getFullYear();
 ---
 
-<footer class="site-footer container" data-reveal>
-  <div class="site-footer__bar">
-    <ul role="list" class="link-row">
-      {
-        site.socials.map((s) => (
-          <li>
-            <a href={s.href} class="link">{s.label}</a>
-          </li>
-        ))
-      }
+<footer data-reveal>
+  <div>
+    <ul role="list">
+      {site.socials.map((s) => <li><a href={s.href}>{s.label}</a></li>)}
     </ul>
-    <p class="site-footer__meta">© {year} {site.name}</p>
+    <p>© {new Date().getFullYear()} {site.name}</p>
   </div>
 </footer>
 
 <style>
-  .site-footer {
-    max-width: var(--measure);
-  }
+  /* The rule sits on the inner box so it lines up with the text column rather
+     than running out into the gutters. */
 
-  .site-footer__bar {
+  div {
     border-block-start: 1px solid var(--line-strong);
     display: flex;
     flex-direction: column;
@@ -32,7 +23,7 @@ const year = new Date().getFullYear();
     padding-block: var(--space-lg);
   }
 
-  .site-footer__meta {
+  p {
     font-size: var(--step--1);
     font-weight: var(--weight-medium);
     color: var(--ink-3);

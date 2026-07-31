@@ -11,7 +11,7 @@
                                                             public/locked/<slug>.json  (ciphertext, committed)
 
    The browser later derives the same key from the visitor's password
-   (PBKDF2) and decrypts with AES-GCM. See src/lib/decrypt.ts.
+   (PBKDF2) and decrypts with AES-GCM. See src/components/PasswordGate.astro.
 
    This runs automatically before `astro build` (npm "prebuild") and can be
    run on demand with `npm run encrypt`.

@@ -35,6 +35,10 @@ const unlock = (password) =>
  * counts as changed — only the home page needs it, because its layout comes out
  * of a randomised physics simulation whose settling path is never bit-identical
  * (two captures of the *same* build land within ~0.5%).
+ *
+ * `media: 'print'` photographs the page as a printer would see it, and
+ * `fullPage: true` takes the whole document rather than one screenful — the two
+ * together are how the CV's print stylesheet gets checked.
  */
 export const scenarios = [
   { name: 'home', path: '/', drift: 0.01 },
@@ -42,9 +46,10 @@ export const scenarios = [
     name: 'home-card-open',
     path: '/',
     drift: 0.01,
-    act: (page) => page.evaluate(() => document.querySelector('[data-id="about"] .node__hit').click()),
+    act: (page) => page.evaluate(() => document.querySelector('[data-id="about"] button').click()),
   },
   { name: 'about', path: '/about/' },
+  { name: 'about-print', path: '/about/', media: 'print', fullPage: true },
   { name: 'about-scrolled', path: '/about/', act: scrollTo(1200) },
   { name: 'about-nav-pinned', path: '/about/', act: scrollTo(1200, 900) },
   { name: 'project', path: '/projects/systems-thinker/' },
@@ -59,59 +64,77 @@ export const scenarios = [
  * Computed styles are compared as well as the pixels: it catches changes the
  * camera can't see (an off-screen element, a different way of parking the skip
  * link) and, unlike a screenshot, it never drifts.
+ *
+ * These are deliberately structural rather than class-based, so a run still
+ * compares like with like after markup is renamed.
  */
 export const styleProbes = [
+  // Shell
   'body',
   'main',
   '.skip-link',
+  'body > footer',
+  'body > footer > div',
+  'body > footer a',
+  'body > footer p',
+
+  // Shared type and link roles
   '.prose',
   '.prose a',
-  '.link',
-  '.button__pad',
-  '.input__box',
-  '.label',
   '.meta',
-  '.mono',
-  '.site-footer',
-  '.site-footer__meta',
+  '.meta-row',
   '.page-nav',
-  '.page-nav__at-rest',
-  '.cv__head',
-  '.cv__name',
-  '.cv__summary',
-  '.cv__section-title',
+  '.page-nav a',
+  '.page-nav li:last-child',
+  '.page-nav button',
+
+  // Article pages (About + case study)
+  'main > article > header',
+  'main > article > header h1',
+  'main > article > header p',
+  'main > article > header ul',
+  'main > article > header + div',
+  'main > article > div:last-child',
+  'main > article section h2',
   '.entry',
-  '.entry__period',
-  '.entry__role',
-  '.cv__foot',
-  '.project__title',
-  '.project__summary',
-  '.project__links',
+  '.entry > :first-child',
+  '.entry h3',
+  '.entry ul',
+  '.entry li',
+
+  // Passphrase gate
   '.lock',
-  '.lock__panel',
-  '.lock__title',
-  '.lock__form',
-  '.lock__error',
-  '.lock__content',
-  '.error__code',
-  '.error__title',
-  '.error__nav',
+  '.lock > div',
+  '.lock h2',
+  '.lock form',
+  '.lock input',
+  '.lock form button',
+  '.lock [role="alert"]',
+  '.lock article',
+
+  // 404
+  'main > section h1',
+  'main > section h2',
+  'main > section p',
+  'main > section ul',
+
+  // The map
   '.diagram',
-  '.diagram__links',
+  '.diagram > svg',
   '.link-line',
   '.node',
   '.node--identity',
   '.node--floating',
-  '.node__hit',
-  '.node__dot',
-  '.node__dot polygon',
-  '.node__label',
-  '.node__ring',
-  '.node__ring-text',
-  '.node__panel',
-  '.panel__lead',
-  '.panel__text',
-  '.panel__link',
+  '.node--floating svg',
+  '.node--floating text',
+  '.node button',
+  '.node button svg',
+  '.node button polygon',
+  '.node button span',
+  '.node > div',
+  '.node > div > p:first-child',
+  '.node > div p',
+  '.node > div > a',
 ];
 
 /**

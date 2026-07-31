@@ -6,6 +6,7 @@ import Base from '../layouts/Base.astro';
 import PageNav from '../components/PageNav.astro';
 import { site } from '../site.config';
 import { withBase } from '../lib/base';
+import { mailtoToken } from '../lib/email';
 import cvData from '../cv.data.json';
 
 interface CV {
@@ -85,14 +86,24 @@ const jsonLd = [
       <div>
         <h1>{name}</h1>
         <p>{headline}</p>
-        {/* On paper there are no links to click, so the addresses are spelled out. */}
+        {/* On paper there are no links to click, so the addresses are spelled out.
+            The email is filled in by script (see src/scripts/site.ts) so it is
+            never in the shipped HTML. */}
         <div class="print-only">
-          {site.socials.map((s) => <p>{s.href.replace(/^mailto:/, '')}</p>)}
+          {site.socials.map((s) => {
+            const token = mailtoToken(s.href);
+            return token
+              ? <p data-email={token} data-email-text></p>
+              : <p>{s.href}</p>;
+          })}
         </div>
       </div>
 
       <ul class="no-print" role="list">
-        {site.socials.map((s) => <li><a href={s.href}>{s.label}</a></li>)}
+        {site.socials.map((s) => {
+          const token = mailtoToken(s.href);
+          return <li><a href={token ? undefined : s.href} data-email={token ?? undefined}>{s.label}</a></li>;
+        })}
       </ul>
     </header>
 

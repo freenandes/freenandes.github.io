@@ -146,5 +146,8 @@ image, raster app icons, and self-hosted fonts).
 - [ ] Add `public/og.png` (1200×630) — `og:image` is wired up but the asset is missing.
 - [ ] Add raster app icons (`favicon.ico`, `apple-touch-icon.png`, maskable PWA icon).
 - [ ] Self-host the web fonts (drops the Google Fonts third-party request, enables SRI).
-- [ ] Create a solution to avoid exposing the email.
+- [x] Create a solution to avoid exposing the email. The address ships as an
+      opaque hex token (`src/lib/email.ts`) and is reassembled in the browser
+      (`src/scripts/site.ts`), so it is never in the served HTML or `/llms.txt`;
+      the printed CV line is filled in the same way.
 - [ ] See [`SPEC-COMPLIANCE.md`](./SPEC-COMPLIANCE.md) for the complete pending list.

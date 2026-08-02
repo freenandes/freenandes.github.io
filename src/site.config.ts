@@ -4,8 +4,13 @@ export interface SiteConfig {
   name: string;
   role: string;
   description: string;
-  /** Shown in link rows, the footer, the contact card and /llms.txt. */
-  socials: { label: string; href: string }[];
+  /** Shown in link rows, the footer, the contact card and /llms.txt. A normal
+   *  link carries an `href`; the email carries an obfuscated `token` instead
+   *  (see `src/lib/email.ts`) so the address is never written as plaintext into
+   *  the served HTML *or* this public repo — the browser turns it back into a
+   *  `mailto:` link at runtime. Regenerate the token with `encodeEmail(addr)`
+   *  from `src/lib/email.ts` if the address changes. */
+  socials: { label: string; href?: string; token?: string }[];
   /** BCP 47 language tag for the document (matches <html lang>). */
   locale: string;
   /** Open Graph locale (underscore form, e.g. en_US). */
@@ -25,7 +30,7 @@ export const site: SiteConfig = {
   description:
     'Systems-thinking product designer turning stagnating products into growth engines — fixing ecosystems, not just interfaces, and shipping the code to prove it.',
   socials: [
-    { label: 'Email', href: 'mailto:redacted@example.invalid' },
+    { label: 'Email', token: 'b3c3d6d7c1dcf3c3ded0d59dcbcac9' },
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/pmcfernandes' },
     { label: 'GitHub', href: 'https://github.com/freenandes' },
   ],

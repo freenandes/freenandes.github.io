@@ -7,7 +7,6 @@ import Base from '../layouts/Base.astro';
 import { diagramNodes, type DiagramNode, type NodeKind, type NodeShape } from '../diagram.config';
 import { withBase } from '../lib/base';
 import { site } from '../site.config';
-import { mailtoToken } from '../lib/email';
 
 /** Marker outline: a regular polygon in a 20×20 box, point up (square: flat). */
 const SIDES: Record<NodeShape, number> = { triangle: 3, square: 4, pentagon: 5, hexagon: 6 };
@@ -118,20 +117,17 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
                     )}
                     {node.kind === 'contact' && (
                       <ul role="list">
-                        {site.socials.map((s) => {
-                          const token = mailtoToken(s.href);
-                          return (
-                            <li>
-                              <a
-                                href={token ? undefined : s.href}
-                                data-email={token ?? undefined}
-                                rel={s.href.startsWith('http') ? 'me noopener' : undefined}
-                              >
-                                {s.label}
-                              </a>
-                            </li>
-                          );
-                        })}
+                        {site.socials.map((s) => (
+                          <li>
+                            <a
+                              href={s.href}
+                              data-email={s.token}
+                              rel={s.href?.startsWith('http') ? 'me noopener' : undefined}
+                            >
+                              {s.label}
+                            </a>
+                          </li>
+                        ))}
                       </ul>
                     )}
                     {node.link && (

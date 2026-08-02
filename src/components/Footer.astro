@@ -1,15 +1,13 @@
 ---
 import { site } from '../site.config';
-import { mailtoToken } from '../lib/email';
 ---
 
 <footer data-reveal>
   <div>
     <ul role="list">
-      {site.socials.map((s) => {
-        const token = mailtoToken(s.href);
-        return <li><a href={token ? undefined : s.href} data-email={token ?? undefined}>{s.label}</a></li>;
-      })}
+      {site.socials.map((s) => (
+        <li><a href={s.href} data-email={s.token}>{s.label}</a></li>
+      ))}
     </ul>
     <p>© {new Date().getFullYear()} {site.name}</p>
   </div>

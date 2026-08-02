@@ -229,8 +229,10 @@ function parseContact(items = []) {
   const contact = {};
   for (const raw of items) {
     const t = raw.replace(/\s*\((LinkedIn|Personal|Mobile|Home|Work)\)\s*$/i, '').trim();
-    if (/@/.test(t)) contact.email = t;
-    else if (/linkedin\.com/i.test(t)) contact.linkedin = t.startsWith('http') ? t : `https://${t}`;
+    // The email is intentionally never stored: it would leak into this public
+    // repo. The site carries it as an obfuscated token instead (src/lib/email.ts).
+    if (/@/.test(t)) continue;
+    if (/linkedin\.com/i.test(t)) contact.linkedin = t.startsWith('http') ? t : `https://${t}`;
     else if (/^\+?\d[\d\s()-]{6,}$/.test(t)) contact.phone = t;
     else if (/\.[a-z]{2,}($|\/)/i.test(t) && !/,/.test(t)) contact.website = t.startsWith('http') ? t : `https://${t}`;
     else if (/,/.test(t) && !contact.location) contact.location = t;

@@ -146,8 +146,10 @@ image, raster app icons, and self-hosted fonts).
 - [ ] Add `public/og.png` (1200×630) — `og:image` is wired up but the asset is missing.
 - [ ] Add raster app icons (`favicon.ico`, `apple-touch-icon.png`, maskable PWA icon).
 - [ ] Self-host the web fonts (drops the Google Fonts third-party request, enables SRI).
-- [x] Create a solution to avoid exposing the email. The address ships as an
-      opaque hex token (`src/lib/email.ts`) and is reassembled in the browser
-      (`src/scripts/site.ts`), so it is never in the served HTML or `/llms.txt`;
-      the printed CV line is filled in the same way.
+- [x] Create a solution to avoid exposing the email. The address lives only as
+      an opaque hex token in `site.config.ts` (`socials[].token`) and is
+      reassembled in the browser (`src/lib/email.ts`, `src/scripts/site.ts`), so
+      it is never in plaintext in the served HTML, `/llms.txt`, or this public
+      repo; the printed CV line is filled in the same way. Regenerate the token
+      with `encodeEmail()` from `src/lib/email.ts` if the address changes.
 - [ ] See [`SPEC-COMPLIANCE.md`](./SPEC-COMPLIANCE.md) for the complete pending list.

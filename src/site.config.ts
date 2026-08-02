@@ -8,8 +8,8 @@ export interface SiteConfig {
    *  link carries an `href`; the email carries an obfuscated `token` instead
    *  (see `src/lib/email.ts`) so the address is never written as plaintext into
    *  the served HTML *or* this public repo — the browser turns it back into a
-   *  `mailto:` link at runtime. Regenerate the token with `encodeEmail(addr)`
-   *  from `src/lib/email.ts` if the address changes. */
+   *  `mailto:` link at runtime. To change the email run
+   *  `npm run email -- you@example.com`; never edit the token by hand. */
   socials: { label: string; href?: string; token?: string }[];
   /** BCP 47 language tag for the document (matches <html lang>). */
   locale: string;

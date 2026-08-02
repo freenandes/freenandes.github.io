@@ -49,6 +49,7 @@ it before adding a file.
  computed-style probes are structural so a class rename doesn't drown the report.
 - **Encrypt locked projects:** `npm run encrypt`
 - **Sync About page from LinkedIn:** `npm run sync:linkedin` (parses `sources/linkedin-profile.pdf` → `src/cv.data.json`)
+- **Change contact email:** `npm run email -- you@example.com` (writes the obfuscated token into `src/site.config.ts`; the address is never stored as plaintext)
 
 ## Locked projects
 

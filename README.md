@@ -32,6 +32,7 @@ next to it.
 | Colour, type scale, spacing, motion — anything used more than once | `src/styles/tokens.css` |
 | How plain elements look everywhere (links, buttons, headings, lists, rendered Markdown) | `src/styles/global.css` |
 | Name, role, social links, OG image, theme colour | `src/site.config.ts` |
+| The contact email (obfuscated) | `npm run email -- you@example.com` — writes the token into `src/site.config.ts` |
 | `<head>`, metadata, JSON-LD, the skip link, the page shell | `src/layouts/Base.astro` |
 | The home page — markup and look | `src/pages/index.astro` |
 | The home page — which markers exist, what their cards say, what connects to what | `src/diagram.config.ts` |

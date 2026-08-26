@@ -48,7 +48,7 @@ it before adding a file.
  `drift` budget because its layout is a randomised simulation, and the
  computed-style probes are structural so a class rename doesn't drown the report.
 - **Encrypt locked projects:** `npm run encrypt`
-- **Sync About page from LinkedIn:** `npm run sync:linkedin` (parses `sources/linkedin-profile.pdf` → `src/cv.data.json`)
+- **Sync About page from LinkedIn:** `npm run sync:linkedin` (parses `sources/linkedin-profile.pdf` → `src/cv.data.json`; the PDF is local-only — `sources/` is git-ignored and there is no CI sync — and the email/phone are dropped from the output)
 - **Change contact email:** `npm run email -- you@example.com` (writes the obfuscated token into `src/site.config.ts`; the address is never stored as plaintext)
 
 ## Locked projects

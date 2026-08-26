@@ -11,34 +11,17 @@
    plaintext never lands in the repo and you never hand-translate a token.
    `src/lib/email.ts` reverses the token in the browser to rebuild the link.
 
-   The codec below mirrors `src/lib/email.ts` on purpose: this is a plain Node
-   script with no TypeScript runtime, and the algorithm is a few lines that must
-   not change in one place without the other.
+   The codec is imported from `src/lib/email-codec.mjs` — the same file the
+   site ships — so the round-trip check below exercises the exact decoder the
+   browser will run, and the two sides cannot drift apart.
    ========================================================================= */
 
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { encodeEmail, decodeEmail } from '../src/lib/email-codec.mjs';
 
 const CONFIG = fileURLToPath(new URL('../src/site.config.ts', import.meta.url));
-
-/** XOR each byte with a key; the first octet is the key, the rest the address
- *  xor'd with it, all hex. The key is derived from the address so the token is
- *  reproducible. Mirror of `src/lib/email.ts`. */
-function encodeEmail(email) {
-  const key = (Array.from(email).reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % 251) + 1;
-  const bytes = [key, ...Array.from(email, (ch) => ch.charCodeAt(0) ^ key)];
-  return bytes.map((byte) => byte.toString(16).padStart(2, '0')).join('');
-}
-
-function decodeEmail(token) {
-  const key = parseInt(token.slice(0, 2), 16);
-  let email = '';
-  for (let i = 2; i < token.length; i += 2) {
-    email += String.fromCharCode(parseInt(token.slice(i, i + 2), 16) ^ key);
-  }
-  return email;
-}
 
 const email = process.argv[2]?.trim();
 if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {

@@ -1,5 +1,7 @@
 /** Everything about the site that isn't a page: name, links, metadata, assets. */
 
+import { decodeEmail } from './lib/email';
+
 export interface SiteConfig {
   name: string;
   role: string;
@@ -42,3 +44,16 @@ export const site: SiteConfig = {
   shortName: 'PMCF',
   themeColor: '#ffffff',
 };
+
+// This module only loads server-side (build/dev), so a token that no longer
+// decodes to an address — hand-edited, or left behind by a codec change —
+// fails the build here with instructions, instead of shipping a site whose
+// email links silently point nowhere.
+for (const social of site.socials) {
+  if (social.token && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(decodeEmail(social.token))) {
+    throw new Error(
+      `site.config.ts: the "${social.label}" token does not decode to an email address. ` +
+        'Regenerate it with `npm run email -- you@example.com`.'
+    );
+  }
+}

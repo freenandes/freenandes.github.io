@@ -8,9 +8,10 @@
  * `src/scripts/site.ts`).
  *
  * The trade-off is that the mail link needs JavaScript to work; that is the
- * point. With scripting off the email entry hides itself rather than sit there
- * as a dead link or a blank printed line (the `[data-email]` noscript rule in
- * `src/layouts/Base.astro`) — the other contact links work without JS.
+ * point. Until the script has decoded the address — scripting off, blocked, or
+ * the bundle failed — the email entry stays hidden rather than sit there as a
+ * dead link or a blank printed line (the `[data-email]` state rule in
+ * `src/styles/global.css`); the other contact links work without JS.
  *
  * The codec itself lives in `./email-codec.mjs`: one implementation, plain
  * JavaScript, shared by this module and the `npm run email` setter

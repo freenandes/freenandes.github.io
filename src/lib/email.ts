@@ -8,7 +8,9 @@
  * `src/scripts/site.ts`).
  *
  * The trade-off is that the mail link needs JavaScript to work; that is the
- * point, and the label still reads as a link with none.
+ * point. With scripting off the email entry hides itself rather than sit there
+ * as a dead link or a blank printed line (the `[data-email]` noscript rule in
+ * `src/layouts/Base.astro`) — the other contact links work without JS.
  *
  * Generating that token (the reverse of this) is a build-time chore, not a
  * runtime one, so it lives in `scripts/set-email.mjs`. Never edit the token by

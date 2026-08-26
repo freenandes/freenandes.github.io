@@ -139,6 +139,14 @@ const csp = [
         [data-reveal] {
           animation: none !important;
         }
+
+        /* The email link (and its printed-CV line) is assembled by script so
+           the address is never in this HTML — see src/lib/email.ts. Without
+           scripting it would be a dead control and a blank print line, so it
+           hides instead; LinkedIn and GitHub still work. */
+        [data-email] {
+          display: none !important;
+        }
       </style>
     </noscript>
   </head>

@@ -1,8 +1,8 @@
 {
   "name": "Pedro MC Fernandes",
-  "headline": "Experienced Product Designer | Systems Thinker | Enterprise 0→1 Strategy & Code-Shipping | 18+ Years Building & Scaling",
+  "headline": "Lead Interface Designer — Researching, designing, and coding systems for web software",
   "location": "Leiria, Leiria, Portugal",
-  "summary": "I'm a systems-thinking product designer who transforms stagnating products into growth engines by fixing ecosystems, not just interfaces.\n\nI operate at the intersection of strategy and execution, defining a vision that influences executive roadmaps while shipping production code that helps scale teams and operations. My specialty is diagnosing why products underperform, then building the frameworks and systems that unlock their potential.\n\nAt Percona, I helped upkeep and then amplify product adoption growth by identifying the underlying problems, beyond UI cosmetics, and systematizing core, scalable fixes that slowly start to scaffold. At Farfetch, I shifted sustainability from being costly to being a business opportunity by revealing how shopping discovery barriers created vicious cycles.\n\nI thrive in ambiguous 0→1 spaces where I can own strategy as well as delivery, building design systems that become force multipliers for teams.",
+  "summary": "I design web software interfaces and write production front-end code that teams can use to scale their products. I focus on researching and solving underlying product workflows, building component systems that keep applications clean, performant, and easy to use.",
   "experience": [
     {
       "role": "Senior Product Designer",
@@ -10,17 +10,11 @@
       "period": "August 2022 — Present",
       "location": "Leiria, Portugal",
       "points": [
-        "Contributed to the team effort of 45% PMM adoption growth through systematic UX improvements across product ecosystem",
-        "Identified critical adoption barriers through user pathway analysis, shifting strategy from UI updates to ecosystem-wide improvements",
-        "Delivered validated SaaS prototype in 2-week sprint securing executive investment",
-        "Influenced executive strategy with compelling vision prototypes and extensive user research, securing buy-in for roadmap initiatives",
-        "Built Peak Design System adopted across 3 products and 10+ engineers, reducing handoff and front-end development by ~50%",
-        "Achieved near 100% implementation accuracy through self-serve components and developer tooling",
-        "Established analytics framework (PostHog) enabling data-driven decisions across documentation and products",
-        "Shipped production code for internal services platform, eliminating handoff friction",
-        "Led documentation redesign across 10+ products, establishing patterns for consistent onboarding",
-        "Initiated New Native Navigation project to reduce Grafana dependency, unblocking strategies against technical debt",
-        "Mentored designers and engineers, establishing research practices, design excellence standards, and a modernized front-end practice"
+        "Built and managed Peak UI, establishing front-end component patterns that streamlined development and enabled extensibility for Percona products.",
+        "Designed and coded a native navigation architecture for PMM (Percona Monitoring and Management), decoupling the interface from heavy third-party dependencies to reduce technical debt and unblock custom features.",
+        "Built high-fidelity vision prototypes to resolve core workflow issues in products, using user research to secure executive buy-in and drive product adoption.",
+        "Redesigned and coded modular templates across 10+ documentation sites, creating a scalable framework that improved readability and simplified content creation.",
+        "Mentored designers and engineers on front-end code practices, design system patterns, and research methods."
       ]
     },
     {
@@ -29,15 +23,10 @@
       "period": "June 2021 — July 2022",
       "location": "Lisbon, Portugal",
       "points": [
-        "Led sustainability research revealing discovery barriers and supporting corporate sustainability goals",
-        "Created taxonomy frameworks addressing catalog confusion while informing sustainability roadmap",
-        "Enabled direct purchasing capability from listing pages through card redesign, removing unnecessary navigation steps",
-        "Developed testing protocols and comparison matrices adopted by multiple teams",
-        "Built modular component patterns balancing luxury aesthetics with functional requirements",
-        "Established documentation bridging design and catalog teams, reducing cross-team friction",
-        "Research showed path and margin to grow conscious products improved discovery",
-        "Shifted organizational narrative from “sustainability as cost center” to “sustainability as growth opportunity”",
-        "Earned leadership recognition for cross-department alignment on sustainable product strategy"
+        "Redesigned product listing cards to enable direct purchasing from catalog pages, removing friction in the checkout funnel and improving product discovery.",
+        "Built modular component patterns that balanced high-end luxury brand aesthetics with strict functional e-commerce requirements.",
+        "Created taxonomy frameworks to resolve catalog disparities around sustainable items, making complex product attributes clearer while establishing documentation to align cross-department standards.",
+        "Uncovered catalog discovery barriers through user research, using the insights to shape the conscious shopping roadmap."
       ]
     },
     {
@@ -46,15 +35,10 @@
       "period": "March 2019 — May 2021",
       "location": "Lisbon, Portugal",
       "points": [
-        "Designed PageBuilder system generating 100K+ destination pages, supporting 4x organic traffic growth and reducing metasearch business dependence",
-        "Influenced product strategy and roadmaps through data-driven vision prototypes earning executive recognition",
-        "Co-founded TUI Lisbon hub, scaling the team while establishing innovation practices",
-        "Created Tagus design system unifying experiences across 5 global markets",
-        "Helped build a templating framework accelerating multi-market deployment",
-        "Designed complete e-commerce flows from inspiration through checkout, standardized across markets",
-        "Partnered with distributed teams across European offices sharing rapid deployment methodologies",
-        "Validated team approaches through A/B testing and Baymard benchmarking before scaling",
-        "Managed external development partnerships ensuring high implementation quality"
+        "Created the Tagus design system across 5 global markets, standardizing e- commerce flows from inspiration through checkout while managing front-end QA with external dev teams to maintain design quality.",
+        "Designed a modular page building system that generated 100K+ destination pages, driving 4x organic traffic growth and simplifying multi-market deployment.",
+        "Validated interface patterns using A/B testing and Baymard UX benchmarking before scaling features across distributed European teams.",
+        "Built vision prototypes to align international product strategy while helping scale the TUI Lisbon hub influence inside the group."
       ]
     },
     {
@@ -63,12 +47,9 @@
       "period": "June 2013 — August 2019",
       "location": "Leiria, Portugal",
       "points": [
-        "Scaled accessories brand to 50+ countries through e-commerce and wholesale channels",
-        "Managed complete product lifecycle from concept through manufacturing with Portuguese suppliers",
-        "Secured international stockists and editorial features through strategic brand positioning",
-        "Built custom e-commerce platform through front-end skills",
-        "Optimized for international SEO and conversion through analytics-driven iteration",
-        "Created sustainable supply chain balancing growth with environmental responsibility"
+        "Designed and coded a custom e-commerce platform, optimizing conversion pathways and SEO for global sales across 50+ countries.",
+        "Managed complete physical and digital product lifecycles, bridging brand design, manufacturing execution, and digital interface touchpoints.",
+        "Iterated on storefront UI using analytics and user data, refining purchasing flows to grow international e-commerce and wholesale revenue."
       ]
     },
     {
@@ -77,12 +58,9 @@
       "period": "May 2016 — March 2019",
       "location": "Leiria, Portugal",
       "points": [
-        "Designed and coded 4 interconnected products and showcased at CES 2017",
-        "Secured European Community funding through compelling product demonstration and market validation",
-        "Helped transform a traditional direct-servicing company into digital platform connecting customers with certified professionals",
-        "Delivered production front-end code in a lean 4-person team format",
-        "Built component system from scratch enabling ~50-75% faster feature development",
-        "Created platform micro-tools: calendar, finance tracking, bidding systems, ISO-compliant onboarding"
+        "Designed and coded 4 interconnected web applications, delivering production front-end code that transformed a traditional service business into a digital platform connecting clients with certified professionals.",
+        "Built a UI component system from scratch to standardize interface patterns across complex workflows, including calendar scheduling, financial tracking, bidding systems, and onboarding flows.",
+        "Created high-fidelity product demonstrations and front-end builds showcased at CES 2017 to validate market demand and platform capabilities."
       ]
     },
     {
@@ -91,13 +69,9 @@
       "period": "June 2010 — October 2013",
       "location": "Aveiro, Portugal",
       "points": [
-        "Designed 50+ B2B products using systematic approach to customization and categorization",
-        "Established modular design systems enabling mass customization within the manufacturing constraints",
-        "Conducted competitive analysis at international trade shows informing product strategy",
-        "Conducted field research at international trade shows, analyzing competitor offerings",
-        "Developed user testing protocols reducing overseas production iterations by 25-50%",
-        "Presented to C-level stakeholders securing buy-in for innovative product lines",
-        "Established digital catalog foundations through information architecture work"
+        "Established information architecture foundations for digital catalogs, structuring complex B2B product taxonomies and customization rules.",
+        "Designed modular systems for 50+ B2B products, enabling scalable customization within strict production constraints.",
+        "Developed testing protocols and conducted field research at international trade shows to benchmark competitor offerings and refine product usability."
       ]
     },
     {
@@ -106,11 +80,9 @@
       "period": "September 2009 — June 2011",
       "location": "Lisbon, Portugal",
       "points": [
-        "Published illustrations in leading Portuguese editorial publications",
-        "Self-taught web technologies (HTML, CSS, JavaScript) bridging design and development",
-        "Contributed to open-source communities while building technical foundation",
-        "Produced marketing collaterals translating brand messages into compelling visual designs",
-        "Designed brand identities with comprehensive guidelines for visual consistency"
+        "Built web layouts using HTML, CSS, and JavaScript, establishing a front-end technical foundation that bridged visual design with functional code.",
+        "Designed brand identities and visual guidelines for diverse clients, applying a systemized approach to maintain visual consistency.",
+        "Produced editorial illustrations published in major national media outlets."
       ]
     },
     {
@@ -119,11 +91,8 @@
       "period": "September 2007 — September 2009",
       "location": "Coimbra, Portugal",
       "points": [
-        "Designed modular furniture system enabling 3x faster production",
-        "Benchmarked against industry leaders (Boffi, Bulthaup, Poggenpohl) elevating design quality",
-        "Customized CAD software reducing design-to-production time by ~50-70%",
-        "Pioneered digital pipeline connecting customer requirements directly to manufacturing parameters",
-        "Led 15+ interior design projects translating lifestyle needs into functional kitchen solutions"
+        "Designed modular furniture systems and digital pipelines that translated user requirements directly into manufacturing parameters.",
+        "Customized CAD software workflows to automate and streamline design-to- production handoffs."
       ]
     }
   ],
@@ -148,9 +117,9 @@
     {
       "label": "Top Skills",
       "items": [
-        "Product Design",
-        "Design Systems",
-        "Product Strategy"
+        "Web Analytics",
+        "A/B Testing",
+        "E-commerce UI"
       ]
     },
     {

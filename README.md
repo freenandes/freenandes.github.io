@@ -32,6 +32,7 @@ next to it.
 | Colour, type scale, spacing, motion — anything used more than once | `src/styles/tokens.css` |
 | How plain elements look everywhere (links, buttons, headings, lists, rendered Markdown) | `src/styles/global.css` |
 | Name, role, social links, OG image, theme colour | `src/site.config.ts` |
+| The contact email (obfuscated) | `npm run email -- you@example.com` — writes the token into `src/site.config.ts` |
 | `<head>`, metadata, JSON-LD, the skip link, the page shell | `src/layouts/Base.astro` |
 | The home page — markup and look | `src/pages/index.astro` |
 | The home page — which markers exist, what their cards say, what connects to what | `src/diagram.config.ts` |
@@ -101,19 +102,22 @@ add a page there and both builds get it.
 
 ## Syncing the About page from LinkedIn
 
-The About page renders from `src/cv.data.json`, which is generated from a LinkedIn profile's PDF. To update:
+The About page renders from `src/cv.data.json`, which is generated from a LinkedIn profile's PDF. The PDF stays on your machine: `sources/` is git-ignored, because the export embeds personal contact details that must not land in the repo. To update:
 
 1. On LinkedIn, open profile, save it to PDF.
-2. Replace `sources/linkedin-profile.pdf` with the new export.
+2. Replace `sources/linkedin-profile.pdf` with the new export (locally — it is never committed).
 3. Regenerate the data:
 
    ```bash
    npm run sync:linkedin
    ```
 
-   This reads the PDF and writes `src/cv.data.json`. Commit both files. The next build picks up the new content.
+   This reads the PDF and writes `src/cv.data.json`. Commit just `src/cv.data.json`. The next build picks up the new content.
 
-There's a Github action for this as well, `.github/workflows/sync-linkedin.yml` does steps 3 for you: when you push a new `sources/linkedin-profile.pdf` to `main`, it runs the sync, commits the regenerated `src/cv.data.json`, and that commit triggers the normal Pages deploy.
+The sync deliberately drops the email address and phone number from the PDF's
+contact block — the site never renders them, and they must not sit in the repo
+in plaintext (the contact email lives as an obfuscated token instead; see
+`npm run email`).
 
 The sync also writes `selectedClients` and `recognition`, which no page renders
 today — they are there if you want to add those sections.
@@ -146,5 +150,4 @@ image, raster app icons, and self-hosted fonts).
 - [ ] Add `public/og.png` (1200×630) — `og:image` is wired up but the asset is missing.
 - [ ] Add raster app icons (`favicon.ico`, `apple-touch-icon.png`, maskable PWA icon).
 - [ ] Self-host the web fonts (drops the Google Fonts third-party request, enables SRI).
-- [ ] Create a solution to avoid exposing the email.
 - [ ] See [`SPEC-COMPLIANCE.md`](./SPEC-COMPLIANCE.md) for the complete pending list.

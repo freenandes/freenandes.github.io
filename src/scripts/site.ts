@@ -1,7 +1,24 @@
-/** Behaviour every page loads: print-to-PDF buttons and the reveal deferral. */
+/** Behaviour every page loads: print-to-PDF buttons, the reveal deferral, and
+    reassembling the obfuscated email address. */
+
+import { decodeEmail } from '../lib/email';
 
 for (const button of document.querySelectorAll('[data-print]')) {
   button.addEventListener('click', () => window.print());
+}
+
+/**
+ * Turn every obfuscated address (see `src/lib/email.ts`) back into a working
+ * `mailto:` link, and spell it out where the markup asks for the plain text —
+ * the print-only contact line on the CV, flagged with `data-email-text`. The
+ * real address only ever exists in the DOM the reader's browser builds, never
+ * in the HTML that ships.
+ */
+for (const el of document.querySelectorAll<HTMLElement>('[data-email]')) {
+  const address = decodeEmail(el.dataset.email ?? '');
+  if (!address) continue;
+  if (el instanceof HTMLAnchorElement) el.href = `mailto:${address}`;
+  if ('emailText' in el.dataset) el.textContent = address;
 }
 
 /** Release a held block once its top has come this far inside the viewport. */

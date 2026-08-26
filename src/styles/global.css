@@ -328,6 +328,18 @@ main.home::before {
   display: none;
 }
 
+/* The email link and its printed-CV line are assembled by script — the address
+   is never in the served HTML (src/lib/email.ts). Until the script has decoded
+   it, the anchor has no href and the print line is empty; if scripting is off,
+   blocked, or the bundle failed, that state is permanent. Hide it rather than
+   ship a dead control or a blank printed line — the other contact links are
+   plain hrefs and keep working. */
+
+a[data-email]:not([href]),
+[data-email]:empty {
+  display: none;
+}
+
 /* --- Motion -------------------------------------------------------------- */
 
 /* Reveal runs off CSS alone, so it can never leave content stuck invisible:

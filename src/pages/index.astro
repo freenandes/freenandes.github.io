@@ -121,7 +121,8 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
                           <li>
                             <a
                               href={s.href}
-                              rel={s.href.startsWith('http') ? 'me noopener' : undefined}
+                              data-email={s.token}
+                              rel={s.href?.startsWith('http') ? 'me noopener' : undefined}
                             >
                               {s.label}
                             </a>

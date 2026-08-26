@@ -36,7 +36,13 @@ export const GET: APIRoute = async ({ site: astroSite }) => {
     '',
     '## Contact',
     '',
-    ...site.socials.map((s) => `- ${s.label}: ${s.href}`),
+    // The email is deliberately kept out of this plain-text file — it is the
+    // easiest thing for a spam harvester to lift. Reach it via the site's
+    // contact card or the About page; the durable profiles are listed here.
+    ...site.socials
+      .filter((s) => s.href)
+      .map((s) => `- ${s.label}: ${s.href}`),
+    `- Email: on the contact card at ${abs('/')} and the About page at ${abs('/about')} (kept out of plain text to deter scrapers).`,
     '',
   ];
 

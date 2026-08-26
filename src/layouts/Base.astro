@@ -37,8 +37,8 @@ const topoPattern = mainClass === 'home' ? withBase('/topo-low.svg') : null;
 
 // Profiles the site owner can be cross-referenced by (schema.org sameAs).
 const sameAs = site.socials
-  .filter((s) => /^https?:/.test(s.href))
-  .map((s) => s.href);
+  .map((s) => s.href)
+  .filter((href): href is string => href !== undefined && /^https?:/.test(href));
 
 // Site-wide JSON-LD. Page-specific nodes (ProfilePage, CreativeWork,
 // BreadcrumbList…) are appended via the `jsonLd` prop and share these @ids.

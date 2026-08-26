@@ -85,14 +85,20 @@ const jsonLd = [
       <div>
         <h1>{name}</h1>
         <p>{headline}</p>
-        {/* On paper there are no links to click, so the addresses are spelled out. */}
+        {/* On paper there are no links to click, so the addresses are spelled out.
+            The email is filled in by script (see src/scripts/site.ts) so it is
+            never in the shipped HTML. */}
         <div class="print-only">
-          {site.socials.map((s) => <p>{s.href.replace(/^mailto:/, '')}</p>)}
+          {site.socials.map((s) =>
+            s.token ? <p data-email={s.token} data-email-text></p> : <p>{s.href}</p>
+          )}
         </div>
       </div>
 
       <ul class="no-print" role="list">
-        {site.socials.map((s) => <li><a href={s.href}>{s.label}</a></li>)}
+        {site.socials.map((s) => (
+          <li><a href={s.href} data-email={s.token}>{s.label}</a></li>
+        ))}
       </ul>
     </header>
 

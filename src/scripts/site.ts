@@ -8,6 +8,18 @@ for (const button of document.querySelectorAll('[data-print]')) {
 }
 
 /**
+ * Off-screen reveals sit paused on the first frame (opacity 0). Chrome's print
+ * preview snapshots that layer, so jump every block to its end state first —
+ * the button and Cmd+P both go through `beforeprint`.
+ */
+window.addEventListener('beforeprint', () => {
+  for (const el of document.querySelectorAll<HTMLElement>('[data-reveal]')) {
+    el.removeAttribute('data-reveal-wait');
+    el.style.animation = 'none';
+  }
+});
+
+/**
  * Turn every obfuscated address (see `src/lib/email.ts`) back into a working
  * `mailto:` link, and spell it out where the markup asks for the plain text —
  * the print-only contact line on the CV, flagged with `data-email-text`. The

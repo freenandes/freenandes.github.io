@@ -17,7 +17,7 @@ it before adding a file.
   block, not into `global.css`. Only styling that is genuinely shared is global.
 - **Two stylesheets, and no more:** `src/styles/tokens.css` (every value) and
   `src/styles/global.css` (reset, element defaults, layout, prose, utilities,
-  motion, print).
+  motion, shared print). About-specific print lives in `src/pages/about.astro`.
 - **Style elements, not classes.** `a`, `button`, `input`, `h1`–`h4` and
   `ul[role="list"]` are styled as themselves. Add a class only when an element
   must look unlike its own kind (`button.link`) or when no element describes the
@@ -55,4 +55,5 @@ it before adding a file.
 
 - Plaintext protected content (`src/protected/*.md`) and `passwords.json` are **git-ignored**. Only ciphertext (`public/locked/*.json`) is committed.
 - Demo locked project `halcyon` uses passphrase `soft-club`.
-- On a fresh checkout without the plaintext sources, `npm run encrypt` skips missing projects and the committed ciphertext is used as-is.
+- On a fresh checkout without the plaintext sources, `npm run encrypt` leaves
+  the committed ciphertext alone.

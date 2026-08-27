@@ -450,14 +450,17 @@ a[data-email]:not([href]),
   }
 
   /* A print can be triggered mid-reveal (the About page's "Download PDF"), and
-     a held block may never have played at all — neither may reach paper
-     faded. */
+     a held block may never have played at all. Chrome's preview keeps the
+     paused first frame unless the end state is forced, so animation:none
+     alone is not enough. */
 
   [data-reveal] {
     animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 
   @page {
-    margin: 1.4cm 3.8cm;
+    margin: 1.4cm 3.4cm;
   }
 }

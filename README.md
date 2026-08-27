@@ -8,9 +8,9 @@ Built with:
 
 ## Features
 
-- Home page with a dynamic, interactive diagram as the intro to the content.
-- Password-locked pages for confidentiality. Content is encrypted at build time (AES-GCM via PBKDF2) and only decrypted client-side. Secrets never ship in HTML.
-- A structured résumé/About page that downloads as a clean PDF (via the browser print pipeline + a dedicated print stylesheet).
+- Home page with a dynamic, interactive diagram as the intro.
+- Password-locked pages for confidentiality, encrypted at build time (AES-GCM via PBKDF2) and only decrypted client-side. Secrets never ship.
+- A structured résumé/About page that downloads as a PDF, via the browser print pipeline + a dedicated print stylesheet.
 
 ## Quick start
 
@@ -28,14 +28,14 @@ Each page owns its own markup and its own styling, so changing how a page looks 
 | To change… | Open |
 | --- | --- |
 | Colour, type scale, spacing, motion — anything used more than once | `src/styles/tokens.css` |
-| How plain elements look everywhere (links, buttons, headings, lists, rendered Markdown) | `src/styles/global.css` |
+| How plain elements look everywhere (links, buttons, headings, lists, rendered Markdown), and shared print | `src/styles/global.css` |
 | Name, role, social links, OG image, theme colour | `src/site.config.ts` |
 | The contact email (obfuscated) | `npm run email -- you@example.com` — writes the token into `src/site.config.ts` |
 | `<head>`, metadata, JSON-LD, the skip link, the page shell | `src/layouts/Base.astro` |
 | The home page — markup and look | `src/pages/index.astro` |
 | The home page — which markers exist, what their cards say, what connects to what | `src/diagram.config.ts` |
 | Where the markers end up on screen (the force layout) | `src/scripts/nav-diagram.ts` |
-| The About page — markup and look, including its print stylesheet | `src/pages/about.astro` |
+| The About page — markup and look, including its page-specific print rules | `src/pages/about.astro` |
 | The About page — content | `src/cv.data.json` (generated; see below) |
 | A case study — markup and look | `src/pages/projects/[...slug].astro` |
 | A case study — content | `src/content/projects/<slug>.mdx` |
@@ -73,9 +73,11 @@ Pages, states and probed selectors all live in `scripts/visual/scenarios.mjs` �
 
 ## Syncing the About page from LinkedIn
 
-The About page renders from `src/cv.data.json`, which is generated from a LinkedIn profile's PDF. The PDF stays on your machine: `sources/` is git-ignored, because the export embeds personal contact details that must not land in the repo. To update:
+The About page renders from `src/cv.data.json`, which is generated from a LinkedIn profile's PDF. The PDF stays on your machine: `sources/` is git-ignored, because the export embeds personal contact details that must not land in the repo.
 
-1. On LinkedIn, open profile, save it to PDF.
+To update:
+
+1. Go to the LinkedIn profile and save it to PDF.
 2. Replace `sources/linkedin-profile.pdf` with the new export (locally — it is never committed).
 3. Regenerate the data:
 
@@ -83,18 +85,19 @@ The About page renders from `src/cv.data.json`, which is generated from a Linked
    npm run sync:linkedin
    ```
 
-   This reads the PDF and writes `src/cv.data.json`. Commit just `src/cv.data.json`. The next build picks up the new content.
+   This reads the PDF and writes `src/cv.data.json`.
+4. Commit just `src/cv.data.json`. The next build picks up the new content.
 
-The sync deliberately drops the email address and phone number from the PDF's contact block — the site never renders them, and they must not sit in the repo in plaintext (the contact email lives as an obfuscated token instead; see `npm run email`).
+The sync deliberately drops the email address and phone number from the PDF's contact block. The site never renders them, and they must not sit in the repo in plaintext (the contact email lives as an obfuscated token instead; see `npm run email`).
 
-The sync also writes `selectedClients` and `recognition`, which no page renders today — they are there if you want to add those sections.
+The sync also writes `selectedClients` and `recognition`, which no page renders today. They are there as an optional addition.
 
 ## Locking a project behind a password
 
 For confidential pages share a passphrase instead of publishing it.
 
 1. In the project's MDX frontmatter set `locked: true`. The MDX body becomes the public teaser shown before unlock.
-2. Put the full, confidential write-up in `src/protected/<slug>.md` (plain Markdown). This file is **git-ignored**.
+2. Put the full, confidential write-up in `src/protected/<slug>.md` (plain Markdown). This file is git-ignored.
 3. Set the password — either:
 
    1. add `"<slug>": "your-pass"` to `src/protected/passwords.json` (copy `passwords.example.json`)
@@ -105,11 +108,15 @@ For confidential pages share a passphrase instead of publishing it.
 
 ## Website Specification compliance
 
-This site is audited against [The Website Specification](https://specification.website). See [`SPEC-COMPLIANCE.md`](./SPEC-COMPLIANCE.md) for the full status: what's implemented (CSP, JSON-LD structured data, manifest, robots/llms/security.txt, custom 404, contrast fixes, …), what the GitHub Pages platform already provides, and what's still **pending** (notably an `og.png` social image, raster app icons, and self-hosted fonts).
+This site is audited against [The Website Specification](https://specification.website). See [`SPEC-COMPLIANCE.md`](./SPEC-COMPLIANCE.md) for the full status: 
+
+- what's implemented (CSP, JSON-LD structured data, manifest, robots/llms/security.txt, custom 404, contrast fixes, …),
+- what the GitHub Pages platform already provides,
+- and what's still **pending** (notably an `og.png` social image, raster app icons, and self-hosted fonts).
 
 ## To do
 
+- [ ] Up next: crate the content based on [the list](notes/content-strategy.md)
 - [ ] Add `public/og.png` (1200×630) — `og:image` is wired up but the asset is missing.
 - [ ] Add raster app icons (`favicon.ico`, `apple-touch-icon.png`, maskable PWA icon).
-- [ ] Self-host the web fonts (drops the Google Fonts third-party request, enables SRI).
 - [ ] See [`SPEC-COMPLIANCE.md`](./SPEC-COMPLIANCE.md) for the complete pending list.

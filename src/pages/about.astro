@@ -111,14 +111,23 @@ const jsonLd = [
       {
         cv.experience.map((job) => (
           <div class="entry">
-            <p class="period">{job.period}</p>
-            <div>
-              <h3>{job.role}, {job.org}</h3>
-              {job.summary && <p>{job.summary}</p>}
-              <ul>
-                {job.points.map((point) => <li>{point}</li>)}
-              </ul>
+            <div class="entry-keep">
+              <p class="period">{job.period}</p>
+              <div>
+                <h3>{job.role}, {job.org}</h3>
+                {job.summary && <p>{job.summary}</p>}
+                {job.points.length > 0 && (
+                  <ul>
+                    {job.points.slice(0, 2).map((point) => <li>{point}</li>)}
+                  </ul>
+                )}
+              </div>
             </div>
+            {job.points.length > 2 && (
+              <ul>
+                {job.points.slice(2).map((point) => <li>{point}</li>)}
+              </ul>
+            )}
           </div>
         ))
       }
@@ -129,11 +138,13 @@ const jsonLd = [
       {
         cv.education.map((entry) => (
           <div class="entry">
-            <p class="period">{entry.period}</p>
-            <div>
-              <h3>{entry.title}</h3>
-              <p>{entry.org}</p>
-              {entry.note && <p>{entry.note}</p>}
+            <div class="entry-keep">
+              <p class="period">{entry.period}</p>
+              <div>
+                <h3>{entry.title}</h3>
+                <p>{entry.org}</p>
+                {entry.note && <p>{entry.note}</p>}
+              </div>
             </div>
           </div>
         ))
@@ -179,23 +190,21 @@ const jsonLd = [
     border-block-end: 1px solid var(--line-strong);
   }
 
-  /* Dates in a fixed column, the job beside them. */
+  /* Dates in a fixed column, the job beside them. `.entry-keep` unwraps on
+     screen so the grid still sees the date and the body as its two children. */
 
   .entry {
     display: grid;
     grid-template-columns: 9rem 1fr;
-    gap: var(--space-lg);
+    column-gap: var(--space-lg);
+  }
+
+  .entry-keep {
+    display: contents;
   }
 
   .entry + .entry {
     margin-block-start: var(--space-lg);
-  }
-
-  @media (width <= 640px) {
-    .entry {
-      grid-template-columns: 1fr;
-      gap: var(--space-sm);
-    }
   }
 
   .period {
@@ -218,9 +227,25 @@ const jsonLd = [
     list-style: square;
   }
 
+  .entry > ul {
+    grid-column: 2;
+  }
+
   .entry li::marker {
     font-size: var(--step--1);
     color: var(--ink-3);
+  }
+
+  @media (width <= 640px) {
+    .entry {
+      grid-template-columns: 1fr;
+      gap: var(--space-sm);
+    }
+
+    .entry > ul {
+      grid-column: 1;
+      margin-block-start: 0;
+    }
   }
 
   .download {
@@ -248,13 +273,19 @@ const jsonLd = [
 
     section,
     .entry,
-    .entry > div,
     .entry ul {
       break-inside: auto;
     }
 
     .entry {
       display: block;
+    }
+
+    /* If this group doesn't fit in the space left on the page, the whole
+       job moves with it — later bullets cannot stay behind out of order. */
+    .entry-keep {
+      display: block;
+      break-inside: avoid;
     }
 
     .period {
@@ -264,6 +295,10 @@ const jsonLd = [
     .entry ul {
       display: block;
       padding-inline-start: 1em;
+    }
+
+    .entry > ul {
+      margin-block-start: var(--space-sm);
     }
 
     .entry li {

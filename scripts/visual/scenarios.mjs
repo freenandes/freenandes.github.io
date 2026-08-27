@@ -97,7 +97,7 @@ export const styleProbes = [
   'main > article > div:last-child',
   'main > article section h2',
   '.entry',
-  '.entry > :first-child',
+  '.entry p:first-of-type',
   '.entry h3',
   '.entry ul',
   '.entry li',

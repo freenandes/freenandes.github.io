@@ -1,6 +1,0 @@
-# Security contact for pmcf.xyz / freenandes.github.io portfolio.
-# Format: RFC 9116 (https://www.rfc-editor.org/rfc/rfc9116).
-Contact: https://github.com/freenandes/portfolio/security/advisories/new
-Contact: https://www.linkedin.com/in/pmcfernandes
-Expires: 2027-06-15T00:00:00.000Z
-Preferred-Languages: en

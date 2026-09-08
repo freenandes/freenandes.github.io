@@ -65,17 +65,17 @@ export const diagramNodes: DiagramNode[] = [
     landscape: { x: 0.12, y: 0.74 },
   },
   {
-    id: 'systems-thinker',
-    label: 'Systems-Thinker',
+    id: 'percona',
+    label: 'Interface Systems',
     kind: 'project',
     shape: 'triangle',
     tagline:
-      'The complexity piece. Untangling messy, highly technical ecosystems into systems that scale.',
+      "The complexity piece. Taking PMM's interface back from Grafana without pretending Grafana is gone.",
     lines: [
-      'Built the Peak Design System across 3 products and 10+ engineers, established a PostHog analytics framework, and kicked off Native Navigation to retire Grafana technical debt.',
+      'Designed native navigation and built Peak UI so new PMM workflows — Query Analytics, then management apps on SEP — do not have to be Grafana frontend.',
     ],
     tags: ['Design Systems', 'Developer Tools', 'Architecture'],
-    link: { label: 'Open case study', href: '/projects/systems-thinker/' },
+    link: { label: 'Open case study', href: '/projects/percona/' },
     portrait: { x: 0.44, y: 0.5 },
     landscape: { x: 0.47, y: 0.4 },
   },
@@ -142,7 +142,7 @@ export const diagramChain = [
   'contact',
   'about',
   'pedro',
-  'systems-thinker',
+  'percona',
   'design-at-scale',
   'visionary',
 ];

@@ -1,0 +1,52 @@
+---
+title: Interface Systems
+description: PMM still runs Grafana for dashboards and auth. I designed the native navigation and Peak UI so the rest of the product doesn't have to.
+date: 2022-08-01
+order: 1
+role: Senior Product Designer
+client: Percona
+tags: ['Architecture', 'Developer Tools', 'Design Systems']
+---
+
+PMM — Percona Monitoring and Management — is software for people who run databases. A large part of its UI still lives in Grafana: the dashboards, the editor, authentication. Those are not leaving soon. Alerting is what we want to replace next. The long haul is Grafana as a vanilla dashboard host — no hardcoded Percona changes. That is not possible yet.
+
+What I could take back was the product interface. I designed a **native navigation** architecture, and I built and ran **Peak UI**, so new Percona workflows can ship without being Grafana frontend.
+
+## The constraint
+
+- Dashboards and auth stay on Grafana, on purpose. Custom PMM behaviour still meant fighting hardcoded Grafana.
+- Query Analytics (QAN) sat on Grafana's frontend framework. It was a hectic experience. The UI stood in the way.
+- There was no clean way to ship Percona management work — backups, diagnostics — as product, not as another dashboard.
+
+## Native navigation
+
+I designed the native navigation architecture so PMM could own its own shell: decoupling the interface from a heavy third-party dependency, cutting technical debt, unblocking features that could not live in Grafana's chrome.
+
+What I shipped in production were refinements: animation, visual alignment, and extra interactivity — hide, expand, overlay — that follow the viewport.
+
+## Query Analytics
+
+QAN's backend is now Percona, which makes a clean migration off Grafana's frontend possible. We started that new UX in Peak UI with **Real-time analytics** — a key piece of the enterprise stack, where the UI stands in the way less than the Grafana-frontend version did.
+
+High-fidelity vision prototypes and user research were how those workflow changes got executive buy-in.
+
+## Peak UI
+
+I built and managed **Peak UI**: front-end component patterns that streamline how Percona products are developed.
+
+On **SEP**, PMM's plugin framework, an app is created in the backend and a declarative sheet assembles the UI by calling the right Peak UI components. **MySQL backups** and **Support diagnostics** are the first apps on that path. That is a different paradigm for PMM: proper management apps, not more dashboards.
+
+Peak UI is used internally. It is also open to anyone shipping a new app into the PMM framework.
+
+I mentored designers and engineers on front-end practice, Peak UI patterns, and research methods.
+
+## What changed
+
+- PMM owns its navigation. Grafana still hosts dashboards and auth — a deliberate split, not a finished decoupling.
+- Real-time analytics proved Peak UI on a live enterprise workflow. QAN can move the same way.
+- The first management apps landed on SEP.
+- The same systems idea reached docs: modular templates across **10+ documentation sites**, designed and coded as a framework.
+
+## What I would do again
+
+Don't pretend you can rip Grafana out. Take the interface back where Percona already owns the backend. Prove it on one workflow. Then make the next app a declaration, not a fork of someone else's frontend.

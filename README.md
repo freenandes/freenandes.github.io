@@ -1,122 +1,147 @@
 # PMCF.XYZ Portfolio
 
-Built with:
+Pedro MC Fernandes's portfolio site. The home page is an interactive map that links to an About/CV page (which prints to PDF) and to a set of case studies, some of them unlocked with a passphrase.
 
-- [Astro](https://astro.build)
-- `marked` for client-side rendering of decrypted Markdown
-- Web Crypto (PBKDF2 + AES-GCM) for the lock feature
+- Live: https://freenandes.github.io/portfolio/
+- Repo: https://github.com/freenandes/portfolio (branch `main`)
+- Every push to `main` deploys to the live site.
 
-## Features
+## Commands
 
-- Home page with a dynamic, interactive diagram as the intro.
-- Password-locked pages for confidentiality, encrypted at build time (AES-GCM via PBKDF2) and only decrypted client-side. Secrets never ship.
-- A structured résumé/About page that downloads as a PDF, via the browser print pipeline + a dedicated print stylesheet.
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Local site at http://localhost:4321/portfolio/ with live reload |
+| `npm run build` | Encrypts locked projects, then builds to `./dist` |
+| `npm run preview` | Serves the last build from `./dist` |
+| `npm run check` | Type and template errors (`astro check`) |
+| `npm run lint:css` | CSS lint, which CI also runs. `npm run lint:css:fix` fixes what it can |
+| `npm run visual` | Compares this working tree's look with `origin/main` (see below) |
+| `npm run encrypt` | Re-encrypts locked projects (also part of `build`) |
+| `npm run sync:linkedin` | Rebuilds the About page data from your LinkedIn PDF |
+| `npm run email -- you@example.com` | Changes the contact email |
 
-## Quick start
+Before you push: run `npm run check`, `npm run lint:css` and `npm run build`.
 
-```bash
-npm install
-npm run dev       # http://localhost:4321
-npm run build     # outputs to ./dist (runs encryption first)
-npm run preview   # preview the build
-```
+## Setup (once per machine)
+
+1. Install Homebrew, then add it to your PATH. The installer prints the two lines to run under "Next steps".
+2. Install Node 22, the version in `.nvmrc`, and add it to your PATH:
+
+   ```bash
+   brew install node@22
+   echo 'export PATH="/opt/homebrew/opt/node@22/bin:$PATH"' >> ~/.zprofile && source ~/.zprofile
+   ```
+
+3. In the project folder, run `npm install`, then `npm run dev`.
+
+The visual check also needs Google Chrome installed.
+
+## How it's made
+
+- [Astro](https://astro.build) 5 builds a fully static site. Pages are `.astro` files, and case studies are MDX. There's no React or Tailwind, just Astro components, TypeScript and plain CSS.
+- The site lives under `/portfolio/` on GitHub Pages, so internal links go through `withBase()` (`src/lib/base.ts`).
+- The home map takes its markers and card text from `src/diagram.config.ts`. A physics simulation in `src/scripts/nav-diagram.ts` positions the markers, so the layout varies a little on every load.
+- The About page renders `src/cv.data.json`, which is generated from a LinkedIn PDF export.
+- To lock a project, you write its full text in a git-ignored file, and the build encrypts it into `public/locked/<slug>.json`. Visitors decrypt it in their browser with the passphrase (PBKDF2 + AES-GCM), and `marked` renders the Markdown. The plaintext is never published.
+- A strict Content Security Policy in `src/layouts/Base.astro` blocks inline and third-party scripts.
+- Deploy: `.github/workflows/deploy.yml` lints the CSS, builds and publishes to Pages on every push to `main`.
 
 ## Where things live
 
-Each page owns its own markup and its own styling, so changing how a page looks means opening that page. Copy that a page reads from lives in one file next to it.
+Each page owns its markup and its styling, so changing how a page looks means opening that page.
 
 | To change… | Open |
 | --- | --- |
-| Colour, type scale, spacing, motion — anything used more than once | `src/styles/tokens.css` |
-| How plain elements look everywhere (links, buttons, headings, lists, rendered Markdown), and shared print | `src/styles/global.css` |
+| Colours, type scale, spacing, motion | `src/styles/tokens.css` |
+| How plain elements look everywhere (links, buttons, headings, lists, Markdown), shared print | `src/styles/global.css` |
 | Name, role, social links, OG image, theme colour | `src/site.config.ts` |
-| The contact email (obfuscated) | `npm run email -- you@example.com` — writes the token into `src/site.config.ts` |
-| `<head>`, metadata, JSON-LD, the skip link, the page shell | `src/layouts/Base.astro` |
-| The home page — markup and look | `src/pages/index.astro` |
-| The home page — which markers exist, what their cards say, what connects to what | `src/diagram.config.ts` |
-| Where the markers end up on screen (the force layout) | `src/scripts/nav-diagram.ts` |
-| The About page — markup and look, including its page-specific print rules | `src/pages/about.astro` |
-| The About page — content | `src/cv.data.json` (generated; see below) |
-| A case study — markup and look | `src/pages/projects/[...slug].astro` |
-| A case study — content | `src/content/projects/<slug>.mdx` |
-| The passphrase gate — markup, look and crypto | `src/components/PasswordGate.astro` |
-| The sticky page nav, the footer | `src/components/PageNav.astro`, `src/components/Footer.astro` |
-| The 404 page | `src/pages/404.astro` |
+| `<head>`, metadata, CSP, JSON-LD, page shell | `src/layouts/Base.astro` |
+| Home page: markup and look | `src/pages/index.astro` |
+| Home page: markers, card copy, what connects to what | `src/diagram.config.ts` |
+| Home page: where markers end up (force layout) | `src/scripts/nav-diagram.ts` |
+| About page: markup, look, its print rules | `src/pages/about.astro` |
+| About page: content | `src/cv.data.json` (generated, don't edit by hand) |
+| Case study: markup and look | `src/pages/projects/[...slug].astro` |
+| Case study: content | `src/content/projects/<slug>.mdx` |
+| Case study frontmatter fields | `src/content.config.ts` |
+| Passphrase gate | `src/components/PasswordGate.astro` |
+| Page nav, footer | `src/components/PageNav.astro`, `src/components/Footer.astro` |
+| Print button, email decoding, reveal-on-print | `src/scripts/site.ts` |
+| 404, `/llms.txt`, `/robots.txt`, manifest | `src/pages/` |
+| Build scripts (encrypt, LinkedIn sync, email, visual check) | `scripts/` |
 
-### Conventions
+## Common tasks
 
-- **Elements are styled as themselves.** A `<button>` looks like a button and an `<a>` looks like a link with no class on it. A class appears only when an element has to look unlike its own kind (`button.link` is a button that reads as a link) or when no element describes the job (`.prose`, `.meta`).
-- **`role="list"` means "a row of things"** — nav, socials, tags, links. It gets the markers removed and laid out in a wrapping row. A list that keeps its bullets is a plain `<ul>`.
-- **Stagger an entrance** with `data-reveal style="--reveal-step: 2"`: the step is its place in the queue, and the gap between steps is one token (`--reveal-stagger`).
-- **Internal links go through `withBase()`** (`src/lib/base.ts`) — the site is served from a sub-path.
+### Add a case study
 
-## Checking you haven't changed the look
+1. Create `src/content/projects/<slug>.mdx`. The file name becomes the URL, `/portfolio/projects/<slug>/`.
+
+   ```mdx
+   ---
+   title: Project name
+   description: One sentence, used on the page and in search results.
+   date: 2024-06-01
+   order: 1            # lower comes first; optional
+   role: Lead Product Designer
+   client: Company
+   tags: ['Design Systems', 'Growth']
+   draft: true         # hides it from the live site, still shows in dev
+   ---
+
+   The write-up, in Markdown.
+   ```
+
+2. To put it on the home map, add a node with `kind: 'project'` to `src/diagram.config.ts`, and add its `id` to `diagramChain` so it gets connected.
+3. When it's ready, remove `draft: true`.
+
+### Lock a project behind a passphrase
+
+1. In the project's MDX, set `locked: true`. The MDX body becomes the public teaser.
+2. Put the full write-up in `src/protected/<slug>.md`. This file is git-ignored.
+3. Add `"<slug>": "the-passphrase"` to `src/protected/passwords.json` (copy it from `passwords.example.json`), or set the env var `LOCK_PASSWORD_<SLUG>`.
+4. Run `npm run encrypt`, then commit `public/locked/<slug>.json`.
+5. Send the passphrase to whoever should read it.
+
+The demo project `halcyon` uses the passphrase `soft-club`. If a checkout has no plaintext files, encrypting leaves the committed files alone. More detail is in `src/protected/README.md`.
+
+### Update the About page from LinkedIn
+
+1. On LinkedIn, open your profile and choose Resources → Save to PDF.
+2. Save the file as `sources/linkedin-profile.pdf`. The folder is git-ignored, because the PDF contains your phone number and email.
+3. Run `npm run sync:linkedin`, check the About page in dev, then commit `src/cv.data.json`.
+
+The sync drops your email and phone number. It also writes `selectedClients` and `recognition`, which no page shows yet.
+
+### Change the contact email
+
+Run `npm run email -- you@example.com`. It stores an obfuscated token in `src/site.config.ts`, so the address never appears as plain text in the repo or the HTML. Don't edit the token by hand: if it doesn't decode to a valid address, the build fails.
+
+### Check you haven't changed the look
 
 ```bash
 npm run visual                    # this working tree vs origin/main
-npm run visual -- --base HEAD~1
-npm run visual -- --only about    # just the scenarios named like "about"
-npm run visual -- --keep          # keep both builds in .visual/ to poke at
+npm run visual -- --base HEAD~1   # compare against another commit
+npm run visual -- --only about    # only scenarios with "about" in the name
+npm run visual -- --keep          # keep both builds in .visual/
 ```
 
-It builds the reference commit in a throwaway git worktree and the current working tree (uncommitted changes included), serves both, and photographs the same list of pages and states in each — home, the map with a card open, the CV at three scroll positions and as it reaches a printer, a case study, the locked project before/refused/after unlocking, and the 404 — at desktop and phone sizes. It then compares the screenshots pixel by pixel **and** compares computed styles, which catches changes a screenshot can't see.
+It builds both versions and screenshots the same pages and states at desktop and phone sizes. Then it compares pixels and computed styles. Differences are saved as highlighted images in `.visual/`, and the run exits `1`. That means "there's something to review", not "it's broken". The home page always varies slightly because of the simulation; small differences there are reported as `drift`. To add pages or states, edit `scripts/visual/scenarios.mjs`. If Chrome isn't found, set `CHROME_PATH`.
 
-Anything that differs is written to `.visual/<scenario>.png` as a highlighted diff, and the run exits `1`. That exit code means "there are differences to review", not "something is broken": if the change was the point, the run is your evidence for it.
+## Conventions
 
-Three things to know:
+- Style elements, not classes. `<a>`, `<button>` and the headings look right without classes. Use a class only when an element must look unlike its own kind (`button.link`) or when no element fits (`.prose`, `.meta`).
+- `role="list"` means "a row of things" (nav, socials, tags): no bullets, laid out in a wrapping row. A plain `<ul>` keeps its bullets.
+- Page-specific CSS lives in that page's `<style>` block. Shared values belong in `tokens.css`.
+- To stagger an entrance, use `data-reveal style="--reveal-step: 2"`. The step number is its place in the queue.
 
-- **Chrome does the photography.** `puppeteer-core` drives whatever Chrome is already installed; set `CHROME_PATH` if it lives somewhere unusual.
-- **The home page drifts.** Its layout comes out of a randomised physics simulation, so two captures of the *same* build land within a few tenths of a percent. `Math.random` is seeded and looping animations are rewound and paused to keep that as small as possible; what's left is absorbed by the per-scenario `drift` budget in `scripts/visual/scenarios.mjs`, and shows up as `drift` rather than `CHANGED`.
-- **The computed-style probes are structural** (`main > article > header h1`, not `.cv__name`), so renaming a class doesn't make the report shout. Moving a declaration from a wrapper onto the thing it wrapped still shows up, which is the point — check the pixels alongside it.
+## Website Specification
 
-Pages, states and probed selectors all live in `scripts/visual/scenarios.mjs` — add a page there and both builds get it.
-
-## Syncing the About page from LinkedIn
-
-The About page renders from `src/cv.data.json`, which is generated from a LinkedIn profile's PDF. The PDF stays on your machine: `sources/` is git-ignored, because the export embeds personal contact details that must not land in the repo.
-
-To update:
-
-1. Go to the LinkedIn profile and save it to PDF.
-2. Replace `sources/linkedin-profile.pdf` with the new export (locally — it is never committed).
-3. Regenerate the data:
-
-   ```bash
-   npm run sync:linkedin
-   ```
-
-   This reads the PDF and writes `src/cv.data.json`.
-4. Commit just `src/cv.data.json`. The next build picks up the new content.
-
-The sync deliberately drops the email address and phone number from the PDF's contact block. The site never renders them, and they must not sit in the repo in plaintext (the contact email lives as an obfuscated token instead; see `npm run email`).
-
-The sync also writes `selectedClients` and `recognition`, which no page renders today. They are there as an optional addition.
-
-## Locking a project behind a password
-
-For confidential pages share a passphrase instead of publishing it.
-
-1. In the project's MDX frontmatter set `locked: true`. The MDX body becomes the public teaser shown before unlock.
-2. Put the full, confidential write-up in `src/protected/<slug>.md` (plain Markdown). This file is git-ignored.
-3. Set the password — either:
-
-   1. add `"<slug>": "your-pass"` to `src/protected/passwords.json` (copy `passwords.example.json`)
-   2. or set an env var `LOCK_PASSWORD_<SLUG>`
-
-4. Run `npm run encrypt` (also runs automatically on `npm run build`). This writes ciphertext to `public/locked/<slug>.json`.
-5. Hand the passphrase to your client. They enter it on the project page; the content is decrypted in their browser with the Web Crypto API.
-
-## Website Specification compliance
-
-This site is audited against [The Website Specification](https://specification.website). See [`SPEC-COMPLIANCE.md`](./SPEC-COMPLIANCE.md) for the full status: 
-
-- what's implemented (CSP, JSON-LD structured data, manifest, robots/llms/security.txt, custom 404, contrast fixes, …),
-- what the GitHub Pages platform already provides,
-- and what's still **pending** (notably an `og.png` social image, raster app icons, and self-hosted fonts).
+The site is audited against [The Website Specification](https://specification.website). [`SPEC-COMPLIANCE.md`](./SPEC-COMPLIANCE.md) lists what's done, what GitHub Pages provides and what's pending.
 
 ## To do
 
-- [ ] Up next: crate the content based on [the list](notes/content-strategy.md)
-- [ ] Add `public/og.png` (1200×630) — `og:image` is wired up but the asset is missing.
+- [ ] Create the content based on [the list](notes/content-strategy.md) (local-only, `notes/` is git-ignored)
+- [ ] Replace or draft the placeholder projects `atlas-design-system`, `field-notes` and `helio-banking`. They're live pages with fictional content.
+- [ ] Add `public/og.png` (1200×630). `og:image` already points to it, but the file is missing.
 - [ ] Add raster app icons (`favicon.ico`, `apple-touch-icon.png`, maskable PWA icon).
-- [ ] See [`SPEC-COMPLIANCE.md`](./SPEC-COMPLIANCE.md) for the complete pending list.
+- [ ] Self-host the fonts (currently Google Fonts).

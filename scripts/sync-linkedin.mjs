@@ -9,7 +9,8 @@
    Workflow:
      1. On LinkedIn → your profile → "Resources" → "Save to PDF".
      2. Drop the file in  sources/linkedin-profile.pdf  (overwrite the old one).
-     3. Run  `npm run sync:linkedin`  (or let the GitHub Action do it on push).
+     3. Run  `npm run sync:linkedin`. There is no CI sync: sources/ is
+        git-ignored, so the PDF only exists on your machine.
         → writes  src/cv.data.json , which src/pages/about.astro renders.
 
    How it works:

@@ -20,7 +20,6 @@ Legend: ✅ done · 🟙 platform-provided · ⏳ pending · ➖ not applicable
 | Meta robots | seo | Explicit `index, follow`. |
 | robots.txt | seo / agent-readiness | Generated with sitemap reference and explicit allow rules for named AI crawlers (GPTBot, ClaudeBot, PerplexityBot, …). *See sub-path caveat below.* |
 | `/llms.txt` | agent-readiness | Curated markdown index of pages + case studies. *See sub-path caveat below.* |
-| `/.well-known/security.txt` | security / well-known | RFC 9116 disclosure contacts + expiry. *See sub-path caveat below.* |
 | Content Security Policy | security | Delivered via `<meta http-equiv>`: strict `script-src 'self'` with **no** inline-script allowance (every bundled script is emitted as its own file — see `assetsInlineLimit` in `astro.config.mjs`); `default-src 'self'`, `object-src 'none'`, `base-uri 'self'`, `upgrade-insecure-requests`, scoped font/style allowances. |
 | Referrer-Policy | security | `strict-origin-when-cross-origin` via `<meta name="referrer">`. |
 | Colour contrast | accessibility | Tertiary text token darkened `#aaa → #6f6f6f` (≈5:1 on paper, WCAG AA). Decorative-only ink kept faint via a separate `--ink-faint`. |
@@ -62,8 +61,8 @@ GitHub Pages can't send custom response headers, and the site is served from the
 **sub-path**. Both limits block the items below until the site moves to a root domain (e.g.
 `pmcf.xyz`) and/or sits behind something that can set headers (Cloudflare, a reverse proxy, etc.).
 
-- **Sub-path caveat for `robots.txt`, `/llms.txt`, `/.well-known/security.txt`:** these files are
-  generated and committed, but crawlers/agents only read them from the **domain root**. Under
+- **Sub-path caveat for `robots.txt` and `/llms.txt`:** these files are generated at build
+  time, but crawlers/agents only read them from the **domain root**. Under
   `/portfolio/` they resolve to `/portfolio/robots.txt` etc. and are effectively ignored. They
   become authoritative automatically once the base path is `/`.
 - **Clickjacking protection** (`Content-Security-Policy: frame-ancestors` / `X-Frame-Options`):
@@ -87,6 +86,9 @@ Re-evaluate if the site grows to include these:
   the site is single-language (`en`). `<html lang>` and `og:locale` are set.
 - **Form labels/errors, mobile input types**: the only form is the passphrase gate, which already
   has an associated `<label>` and an `role="alert"` error region.
+- **`/.well-known/security.txt`**: added in the compliance pass, then removed as unneeded
+  (commit `feeced0`). Under the `/portfolio/` sub-path it wouldn't be read anyway; reconsider
+  if the site moves to a root domain.
 
 ---
 

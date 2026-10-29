@@ -235,7 +235,7 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
 
   .diagram {
     --topo-size: 150rem; /* width of one tile of the contour texture */
-    --topo-opacity: 0.075;
+    --topo-opacity: 0.09;
     --marker-size: 1rem;
     --marker-size-identity: 1.25rem; /* the name at the centre */
     --link-width: 1.375; /* connector stroke */
@@ -481,6 +481,13 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     letter-spacing: var(--tracking-tight);
     text-transform: none;
     color: var(--ink-2);
+  }
+
+  /* The job title keeps the line break diagram.config.ts writes into it. */
+
+  .node--identity button span + span {
+    white-space: pre-line;
+    text-align: center;
   }
 
   /* --- Floating rings --------------------------------------------------- */

@@ -36,7 +36,8 @@ export const diagramNodes: DiagramNode[] = [
   {
     id: 'pedro',
     label: site.name,
-    subLabel: site.role,
+    // Two lines under the name, breaking before the "&".
+    subLabel: site.role.replace(' & ', '\n& '),
     kind: 'identity',
     shape: 'pentagon',
     portrait: { x: 0.5, y: 0.28 },
@@ -44,12 +45,12 @@ export const diagramNodes: DiagramNode[] = [
   },
   {
     id: 'about',
-    label: 'About',
+    label: 'About/CV',
     kind: 'about',
     shape: 'hexagon',
-    tagline: 'I design and build — fixing the system, not just the screen.',
+    tagline: 'I specialize in building interfaces for complex technical software.',
     lines: [
-      'I react against stagnation and look forward to a sustainable growth path by fixing ecosystems, not just interfaces. At the boundary between strategy and execution, I will be there shipping the code as well.',
+      'I cover the whole path, from user research and information architecture to interaction design, prototyping, design systems, and the production front-end code that ships them.',
     ],
     link: { label: 'Read the full story', href: '/about' },
     portrait: { x: 0.24, y: 0.08 },
@@ -60,7 +61,7 @@ export const diagramNodes: DiagramNode[] = [
     label: 'Contact',
     kind: 'contact',
     shape: 'square',
-    tagline: 'Open to principal / lead product design and design-engineering work.',
+    tagline: 'Open to remote Senior Product Designer and Design Engineer roles in complex technical products.',
     portrait: { x: 0.76, y: 0.16 },
     landscape: { x: 0.12, y: 0.74 },
   },

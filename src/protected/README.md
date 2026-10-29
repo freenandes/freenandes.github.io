@@ -4,19 +4,14 @@ This folder holds the **plaintext** of password-locked projects. Nothing here is
 shipped to the browser — it is encrypted at build time into
 `public/locked/<slug>.json`, and only that ciphertext is deployed.
 
-## How to add a locked project
+The steps to lock a project are in the root README → "Lock a project behind a
+passphrase". What lives here:
 
-1. In `src/content/projects/<slug>.mdx`, set `locked: true`. The MDX body is the
-   public teaser shown before unlock.
-2. Create `src/protected/<slug>.md` with the full, confidential write-up
-   (plain Markdown).
-3. Give it a password — either:
-   - add `"<slug>": "your-password"` to `passwords.json` (copy from
-     `passwords.example.json`), **or**
-   - set an env var `LOCK_PASSWORD_<SLUG>` (uppercased, non-alphanumerics → `_`).
-4. Run `npm run encrypt` (also runs automatically before `npm run build`).
-5. Hand the password to your client. They enter it on the project page to
-   decrypt the content in their browser.
+- `<slug>.md`: the full, confidential write-up for `src/content/projects/<slug>.mdx`
+  (plain Markdown). Git-ignored.
+- `passwords.json`: `{ "<slug>": "the-passphrase" }`, copied from
+  `passwords.example.json`. Git-ignored. An env var `LOCK_PASSWORD_<SLUG>`
+  (uppercased, non-alphanumerics → `_`) wins over it.
 
 ## Security notes
 

@@ -19,7 +19,7 @@ Pedro MC Fernandes's portfolio site. The home page is an interactive map that li
 | `npm run encrypt` | Re-encrypts locked projects (also part of `build`) |
 | `npm run email -- you@example.com` | Changes the contact email |
 
-Before you push: run `npm run check`, `npm run lint:css` and `npm run build`.
+Before you push: run `npm run check`, `npm run lint:css` and `npm run build`. CI runs the same three on every pull request to `main`, and a push to `main` doesn't deploy if one of them fails.
 
 ## Setup (once per machine)
 
@@ -35,6 +35,21 @@ Before you push: run `npm run check`, `npm run lint:css` and `npm run build`.
 
 The visual check also needs Google Chrome installed.
 
+### Claude Code cloud sessions
+
+The cloud image already has Node 22 and a Chromium that `npm run visual` finds without configuration. These go in the cloud environment's settings (the environment menu in the session's title bar, then Edit), not in the repo:
+
+- Setup script, so dependencies are installed before the session starts (it runs one folder above the repo):
+
+  ```bash
+  cd portfolio && npm ci --no-audit --no-fund
+  ```
+
+- Environment variables, which keep command output short: `ASTRO_TELEMETRY_DISABLED=1` and `NPM_CONFIG_UPDATE_NOTIFIER=false`.
+- Network access: the default level is enough (npm, GitHub, and Google Fonts, which the visual check loads). On a stricter level, allow `fonts.googleapis.com` and `fonts.gstatic.com`, plus `www.pmcf.xyz` if you want sessions to check the live site.
+
+No secrets are needed: the locked project's ciphertext is committed, and the visual check uses the demo passphrase.
+
 ## How it's made
 
 - [Astro](https://astro.build) 5 builds a fully static site. Pages are `.astro` files, and case studies are MDX. There's no React or Tailwind, just Astro components, TypeScript and plain CSS.
@@ -43,22 +58,26 @@ The visual check also needs Google Chrome installed.
 - The About page, which doubles as the printable CV, renders `src/content/cv.md`, a list of fields in the same order as the page: location and languages (one small line under your name), headline, summary (Markdown), jobs, earlier work, education. You edit it by hand; the build rejects missing or misspelled fields.
 - To lock a project, you write its full text in a git-ignored file, and the build encrypts it into `public/locked/<slug>.json`. Visitors decrypt it in their browser with the passphrase (PBKDF2 + AES-GCM), and `marked` renders the Markdown. The plaintext is never published.
 - A strict Content Security Policy in `src/layouts/Base.astro` blocks inline and third-party scripts.
-- Deploy: `.github/workflows/deploy.yml` lints the CSS, builds and publishes to Pages on every push to `main`.
+- Deploy: `.github/workflows/deploy.yml` lints the CSS, checks types and builds on every pull request and every push to `main`. Only a push to `main` publishes to Pages.
 
 ## Where things live
 
-Each page owns its markup and its styling, so changing how a page looks means opening that page.
+Each page owns its markup and its styling, so changing how a page looks means opening that page. Values you're likely to tune sit at the top of the file that uses them, as named knobs: shared ones in `tokens.css`, a page's own ones at the top of its `<style>` block.
 
 | To change… | Open |
 | --- | --- |
 | Colours, type scale, spacing, motion | `src/styles/tokens.css` |
 | How plain elements look everywhere (links, buttons, headings, lists, Markdown), shared print | `src/styles/global.css` |
 | Name, role, social links, OG image, theme colour, extra contact lines printed only on the PDF CV (`printContacts`) | `src/site.config.ts` |
+| Site URL and base path (`/portfolio` until launch) | `astro.config.mjs` |
 | `<head>`, metadata, CSP, JSON-LD, page shell | `src/layouts/Base.astro` |
 | Home page: markup and look | `src/pages/index.astro` |
+| Home page: texture, marker size, connector weight, card width, ring speed | the knobs at the top of the `<style>` in `src/pages/index.astro` |
 | Home page: markers, card copy, what connects to what | `src/diagram.config.ts` |
-| Home page: where markers end up (force layout) | `src/scripts/nav-diagram.ts` |
+| Home page: spacing between markers, connector wiggle, where cards open, entrance timing, physics | `KNOBS` and `SIM` at the top of `src/scripts/nav-diagram.ts` |
+| Home page: how the layout is solved | the rest of `src/scripts/nav-diagram.ts` |
 | About page: markup, look, its print rules | `src/pages/about.astro` |
+| About page: vertical rhythm (gaps between sections, titles, entries) | the `--cv-*` knobs at the top of the `<style>` in `src/pages/about.astro` |
 | About page / CV: content | `src/content/cv.md` |
 | About page / CV: which fields exist | `src/content.config.ts` (`cv`) |
 | Case study: markup and look | `src/pages/projects/[...slug].astro` |
@@ -69,6 +88,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | Print button, email decoding, reveal-on-print | `src/scripts/site.ts` |
 | 404, `/llms.txt`, `/robots.txt`, manifest | `src/pages/` |
 | Build scripts (encrypt, email, visual check) | `scripts/` |
+| CI and deploy | `.github/workflows/deploy.yml` |
 
 ## Common tasks
 
@@ -91,7 +111,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
    The write-up, in Markdown.
    ```
 
-2. To put it on the home map, add a node with `kind: 'project'` to `src/diagram.config.ts`, and add its `id` to `diagramChain` so it gets connected.
+2. To put it on the home map, add a node with `kind: 'project'` to `src/diagram.config.ts`, and add its `id` to `diagramChain` so it gets connected. The build stops with a message if a node links to a page that doesn't exist (or is still a draft), or if `diagramChain` names an id no node has.
 3. When it's ready, remove `draft: true`.
 
 ### Lock a project behind a passphrase
@@ -102,7 +122,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 4. Run `npm run encrypt`, then commit `public/locked/<slug>.json`.
 5. Send the passphrase to whoever should read it.
 
-The demo project `halcyon` uses the passphrase `soft-club`. If a checkout has no plaintext files, encrypting leaves the committed files alone. More detail is in `src/protected/README.md`.
+The demo project `halcyon` uses the passphrase `soft-club`. If a checkout has no plaintext files, encrypting leaves the committed files alone. How the encryption works, and what it doesn't protect against: `src/protected/README.md`.
 
 ### Update the About page / CV
 
@@ -132,6 +152,7 @@ It builds both versions and screenshots the same pages and states at desktop and
 - Style elements, not classes. `<a>`, `<button>` and the headings look right without classes. Use a class only when an element must look unlike its own kind (`button.link`) or when no element fits (`.prose`, `.meta`).
 - `role="list"` means "a row of things" (nav, socials, tags): no bullets, laid out in a wrapping row. A plain `<ul>` keeps its bullets.
 - Page-specific CSS lives in that page's `<style>` block. Shared values belong in `tokens.css`.
+- A value you'll want to tune gets a name where it's used: a custom property at the top of the page's `<style>` (like `--cv-section-gap`), or an entry in `KNOBS` for the map's script. Add new ones there rather than as a bare number further down.
 - To stagger an entrance, use `data-reveal style="--reveal-step: 2"`. The step number is its place in the queue.
 
 ### Launching at www.pmcf.xyz
@@ -139,7 +160,7 @@ It builds both versions and screenshots the same pages and states at desktop and
 Not yet. While the old site lives at the root, keep this one under `/portfolio/`. When you're ready:
 
 1. In the old site's repo (`freenandes.github.io`), go to Settings → Pages and remove the custom domain.
-2. In this repo, set `BASE_PATH: /` in `.github/workflows/deploy.yml` and change the default in `astro.config.mjs` to match.
+2. In this repo, change the `BASE_PATH` default in `astro.config.mjs` to `'/'`. It's the only place it's set; CI and `npm run visual` read it from there.
 3. In this repo, go to Settings → Pages, set the custom domain to `www.pmcf.xyz` and tick "Enforce HTTPS".
 4. Push, then check https://www.pmcf.xyz/ and update the "Live" line and the base-path notes in this README and `AGENTS.md`.
 
@@ -156,3 +177,5 @@ The site is audited against [The Website Specification](https://specification.we
 - [ ] Add `public/og.png` (1200×630). `og:image` already points to it, but the file is missing.
 - [ ] Add raster app icons (`favicon.ico`, `apple-touch-icon.png`, maskable PWA icon).
 - [ ] Self-host the fonts (currently Google Fonts).
+
+The last three are the Website Specification items that wait on assets; `SPEC-COMPLIANCE.md` → Pending has what each one involves.

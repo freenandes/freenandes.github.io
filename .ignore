@@ -1,0 +1,6 @@
+# Kept out of ripgrep-based searches (editor search, coding agents): generated
+# or binary-like files whose matches are noise and cost a lot to read. Git and
+# the build ignore this file.
+package-lock.json
+public/topo-low.svg
+public/locked/

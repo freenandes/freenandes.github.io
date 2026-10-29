@@ -2,7 +2,7 @@
 
 Pedro MC Fernandes's portfolio site. The home page is an interactive map that links to an About/CV page (which prints to PDF) and to a set of case studies, some of them unlocked with a passphrase.
 
-- Live: https://freenandes.github.io/portfolio/
+- Live (in development): https://www.pmcf.xyz/portfolio/. The old site stays at https://www.pmcf.xyz until launch.
 - Repo: https://github.com/freenandes/portfolio (branch `main`)
 - Every push to `main` deploys to the live site.
 
@@ -39,7 +39,7 @@ The visual check also needs Google Chrome installed.
 ## How it's made
 
 - [Astro](https://astro.build) 5 builds a fully static site. Pages are `.astro` files, and case studies are MDX. There's no React or Tailwind, just Astro components, TypeScript and plain CSS.
-- The site lives under `/portfolio/` on GitHub Pages, so internal links go through `withBase()` (`src/lib/base.ts`).
+- The site lives under `/portfolio/` on GitHub Pages, so internal links go through `withBase()` (`src/lib/base.ts`). The domain `pmcf.xyz` belongs to the old site's repo (`freenandes.github.io`), which is why this repo shows up at `www.pmcf.xyz/portfolio/`.
 - The home map takes its markers and card text from `src/diagram.config.ts`. A physics simulation in `src/scripts/nav-diagram.ts` positions the markers, so the layout varies a little on every load.
 - The About page renders `src/cv.data.json`, which is generated from a LinkedIn PDF export.
 - To lock a project, you write its full text in a git-ignored file, and the build encrypts it into `public/locked/<slug>.json`. Visitors decrypt it in their browser with the passphrase (PBKDF2 + AES-GCM), and `marked` renders the Markdown. The plaintext is never published.
@@ -133,6 +133,17 @@ It builds both versions and screenshots the same pages and states at desktop and
 - `role="list"` means "a row of things" (nav, socials, tags): no bullets, laid out in a wrapping row. A plain `<ul>` keeps its bullets.
 - Page-specific CSS lives in that page's `<style>` block. Shared values belong in `tokens.css`.
 - To stagger an entrance, use `data-reveal style="--reveal-step: 2"`. The step number is its place in the queue.
+
+### Launching at www.pmcf.xyz
+
+Not yet. While the old site lives at the root, keep this one under `/portfolio/`. When you're ready:
+
+1. In the old site's repo (`freenandes.github.io`), go to Settings → Pages and remove the custom domain.
+2. In this repo, set `BASE_PATH: /` in `.github/workflows/deploy.yml` and change the default in `astro.config.mjs` to match.
+3. In this repo, go to Settings → Pages, set the custom domain to `www.pmcf.xyz` and tick "Enforce HTTPS".
+4. Push, then check https://www.pmcf.xyz/ and update the "Live" line and the base-path notes in this README and `AGENTS.md`.
+
+`withBase()` makes every internal link follow the new base, so no page code changes. Once at the root, `robots.txt` and `/llms.txt` start being read by crawlers.
 
 ## Website Specification
 

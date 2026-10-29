@@ -3,8 +3,9 @@ import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 
-// SITE and BASE_PATH env vars override GitHub Pages defaults.
-const SITE = process.env.SITE ?? 'https://freenandes.github.io';
+// SITE and BASE_PATH env vars override these defaults. The site sits under
+// /portfolio while in development; launching at www.pmcf.xyz/ means BASE_PATH '/'.
+const SITE = process.env.SITE ?? 'https://www.pmcf.xyz';
 const BASE_PATH = process.env.BASE_PATH ?? '/portfolio';
 
 export default defineConfig({

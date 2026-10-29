@@ -41,9 +41,10 @@ jobs:
       - name: Build site
         run: npm run build
         env:
-          # Match astro.config.mjs defaults to the repo's Pages URL. Override
-          # here if you move to a custom domain or a user/org page.
-          SITE: https://freenandes.github.io
+          # Match astro.config.mjs defaults. pmcf.xyz belongs to the old site's
+          # repo, so this one is served at www.pmcf.xyz/portfolio/. At launch,
+          # set BASE_PATH to / (see README → Launching at www.pmcf.xyz).
+          SITE: https://www.pmcf.xyz
           BASE_PATH: /portfolio
 
       - name: Upload artifact

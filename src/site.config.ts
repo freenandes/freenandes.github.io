@@ -13,6 +13,9 @@ export interface SiteConfig {
    *  `mailto:` link at runtime. To change the email run
    *  `npm run email -- you@example.com`; never edit the token by hand. */
   socials: { label: string; href?: string; token?: string }[];
+  /** Extra contacts printed before the socials on the PDF CV only, as
+   *  written; the web page never shows them. */
+  printContacts: string[];
   /** BCP 47 language tag for the document (matches <html lang>). */
   locale: string;
   /** Open Graph locale (underscore form, e.g. en_US). */
@@ -36,6 +39,7 @@ export const site: SiteConfig = {
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/pmcfernandes' },
     { label: 'GitHub', href: 'https://github.com/freenandes' },
   ],
+  printContacts: ['pmcf.xyz'],
   locale: 'en',
   ogLocale: 'en_US',
   ogImage: '/og.png',

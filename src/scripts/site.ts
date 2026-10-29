@@ -20,6 +20,18 @@ window.addEventListener('beforeprint', () => {
 });
 
 /**
+ * "Save as PDF" names the file after the page title. A page can offer a better
+ * file name with `data-print-title` (the CV: "Pedro MC Fernandes — CV"); it
+ * stands in while the print dialog is open, then the tab title comes back.
+ */
+const printTitle = document.querySelector<HTMLElement>('[data-print-title]')?.dataset.printTitle;
+if (printTitle) {
+  const pageTitle = document.title;
+  window.addEventListener('beforeprint', () => (document.title = printTitle));
+  window.addEventListener('afterprint', () => (document.title = pageTitle));
+}
+
+/**
  * Turn every obfuscated address (see `src/lib/email.ts`) back into a working
  * `mailto:` link, and spell it out where the markup asks for the plain text —
  * the print-only contact line on the CV, flagged with `data-email-text`. The

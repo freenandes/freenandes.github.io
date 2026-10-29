@@ -3,7 +3,7 @@ export default {
   extends: ['stylelint-config-standard', 'stylelint-config-html/astro'],
   ignoreFiles: ['dist/**', 'node_modules/**'],
   rules: {
-    // BEM blocks/elements/modifiers (e.g. .cv__section-title, .node--floating).
+    // BEM-style modifiers (e.g. .node--floating) aren't kebab-case.
     'selector-class-pattern': null,
     // Fluid type scale tokens (e.g. --step--1) from tokens.css.
     'custom-property-pattern': null,

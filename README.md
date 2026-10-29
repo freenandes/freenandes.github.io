@@ -40,7 +40,7 @@ The visual check also needs Google Chrome installed.
 - [Astro](https://astro.build) 5 builds a fully static site. Pages are `.astro` files, and case studies are MDX. There's no React or Tailwind, just Astro components, TypeScript and plain CSS.
 - The site lives under `/portfolio/` on GitHub Pages, so internal links go through `withBase()` (`src/lib/base.ts`). The domain `pmcf.xyz` belongs to the old site's repo (`freenandes.github.io`), which is why this repo shows up at `www.pmcf.xyz/portfolio/`.
 - The home map takes its markers and card text from `src/diagram.config.ts`. A physics simulation in `src/scripts/nav-diagram.ts` positions the markers, so the layout varies a little on every load.
-- The About page, which doubles as the printable CV, renders `src/content/cv.md`: jobs and education as fields at the top, the summary as Markdown below. You edit it by hand; the build rejects missing or misspelled fields.
+- The About page, which doubles as the printable CV, renders `src/content/cv.md`, a list of fields in the same order as the page: location and languages (one small line under your name), headline, summary (Markdown), jobs, earlier work, education. You edit it by hand; the build rejects missing or misspelled fields.
 - To lock a project, you write its full text in a git-ignored file, and the build encrypts it into `public/locked/<slug>.json`. Visitors decrypt it in their browser with the passphrase (PBKDF2 + AES-GCM), and `marked` renders the Markdown. The plaintext is never published.
 - A strict Content Security Policy in `src/layouts/Base.astro` blocks inline and third-party scripts.
 - Deploy: `.github/workflows/deploy.yml` lints the CSS, builds and publishes to Pages on every push to `main`.
@@ -53,7 +53,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | --- | --- |
 | Colours, type scale, spacing, motion | `src/styles/tokens.css` |
 | How plain elements look everywhere (links, buttons, headings, lists, Markdown), shared print | `src/styles/global.css` |
-| Name, role, social links, OG image, theme colour | `src/site.config.ts` |
+| Name, role, social links, OG image, theme colour, extra contact lines printed only on the PDF CV (`printContacts`) | `src/site.config.ts` |
 | `<head>`, metadata, CSP, JSON-LD, page shell | `src/layouts/Base.astro` |
 | Home page: markup and look | `src/pages/index.astro` |
 | Home page: markers, card copy, what connects to what | `src/diagram.config.ts` |
@@ -106,11 +106,11 @@ The demo project `halcyon` uses the passphrase `soft-club`. If a checkout has no
 
 ### Update the About page / CV
 
-1. Edit `src/content/cv.md`. A job is a block of `role`, `org`, `period` and a list of `points`; newest goes first. The summary under the closing `---` is Markdown, so blank lines make paragraphs and `- ` lines make a bulleted list.
+1. Edit `src/content/cv.md`. A job is a block of `role`, `org`, `period`, an optional one-line `summary` and a list of `points`; newest goes first. `earlierWork` entries take the same fields minus `points`, for older jobs in one line each. The summary sits under `summary: |`, with every line indented by two spaces. It's Markdown, so blank lines make paragraphs and `- ` lines make a bulleted list. Outside the summary, if a value contains `: ` (like `software: observability`), wrap it in double quotes, or the page fails to load.
 2. Check it with `npm run dev` at `/portfolio/about/`. Use the page's Download PDF button to check the printed CV.
 3. Commit and push.
 
-The portfolio is the original: change the wording here, then paste it into LinkedIn. `skills` and `languages` aren't shown on the page; search engines read them. If the build fails, the error names the field in `cv.md` it didn't accept.
+The portfolio is the original: change the wording here, then paste it into LinkedIn. `skills` isn't shown on the page; search engines read it. If the build fails, the error names the field in `cv.md` it didn't accept.
 
 ### Change the contact email
 

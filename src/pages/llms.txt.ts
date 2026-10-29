@@ -25,7 +25,7 @@ export const GET: APIRoute = async ({ site: astroSite }) => {
     '## Pages',
     '',
     `- [Home / site map](${abs('/')}): Interactive map linking the case studies, about and contact.`,
-    `- [About / CV](${abs('/about')}): Career history, experience and education.`,
+    `- [About & CV](${abs('/about')}): Career history, experience and education.`,
     '',
     '## Case studies',
     '',

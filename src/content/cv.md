@@ -1,103 +1,107 @@
 ---
-# The About page and the CV it prints. Edit this file directly: the fields are
-# below, the summary is the Markdown after the closing ---. The build checks it
-# against the `cv` schema in src/content.config.ts and names any field it rejects.
+# The About page and the CV it prints, in the order the page shows them. Edit
+# this file directly. The build checks it against the `cv` schema in
+# src/content.config.ts and names any field it rejects.
+#
+# Wrap a one-line value in double quotes if it contains ": " or " #", or starts
+# with a quote, [, {, &, * or !. Example: headline: "Design: systems and code"
+#
+# The summary is Markdown under `summary: |`. Indent every line by two spaces;
+# inside it, colons and quotes need no escaping. Blank lines make paragraphs,
+# "- " lines make a bulleted list.
 
-headline: Lead Interface Designer — Researching, designing, and coding systems for web software
+# Shown under your name as one line: "Leiria, Portugal / Fluent in Portuguese &
+# English". List only languages you're fluent in, by name alone.
 location: Leiria, Portugal
+languages:
+  - Portuguese
+  - English
+
+headline: "Senior Product Designer & Design Engineer"
+
+summary: |
+  I specialize in building interfaces for complex technical software: observability, databases, and developer tools. It’s a world I navigate with ease. I know its terminology, its workflows, and I understand the people who use these tools every day: DBAs, SREs and software developers.
+
+  How I work:
+  
+  - Research first. Understanding real users and workflows is crucial. From diagrams to high-fidelity coded prototypes, I use whatever it takes to align teams and leadership on what to build.
+  - Design systems in code. I write production front-end code, so design and engineering work from the same source and share the same intent.
+  - Reviews that unblock teams. When teams ship fast, I turn UX findings into clear, actionable issue notes that anyone can pick up, so they can meet the deadline and still ship with quality.
 
 experience:
   - role: Senior Product Designer
     org: Percona
-    period: August 2022 — Present
+    period: August 2022 — October 2026
+    summary: Percona builds open-source database software and services, including PMM (Percona Monitoring and Management), a monitoring and observability platform for MySQL, PostgreSQL, MongoDB, Redis, and more.
     points:
-      - Built and managed Peak UI, establishing front-end component patterns that streamlined development and enabled extensibility for Percona products.
-      - Designed and coded a native navigation architecture for PMM (Percona Monitoring and Management), decoupling the interface from heavy third-party dependencies to reduce technical debt and unblock custom features.
-      - Built high-fidelity vision prototypes to resolve core workflow issues in products, using user research to secure executive buy-in and drive product adoption.
-      - Redesigned and coded modular templates across 10+ documentation sites, creating a scalable framework that improved readability and simplified content creation.
+      - Designed and coded a native UI for PMM, decoupling the interface from heavy third-party dependencies to reduce technical debt and unblock the development of custom features.
+      - Built and managed Peak UI, the front-end component and style foundation that streamlined development and enabled extensibility across Percona products.
+      - Created high-fidelity vision prototypes grounded in user research with DBAs, SREs and developers to resolve core workflow issues, securing executive buy-in and driving product adoption.
+      - Audited the user journey to PMM adoption, identified documentation as a key gap, and redesigned and coded modular templates across 10+ documentation sites, improving readability and simplifying content creation.
       - Mentored designers and engineers on front-end code practices, design system patterns, and research methods.
 
   - role: Senior Product Designer
     org: FARFETCH
     period: June 2021 — July 2022
+    summary: FARFETCH is a global marketplace for luxury fashion. I worked on catalog and product discovery, including conscious, or eco-friendly, shopping.
     points:
-      - Redesigned product listing cards to enable direct purchasing from catalog pages, removing friction in the checkout funnel and improving product discovery.
-      - Built modular component patterns that balanced high-end luxury brand aesthetics with strict functional e-commerce requirements.
-      - Created taxonomy frameworks to resolve catalog disparities around sustainable items, making complex product attributes clearer while establishing documentation to align cross-department standards.
       - Uncovered catalog discovery barriers through user research, using the insights to shape the conscious shopping roadmap.
+      - Created a taxonomy framework for sustainable items, resolving catalog inconsistencies, making complex product attributes clearer, and documenting standards shared across departments.
+      - Redesigned product listing cards to enable direct purchasing from catalog pages, removing friction in the checkout funnel and improving product discovery.
+      - Built modular component patterns that balanced high-end luxury aesthetics with strict functional e-commerce requirements.
 
   - role: Senior Product Designer
-    org: TUI
+    org: TUI Group
     period: March 2019 — May 2021
+    summary: TUI Group is one of the world’s largest leisure travel companies. From the Lisbon hub, I worked on its e-commerce experience across multiple markets.
     points:
-      - Created the Tagus design system across 5 global markets, standardizing e- commerce flows from inspiration through checkout while managing front-end QA with external dev teams to maintain design quality.
-      - Designed a modular page building system that generated 100K+ destination pages, driving 4x organic traffic growth and simplifying multi-market deployment.
+      - Designed a modular page-building system that generated 100K+ destination pages, driving 4x organic traffic growth and simplifying multi-market deployment.
+      - Created the Tagus design system across 5 global markets, standardizing e-commerce flows from inspiration through checkout.
+      - Managed front-end QA with external development teams to keep implementation true to the design.
       - Validated interface patterns using A/B testing and Baymard UX benchmarking before scaling features across distributed European teams.
-      - Built vision prototypes to align international product strategy while helping scale the TUI Lisbon hub influence inside the group.
-
-  - role: Founder and Manager
-    org: Noise Goods
-    period: June 2013 — August 2019
-    points:
-      - Designed and coded a custom e-commerce platform, optimizing conversion pathways and SEO for global sales across 50+ countries.
-      - Managed complete physical and digital product lifecycles, bridging brand design, manufacturing execution, and digital interface touchpoints.
-      - Iterated on storefront UI using analytics and user data, refining purchasing flows to grow international e-commerce and wholesale revenue.
+      - Built vision prototypes to align international product strategy, helping grow the Lisbon hub’s influence within the group.
 
   - role: User Experience Designer
     org: SMARTIDIOM
     period: May 2016 — March 2019
+    summary: SMARTIDIOM is a translation services company. I led the design and front-end of its move from a traditional service business to a digital platform.
     points:
-      - Designed and coded 4 interconnected web applications, delivering production front-end code that transformed a traditional service business into a digital platform connecting clients with certified professionals.
-      - Built a UI component system from scratch to standardize interface patterns across complex workflows, including calendar scheduling, financial tracking, bidding systems, and onboarding flows.
+      - Designed and coded 4 interconnected web applications, turning a traditional service business into a digital platform that connects clients with certified professionals.
+      - Built Slayout, a UI component system created from scratch to standardize interface patterns across complex workflows, including calendar scheduling, financial tracking, bidding systems, and onboarding flows.
       - Created high-fidelity product demonstrations and front-end builds showcased at CES 2017 to validate market demand and platform capabilities.
+
+# Older or side jobs, one short line each: no bullet points.
+earlierWork:
+  - role: Founder & Designer
+    org: Noise Goods
+    period: 2013 — 2019
+    summary: "Founded and ran a bag brand end to end, from product design and manufacturing to a self-coded online store selling to 50+ countries."
 
   - role: Product Designer
     org: Stricker
-    period: June 2010 — October 2013
-    points:
-      - Established information architecture foundations for digital catalogs, structuring complex B2B product taxonomies and customization rules.
-      - Designed modular systems for 50+ B2B products, enabling scalable customization within strict production constraints.
-      - Developed testing protocols and conducted field research at international trade shows to benchmark competitor offerings and refine product usability.
+    period: 2010 — 2013
+    summary: "Designed modular systems for 50+ B2B products and structured their digital catalogues, with extensive field research at trade shows."
 
-  - role: Illustrator and Graphic Designer
-    org: Self-employed
-    period: September 2009 — June 2011
-    points:
-      - Built web layouts using HTML, CSS, and JavaScript, establishing a front-end technical foundation that bridged visual design with functional code.
-      - Designed brand identities and visual guidelines for diverse clients, applying a systemized approach to maintain visual consistency.
-      - Produced editorial illustrations published in major national media outlets.
+  - role: Illustrator & Graphic Designer
+    org: Freelance
+    period: 2009 — 2011
+    summary: "Editorial illustration for Visão, DIFF and Lux Woman, brand identities with systematic guidelines, and my first web layouts in code."
 
   - role: Industrial Designer
-    org: COMOPI Kitchen Design
-    period: September 2007 — September 2009
-    points:
-      - Designed modular furniture systems and digital pipelines that translated user requirements directly into manufacturing parameters.
-      - Customized CAD software workflows to automate and streamline design-to- production handoffs.
+    org: COMOPI
+    period: 2007 — 2009
+    summary: "Designed modular kitchen systems from concept to production, scripting CAD workflows to automate the handoff to manufacturing."
 
 education:
   - title: Master’s Degree, Industrial and Product Design
     org: Escola Universitária das Artes de Coimbra
     period: 2002 — 2007
 
-  - title: Multimedia Design
-    org: Instituto Politécnico de Coimbra - Escola Superior de Educação
-    period: 2001 — 2002
-
-  - title: High School, Tridimensional Design
-    org: Escola Secundária José Falcão
-    period: 1998 — 2001
-
-# Not shown on the page. Search engines read them from the page's structured data.
+# Not shown on the page. Search engines read it from the page's structured data.
 skills:
-  - Web Analytics
-  - A/B Testing
-  - E-commerce UI
-
-languages:
-  - Portuguese (Native or Bilingual)
-  - French (Elementary)
-  - Spanish (Elementary)
-  - English (Full Professional)
+  - Design Systems
+  - User Research
+  - Front-end Development
+  - User Interface Design
+  - Enterprise UX
 ---
-
-I design web software interfaces and write production front-end code that teams can use to scale their products. I focus on researching and solving underlying product workflows, building component systems that keep applications clean, performant, and easy to use.

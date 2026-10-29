@@ -1,8 +1,9 @@
 ---
-/** About / CV. Content comes from `src/content/cv.md`, edited by hand;
+/** About & CV. Content comes from `src/content/cv.md`, edited by hand;
     everything about how it looks is in this file. */
 
-import { getEntry, render } from 'astro:content';
+import { getEntry } from 'astro:content';
+import { marked } from 'marked';
 import Base from '../layouts/Base.astro';
 import PageNav from '../components/PageNav.astro';
 import { site } from '../site.config';
@@ -11,17 +12,29 @@ import { withBase } from '../lib/base';
 const entry = await getEntry('cv', 'cv');
 if (!entry) throw new Error('src/content/cv.md is missing — the About page renders from it.');
 const cv = entry.data;
-const { Content: Summary } = await render(entry);
+// The summary is a Markdown field (not the file body) so cv.md reads in page order.
+const summary = await marked.parse(cv.summary);
 const name = site.name;
+// "https://www.linkedin.com/in/pmcfernandes" → "linkedin.com/in/pmcfernandes", for print.
+const bareUrl = (href: string) => href.replace(/^https?:\/\/(www\.)?/, '');
+// The printed contact line, in order: print-only extras, then the socials (the
+// email as its token, for the script to spell out; the rest as bare addresses).
+const printContacts = [
+  ...site.printContacts.map((text) => ({ text, token: undefined })),
+  ...site.socials.map((s) => ({ text: s.href && bareUrl(s.href), token: s.token })),
+];
 const headline = cv.headline;
+// The small line under the name: "Leiria, Portugal / Fluent in Portuguese & English".
+const { languages } = cv;
+const fluentIn = languages.length
+  ? `Fluent in ${[languages.slice(0, -1).join(', '), languages.at(-1)].filter(Boolean).join(' & ')}`
+  : undefined;
+const facts = [cv.location, fluentIn].filter((part): part is string => !!part);
 
 const origin = Astro.site ?? Astro.url;
 const abs = (path: string) => new URL(withBase(path), origin).toString();
 const pageUrl = new URL(Astro.url.pathname, origin).toString();
 const personId = `${abs('/')}#person`;
-
-// "Portuguese (Native or Bilingual)" → "Portuguese" for schema.org.
-const languages = cv.languages.map((item) => item.replace(/\s*\(.*\)\s*$/, '').trim());
 
 // Enrich the shared Person node (merged by @id) with CV facts, and describe the
 // page itself as a ProfilePage.
@@ -45,7 +58,7 @@ const jsonLd = [
     '@type': 'ProfilePage',
     '@id': `${pageUrl}#profilepage`,
     url: pageUrl,
-    name: `About / CV — ${name}`,
+    name: `About & CV — ${name}`,
     isPartOf: { '@id': `${abs('/')}#website` },
     mainEntity: { '@id': personId },
   },
@@ -53,19 +66,19 @@ const jsonLd = [
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Map', item: abs('/') },
-      { '@type': 'ListItem', position: 2, name: 'About / CV', item: pageUrl },
+      { '@type': 'ListItem', position: 2, name: 'About & CV', item: pageUrl },
     ],
   },
 ];
 ---
 
 <Base
-  title="About / CV"
+  title="About & CV"
   description={`Curriculum vitae of ${name}, ${headline}.`}
   ogType="profile"
   jsonLd={jsonLd}
 >
-  <article>
+  <article data-print-title={`${name} — CV`}>
     <PageNav>
       <li><a href={withBase('/')}>Back to map</a></li>
       <button slot="at-rest" class="link" type="button" data-print>Download PDF</button>
@@ -74,15 +87,23 @@ const jsonLd = [
     <header data-reveal>
       <div>
         <h1>{name}</h1>
+        {/* Each part stays whole and the slash ends the line it's on, so a narrow
+            screen wraps after "Portugal /" rather than mid-phrase. */}
+        {
+          facts.length > 0 && (
+            <p class="meta">
+              {facts.map((part, i) => <>{i > 0 && '\u00a0/ '}<span>{part}</span></>)}
+            </p>
+          )
+        }
         <p>{headline}</p>
-        {/* On paper there are no links to click, so the addresses are spelled out.
-            The email is filled in by script (see src/scripts/site.ts) so it is
-            never in the shipped HTML. */}
-        <div class="print-only">
-          {site.socials.map((s) =>
-            s.token ? <p data-email={s.token} data-email-text></p> : <p>{s.href}</p>
-          )}
-        </div>
+        {/* On paper there are no links to click, so the contacts are spelled out
+            on one line, dot-separated (the dots are CSS), each kept whole. The
+            email is filled in by script (see src/scripts/site.ts) so it is never
+            in the shipped HTML. */}
+        <p class="print-only">
+          {printContacts.map((c) => (c.token ? <span data-email={c.token} data-email-text></span> : <span>{c.text}</span>))}
+        </p>
       </div>
 
       <ul class="no-print" role="list">
@@ -93,29 +114,31 @@ const jsonLd = [
     </header>
 
     <div class="summary" data-reveal style="--reveal-step: 1">
-      <Summary />
+      <Fragment set:html={summary} />
     </div>
 
-    <section data-reveal style="--reveal-step: 2">
-      <h2>Experience</h2>
+    {/* Each section's <h2> lives inside its first entry's .entry-keep, so a
+        printed page can never end on a section title (see the print styles). */}
+    <section id="experience" data-reveal style="--reveal-step: 2">
       {
-        cv.experience.map((job) => (
+        cv.experience.map((job, i) => (
           <div class="entry">
             <div class="entry-keep">
+              {i === 0 && <h2>Experience</h2>}
               <p class="period">{job.period}</p>
               <div>
                 <h3>{job.role}, {job.org}</h3>
                 {job.summary && <p>{job.summary}</p>}
                 {job.points.length > 0 && (
                   <ul>
-                    {job.points.slice(0, 2).map((point) => <li>{point}</li>)}
+                    {job.points.slice(0, 1).map((point) => <li>{point}</li>)}
                   </ul>
                 )}
               </div>
             </div>
-            {job.points.length > 2 && (
+            {job.points.length > 1 && (
               <ul>
-                {job.points.slice(2).map((point) => <li>{point}</li>)}
+                {job.points.slice(1).map((point) => <li>{point}</li>)}
               </ul>
             )}
           </div>
@@ -123,12 +146,31 @@ const jsonLd = [
       }
     </section>
 
-    <section data-reveal>
-      <h2>Education</h2>
+    {
+      cv.earlierWork.length > 0 && (
+        <section id="earlier-work" data-reveal>
+          {cv.earlierWork.map((job, i) => (
+            <div class="entry">
+              <div class="entry-keep">
+                {i === 0 && <h2>Earlier work</h2>}
+                <p class="period">{job.period}</p>
+                <div>
+                  <h3>{job.role}, {job.org}</h3>
+                  {job.summary && <p>{job.summary}</p>}
+                </div>
+              </div>
+            </div>
+          ))}
+        </section>
+      )
+    }
+
+    <section id="education" data-reveal>
       {
-        cv.education.map((entry) => (
+        cv.education.map((entry, i) => (
           <div class="entry">
             <div class="entry-keep">
+              {i === 0 && <h2>Education</h2>}
               <p class="period">{entry.period}</p>
               <div>
                 <h3>{entry.title}</h3>
@@ -148,14 +190,30 @@ const jsonLd = [
 </Base>
 
 <style>
+  /* Name block, then the links below it, however short the headline is. */
   header {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
     gap: var(--space-lg);
   }
 
   h1 {
-    margin-block-end: var(--space-sm);
+    margin-block-end: var(--space-xs);
+  }
+
+  /* Space between the location line and the headline. */
+  h1 + .meta {
+    margin-block-end: var(--space-md);
+  }
+
+  /* The headline: the one plain paragraph beside the name (not the location
+     line, not the printed contacts). */
+  header > div > p:not(.meta, .print-only) {
+    font-weight: var(--weight-semibold);
+  }
+
+
+  header .meta span {
+    display: inline-block;
   }
 
   .summary {
@@ -181,8 +239,16 @@ const jsonLd = [
     color: var(--ink-3);
   }
 
+  /* The CV's vertical rhythm, in one place. On a phone the title gap is
+     corrected for the one-column grid further down. */
+  article {
+    --cv-section-gap: calc(var(--space-lg) + var(--space-md)); /* above a section title */
+    --cv-title-gap: calc(var(--space-md) + var(--space-sm)); /* below the title's rule */
+    --cv-entry-gap: calc(var(--space-md) + var(--space-sm)); /* between entries */
+  }
+
   section {
-    margin-block-start: var(--space-xl);
+    margin-block-start: var(--cv-section-gap);
   }
 
   h2 {
@@ -191,8 +257,14 @@ const jsonLd = [
     text-transform: uppercase;
     letter-spacing: var(--tracking-mono);
     padding-block-end: var(--space-sm);
-    margin-block-end: var(--space-lg);
+    margin-block-end: var(--cv-title-gap);
     border-block-end: 1px solid var(--line-strong);
+  }
+
+  /* The title sits inside the first entry (so print keeps them together);
+     on screen it spans both columns above the dates. */
+  .entry h2 {
+    grid-column: 1 / -1;
   }
 
   /* Dates in a fixed column, the job beside them. `.entry-keep` unwraps on
@@ -209,7 +281,7 @@ const jsonLd = [
   }
 
   .entry + .entry {
-    margin-block-start: var(--space-lg);
+    margin-block-start: var(--cv-entry-gap);
   }
 
   .period {
@@ -222,6 +294,13 @@ const jsonLd = [
     color: var(--ink-3);
     padding-block-start: 0.4375rem;
     text-wrap: balance;
+  }
+
+  /* A job's summary sits as far below the title as its first bullet would.
+     Education's school line stays tight under its title. */
+  #experience h3 + p,
+  #earlier-work h3 + p {
+    margin-block-start: var(--space-sm);
   }
 
   .entry ul {
@@ -251,6 +330,11 @@ const jsonLd = [
       grid-column: 1;
       margin-block-start: 0;
     }
+
+    /* The one-column grid adds its gap under the title too. */
+    .entry h2 {
+      margin-block-end: calc(var(--cv-title-gap) - var(--space-sm));
+    }
   }
 
   .download {
@@ -265,11 +349,27 @@ const jsonLd = [
       font-size: 12pt;
     }
 
+    /* One row of contacts. The dots are drawn here, with --contact-gap on each
+       side; a long row wraps between contacts, the dot ending the line. */
     .print-only {
+      --contact-gap: var(--space-md);
+
+      display: flex;
+      flex-wrap: wrap;
+      column-gap: var(--contact-gap);
       font-size: 12pt;
       padding-block: 5mm;
       margin-block-start: 5mm;
       border-block: 1px solid #000;
+    }
+
+    .print-only span {
+      white-space: nowrap;
+    }
+
+    .print-only span:not(:last-child)::after {
+      content: '·';
+      margin-inline-start: var(--contact-gap);
     }
 
     .summary {
@@ -303,8 +403,10 @@ const jsonLd = [
       display: block;
     }
 
-    /* If this group doesn't fit in the space left on the page, the whole
-       job moves with it — later bullets cannot stay behind out of order. */
+    /* The dates, title, summary and first bullet of a job never split, and in
+       a section's first entry the section title joins them, so no title ends a
+       page alone. The remaining bullets flow on, breaking only between bullets,
+       so a long job can start low on a page instead of leaving it half empty. */
     .entry-keep {
       display: block;
       break-inside: avoid;

@@ -31,9 +31,9 @@ export interface SiteConfig {
 
 export const site: SiteConfig = {
   name: 'Pedro MC Fernandes',
-  role: 'Lead Product Designer',
+  role: 'Senior Product Designer & Design Engineer',
   description:
-    'Systems-thinking product designer turning stagnating products into growth engines — fixing ecosystems, not just interfaces, and shipping the code to prove it.',
+    'I build interfaces for complex technical software: observability, databases, and developer tools. From research to design systems and front-end code.',
   socials: [
     { label: 'Email', token: 'b3c3d6d7c1dcf3c3ded0d59dcbcac9' },
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/pmcfernandes' },
@@ -43,7 +43,7 @@ export const site: SiteConfig = {
   locale: 'en',
   ogLocale: 'en_US',
   ogImage: '/og.png',
-  ogImageAlt: 'Pedro MC Fernandes — Lead Product Designer',
+  ogImageAlt: 'Pedro MC Fernandes — Senior Product Designer & Design Engineer',
   favicon: '/favicon.svg',
   shortName: 'PMCF',
   themeColor: '#ffffff',

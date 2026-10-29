@@ -80,6 +80,9 @@ function deferOffscreenReveals() {
 
   for (const el of held) {
     el.setAttribute('data-reveal-wait', '');
+    // The entrance started with the page, a few frames before this script
+    // ran; rewind it so the block waits on its first frame, not partway in.
+    for (const animation of el.getAnimations()) animation.currentTime = 0;
     observer.observe(el);
   }
 }

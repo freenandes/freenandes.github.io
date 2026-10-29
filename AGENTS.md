@@ -1,6 +1,6 @@
 # Portfolio website: agent brief
 
-Pedro MC Fernandes's portfolio: a static Astro 5 + MDX site on GitHub Pages, served at https://www.pmcf.xyz/portfolio/ while in development (the old site keeps www.pmcf.xyz until launch; see README → Launching at www.pmcf.xyz). README.md is the human guide, with the commands, a "Where things live" table and step-by-step tasks. Read it before adding or moving a file. This file covers what an agent needs on top of that.
+Pedro MC Fernandes's portfolio: a static Astro 7 + MDX site on GitHub Pages, served at https://www.pmcf.xyz/portfolio/ while in development (the old site keeps www.pmcf.xyz until launch; see README → Launching at www.pmcf.xyz). README.md is the human guide, with the commands, a "Where things live" table and step-by-step tasks. Read it before adding or moving a file. This file covers what an agent needs on top of that.
 
 ## Ground rules
 

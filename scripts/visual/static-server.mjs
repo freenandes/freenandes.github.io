@@ -46,14 +46,22 @@ async function resolveFile(root, urlPath) {
 
 /**
  * @param {string} root  a built dist directory
- * @param {string} base  base path the site is mounted at, e.g. "/portfolio"
+ * @param {string} base  base path the site is mounted at, e.g. "/portfolio", or "/"
  * @returns {Promise<{ origin: string, base: string, close: () => Promise<void> }>}
  */
 export function serveDist(root, base) {
-  const prefix = `/${base.replace(/^\/|\/$/g, '')}`;
+  // "" when the site is at the root, so `${base}${path}` never doubles a slash.
+  const trimmed = base.replace(/^\/+|\/+$/g, '');
+  const prefix = trimmed ? `/${trimmed}` : '';
   const server = createServer(async (req, res) => {
     const url = req.url ?? '/';
-    const within = url === prefix ? '/' : url.startsWith(`${prefix}/`) ? url.slice(prefix.length) : null;
+    const within = !prefix
+      ? url
+      : url === prefix
+        ? '/'
+        : url.startsWith(`${prefix}/`)
+          ? url.slice(prefix.length)
+          : null;
     if (within === null) {
       res.writeHead(404, { 'content-type': 'text/plain' });
       res.end('outside the base path');

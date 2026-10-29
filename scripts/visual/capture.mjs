@@ -31,6 +31,8 @@ const CHROME_CANDIDATES = [
   '/usr/bin/google-chrome',
   '/usr/bin/chromium',
   '/usr/bin/chromium-browser',
+  // Claude Code cloud sessions ship Playwright's Chromium here.
+  '/opt/pw-browsers/chromium',
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

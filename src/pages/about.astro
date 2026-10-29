@@ -190,6 +190,14 @@ const jsonLd = [
 </Base>
 
 <style>
+  /* --- Knobs: the CV's vertical rhythm, in one place. On a phone the title
+     gap is corrected for the one-column grid further down. */
+  article {
+    --cv-section-gap: calc(var(--space-lg) + var(--space-md)); /* above a section title */
+    --cv-title-gap: calc(var(--space-md) + var(--space-sm)); /* below the title's rule */
+    --cv-entry-gap: calc(var(--space-md) + var(--space-sm)); /* between entries */
+  }
+
   /* Name block, then the links below it, however short the headline is. */
   header {
     display: grid;
@@ -210,7 +218,6 @@ const jsonLd = [
   header > div > p:not(.meta, .print-only) {
     font-weight: var(--weight-semibold);
   }
-
 
   header .meta span {
     display: inline-block;
@@ -237,14 +244,6 @@ const jsonLd = [
   .summary :global(li::marker) {
     font-size: var(--step--1);
     color: var(--ink-3);
-  }
-
-  /* The CV's vertical rhythm, in one place. On a phone the title gap is
-     corrected for the one-column grid further down. */
-  article {
-    --cv-section-gap: calc(var(--space-lg) + var(--space-md)); /* above a section title */
-    --cv-title-gap: calc(var(--space-md) + var(--space-sm)); /* below the title's rule */
-    --cv-entry-gap: calc(var(--space-md) + var(--space-sm)); /* between entries */
   }
 
   section {

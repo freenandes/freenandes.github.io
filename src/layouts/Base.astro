@@ -33,7 +33,6 @@ const origin = Astro.site ?? Astro.url;
 const canonical = new URL(Astro.url.pathname, origin).toString();
 const siteBase = new URL(withBase('/'), origin).toString();
 const ogImage = new URL(withBase(site.ogImage), origin).toString();
-const topoPattern = mainClass === 'home' ? withBase('/topo-low.svg') : null;
 
 // Profiles the site owner can be cross-referenced by (schema.org sameAs).
 const sameAs = site.socials
@@ -70,10 +69,11 @@ const structuredData = {
 
 // Static-site CSP delivered via <meta>. Note: frame-ancestors, sandbox and
 // report-uri are header-only and are intentionally omitted here (see
-// SPEC-COMPLIANCE.md). 'unsafe-inline' is required for style only because the
-// theme relies on inline `style="--…"` custom-property attributes; scripts are
-// all bundled to files (see the assetsInlineLimit note in astro.config.mjs), so
-// script-src needs nothing but 'self'.
+// SPEC-COMPLIANCE.md). style-src needs 'unsafe-inline' for the inline
+// `style="--…"` custom-property attributes and for the small stylesheets Astro
+// inlines into the page; scripts are all bundled to files (see the
+// assetsInlineLimit note in astro.config.mjs), so script-src needs nothing but
+// 'self'.
 const csp = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -145,11 +145,7 @@ const csp = [
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
-    <main
-      id="main"
-      class:list={[mainClass]}
-      style={topoPattern ? `--topo-pattern: url('${topoPattern}')` : undefined}
-    >
+    <main id="main" class:list={[mainClass]}>
       <slot />
     </main>
 

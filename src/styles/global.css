@@ -177,7 +177,7 @@ ul.meta-row {
 /* --- Layout -------------------------------------------------------------- */
 
 /* Every page is one column of `--measure`, and the footer lines up with it.
-   The home page opts out: its map is full-bleed. */
+   The home page opts out in index.astro: its map is full-bleed. */
 
 main,
 body > footer {
@@ -195,29 +195,6 @@ main {
 main > article,
 main > section {
   padding-block: var(--space-lg);
-}
-
-main.home {
-  max-width: none;
-  min-height: 100svh;
-  padding-inline: 0;
-  isolation: isolate;
-}
-
-/* Contour texture behind the map. `--topo-pattern` is set on `main` by the
-   layout so the asset path can respect the site's base path. */
-
-main.home::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: var(--topo-pattern);
-  background-repeat: repeat;
-  background-position: top center;
-  background-size: 150rem auto;
-  opacity: 0.075;
 }
 
 /* --- Prose --------------------------------------------------------------- */
@@ -436,7 +413,6 @@ a[data-email]:not([href]),
     padding-block: 0;
   }
 
-  main.home::before,
   body > footer {
     display: none !important;
   }

@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "sync:linkedin": "node scripts/sync-linkedin.mjs",
     "email": "node scripts/set-email.mjs",
     "encrypt": "node scripts/encrypt-projects.mjs",
     "check": "astro check",
@@ -33,7 +32,6 @@
     "stylelint": "^17.13.0",
     "stylelint-config-html": "^1.1.0",
     "stylelint-config-standard": "^40.0.0",
-    "typescript": "^5.9.3",
-    "unpdf": "^1.6.2"
+    "typescript": "^5.9.3"
   }
 }

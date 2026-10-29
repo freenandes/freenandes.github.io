@@ -17,7 +17,6 @@ Pedro MC Fernandes's portfolio site. The home page is an interactive map that li
 | `npm run lint:css` | CSS lint, which CI also runs. `npm run lint:css:fix` fixes what it can |
 | `npm run visual` | Compares this working tree's look with `origin/main` (see below) |
 | `npm run encrypt` | Re-encrypts locked projects (also part of `build`) |
-| `npm run sync:linkedin` | Rebuilds the About page data from your LinkedIn PDF |
 | `npm run email -- you@example.com` | Changes the contact email |
 
 Before you push: run `npm run check`, `npm run lint:css` and `npm run build`.
@@ -41,7 +40,7 @@ The visual check also needs Google Chrome installed.
 - [Astro](https://astro.build) 5 builds a fully static site. Pages are `.astro` files, and case studies are MDX. There's no React or Tailwind, just Astro components, TypeScript and plain CSS.
 - The site lives under `/portfolio/` on GitHub Pages, so internal links go through `withBase()` (`src/lib/base.ts`). The domain `pmcf.xyz` belongs to the old site's repo (`freenandes.github.io`), which is why this repo shows up at `www.pmcf.xyz/portfolio/`.
 - The home map takes its markers and card text from `src/diagram.config.ts`. A physics simulation in `src/scripts/nav-diagram.ts` positions the markers, so the layout varies a little on every load.
-- The About page renders `src/cv.data.json`, which is generated from a LinkedIn PDF export.
+- The About page, which doubles as the printable CV, renders `src/content/cv.md`: jobs and education as fields at the top, the summary as Markdown below. You edit it by hand; the build rejects missing or misspelled fields.
 - To lock a project, you write its full text in a git-ignored file, and the build encrypts it into `public/locked/<slug>.json`. Visitors decrypt it in their browser with the passphrase (PBKDF2 + AES-GCM), and `marked` renders the Markdown. The plaintext is never published.
 - A strict Content Security Policy in `src/layouts/Base.astro` blocks inline and third-party scripts.
 - Deploy: `.github/workflows/deploy.yml` lints the CSS, builds and publishes to Pages on every push to `main`.
@@ -60,7 +59,8 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | Home page: markers, card copy, what connects to what | `src/diagram.config.ts` |
 | Home page: where markers end up (force layout) | `src/scripts/nav-diagram.ts` |
 | About page: markup, look, its print rules | `src/pages/about.astro` |
-| About page: content | `src/cv.data.json` (generated, don't edit by hand) |
+| About page / CV: content | `src/content/cv.md` |
+| About page / CV: which fields exist | `src/content.config.ts` (`cv`) |
 | Case study: markup and look | `src/pages/projects/[...slug].astro` |
 | Case study: content | `src/content/projects/<slug>.mdx` |
 | Case study frontmatter fields | `src/content.config.ts` |
@@ -68,7 +68,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | Page nav, footer | `src/components/PageNav.astro`, `src/components/Footer.astro` |
 | Print button, email decoding, reveal-on-print | `src/scripts/site.ts` |
 | 404, `/llms.txt`, `/robots.txt`, manifest | `src/pages/` |
-| Build scripts (encrypt, LinkedIn sync, email, visual check) | `scripts/` |
+| Build scripts (encrypt, email, visual check) | `scripts/` |
 
 ## Common tasks
 
@@ -104,13 +104,13 @@ Each page owns its markup and its styling, so changing how a page looks means op
 
 The demo project `halcyon` uses the passphrase `soft-club`. If a checkout has no plaintext files, encrypting leaves the committed files alone. More detail is in `src/protected/README.md`.
 
-### Update the About page from LinkedIn
+### Update the About page / CV
 
-1. On LinkedIn, open your profile and choose Resources → Save to PDF.
-2. Save the file as `sources/linkedin-profile.pdf`. The folder is git-ignored, because the PDF contains your phone number and email.
-3. Run `npm run sync:linkedin`, check the About page in dev, then commit `src/cv.data.json`.
+1. Edit `src/content/cv.md`. A job is a block of `role`, `org`, `period` and a list of `points`; newest goes first. The summary under the closing `---` is Markdown, so blank lines make paragraphs and `- ` lines make a bulleted list.
+2. Check it with `npm run dev` at `/portfolio/about/`. Use the page's Download PDF button to check the printed CV.
+3. Commit and push.
 
-The sync drops your email and phone number. It also writes `selectedClients` and `recognition`, which no page shows yet.
+The portfolio is the original: change the wording here, then paste it into LinkedIn. `skills` and `languages` aren't shown on the page; search engines read them. If the build fails, the error names the field in `cv.md` it didn't accept.
 
 ### Change the contact email
 

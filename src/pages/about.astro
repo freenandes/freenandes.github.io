@@ -1,37 +1,27 @@
 ---
-/** About / CV. Content comes from `src/cv.data.json` — regenerate it with
-    `npm run sync:linkedin`; everything about how it looks is in this file. */
+/** About / CV. Content comes from `src/content/cv.md`, edited by hand;
+    everything about how it looks is in this file. */
 
+import { getEntry, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import PageNav from '../components/PageNav.astro';
 import { site } from '../site.config';
 import { withBase } from '../lib/base';
-import cvData from '../cv.data.json';
 
-interface CV {
-  name?: string;
-  headline?: string;
-  summary: string;
-  experience: { role: string; org: string; period: string; summary?: string; points: string[] }[];
-  education: { title: string; org?: string; period?: string; note?: string }[];
-  skills: { label: string; items: string[] }[];
-  contact?: { location?: string };
-}
-
-const cv = cvData as CV;
-const name = cv.name ?? site.name;
-const headline = cv.headline ?? site.role;
-const summary = cv.summary.split(/\n{2,}/).filter(Boolean);
+const entry = await getEntry('cv', 'cv');
+if (!entry) throw new Error('src/content/cv.md is missing — the About page renders from it.');
+const cv = entry.data;
+const { Content: Summary } = await render(entry);
+const name = site.name;
+const headline = cv.headline;
 
 const origin = Astro.site ?? Astro.url;
 const abs = (path: string) => new URL(withBase(path), origin).toString();
 const pageUrl = new URL(Astro.url.pathname, origin).toString();
 const personId = `${abs('/')}#person`;
 
-const languages = cv.skills
-  .find((g) => /languages/i.test(g.label))
-  ?.items.map((item) => item.replace(/\s*\(.*\)\s*$/, '').trim());
-const topSkills = cv.skills.find((g) => /skills/i.test(g.label))?.items ?? [];
+// "Portuguese (Native or Bilingual)" → "Portuguese" for schema.org.
+const languages = cv.languages.map((item) => item.replace(/\s*\(.*\)\s*$/, '').trim());
 
 // Enrich the shared Person node (merged by @id) with CV facts, and describe the
 // page itself as a ProfilePage.
@@ -45,11 +35,11 @@ const jsonLd = [
     alumniOf: cv.education
       .filter((e) => e.org)
       .map((e) => ({ '@type': 'EducationalOrganization', name: e.org })),
-    ...(cv.contact?.location
-      ? { address: { '@type': 'PostalAddress', addressLocality: cv.contact.location } }
+    ...(cv.location
+      ? { address: { '@type': 'PostalAddress', addressLocality: cv.location } }
       : {}),
-    ...(languages?.length ? { knowsLanguage: languages } : {}),
-    ...(topSkills.length ? { knowsAbout: topSkills } : {}),
+    ...(languages.length ? { knowsLanguage: languages } : {}),
+    ...(cv.skills.length ? { knowsAbout: cv.skills } : {}),
   },
   {
     '@type': 'ProfilePage',
@@ -103,7 +93,7 @@ const jsonLd = [
     </header>
 
     <div class="summary" data-reveal style="--reveal-step: 1">
-      {summary.map((para) => <p>{para}</p>)}
+      <Summary />
     </div>
 
     <section data-reveal style="--reveal-step: 2">
@@ -172,8 +162,23 @@ const jsonLd = [
     margin-block-start: var(--space-lg);
   }
 
-  .summary p + p {
+  /* The summary is rendered Markdown, so its paragraphs and lists aren't
+     scoped to this file and need :global(). Lists match the job bullets. */
+
+  .summary > :global(* + *) {
     margin-block-start: var(--space-md);
+  }
+
+  .summary :global(ul) {
+    display: grid;
+    gap: var(--space-sm);
+    padding: 0;
+    list-style: square;
+  }
+
+  .summary :global(li::marker) {
+    font-size: var(--step--1);
+    color: var(--ink-3);
   }
 
   section {
@@ -269,6 +274,23 @@ const jsonLd = [
 
     .summary {
       margin-block-start: 5mm;
+    }
+
+    .summary :global(ul) {
+      display: block;
+      padding-inline-start: 1em;
+    }
+
+    .summary :global(li) {
+      break-inside: avoid;
+    }
+
+    .summary :global(li + li) {
+      margin-block-start: var(--space-sm);
+    }
+
+    .summary :global(li::marker) {
+      color: #000;
     }
 
     section,

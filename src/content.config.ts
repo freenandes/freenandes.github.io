@@ -19,4 +19,34 @@ const projects = defineCollection({
   }),
 });
 
-export const collections = { projects };
+// One entry: src/content/cv.md. The fields drive the About page's experience
+// and education; the Markdown body is its summary. `.strict()` turns a
+// misspelled field into a build error instead of silently dropping it.
+const cv = defineCollection({
+  loader: glob({ pattern: 'cv.md', base: './src/content' }),
+  schema: z.object({
+    headline: z.string(),
+    location: z.string().optional(),
+    experience: z.array(
+      z.object({
+        role: z.string(),
+        org: z.string(),
+        period: z.string(),
+        summary: z.string().optional(),
+        points: z.array(z.string()).default([]),
+      }).strict()
+    ),
+    education: z.array(
+      z.object({
+        title: z.string(),
+        org: z.string().optional(),
+        period: z.string().optional(),
+        note: z.string().optional(),
+      }).strict()
+    ),
+    skills: z.array(z.string()).default([]),
+    languages: z.array(z.string()).default([]),
+  }).strict(),
+});
+
+export const collections = { projects, cv };

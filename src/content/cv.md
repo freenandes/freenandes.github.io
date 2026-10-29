@@ -1,0 +1,103 @@
+---
+# The About page and the CV it prints. Edit this file directly: the fields are
+# below, the summary is the Markdown after the closing ---. The build checks it
+# against the `cv` schema in src/content.config.ts and names any field it rejects.
+
+headline: Lead Interface Designer — Researching, designing, and coding systems for web software
+location: Leiria, Portugal
+
+experience:
+  - role: Senior Product Designer
+    org: Percona
+    period: August 2022 — Present
+    points:
+      - Built and managed Peak UI, establishing front-end component patterns that streamlined development and enabled extensibility for Percona products.
+      - Designed and coded a native navigation architecture for PMM (Percona Monitoring and Management), decoupling the interface from heavy third-party dependencies to reduce technical debt and unblock custom features.
+      - Built high-fidelity vision prototypes to resolve core workflow issues in products, using user research to secure executive buy-in and drive product adoption.
+      - Redesigned and coded modular templates across 10+ documentation sites, creating a scalable framework that improved readability and simplified content creation.
+      - Mentored designers and engineers on front-end code practices, design system patterns, and research methods.
+
+  - role: Senior Product Designer
+    org: FARFETCH
+    period: June 2021 — July 2022
+    points:
+      - Redesigned product listing cards to enable direct purchasing from catalog pages, removing friction in the checkout funnel and improving product discovery.
+      - Built modular component patterns that balanced high-end luxury brand aesthetics with strict functional e-commerce requirements.
+      - Created taxonomy frameworks to resolve catalog disparities around sustainable items, making complex product attributes clearer while establishing documentation to align cross-department standards.
+      - Uncovered catalog discovery barriers through user research, using the insights to shape the conscious shopping roadmap.
+
+  - role: Senior Product Designer
+    org: TUI
+    period: March 2019 — May 2021
+    points:
+      - Created the Tagus design system across 5 global markets, standardizing e- commerce flows from inspiration through checkout while managing front-end QA with external dev teams to maintain design quality.
+      - Designed a modular page building system that generated 100K+ destination pages, driving 4x organic traffic growth and simplifying multi-market deployment.
+      - Validated interface patterns using A/B testing and Baymard UX benchmarking before scaling features across distributed European teams.
+      - Built vision prototypes to align international product strategy while helping scale the TUI Lisbon hub influence inside the group.
+
+  - role: Founder and Manager
+    org: Noise Goods
+    period: June 2013 — August 2019
+    points:
+      - Designed and coded a custom e-commerce platform, optimizing conversion pathways and SEO for global sales across 50+ countries.
+      - Managed complete physical and digital product lifecycles, bridging brand design, manufacturing execution, and digital interface touchpoints.
+      - Iterated on storefront UI using analytics and user data, refining purchasing flows to grow international e-commerce and wholesale revenue.
+
+  - role: User Experience Designer
+    org: SMARTIDIOM
+    period: May 2016 — March 2019
+    points:
+      - Designed and coded 4 interconnected web applications, delivering production front-end code that transformed a traditional service business into a digital platform connecting clients with certified professionals.
+      - Built a UI component system from scratch to standardize interface patterns across complex workflows, including calendar scheduling, financial tracking, bidding systems, and onboarding flows.
+      - Created high-fidelity product demonstrations and front-end builds showcased at CES 2017 to validate market demand and platform capabilities.
+
+  - role: Product Designer
+    org: Stricker
+    period: June 2010 — October 2013
+    points:
+      - Established information architecture foundations for digital catalogs, structuring complex B2B product taxonomies and customization rules.
+      - Designed modular systems for 50+ B2B products, enabling scalable customization within strict production constraints.
+      - Developed testing protocols and conducted field research at international trade shows to benchmark competitor offerings and refine product usability.
+
+  - role: Illustrator and Graphic Designer
+    org: Self-employed
+    period: September 2009 — June 2011
+    points:
+      - Built web layouts using HTML, CSS, and JavaScript, establishing a front-end technical foundation that bridged visual design with functional code.
+      - Designed brand identities and visual guidelines for diverse clients, applying a systemized approach to maintain visual consistency.
+      - Produced editorial illustrations published in major national media outlets.
+
+  - role: Industrial Designer
+    org: COMOPI Kitchen Design
+    period: September 2007 — September 2009
+    points:
+      - Designed modular furniture systems and digital pipelines that translated user requirements directly into manufacturing parameters.
+      - Customized CAD software workflows to automate and streamline design-to- production handoffs.
+
+education:
+  - title: Master’s Degree, Industrial and Product Design
+    org: Escola Universitária das Artes de Coimbra
+    period: 2002 — 2007
+
+  - title: Multimedia Design
+    org: Instituto Politécnico de Coimbra - Escola Superior de Educação
+    period: 2001 — 2002
+
+  - title: High School, Tridimensional Design
+    org: Escola Secundária José Falcão
+    period: 1998 — 2001
+
+# Not shown on the page. Search engines read them from the page's structured data.
+skills:
+  - Web Analytics
+  - A/B Testing
+  - E-commerce UI
+
+languages:
+  - Portuguese (Native or Bilingual)
+  - French (Elementary)
+  - Spanish (Elementary)
+  - English (Full Professional)
+---
+
+I design web software interfaces and write production front-end code that teams can use to scale their products. I focus on researching and solving underlying product workflows, building component systems that keep applications clean, performant, and easy to use.

@@ -27,6 +27,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
+import astroConfig from '../astro.config.mjs';
 import { launch, capture } from './visual/capture.mjs';
 import { comparePng, compareStyles, report } from './visual/compare.mjs';
 import { serveDist } from './visual/static-server.mjs';
@@ -35,7 +36,8 @@ import { scenarios, viewports, styleProbes, styleProperties } from './visual/sce
 const run = promisify(execFile);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, '.visual');
-const BASE_PATH = process.env.BASE_PATH ?? '/portfolio';
+/** Served where the site is: astro.config.mjs owns the base path. */
+const BASE_PATH = astroConfig.base ?? '/';
 
 function parseArgs(argv) {
   const args = { base: null, only: null, keep: false };

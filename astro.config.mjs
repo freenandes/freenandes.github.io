@@ -3,8 +3,10 @@ import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 
-// SITE and BASE_PATH env vars override these defaults. The site sits under
-// /portfolio while in development; launching at www.pmcf.xyz/ means BASE_PATH '/'.
+// Where the site is served. This is the only place it's set: CI and
+// `npm run visual` read it from here, and SITE / BASE_PATH env vars override it
+// for a one-off build. It sits under /portfolio while in development; launching
+// at www.pmcf.xyz/ means changing the BASE_PATH default to '/'.
 const SITE = process.env.SITE ?? 'https://www.pmcf.xyz';
 const BASE_PATH = process.env.BASE_PATH ?? '/portfolio';
 

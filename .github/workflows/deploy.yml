@@ -4,6 +4,9 @@ on:
   # Deploy on every push to the default branch.
   push:
     branches: [main]
+  # Check pull requests the same way, without deploying them.
+  pull_request:
+    branches: [main]
   # Allow manual runs from the Actions tab.
   workflow_dispatch:
 
@@ -13,10 +16,10 @@ permissions:
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment; don't cancel in-progress runs so a
-# deploy that's mid-flight can finish.
+# One run per branch at a time, so deploys from main never overlap; don't
+# cancel in-progress runs so a deploy that's mid-flight can finish.
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -29,7 +32,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
 
       - name: Install dependencies
@@ -38,21 +41,21 @@ jobs:
       - name: Lint CSS
         run: npm run lint:css
 
+      - name: Check types and templates
+        run: npm run check
+
+      # The site URL and base path come from astro.config.mjs.
       - name: Build site
         run: npm run build
-        env:
-          # Match astro.config.mjs defaults. pmcf.xyz belongs to the old site's
-          # repo, so this one is served at www.pmcf.xyz/portfolio/. At launch,
-          # set BASE_PATH to / (see README → Launching at www.pmcf.xyz).
-          SITE: https://www.pmcf.xyz
-          BASE_PATH: /portfolio
 
       - name: Upload artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     environment:

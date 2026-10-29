@@ -51,7 +51,8 @@
   --measure: 66ch;
   --gutter: 1rem;
 
-  /* Shape, depth, motion */
+  /* Shape, depth, motion. Keep durations in ms: PasswordGate.astro reads
+     --dur-fast as a number of milliseconds. */
   --radius-sm: 0.1875rem;
   --radius-md: 0.5rem;
   --radius-pill: 999px;

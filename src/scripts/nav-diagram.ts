@@ -9,6 +9,60 @@
 
 import { diagramNodes, diagramChain, type DiagramNode } from '../diagram.config';
 
+/* --- Knobs -------------------------------------------------------------------
+   The values worth turning, in one place; everything below them is machinery.
+   Distances are CSS pixels and times milliseconds. Where a knob has `base` and
+   `narrow`, the value is `base` on a wide canvas and moves by `narrow` as the
+   canvas becomes a tall phone (see `narrowness`). Where each marker would like
+   to sit is per marker, in src/diagram.config.ts; marker and card sizes are in
+   the knobs at the top of index.astro's <style>. */
+
+const KNOBS = {
+  /** Margin kept clear around the map, as a share of the canvas width and
+   *  height, never more than `max`. */
+  inset: {
+    x: { base: 0.12, narrow: 0.1, max: 160 },
+    y: { base: 0.08, narrow: 0.04, max: 150 },
+  },
+  /** Space kept between two markers' boxes (marker plus label). */
+  markerGap: {
+    x: { base: 34, narrow: -12 },
+    y: { base: 30, narrow: -16 },
+  },
+  /** How close two connectors that don't share a marker may run. */
+  lineGap: { base: 54, narrow: -20 },
+  /** A wavy connector's bends (fewest, most) and how far each swings. */
+  wave: { bends: [4, 6], swing: [10, 20] },
+  /** How far a jagged connector's corners stray from the straight line. */
+  jag: { min: 16, max: 60 },
+  /** Room a card needs to open beside its marker, or above or below it; on a
+   *  phone, above and below get up to `narrowBias` of extra preference. */
+  cardRoom: { side: 220, vertical: 80, narrowBias: 80 },
+  /** Gap a card keeps from the edge of the viewport. */
+  cardEdge: 12,
+  /** The entrance: delay before the first marker, then the step to each next
+   *  one along the chain. A connector starts `lineLag` after the later of its
+   *  two markers; the floating rings land last, `ringStep` apart. */
+  entrance: { first: 40, step: 50, lineLag: 40, ringStep: 90 },
+  /** Pointer travel before a press on a marker becomes a drag. */
+  dragThreshold: 6,
+  /** Quiet time after a resize before the full re-layout runs. */
+  resizeSettle: 220,
+} as const;
+
+/** The live physics that settles markers onto their spots and back after a
+ *  drag. Per-frame factors, so small changes go a long way. */
+const SIM = {
+  drag: 0.6,
+  anchorPull: 0.085,
+  edge: 0.01,
+  repel: 0.06,
+  calmPull: 0.12,
+  settleMotion: 0.04,
+  settleFrames: 10,
+  initialScatter: 8,
+};
+
 type Node = {
   el: HTMLElement;
   cfg: DiagramNode;
@@ -101,7 +155,6 @@ export function initDiagram(root: HTMLElement) {
   let W = 0;
   let H = 0;
 
-
   function safeWidth(rect: DOMRect) {
     return rect.width > 1 ? rect.width : window.innerWidth;
   }
@@ -115,7 +168,6 @@ export function initDiagram(root: HTMLElement) {
     return window.innerWidth > window.innerHeight * 1.1;
   }
 
-
   function narrowness() {
     const aspect = W / Math.max(1, H);
     // aspect 1.0 → 0 (square), aspect 0.5 → 1 (very tall phone)
@@ -127,8 +179,9 @@ export function initDiagram(root: HTMLElement) {
     // Labels are centered under the dot and extend to each side, so the
     // horizontal margin grows a little on narrow viewports. The vertical
     // margin gets a small boost so the end labels have room.
-    const mx = Math.min((0.12 + 0.1 * narrow) * W, 160);
-    const my = Math.min((0.08 + 0.04 * narrow) * H, 150);
+    const { x, y } = KNOBS.inset;
+    const mx = Math.min((x.base + x.narrow * narrow) * W, x.max);
+    const my = Math.min((y.base + y.narrow * narrow) * H, y.max);
     return { mx, my, iw: Math.max(1, W - 2 * mx), ih: Math.max(1, H - 2 * my) };
   }
 
@@ -149,7 +202,6 @@ export function initDiagram(root: HTMLElement) {
     const cfg = configFrac(n, landscape);
     return clampFrac(spine.x * (1 - mix) + cfg.x * mix, spine.y * (1 - mix) + cfg.y * mix);
   }
-
 
   function layoutSpine(landscape: boolean, configMix: number) {
     const n = chainOrder.length;
@@ -222,7 +274,6 @@ export function initDiagram(root: HTMLElement) {
     }
   }
 
-
   function pickKindDistribution(n: number): Array<'straight' | 'jagged' | 'wave'> {
     if (n === 5) {
       const options: Array<[number, number, number]> = [
@@ -248,8 +299,9 @@ export function initDiagram(root: HTMLElement) {
   }
 
   function makeWavePoints(): { t: number; off: number }[] {
-    const count = 4 + Math.floor(Math.random() * 3);
-    const amp = 10 + Math.random() * 10;
+    const { bends, swing } = KNOBS.wave;
+    const count = bends[0] + Math.floor(Math.random() * (bends[1] - bends[0] + 1));
+    const amp = swing[0] + Math.random() * (swing[1] - swing[0]);
     const sign = Math.random() < 0.5 ? 1 : -1;
     const pts: { t: number; off: number }[] = [];
     for (let k = 0; k < count; k++) {
@@ -309,12 +361,12 @@ export function initDiagram(root: HTMLElement) {
     return { x: Math.max(r.width, 48) / 2, y: Math.max(r.height, 40) / 2 };
   }
 
-
   function sepPad() {
     const narrow = narrowness();
+    const { x, y } = KNOBS.markerGap;
     return {
-      x: 34 - 12 * narrow,
-      y: 30 - 16 * narrow,
+      x: x.base + x.narrow * narrow,
+      y: y.base + y.narrow * narrow,
     };
   }
 
@@ -422,7 +474,6 @@ export function initDiagram(root: HTMLElement) {
     return false;
   }
 
-
   function orientationMismatched() {
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
     for (const n of nodes) {
@@ -453,7 +504,7 @@ export function initDiagram(root: HTMLElement) {
   function jaggedOffPx(off: number, len: number): number {
     if (off === 0) return 0;
     const px = off * len;
-    const mag = Math.min(60, Math.max(16, Math.abs(px)));
+    const mag = Math.min(KNOBS.jag.max, Math.max(KNOBS.jag.min, Math.abs(px)));
     return px < 0 ? -mag : mag;
   }
 
@@ -727,7 +778,7 @@ export function initDiagram(root: HTMLElement) {
   function openNearMisses(iterations = 32) {
     const { mx, my, iw, ih } = inset();
     if (iw < 2 || ih < 2 || edges.length < 2) return;
-    const CLEAR = 54 - 20 * narrowness();
+    const CLEAR = KNOBS.lineGap.base + KNOBS.lineGap.narrow * narrowness();
     for (let it = 0; it < iterations; it++) {
       let maxPush = 0;
       const polys = edges.map(edgePolyline);
@@ -782,10 +833,10 @@ export function initDiagram(root: HTMLElement) {
     const left = n.ax;
     const top = n.ay;
     const bottom = H - n.ay;
-    const needH = 220;
-    const needV = 80;
+    const needH = KNOBS.cardRoom.side;
+    const needV = KNOBS.cardRoom.vertical;
     const narrow = narrowness();
-    const vBoost = 80 * narrow;
+    const vBoost = KNOBS.cardRoom.narrowBias * narrow;
     const opts: [string, number][] = [
       ['right', right - needH],
       ['left', left - needH],
@@ -817,7 +868,6 @@ export function initDiagram(root: HTMLElement) {
     recomputeRests();
   }
 
-
   function seedFromAnchors() {
     for (const n of nodes) {
       n.x = n.ax + (Math.random() - 0.5) * SIM.initialScatter;
@@ -826,7 +876,6 @@ export function initDiagram(root: HTMLElement) {
       n.vy = 0;
     }
   }
-
 
   function relayout() {
     computeAnchors();
@@ -852,10 +901,12 @@ export function initDiagram(root: HTMLElement) {
    * later of the two it joins, and the decorative rings come in last.
    */
   function startEntrance() {
-    const NODE_BASE = 40;
-    const NODE_STEP = 50;
-    const EDGE_LAG = 40;
-    const RING_STEP = 90;
+    const {
+      first: NODE_BASE,
+      step: NODE_STEP,
+      lineLag: EDGE_LAG,
+      ringStep: RING_STEP,
+    } = KNOBS.entrance;
     const delays = new Map<Node, number>();
 
     chainOrder.forEach((n, i) => {
@@ -888,17 +939,6 @@ export function initDiagram(root: HTMLElement) {
       e.line.setAttribute('d', edgePath(e));
     }
   }
-
-  const SIM = {
-    drag: 0.6,
-    anchorPull: 0.085,
-    edge: 0.01,
-    repel: 0.06,
-    calmPull: 0.12,
-    settleMotion: 0.04,
-    settleFrames: 10,
-    initialScatter: 8,
-  };
 
   function resolveOverlaps(iterations = 50) {
     for (let it = 0; it < iterations; it++) {
@@ -1069,7 +1109,7 @@ export function initDiagram(root: HTMLElement) {
     const acrossNode = n.el.dataset.place === 'bottom' || n.el.dataset.place === 'top';
     const left = boxX - (acrossNode ? rect.width / 2 : 0);
     const top = boxY - (acrossNode ? 0 : rect.height / 2);
-    const M = 12;
+    const M = KNOBS.cardEdge;
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     let nx = 0;
@@ -1153,7 +1193,7 @@ export function initDiagram(root: HTMLElement) {
       if (pid === null) return;
       const dx = ev.clientX - downX;
       const dy = ev.clientY - downY;
-      if (!moved && Math.hypot(dx, dy) > 6) {
+      if (!moved && Math.hypot(dx, dy) > KNOBS.dragThreshold) {
         moved = true;
         n.dragging = true;
         n.el.classList.add('is-dragging');
@@ -1198,7 +1238,8 @@ export function initDiagram(root: HTMLElement) {
         ev.preventDefault();
         return;
       }
-      if (n.id === 'pedro') {
+      // The name at the centre reshuffles the map instead of opening a card.
+      if (n.cfg.kind === 'identity') {
         resetLayout();
         closeAll();
         return;
@@ -1219,7 +1260,6 @@ export function initDiagram(root: HTMLElement) {
   let lastObsW = 0;
   let lastObsH = 0;
   let settleTimer: ReturnType<typeof setTimeout> | null = null;
-  const SETTLE_DELAY = 220; // ms of quiet before the heavy re-layout runs
 
   const remapToViewport = () => {
     if (resizeScheduled) return;
@@ -1269,7 +1309,7 @@ export function initDiagram(root: HTMLElement) {
     settleTimer = setTimeout(() => {
       settleTimer = null;
       settleLayout();
-    }, SETTLE_DELAY);
+    }, KNOBS.resizeSettle);
   };
   const ro = new ResizeObserver(onResize);
   ro.observe(root);

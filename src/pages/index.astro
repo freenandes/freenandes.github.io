@@ -4,9 +4,34 @@
     `src/scripts/nav-diagram.ts`. */
 
 import Base from '../layouts/Base.astro';
-import { diagramNodes, type DiagramNode, type NodeKind, type NodeShape } from '../diagram.config';
+import {
+  diagramChain,
+  diagramNodes,
+  type DiagramNode,
+  type NodeKind,
+  type NodeShape,
+} from '../diagram.config';
 import { withBase } from '../lib/base';
+import { getProjects } from '../lib/projects';
 import { site } from '../site.config';
+
+// A typo in diagram.config.ts would otherwise ship as a card linking to a 404,
+// or a marker that quietly drops out of the chain, so the build stops instead.
+const bare = (path: string) => path.replace(/\/+$/, '') || '/';
+const pages = new Set(['/', '/about', ...(await getProjects()).map((p) => `/projects/${p.id}`)]);
+for (const node of diagramNodes) {
+  if (node.link && !node.link.external && !pages.has(bare(node.link.href))) {
+    throw new Error(
+      `diagram.config.ts: "${node.id}" links to ${node.link.href}, which isn't a published page ` +
+        '(a typo, a renamed file, or a project still marked draft).'
+    );
+  }
+}
+for (const id of diagramChain) {
+  if (!diagramNodes.some((node) => node.id === id)) {
+    throw new Error(`diagram.config.ts: diagramChain lists "${id}", but no node has that id.`);
+  }
+}
 
 /** Marker outline: a regular polygon in a 20×20 box, point up (square: flat). */
 const SIDES: Record<NodeShape, number> = { triangle: 3, square: 4, pentagon: 5, hexagon: 6 };
@@ -51,7 +76,11 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
 ---
 
 <Base footer={false} mainClass="home">
-  <nav class="diagram" aria-label={`Site map — ${site.name}`}>
+  <nav
+    class="diagram"
+    aria-label={`Site map — ${site.name}`}
+    style={`--topo-pattern: url('${withBase('/topo-low.svg')}')`}
+  >
     <svg class="links" aria-hidden="true" focusable="false"></svg>
     {
       runs.map((run) => (
@@ -151,12 +180,13 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
 
 <noscript>
   <style>
-    /* No-JS fallback: collapse the simulation into a plain, readable list. */
+    /* No-JS fallback: collapse the simulation into a plain, readable list.
+       It still fills the screen, so the contour texture does too. */
     .diagram {
       display: flex;
       flex-direction: column;
       height: auto !important;
-      min-height: 0 !important;
+      min-height: 100svh !important;
       padding: var(--space-md) !important;
     }
 
@@ -196,15 +226,60 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
 </noscript>
 
 <style>
-  /* --- The canvas ------------------------------------------------------- */
+  /* --- Knobs and canvas ------------------------------------------------ */
+
+  /* The custom properties are this page's own values, in one place. Shared
+     ones (colour, type, space, motion) are in tokens.css; spacing, physics and
+     entrance timing of the layout are in KNOBS at the top of
+     src/scripts/nav-diagram.ts. */
 
   .diagram {
+    --topo-size: 150rem; /* width of one tile of the contour texture */
+    --topo-opacity: 0.075;
+    --marker-size: 1rem;
+    --marker-size-identity: 1.25rem; /* the name at the centre */
+    --link-width: 1.375; /* connector stroke */
+    --card-width: 20rem; /* widest a card gets (never more than 90vw) */
+    --ring-turn: 30s; /* one full turn of a floating ring */
+
     position: relative;
     width: 100%;
     height: 100svh;
     min-height: 34rem;
     overflow: hidden;
     touch-action: pan-y;
+  }
+
+  /* Full-bleed: the map opts out of the reading column every other page has
+     (global.css → Layout). */
+
+  :global(main.home) {
+    max-width: none;
+    min-height: 100svh;
+    padding-inline: 0;
+    isolation: isolate;
+  }
+
+  /* Contour texture behind the map. `--topo-pattern` is set on the element so
+     the asset path can follow the site's base path. */
+
+  .diagram::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: var(--topo-pattern);
+    background-repeat: repeat;
+    background-position: top center;
+    background-size: var(--topo-size) auto;
+    opacity: var(--topo-opacity);
+  }
+
+  @media print {
+    .diagram::before {
+      display: none;
+    }
   }
 
   .links {
@@ -221,7 +296,7 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
   .links :global(.link-line) {
     fill: none;
     stroke: var(--ink-3);
-    stroke-width: 1.375;
+    stroke-width: var(--link-width);
     stroke-linecap: round;
     stroke-linejoin: round;
   }
@@ -334,8 +409,8 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
   }
 
   .node button svg {
-    width: 1rem;
-    height: 1rem;
+    width: var(--marker-size);
+    height: var(--marker-size);
     overflow: visible;
     flex: none;
     transition: transform var(--dur-fast) var(--ease);
@@ -350,8 +425,8 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
   }
 
   .node--identity button svg {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: var(--marker-size-identity);
+    height: var(--marker-size-identity);
   }
 
   .node--identity button polygon {
@@ -443,7 +518,7 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
 
   @media (prefers-reduced-motion: no-preference) {
     .node--floating svg {
-      animation: ring-spin 30s linear infinite;
+      animation: ring-spin var(--ring-turn) linear infinite;
     }
   }
 
@@ -460,7 +535,7 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
 
     position: absolute;
     width: max-content;
-    max-width: min(90vw, 20rem);
+    max-width: min(90vw, var(--card-width));
     padding: 0.875rem 1rem;
     background: var(--paper);
     outline: 1px solid var(--line-soft);

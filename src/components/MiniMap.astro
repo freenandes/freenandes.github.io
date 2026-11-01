@@ -64,14 +64,16 @@ const stops = (await getDiagramNodes())
 }
 
 <style>
-  /* The custom properties are this component's own values, in one place. They
-     start from the home map's (the knobs at the top of index.astro's <style>);
-     the width where the line turns from a column into a row is the container
-     query further down. */
+  /* The custom properties are this component's own values, in one place. The
+     marker starts from the home map's (the knobs at the top of index.astro's
+     <style>); the connector is drawn like the site's dividers, since it stands
+     in for the footer's rule. The width where the line turns from a column
+     into a row is the container query further down. */
 
   nav {
     --marker-size: 1rem;
-    --link-width: 1.375px; /* connector stroke */
+    --link-width: 1px; /* connector stroke, as thick as a divider */
+    --link-color: var(--line-strong); /* and the same colour */
     --stop-pad: 0.75rem; /* air around a stop, inside its hit area */
     --label-gap: var(--space-md); /* least room between two labels in the row */
 
@@ -104,7 +106,7 @@ const stops = (await getDiagramNodes())
     inset: calc(50% / var(--stops)) auto calc(50% / var(--stops))
       calc((var(--marker-size) - var(--link-width)) / 2);
     width: var(--link-width);
-    background: var(--ink-3);
+    background: var(--link-color);
   }
 
   li {

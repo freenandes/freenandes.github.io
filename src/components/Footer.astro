@@ -4,6 +4,7 @@ import { site } from '../site.config';
 
 <footer data-reveal>
   <div>
+    <p>{site.availability}</p>
     <ul role="list">
       {site.socials.map((s) => (
         <li><a href={s.href} data-email={s.token}>{s.label}</a></li>
@@ -25,7 +26,7 @@ import { site } from '../site.config';
     padding-block: var(--space-lg);
   }
 
-  p {
+  p:last-child {
     font-size: var(--step--1);
     font-weight: var(--weight-medium);
     color: var(--ink-3);

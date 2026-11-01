@@ -22,7 +22,7 @@ function pageOf(node: DiagramNode): string | undefined {
 }
 
 // Stops follow the chain, closing up over the markers it skips. A page the
-// chain leaves out comes last, unconnected, as it is on the map.
+// chain leaves out comes last.
 const rank = (id: string) => {
   const i = diagramChain.indexOf(id);
   return i < 0 ? diagramChain.length : i;
@@ -39,7 +39,6 @@ const stops = (await getDiagramNodes())
     shape: node.shape,
     href,
     current: bare(href) === here,
-    loose: !diagramChain.includes(node.id),
   }));
 ---
 
@@ -49,8 +48,8 @@ const stops = (await getDiagramNodes())
   stops.length > 1 && (
     <nav aria-label="Site map">
       <ol role="list" style={`--stops: ${stops.length}`}>
-        {stops.map(({ label, shape, href, current, loose }) => (
-          <li class:list={{ loose }}>
+        {stops.map(({ label, shape, href, current }) => (
+          <li>
             <a href={href} aria-current={current ? 'page' : undefined}>
               <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
                 <polygon points={polygon(shape)} />
@@ -74,6 +73,7 @@ const stops = (await getDiagramNodes())
     --marker-size: 1rem;
     --link-width: 1.375px; /* connector stroke */
     --stop-pad: 0.75rem; /* air around a stop, inside its hit area */
+    --label-gap: var(--space-md); /* least room between two labels in the row */
 
     container-type: inline-size;
     padding-block-start: var(--space-md);
@@ -81,15 +81,30 @@ const stops = (await getDiagramNodes())
 
   /* An <ol> because the stops have an order, and so the site's row styling
      for ul[role="list"] stays out of it. The role keeps Safari announcing it as
-     a list once the numbers are gone. `isolation` keeps the connectors' z-index
-     inside the list. */
+     a list once the numbers are gone. `isolation` keeps the connector's
+     z-index inside the list. */
 
   ol {
+    position: relative;
     display: grid;
     grid-auto-rows: 1fr;
     padding: 0;
     list-style: none;
     isolation: isolate;
+  }
+
+  /* The connector: one line from the first marker's centre to the last,
+     behind the markers' paper fill. Rows are all one height, so the end
+     markers sit half a row in from either end. */
+
+  ol::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: calc(50% / var(--stops)) auto calc(50% / var(--stops))
+      calc((var(--marker-size) - var(--link-width)) / 2);
+    width: var(--link-width);
+    background: var(--ink-3);
   }
 
   li {
@@ -166,49 +181,23 @@ const stops = (await getDiagramNodes())
     white-space: pre-line;
   }
 
-  /* The connector into each stop from the one before, centre to centre,
-     behind the markers' paper fill. Rows are all one height, so the stop above
-     is one row up. */
-
-  li + li:not(.loose)::before {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    bottom: 50%;
-    left: calc((var(--marker-size) - var(--link-width)) / 2);
-    width: var(--link-width);
-    height: 100%;
-    background: var(--ink-3);
-  }
-
   /* With room for it, the line runs left to right, as the map does on a wide
      screen. 30rem fits five stops; raise it if the map grows past that. */
 
   @container (width >= 30rem) {
-    /* One equal column per stop. The row reaches past the text by most of a
-       column, so the end markers sit on the text edges and their labels hang
-       out into the margin. On a viewport without that much room it reaches as
-       far as it can, short of the gutter. `--column` is a column's width once
-       the end markers are on the edges. */
+    /* Each stop is as wide as its label, and the labels spread across the
+       text with equal gaps, from one edge to the other. */
 
     ol {
-      --column: calc((100% - var(--marker-size)) / (var(--stops) - 1));
-
-      grid-auto-flow: column;
-      grid-auto-columns: minmax(0, 1fr);
-      margin-inline: calc(
-        -1 * min((var(--column) - var(--marker-size)) / 2, (100vw - 100%) / 2 - var(--gutter))
-      );
-    }
-
-    li {
-      justify-content: center;
+      display: flex;
+      justify-content: space-between;
+      column-gap: var(--label-gap);
     }
 
     a {
       flex-direction: column;
       gap: var(--space-xs);
-      padding: var(--stop-pad) var(--space-xs);
+      padding-inline: 0;
       text-align: center;
     }
 
@@ -216,13 +205,34 @@ const stops = (await getDiagramNodes())
       text-wrap: balance;
     }
 
-    /* Through the markers' middle, from this column's centre back to the one
-       before: columns are all one width. */
+    /* Stops are as wide as their labels, so the line can't be measured from
+       them: it runs through the markers' middle from edge to edge, and the end
+       stops cover the stretch beyond their markers with paper, the way the
+       map's labels sit on paper over its connectors. */
 
-    li + li:not(.loose)::before {
-      inset: calc(var(--stop-pad) + (var(--marker-size) - var(--link-width)) / 2) 50% auto auto;
-      width: 100%;
+    ol::before {
+      inset: calc(var(--stop-pad) + (var(--marker-size) - var(--link-width)) / 2) 0 auto;
+      width: auto;
       height: var(--link-width);
+    }
+
+    li:first-child::before,
+    li:last-child::after {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      top: calc(var(--stop-pad) + (var(--marker-size) - var(--link-width)) / 2 - 1px);
+      width: 50%;
+      height: calc(var(--link-width) + 2px);
+      background: var(--paper);
+    }
+
+    li:first-child::before {
+      left: 0;
+    }
+
+    li:last-child::after {
+      right: 0;
     }
   }
 

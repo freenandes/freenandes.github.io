@@ -75,7 +75,7 @@ export const diagramNodes: DiagramEntry[] = [
     label: 'Open to work\nContact me',
     kind: 'contact',
     shape: 'square',
-    tagline: 'Open to remote Senior Product Designer and Design Engineer roles in complex technical products.',
+    tagline: site.availability,
     portrait: { x: 0.76, y: 0.16 },
     landscape: { x: 0.12, y: 0.74 },
   },

@@ -100,7 +100,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
    ---
    title: Project name
    description: One sentence, used on the page and in search results.
-   date: 2024-06-01
+   date: 2024-06-01    # shows as 2024; or write text to show as is, such as 2022–2026
    order: 1            # lower comes first; optional
    role: Lead Product Designer
    client: Company
@@ -111,7 +111,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
    The write-up, in Markdown.
    ```
 
-2. To put it on the home map, add a node with `kind: 'project'` to `src/diagram.config.ts`, and add its `id` to `diagramChain` so it gets connected. The build stops with a message if a node links to a page that doesn't exist (or is still a draft), or if `diagramChain` names an id no node has.
+2. To put it on the home map, add a node with `kind: 'project'` to `src/diagram.config.ts`, using the file name as its `id`, and add that `id` to `diagramChain` so it gets connected. The node holds the card copy and placement; the label, tags and link come from the project's frontmatter. The build stops with a message if a node links to a page that doesn't exist, if a project node has no published project (a wrong `id`, or still a draft), or if `diagramChain` names an id no node has.
 3. When it's ready, remove `draft: true`.
 
 ### Lock a project behind a passphrase

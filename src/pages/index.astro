@@ -1,12 +1,14 @@
 ---
 /** Home: an interactive map of the site. Markers, copy and connections are all
-    in `src/diagram.config.ts`; the physics that places them is in
+    in `src/diagram.config.ts`, except that a case study's label, tags and link
+    come from its project; the physics that places them is in
     `src/scripts/nav-diagram.ts`. */
 
 import Base from '../layouts/Base.astro';
 import {
   diagramChain,
   diagramNodes,
+  projectLinkLabel,
   type DiagramNode,
   type NodeKind,
   type NodeShape,
@@ -17,9 +19,24 @@ import { site } from '../site.config';
 
 // A typo in diagram.config.ts would otherwise ship as a card linking to a 404,
 // or a marker that quietly drops out of the chain, so the build stops instead.
+const projects = await getProjects();
+const nodes: DiagramNode[] = diagramNodes.map((node) => {
+  if (node.kind !== 'project') return node;
+  const project = projects.find((p) => p.id === node.id);
+  if (!project) {
+    throw new Error(
+      `diagram.config.ts: "${node.id}" has no published project ` +
+        '(a typo, a renamed file, or a project still marked draft).'
+    );
+  }
+  const { title, tags } = project.data;
+  const link = { label: projectLinkLabel, href: `/projects/${node.id}/` };
+  return { ...node, label: title, tags, link };
+});
+
 const bare = (path: string) => path.replace(/\/+$/, '') || '/';
-const pages = new Set(['/', '/about', ...(await getProjects()).map((p) => `/projects/${p.id}`)]);
-for (const node of diagramNodes) {
+const pages = new Set(['/', '/about', ...projects.map((p) => `/projects/${p.id}`)]);
+for (const node of nodes) {
   if (node.link && !node.link.external && !pages.has(bare(node.link.href))) {
     throw new Error(
       `diagram.config.ts: "${node.id}" links to ${node.link.href}, which isn't a published page ` +
@@ -67,7 +84,7 @@ const variant = (node: DiagramNode) =>
 
 // Markers render in three runs so the case studies can be announced as a set.
 // The wrappers are `display: contents` — they group, they don't lay out.
-const pick = (...kinds: NodeKind[]) => diagramNodes.filter((n) => kinds.includes(n.kind));
+const pick = (...kinds: NodeKind[]) => nodes.filter((n) => kinds.includes(n.kind));
 const runs: { label?: string; nodes: DiagramNode[] }[] = [
   { nodes: pick('identity', 'about', 'contact') },
   { label: 'Selected projects', nodes: pick('project') },
@@ -139,7 +156,7 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
                   <div class="panel" id={panelId} role="group" aria-label={node.label}>
                     {node.tagline && <p class="lead">{node.tagline}</p>}
                     {node.lines?.map((line) => <p>{line}</p>)}
-                    {node.tags && (
+                    {!!node.tags?.length && (
                       <ul class="meta-row" role="list">
                         {node.tags.map((tag) => <li class="meta">{tag}</li>)}
                       </ul>
@@ -447,7 +464,8 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
   }
 
   /* Each label sits on a solid paper plate so connector lines are masked
-     completely where they pass behind it. */
+     completely where they pass behind it. Labels never wrap on their own,
+     but keep any line break diagram.config.ts writes into them. */
 
   .node button span {
     display: inline-block;
@@ -461,7 +479,8 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
     color: var(--ink-2);
-    white-space: nowrap;
+    white-space: pre;
+    text-align: center;
     transition: color var(--dur-fast) var(--ease);
   }
 
@@ -481,13 +500,6 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     letter-spacing: var(--tracking-tight);
     text-transform: none;
     color: var(--ink-2);
-  }
-
-  /* The job title keeps the line break diagram.config.ts writes into it. */
-
-  .node--identity button span + span {
-    white-space: pre-line;
-    text-align: center;
   }
 
   /* --- Floating rings --------------------------------------------------- */

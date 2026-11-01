@@ -11,8 +11,6 @@ export async function getProjects(): Promise<Project[]> {
     const ao = a.data.order ?? Number.POSITIVE_INFINITY;
     const bo = b.data.order ?? Number.POSITIVE_INFINITY;
     if (ao !== bo) return ao - bo;
-    return b.data.date.getTime() - a.data.date.getTime();
+    return b.data.date.iso.localeCompare(a.data.date.iso);
   });
 }
-
-export const projectYear = (p: Project): number => p.data.date.getFullYear();

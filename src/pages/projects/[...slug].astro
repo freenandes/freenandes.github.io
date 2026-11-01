@@ -6,7 +6,7 @@ import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import PageNav from '../../components/PageNav.astro';
 import PasswordGate from '../../components/PasswordGate.astro';
-import { getProjects, projectYear } from '../../lib/projects';
+import { getProjects } from '../../lib/projects';
 import { withBase } from '../../lib/base';
 import { site } from '../../site.config';
 
@@ -34,7 +34,7 @@ const jsonLd = [
     headline: data.title,
     description: data.description,
     url: pageUrl,
-    datePublished: data.date.toISOString(),
+    datePublished: data.date.iso,
     inLanguage: site.locale,
     isPartOf: { '@id': `${abs('/')}#website` },
     author: { '@id': personId },
@@ -63,7 +63,7 @@ const jsonLd = [
       <p>{data.description}</p>
       <ul class="meta-row" role="list">
         {data.role && <li class="meta">{data.role}</li>}
-        <li class="meta"><time datetime={data.date.toISOString()}>{projectYear(entry)}</time></li>
+        <li class="meta"><time datetime={data.date.iso}>{data.date.label}</time></li>
         {data.tags.map((tag) => <li class="meta">{tag}</li>)}
       </ul>
     </header>

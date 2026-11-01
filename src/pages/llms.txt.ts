@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { site } from '../site.config';
 import { withBase } from '../lib/base';
-import { getProjects, projectYear } from '../lib/projects';
+import { getProjects } from '../lib/projects';
 
 /**
  * /llms.txt — a curated, machine-readable index of the site's most important
@@ -31,7 +31,7 @@ export const GET: APIRoute = async ({ site: astroSite }) => {
     '',
     ...projects.map((p) => {
       const locked = p.data.locked ? ' (full write-up password-protected)' : '';
-      return `- [${p.data.title} (${projectYear(p)})](${abs(`/projects/${p.id}/`)}): ${p.data.description}${locked}`;
+      return `- [${p.data.title} (${p.data.date.label})](${abs(`/projects/${p.id}/`)}): ${p.data.description}${locked}`;
     }),
     '',
     '## Contact',

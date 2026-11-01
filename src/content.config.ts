@@ -7,7 +7,19 @@ const projects = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
-    date: z.coerce.date(),
+    // A real date shows as its year. Anything else shows as written ("2022–2026")
+    // and must hold a year, the first of which sorts it and dates its JSON-LD.
+    date: z.union([z.date(), z.number(), z.string()]).transform((date, ctx) => {
+      if (date instanceof Date) {
+        return { label: String(date.getUTCFullYear()), iso: date.toISOString() };
+      }
+      const year = String(date).match(/\d{4}/)?.[0];
+      if (!year) {
+        ctx.addIssue({ code: 'custom', message: 'Needs a year, such as 2022 or 2022–2026.' });
+        return z.NEVER;
+      }
+      return { label: String(date), iso: year };
+    }),
     order: z.number().optional(),
     tags: z.array(z.string()).default([]),
     role: z.string().optional(),

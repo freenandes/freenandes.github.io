@@ -8,6 +8,7 @@ import { site } from './site.config';
 export type NodeKind = 'identity' | 'about' | 'contact' | 'project' | 'floating';
 export type NodeShape = 'triangle' | 'square' | 'pentagon' | 'hexagon';
 
+/** A marker as the page renders it. */
 export interface DiagramNode {
   id: string;
   label: string;
@@ -32,7 +33,19 @@ export interface DiagramNode {
   ringStart?: number;
 }
 
-export const diagramNodes: DiagramNode[] = [
+/**
+ * A marker as it's written below. A case study's `id` is its file name, and
+ * `index.astro` fills in its label, tags and link from that project, so only
+ * its card copy and placement live here.
+ */
+export type DiagramEntry =
+  | (DiagramNode & { kind: Exclude<NodeKind, 'project'> })
+  | (Omit<DiagramNode, 'label' | 'tags' | 'link'> & { kind: 'project' });
+
+/** The link at the bottom of every case study's card. */
+export const projectLinkLabel = 'Open case study';
+
+export const diagramNodes: DiagramEntry[] = [
   {
     id: 'pedro',
     label: site.name,
@@ -58,7 +71,8 @@ export const diagramNodes: DiagramNode[] = [
   },
   {
     id: 'contact',
-    label: 'Contact',
+    // Two lines, breaking before "Contact".
+    label: 'Open to work\nContact me',
     kind: 'contact',
     shape: 'square',
     tagline: 'Open to remote Senior Product Designer and Design Engineer roles in complex technical products.',
@@ -67,36 +81,29 @@ export const diagramNodes: DiagramNode[] = [
   },
   {
     id: 'percona',
-    label: 'Interface Systems',
     kind: 'project',
     shape: 'triangle',
     tagline:
-      "The complexity piece. Taking PMM's interface back from Grafana without pretending Grafana is gone.",
+      "The systems case. Giving a product its own interface, so it stops looking like someone else's",
     lines: [
-      'Designed native navigation and built Peak UI so new PMM workflows — Query Analytics, then management apps on SEP — do not have to be Grafana frontend.',
+      "I designed PMM's native UI, so it could ship its own features and own its UX instead of borrowing it from upstream, and built Peak UI, the design system Percona's teams build on.",
     ],
-    tags: ['Design Systems', 'Developer Tools', 'Architecture'],
-    link: { label: 'Open case study', href: '/projects/percona/' },
     portrait: { x: 0.44, y: 0.5 },
     landscape: { x: 0.47, y: 0.4 },
   },
   {
     id: 'design-at-scale',
-    label: 'Design at Scale',
     kind: 'project',
     shape: 'triangle',
     tagline: 'The scale piece. Data-driven systems generating massive global business.',
     lines: [
       'Designed the PageBuilder system that generated 100K+ destination pages and 4× organic traffic, and the Tagus design system unifying experiences across 5 global markets.',
     ],
-    tags: ['Scale', 'Design Systems', 'Growth'],
-    link: { label: 'Open case study', href: '/projects/design-at-scale/' },
     portrait: { x: 0.56, y: 0.71 },
     landscape: { x: 0.68, y: 0.58 },
   },
   {
     id: 'visionary',
-    label: 'Visionary',
     kind: 'project',
     shape: 'triangle',
     tagline:
@@ -104,8 +111,6 @@ export const diagramNodes: DiagramNode[] = [
     lines: [
       'Designed and coded 4 interconnected products from scratch, showcased at CES, and secured European Community funding through pure product validation.',
     ],
-    tags: ['0→1', 'Prototyping', 'Innovation'],
-    link: { label: 'Open case study', href: '/projects/visionary/' },
     portrait: { x: 0.5, y: 0.92 },
     landscape: { x: 0.88, y: 0.46 },
   },
@@ -119,7 +124,7 @@ export const diagramNodes: DiagramNode[] = [
   },
   {
     id: 'float-2',
-    label: 'I push design to PROD',
+    label: 'I push designs to PROD',
     kind: 'floating',
     ringStart: 120,
     portrait: { x: 0.84, y: 0.62 },

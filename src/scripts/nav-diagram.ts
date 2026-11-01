@@ -7,7 +7,7 @@
    and the markup can never disagree. This file only decides where things go.
    ============================================================================= */
 
-import { diagramNodes, diagramChain, type DiagramNode } from '../diagram.config';
+import { diagramNodes, diagramChain, type DiagramEntry } from '../diagram.config';
 
 /* --- Knobs -------------------------------------------------------------------
    The values worth turning, in one place; everything below them is machinery.
@@ -19,10 +19,11 @@ import { diagramNodes, diagramChain, type DiagramNode } from '../diagram.config'
 
 const KNOBS = {
   /** Margin kept clear around the map, as a share of the canvas width and
-   *  height, never more than `max`. */
+   *  height, never more than `max`. The height's is never less than `min`, so
+   *  the end labels stay clear of the edge on a short phone. */
   inset: {
     x: { base: 0.12, narrow: 0.1, max: 160 },
-    y: { base: 0.08, narrow: 0.04, max: 150 },
+    y: { base: 0.08, narrow: 0, min: 56, max: 150 },
   },
   /** Space kept between two markers' boxes (marker plus label). */
   markerGap: {
@@ -65,7 +66,7 @@ const SIM = {
 
 type Node = {
   el: HTMLElement;
-  cfg: DiagramNode;
+  cfg: DiagramEntry;
   id: string;
 
   frac: { x: number; y: number };
@@ -177,11 +178,10 @@ export function initDiagram(root: HTMLElement) {
   function inset() {
     const narrow = narrowness();
     // Labels are centered under the dot and extend to each side, so the
-    // horizontal margin grows a little on narrow viewports. The vertical
-    // margin gets a small boost so the end labels have room.
+    // horizontal margin grows a little on narrow viewports.
     const { x, y } = KNOBS.inset;
     const mx = Math.min((x.base + x.narrow * narrow) * W, x.max);
-    const my = Math.min((y.base + y.narrow * narrow) * H, y.max);
+    const my = Math.max(y.min, Math.min((y.base + y.narrow * narrow) * H, y.max));
     return { mx, my, iw: Math.max(1, W - 2 * mx), ih: Math.max(1, H - 2 * my) };
   }
 
@@ -191,9 +191,11 @@ export function initDiagram(root: HTMLElement) {
   }
 
   function clampFrac(x: number, y: number) {
+    // A tall phone spends all its height, so only the inset holds the ends back.
+    const yEdge = 0.08 * (1 - narrowness());
     return {
       x: Math.max(0.08, Math.min(0.92, x)),
-      y: Math.max(0.08, Math.min(0.92, y)),
+      y: Math.max(yEdge, Math.min(1 - yEdge, y)),
     };
   }
 
@@ -210,8 +212,11 @@ export function initDiagram(root: HTMLElement) {
     const alongPx = landscape ? iw : ih;
     const crossPx = landscape ? ih : iw;
     // A small, random breathing margin at each end varies where the chain
-    // starts/stops without ever bunching the nodes together.
-    const endPad = 0.03 + Math.random() * 0.05;
+    // starts/stops without ever bunching the nodes together. A tall phone
+    // skips it, along with the authored spots: those assume one direction, so
+    // a flipped chain would be dragged inward and lose height.
+    const endPad = (0.03 + Math.random() * 0.05) * (1 - narrow);
+    const mix = configMix * (1 - narrow);
     const flip = Math.random() < 0.5; // run the chain either direction
     const lobes = 0.5 + Math.random(); // 0.5..1.5 — one gentle bend, no S-folds
     // Meander as a fraction of the along axis. Landscape gets a touch more
@@ -230,7 +235,7 @@ export function initDiagram(root: HTMLElement) {
       const along = endPad + t * (1 - 2 * endPad);
       const perp = 0.5 + bias + Math.sin(t * Math.PI * lobes + phase) * perpAmp;
       const spine = landscape ? { x: along, y: perp } : { x: perp, y: along };
-      chainOrder[i].frac = blendWithConfig(chainOrder[i], landscape, spine, configMix);
+      chainOrder[i].frac = blendWithConfig(chainOrder[i], landscape, spine, mix);
     }
   }
 

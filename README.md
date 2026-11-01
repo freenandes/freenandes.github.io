@@ -55,6 +55,7 @@ No secrets are needed: the locked project's ciphertext is committed, and the vis
 - [Astro](https://astro.build) 7 builds a fully static site. Pages are `.astro` files, and case studies are MDX. There's no React or Tailwind, just Astro components, TypeScript and plain CSS.
 - The site lives under `/portfolio/` on GitHub Pages, so internal links go through `withBase()` (`src/lib/base.ts`). The domain `pmcf.xyz` belongs to the old site's repo (`freenandes.github.io`), which is why this repo shows up at `www.pmcf.xyz/portfolio/`.
 - The home map takes its markers and card text from `src/diagram.config.ts`. A physics simulation in `src/scripts/nav-diagram.ts` positions the markers, so the layout varies a little on every load.
+- Every case study ends with a mini-map: the same markers in the same order, pulled into one straight line, with no physics and no script. Each marker links to its page, and the page you're on is filled in. Contact isn't on it, because its links are in the footer just below.
 - The About page, which doubles as the printable CV, renders `src/content/cv.md`, a list of fields in the same order as the page: location and languages (one small line under your name), headline, summary (Markdown), jobs, earlier work, education. You edit it by hand; the build rejects missing or misspelled fields.
 - To lock a project, you write its full text in a git-ignored file, and the build encrypts it into `public/locked/<slug>.json`. Visitors decrypt it in their browser with the passphrase (PBKDF2 + AES-GCM), and `marked` renders the Markdown. The plaintext is never published.
 - A strict Content Security Policy in `src/layouts/Base.astro` blocks inline and third-party scripts.
@@ -73,7 +74,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | `<head>`, metadata, CSP, JSON-LD, page shell | `src/layouts/Base.astro` |
 | Home page: markup and look | `src/pages/index.astro` |
 | Home page: texture, marker size, connector weight, card width, ring speed | the knobs at the top of the `<style>` in `src/pages/index.astro` |
-| Home page: markers, card copy, what connects to what | `src/diagram.config.ts` |
+| Home page: markers, card copy, what connects to what (the mini-map follows it) | `src/diagram.config.ts` |
 | Home page: spacing between markers, connector wiggle, where cards open, entrance timing, physics | `KNOBS` and `SIM` at the top of `src/scripts/nav-diagram.ts` |
 | Home page: how the layout is solved | the rest of `src/scripts/nav-diagram.ts` |
 | About page: markup, look, its print rules | `src/pages/about.astro` |
@@ -81,6 +82,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | About page / CV: content | `src/content/cv.md` |
 | About page / CV: which fields exist | `src/content.config.ts` (`cv`) |
 | Case study: markup and look | `src/pages/projects/[...slug].astro` |
+| Case study: the mini-map at the foot of the page, and its knobs | `src/components/MiniMap.astro` |
 | Case study: content | `src/content/projects/<slug>.mdx` |
 | Case study frontmatter fields | `src/content.config.ts` |
 | Passphrase gate | `src/components/PasswordGate.astro` |
@@ -111,7 +113,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
    The write-up, in Markdown.
    ```
 
-2. To put it on the home map, add a node with `kind: 'project'` to `src/diagram.config.ts`, using the file name as its `id`, and add that `id` to `diagramChain` so it gets connected. The node holds the card copy and placement; the label, tags and link come from the project's frontmatter. The build stops with a message if a node links to a page that doesn't exist, if a project node has no published project (a wrong `id`, or still a draft), or if `diagramChain` names an id no node has.
+2. To put it on the home map, add a node with `kind: 'project'` to `src/diagram.config.ts`, using the file name as its `id`, and add that `id` to `diagramChain` so it gets connected. The node holds the card copy and placement; the label, tags and link come from the project's frontmatter. The build stops with a message if a node links to a page that doesn't exist, if a project node has no published project (a wrong `id`, or still a draft), or if `diagramChain` names an id no node has. Once it's on the map, it's also a stop on the mini-map at the foot of every case study.
 3. When it's ready, remove `draft: true`.
 
 ### Lock a project behind a passphrase

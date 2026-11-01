@@ -3,6 +3,8 @@ import { site } from './site.config';
 /**
  * The home page: every marker on the map and the order they connect in.
  * Rendered by `src/pages/index.astro`, laid out by `src/scripts/nav-diagram.ts`.
+ * The mini-map at the foot of every case study (`src/components/MiniMap.astro`)
+ * draws the same markers and chain, pulled straight.
  */
 
 export type NodeKind = 'identity' | 'about' | 'contact' | 'project' | 'floating';
@@ -35,8 +37,8 @@ export interface DiagramNode {
 
 /**
  * A marker as it's written below. A case study's `id` is its file name, and
- * `index.astro` fills in its label, tags and link from that project, so only
- * its card copy and placement live here.
+ * `getDiagramNodes()` (`src/lib/diagram.ts`) fills in its label, tags and link
+ * from that project, so only its card copy and placement live here.
  */
 export type DiagramEntry =
   | (DiagramNode & { kind: Exclude<NodeKind, 'project'> })
@@ -142,7 +144,8 @@ export const diagramNodes: DiagramEntry[] = [
 
 /**
  * The line the connectors draw, marker to marker. One open chain: reorder the
- * ids to reroute it, drop one to leave that marker unconnected.
+ * ids to reroute it, drop one to leave that marker unconnected. The mini-map
+ * follows the same order, skipping the markers that have no page.
  */
 export const diagramChain = [
   'contact',

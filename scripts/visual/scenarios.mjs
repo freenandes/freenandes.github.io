@@ -54,6 +54,8 @@ export const scenarios = [
   { name: 'about-nav-pinned', path: '/about/', act: scrollTo(1200, 900) },
   { name: 'project', path: '/projects/percona/' },
   { name: 'project-scrolled', path: '/projects/percona/', act: scrollTo(600) },
+  // The foot of the page: the mini-map, then the footer.
+  { name: 'project-end', path: '/projects/percona/', act: scrollTo(100000) },
   { name: 'locked', path: '/projects/halcyon/' },
   { name: 'locked-refused', path: '/projects/halcyon/', act: unlock('wrong-passphrase') },
   { name: 'unlocked', path: '/projects/halcyon/', act: unlock(LOCK_PASSWORD) },
@@ -111,6 +113,16 @@ export const styleProbes = [
   '.lock form button',
   '.lock [role="alert"]',
   '.lock article',
+
+  // Case study mini-map (on the home page, `main > nav` is the map itself)
+  'main > article + nav',
+  'main > nav > ol',
+  'main > nav > ol li',
+  'main > nav > ol a',
+  'main > nav > ol a[aria-current]',
+  'main > nav > ol svg',
+  'main > nav > ol polygon',
+  'main > nav > ol span',
 
   // 404
   'main > section h1',

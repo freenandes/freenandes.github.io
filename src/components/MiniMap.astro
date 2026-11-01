@@ -1,0 +1,224 @@
+---
+/** The mini-map that ends every case study: the home map's chain pulled into
+    one straight, static line. Each marker links to its page, and the page it's
+    on is marked. The markers and their order are the map's own
+    (`src/diagram.config.ts`, through `src/lib/diagram.ts`). */
+
+import { diagramChain, type DiagramNode } from '../diagram.config';
+import { bare, withBase } from '../lib/base';
+import { getDiagramNodes, polygon } from '../lib/diagram';
+
+/** The page a marker stands for. The name at the centre stands for the map
+    itself. The contact card has no page (every page's footer carries its
+    links), and the floating rings are decoration. */
+function pageOf(node: DiagramNode): string | undefined {
+  if (node.kind === 'identity') return '/';
+  if (node.kind !== 'about' && node.kind !== 'project') return undefined;
+  return node.link && !node.link.external ? node.link.href : undefined;
+}
+
+// Stops follow the chain, closing up over the markers it skips. A page the
+// chain leaves out comes last, unconnected, as it is on the map.
+const rank = (id: string) => {
+  const i = diagramChain.indexOf(id);
+  return i < 0 ? diagramChain.length : i;
+};
+const here = bare(Astro.url.pathname);
+const stops = (await getDiagramNodes())
+  .flatMap((node) => {
+    const page = pageOf(node);
+    return page ? [{ node, href: withBase(page) }] : [];
+  })
+  .sort((a, b) => rank(a.node.id) - rank(b.node.id))
+  .map(({ node, href }) => ({
+    node,
+    href,
+    current: bare(href) === here,
+    loose: !diagramChain.includes(node.id),
+  }));
+---
+
+<nav aria-label="Site map" data-reveal style="--reveal-step: 4">
+  <ol role="list">
+    {
+      stops.map(({ node, href, current, loose }) => (
+        <li class:list={{ identity: node.kind === 'identity', loose }}>
+          <a href={href} aria-current={current ? 'page' : undefined}>
+            <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+              <polygon points={polygon(node.shape)} />
+            </svg>
+            <span>{node.label}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  /* The custom properties are this component's own values, in one place. They
+     start from the home map's (the knobs at the top of index.astro's <style>);
+     the width where the line turns from a column into a row is the container
+     query further down. */
+
+  nav {
+    --marker-size: 1rem;
+    --link-width: 1.375px; /* connector stroke */
+    --stop-pad: var(--space-sm); /* air around a stop, inside its hit area */
+
+    container-type: inline-size;
+    padding-block: var(--space-md) var(--space-lg);
+  }
+
+  /* An <ol> because the stops have an order, and so the site's row styling
+     for ul[role="list"] stays out of it. The role keeps Safari announcing it as
+     a list once the numbers are gone. `isolation` keeps the connectors' z-index
+     inside the list. */
+
+  ol {
+    display: grid;
+    grid-auto-rows: 1fr;
+    padding: 0;
+    list-style: none;
+    isolation: isolate;
+  }
+
+  li {
+    position: relative;
+    display: flex;
+  }
+
+  /* A stop: the marker, then its label. Resets the site's link look, as the
+     map's markers aren't styled as links either. The page you're on stays a
+     link, marked with aria-current, so a screen reader moving through the
+     links still hears which one is the current page. */
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    min-width: 0;
+    padding: var(--stop-pad) var(--stop-pad) var(--stop-pad) 0;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: none;
+    text-decoration: none;
+    color: var(--ink-2);
+  }
+
+  a:hover,
+  a:focus-visible,
+  a[aria-current='page'] {
+    color: var(--ink);
+  }
+
+  svg {
+    flex: none;
+    width: var(--marker-size);
+    height: var(--marker-size);
+    overflow: visible;
+    transition: transform var(--dur-fast) var(--ease);
+  }
+
+  polygon {
+    fill: var(--paper);
+    stroke: var(--ink);
+    stroke-width: 1.75;
+    vector-effect: non-scaling-stroke;
+    transition: fill var(--dur-fast) var(--ease), stroke var(--dur-fast) var(--ease);
+  }
+
+  /* Pointing at a stop lights it the way the map lights a marker. The page
+     you're on is filled in ink instead, and stays that way: accent is for
+     where you can go. */
+
+  a:not([aria-current]):hover svg,
+  a:not([aria-current]):focus-visible svg {
+    transform: scale(1.25);
+  }
+
+  a:not([aria-current]):hover polygon,
+  a:not([aria-current]):focus-visible polygon {
+    fill: var(--accent);
+    stroke: var(--accent-ink);
+  }
+
+  a[aria-current='page'] polygon {
+    fill: var(--ink);
+  }
+
+  span {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    white-space: pre-line;
+  }
+
+  /* The name is set in the body face, as it is on the map. */
+
+  .identity span {
+    font-family: var(--font-sans);
+    font-size: var(--step-0);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+    text-transform: none;
+  }
+
+  /* The connector into each stop from the one before, centre to centre,
+     behind the markers' paper fill. Rows are all one height, so the stop above
+     is one row up. */
+
+  li + li:not(.loose)::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    bottom: 50%;
+    left: calc((var(--marker-size) - var(--link-width)) / 2);
+    width: var(--link-width);
+    height: 100%;
+    background: var(--ink-3);
+  }
+
+  /* With room for it, the line runs left to right, as the map does on a wide
+     screen. 30rem fits five stops; raise it if the map grows past that. */
+
+  @container (width >= 30rem) {
+    ol {
+      grid-auto-flow: column;
+      grid-auto-columns: 1fr;
+    }
+
+    li {
+      justify-content: center;
+    }
+
+    a {
+      flex-direction: column;
+      gap: var(--space-xs);
+      padding: var(--stop-pad) var(--space-xs);
+      text-align: center;
+    }
+
+    span {
+      text-wrap: balance;
+    }
+
+    /* Through the markers' middle, from this column's centre back to the one
+       before: columns are all one width. */
+
+    li + li:not(.loose)::before {
+      inset: calc(var(--stop-pad) + (var(--marker-size) - var(--link-width)) / 2) 50% auto auto;
+      width: 100%;
+      height: var(--link-width);
+    }
+  }
+
+  @media print {
+    nav {
+      display: none !important;
+    }
+  }
+</style>

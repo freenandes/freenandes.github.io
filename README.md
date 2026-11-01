@@ -55,7 +55,7 @@ No secrets are needed: the locked project's ciphertext is committed, and the vis
 - [Astro](https://astro.build) 7 builds a fully static site. Pages are `.astro` files, and case studies are MDX. There's no React or Tailwind, just Astro components, TypeScript and plain CSS.
 - The site lives under `/portfolio/` on GitHub Pages, so internal links go through `withBase()` (`src/lib/base.ts`). The domain `pmcf.xyz` belongs to the old site's repo (`freenandes.github.io`), which is why this repo shows up at `www.pmcf.xyz/portfolio/`.
 - The home map takes its markers and card text from `src/diagram.config.ts`. A physics simulation in `src/scripts/nav-diagram.ts` positions the markers, so the layout varies a little on every load.
-- Every case study ends with a mini-map: the same markers in the same order, pulled into one straight line, with no physics and no script. Each marker links to its page, and the page you're on is filled in. Contact isn't on it, because its links are in the footer just below.
+- Every case study's footer opens with a mini-map instead of a rule: the same markers in the same order, pulled into one straight line, with no physics and no script. Where the screen has room, the line reaches the edges of the text. Each marker links to its page (the name at the centre becomes Home, for the map), and the page you're on is filled in. Contact isn't on it, because its links are in the footer just below.
 - The About page, which doubles as the printable CV, renders `src/content/cv.md`, a list of fields in the same order as the page: location and languages (one small line under your name), headline, summary (Markdown), jobs, earlier work, education. You edit it by hand; the build rejects missing or misspelled fields.
 - To lock a project, you write its full text in a git-ignored file, and the build encrypts it into `public/locked/<slug>.json`. Visitors decrypt it in their browser with the passphrase (PBKDF2 + AES-GCM), and `marked` renders the Markdown. The plaintext is never published.
 - A strict Content Security Policy in `src/layouts/Base.astro` blocks inline and third-party scripts.
@@ -82,7 +82,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | About page / CV: content | `src/content/cv.md` |
 | About page / CV: which fields exist | `src/content.config.ts` (`cv`) |
 | Case study: markup and look | `src/pages/projects/[...slug].astro` |
-| Case study: the mini-map at the foot of the page, and its knobs | `src/components/MiniMap.astro` |
+| Case study: the mini-map that opens the footer, and its knobs | `src/components/MiniMap.astro` |
 | Case study: content | `src/content/projects/<slug>.mdx` |
 | Case study frontmatter fields | `src/content.config.ts` |
 | Passphrase gate | `src/components/PasswordGate.astro` |

@@ -1,16 +1,20 @@
 ---
-/** The mini-map that ends every case study: the home map's chain pulled into
-    one straight, static line. Each marker links to its page, and the page it's
-    on is marked. The markers and their order are the map's own
+/** The mini-map that opens the footer of every case study: the home map's
+    chain pulled into one straight, static line, which also stands in for the
+    footer's rule. Each marker links to its page, and the page it's on is
+    marked. The markers and their order are the map's own
     (`src/diagram.config.ts`, through `src/lib/diagram.ts`). */
 
 import { diagramChain, type DiagramNode } from '../diagram.config';
 import { bare, withBase } from '../lib/base';
 import { getDiagramNodes, polygon } from '../lib/diagram';
 
+/** The name at the map's centre leads to the map, so here it's called that. */
+const homeLabel = 'Home';
+
 /** The page a marker stands for. The name at the centre stands for the map
-    itself. The contact card has no page (every page's footer carries its
-    links), and the floating rings are decoration. */
+    itself. The contact card has no page (the footer carries its links), and
+    the floating rings are decoration. */
 function pageOf(node: DiagramNode): string | undefined {
   if (node.kind === 'identity') return '/';
   if (node.kind !== 'about' && node.kind !== 'project') return undefined;
@@ -31,29 +35,34 @@ const stops = (await getDiagramNodes())
   })
   .sort((a, b) => rank(a.node.id) - rank(b.node.id))
   .map(({ node, href }) => ({
-    node,
+    label: node.kind === 'identity' ? homeLabel : node.label,
+    shape: node.shape,
     href,
     current: bare(href) === here,
     loose: !diagramChain.includes(node.id),
   }));
 ---
 
-<nav aria-label="Site map" data-reveal style="--reveal-step: 4">
-  <ol role="list">
-    {
-      stops.map(({ node, href, current, loose }) => (
-        <li class:list={{ identity: node.kind === 'identity', loose }}>
-          <a href={href} aria-current={current ? 'page' : undefined}>
-            <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-              <polygon points={polygon(node.shape)} />
-            </svg>
-            <span>{node.label}</span>
-          </a>
-        </li>
-      ))
-    }
-  </ol>
-</nav>
+{/* A line needs two ends. With fewer stops this renders nothing, and the
+    footer keeps its rule. */}
+{
+  stops.length > 1 && (
+    <nav aria-label="Site map">
+      <ol role="list" style={`--stops: ${stops.length}`}>
+        {stops.map(({ label, shape, href, current, loose }) => (
+          <li class:list={{ loose }}>
+            <a href={href} aria-current={current ? 'page' : undefined}>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                <polygon points={polygon(shape)} />
+              </svg>
+              <span>{label}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )
+}
 
 <style>
   /* The custom properties are this component's own values, in one place. They
@@ -64,10 +73,10 @@ const stops = (await getDiagramNodes())
   nav {
     --marker-size: 1rem;
     --link-width: 1.375px; /* connector stroke */
-    --stop-pad: var(--space-sm); /* air around a stop, inside its hit area */
+    --stop-pad: 0.75rem; /* air around a stop, inside its hit area */
 
     container-type: inline-size;
-    padding-block: var(--space-md) var(--space-lg);
+    padding-block-start: var(--space-md);
   }
 
   /* An <ol> because the stops have an order, and so the site's row styling
@@ -157,16 +166,6 @@ const stops = (await getDiagramNodes())
     white-space: pre-line;
   }
 
-  /* The name is set in the body face, as it is on the map. */
-
-  .identity span {
-    font-family: var(--font-sans);
-    font-size: var(--step-0);
-    font-weight: var(--weight-bold);
-    letter-spacing: var(--tracking-tight);
-    text-transform: none;
-  }
-
   /* The connector into each stop from the one before, centre to centre,
      behind the markers' paper fill. Rows are all one height, so the stop above
      is one row up. */
@@ -186,9 +185,20 @@ const stops = (await getDiagramNodes())
      screen. 30rem fits five stops; raise it if the map grows past that. */
 
   @container (width >= 30rem) {
+    /* One equal column per stop. The row reaches past the text by most of a
+       column, so the end markers sit on the text edges and their labels hang
+       out into the margin. On a viewport without that much room it reaches as
+       far as it can, short of the gutter. `--column` is a column's width once
+       the end markers are on the edges. */
+
     ol {
+      --column: calc((100% - var(--marker-size)) / (var(--stops) - 1));
+
       grid-auto-flow: column;
-      grid-auto-columns: 1fr;
+      grid-auto-columns: minmax(0, 1fr);
+      margin-inline: calc(
+        -1 * min((var(--column) - var(--marker-size)) / 2, (100vw - 100%) / 2 - var(--gutter))
+      );
     }
 
     li {

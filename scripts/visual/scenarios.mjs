@@ -54,7 +54,7 @@ export const scenarios = [
   { name: 'about-nav-pinned', path: '/about/', act: scrollTo(1200, 900) },
   { name: 'project', path: '/projects/percona/' },
   { name: 'project-scrolled', path: '/projects/percona/', act: scrollTo(600) },
-  // The foot of the page: the mini-map, then the footer.
+  // The foot of the page: the footer, opened by the mini-map.
   { name: 'project-end', path: '/projects/percona/', act: scrollTo(100000) },
   { name: 'locked', path: '/projects/halcyon/' },
   { name: 'locked-refused', path: '/projects/halcyon/', act: unlock('wrong-passphrase') },
@@ -77,7 +77,7 @@ export const styleProbes = [
   '.skip-link',
   'body > footer',
   'body > footer > div',
-  'body > footer a',
+  'body > footer > div a',
   'body > footer p',
 
   // Shared type and link roles
@@ -114,15 +114,15 @@ export const styleProbes = [
   '.lock [role="alert"]',
   '.lock article',
 
-  // Case study mini-map (on the home page, `main > nav` is the map itself)
-  'main > article + nav',
-  'main > nav > ol',
-  'main > nav > ol li',
-  'main > nav > ol a',
-  'main > nav > ol a[aria-current]',
-  'main > nav > ol svg',
-  'main > nav > ol polygon',
-  'main > nav > ol span',
+  // Case study mini-map, which opens the footer
+  'body > footer > nav',
+  'body > footer > nav > ol',
+  'body > footer > nav > ol li',
+  'body > footer > nav > ol a',
+  'body > footer > nav > ol a[aria-current]',
+  'body > footer > nav > ol svg',
+  'body > footer > nav > ol polygon',
+  'body > footer > nav > ol span',
 
   // 404
   'main > section h1',

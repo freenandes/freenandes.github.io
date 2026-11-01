@@ -6,6 +6,8 @@ export interface SiteConfig {
   name: string;
   role: string;
   description: string;
+  /** What work is wanted. Opens the contact card and the footer. */
+  availability: string;
   /** Shown in link rows, the footer, the contact card and /llms.txt. A normal
    *  link carries an `href`; the email carries an obfuscated `token` instead
    *  (see `src/lib/email.ts`) so the address is never written as plaintext into
@@ -34,6 +36,7 @@ export const site: SiteConfig = {
   role: 'Senior Product Designer & Design Engineer',
   description:
     'I build interfaces for complex technical software: observability, databases, and developer tools. From research to design systems and front-end code.',
+  availability: 'Open to remote Senior Product Designer and Design Engineer roles in complex technical products.',
   socials: [
     { label: 'Email', token: 'b3c3d6d7c1dcf3c3ded0d59dcbcac9' },
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/pmcfernandes' },

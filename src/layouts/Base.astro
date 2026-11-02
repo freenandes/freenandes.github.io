@@ -1,5 +1,6 @@
 ---
-/** The shell every page renders into: <head>, skip link, <main>, footer. */
+/** The shell every page renders into: <head>, skip link, <main>, footer. A
+    page's `footer` slot opens the footer, in place of its rule. */
 
 import '../styles/global.css';
 import { site } from '../site.config';
@@ -149,7 +150,13 @@ const csp = [
       <slot />
     </main>
 
-    {footer && <Footer />}
+    {
+      footer && (
+        <Footer>
+          <slot name="footer" />
+        </Footer>
+      )
+    }
 
     <script>
       import '../scripts/site';

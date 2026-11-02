@@ -1,21 +1,12 @@
 ---
-/** Page navigation. Sits at the top of the article in normal flow, pins itself
-    to the viewport when the reader scrolls back up, and slides away while they
-    read downwards. Children are the `<li>` items of the row; the `at-rest`
-    slot takes a secondary action that only shows while the bar is in the flow,
-    so the pinned bar stays down to its primary link. */
+/** Page navigation. Sits at the top of the article in normal flow, then stays
+    pinned to the viewport for the rest of the page, so the way back to the map
+    is always in reach. Children are the `<li>` items of the row. */
 ---
 
 <div class="sentinel"></div>
 <ul class="page-nav" role="list">
   <slot />
-  {
-    Astro.slots.has('at-rest') && (
-      <li class="at-rest">
-        <slot name="at-rest" />
-      </li>
-    )
-  }
 </ul>
 
 <style>
@@ -34,11 +25,13 @@
     top: var(--space-sm);
     z-index: var(--z-sticky);
     margin-block-end: var(--space-lg);
-    transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease),
-      visibility 0s;
   }
 
-  /* Paper plate so page content scrolls out of sight under the pinned bar. */
+  /* Paper plate so page content scrolls out of sight under the pinned bar. The
+     shadow carries the paper out to the window's edges, over whatever hangs
+     outside the text column (bullets, wide images), and the clip keeps it to
+     the plate's height. A shadow adds nothing to the page's scroll width, and
+     the rule stays on the column, like the site's other dividers. */
 
   .page-nav::before {
     content: '';
@@ -47,6 +40,8 @@
     z-index: -1;
     background: var(--paper);
     border-block-end: 1px solid var(--line);
+    box-shadow: 0 0 0 100vmax var(--paper);
+    clip-path: inset(0 -100vmax);
     opacity: 0;
     transition: opacity var(--dur) var(--ease);
   }
@@ -55,28 +50,10 @@
     opacity: 1;
   }
 
-  /* Fading rather than removing keeps the row from reflowing: this is the last
-     item, so the space it leaves behind reads as empty. */
+  /* Whatever the keyboard moves to lands clear of the pinned bar. */
 
-  .at-rest {
-    transition: opacity var(--dur) var(--ease), visibility 0s;
-  }
-
-  .page-nav.is-pinned .at-rest {
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity var(--dur) var(--ease), visibility 0s linear var(--dur);
-  }
-
-  /* Fading as it lifts keeps the bar from reading as a shutter slamming shut,
-     and covers the moment its paper plate stops overlapping the text. */
-
-  .page-nav.is-hidden {
-    visibility: hidden;
-    opacity: 0;
-    transform: translateY(calc(-100% - var(--space-md) * 2 - 1px));
-    transition: transform var(--dur) var(--ease), opacity var(--dur-fast) var(--ease),
-      visibility 0s linear var(--dur);
+  :global(html) {
+    scroll-padding-block-start: 4rem;
   }
 
   @media print {
@@ -88,49 +65,15 @@
 </style>
 
 <script>
-  /** Movement under this many pixels is treated as jitter, not a direction. */
-  const DELTA = 8;
-
   const nav = document.querySelector<HTMLElement>('.page-nav');
   const sentinel = nav?.previousElementSibling;
 
-  if (nav) {
-    let pinned = false;
-    let hidden = false;
-    let lastY = Math.max(window.scrollY, 0);
-
-    function setHidden(next: boolean) {
-      if (next === hidden) return;
-      hidden = next;
-      nav!.classList.toggle('is-hidden', next);
-    }
-
-    function setPinned(next: boolean) {
-      if (next === pinned) return;
-      pinned = next;
-      nav!.classList.toggle('is-pinned', next);
-      if (!next) setHidden(false);
-    }
-
-    // The sentinel stays put at the bar's resting position, so it remains
-    // measurable while the bar itself is transformed away.
-    if (sentinel) {
-      const observer = new IntersectionObserver(([entry]) => {
-        setPinned(!entry.isIntersecting && entry.boundingClientRect.top < 0);
-      });
-      observer.observe(sentinel);
-    }
-
-    window.addEventListener(
-      'scroll',
-      () => {
-        const y = Math.max(window.scrollY, 0);
-        const delta = y - lastY;
-        if (Math.abs(delta) < DELTA) return;
-        lastY = y;
-        setHidden(pinned && delta > 0);
-      },
-      { passive: true }
-    );
+  // The sentinel stays at the bar's resting place, so it leaving through the
+  // top of the viewport means the bar has pinned.
+  if (nav && sentinel) {
+    const observer = new IntersectionObserver(([entry]) => {
+      nav.classList.toggle('is-pinned', !entry.isIntersecting && entry.boundingClientRect.top < 0);
+    });
+    observer.observe(sentinel);
   }
 </script>

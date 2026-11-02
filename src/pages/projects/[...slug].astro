@@ -1,9 +1,11 @@
 ---
 /** A case study. Body copy lives in `src/content/projects/<slug>.mdx`; locked
-    projects add the passphrase gate below the public teaser. */
+    projects add the passphrase gate below the public teaser. The footer opens
+    with the mini-map, linking every page on the map. */
 
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import MiniMap from '../../components/MiniMap.astro';
 import PageNav from '../../components/PageNav.astro';
 import PasswordGate from '../../components/PasswordGate.astro';
 import { getProjects } from '../../lib/projects';
@@ -86,6 +88,8 @@ const jsonLd = [
       )
     }
   </article>
+
+  <MiniMap slot="footer" />
 </Base>
 
 <style>

@@ -10,9 +10,6 @@ export const viewports = {
   phone: { width: 390, height: 844, deviceScaleFactor: 1, isMobile: true, hasTouch: true },
 };
 
-/** Demo passphrase for the locked project (see AGENTS.md). */
-const LOCK_PASSWORD = process.env.LOCK_PASSWORD_HALCYON ?? 'soft-club';
-
 /** Jump the page without the smooth-scroll animation, so it lands exactly. */
 const scrollTo = (...positions) =>
   async function scroll(page) {
@@ -20,13 +17,6 @@ const scrollTo = (...positions) =>
       await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), top);
       await page.evaluate(() => new Promise((r) => setTimeout(r, 400)));
     }
-  };
-
-/** Fill the passphrase gate and submit. */
-const unlock = (password) =>
-  async function submit(page) {
-    await page.type('.lock input', password, { delay: 10 });
-    await page.click('.lock form button');
   };
 
 /**
@@ -56,9 +46,8 @@ export const scenarios = [
   { name: 'project-scrolled', path: '/projects/percona-case-1/', act: scrollTo(600) },
   // The foot of the page: the footer, opened by the mini-map.
   { name: 'project-end', path: '/projects/percona-case-1/', act: scrollTo(100000) },
-  { name: 'locked', path: '/projects/halcyon/' },
-  { name: 'locked-refused', path: '/projects/halcyon/', act: unlock('wrong-passphrase') },
-  { name: 'unlocked', path: '/projects/halcyon/', act: unlock(LOCK_PASSWORD) },
+  // A locked project gets three more here: as it loads, then with a wrong and
+  // the right passphrase typed into `.lock input` and sent by `.lock form button`.
   { name: 'error-404', path: '/404.html' },
 ];
 

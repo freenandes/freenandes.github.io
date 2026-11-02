@@ -1,66 +1,16 @@
 ---
 /** Home: an interactive map of the site. Markers, copy and connections are all
     in `src/diagram.config.ts`, except that a case study's label, tags and link
-    come from its project; the physics that places them is in
-    `src/scripts/nav-diagram.ts`. */
+    come from its project (`src/lib/diagram.ts`); the physics that places them
+    is in `src/scripts/nav-diagram.ts`. */
 
 import Base from '../layouts/Base.astro';
-import {
-  diagramChain,
-  diagramNodes,
-  projectLinkLabel,
-  type DiagramNode,
-  type NodeKind,
-  type NodeShape,
-} from '../diagram.config';
+import type { DiagramNode, NodeKind } from '../diagram.config';
 import { withBase } from '../lib/base';
-import { getProjects } from '../lib/projects';
+import { getDiagramNodes, polygon } from '../lib/diagram';
 import { site } from '../site.config';
 
-// A typo in diagram.config.ts would otherwise ship as a card linking to a 404,
-// or a marker that quietly drops out of the chain, so the build stops instead.
-const projects = await getProjects();
-const nodes: DiagramNode[] = diagramNodes.map((node) => {
-  if (node.kind !== 'project') return node;
-  const project = projects.find((p) => p.id === node.id);
-  if (!project) {
-    throw new Error(
-      `diagram.config.ts: "${node.id}" has no published project ` +
-        '(a typo, a renamed file, or a project still marked draft).'
-    );
-  }
-  const { title, tags } = project.data;
-  const link = { label: projectLinkLabel, href: `/projects/${node.id}/` };
-  return { ...node, label: title, tags, link };
-});
-
-const bare = (path: string) => path.replace(/\/+$/, '') || '/';
-const pages = new Set(['/', '/about', ...projects.map((p) => `/projects/${p.id}`)]);
-for (const node of nodes) {
-  if (node.link && !node.link.external && !pages.has(bare(node.link.href))) {
-    throw new Error(
-      `diagram.config.ts: "${node.id}" links to ${node.link.href}, which isn't a published page ` +
-        '(a typo, a renamed file, or a project still marked draft).'
-    );
-  }
-}
-for (const id of diagramChain) {
-  if (!diagramNodes.some((node) => node.id === id)) {
-    throw new Error(`diagram.config.ts: diagramChain lists "${id}", but no node has that id.`);
-  }
-}
-
-/** Marker outline: a regular polygon in a 20×20 box, point up (square: flat). */
-const SIDES: Record<NodeShape, number> = { triangle: 3, square: 4, pentagon: 5, hexagon: 6 };
-
-function polygon(shape: NodeShape = 'hexagon'): string {
-  const sides = SIDES[shape];
-  const start = shape === 'square' ? -45 : -90;
-  return Array.from({ length: sides }, (_, i) => {
-    const angle = ((start + (i * 360) / sides) * Math.PI) / 180;
-    return `${(10 + 8.4 * Math.cos(angle)).toFixed(2)},${(10 + 8.4 * Math.sin(angle)).toFixed(2)}`;
-  }).join(' ');
-}
+const nodes = await getDiagramNodes();
 
 /** Circle just big enough to carry `label` once around, with a gap. */
 function ring(label: string) {
@@ -252,7 +202,7 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
 
   .diagram {
     --topo-size: 150rem; /* width of one tile of the contour texture */
-    --topo-opacity: 0.09;
+    --topo-opacity: 0.1;
     --marker-size: 1rem;
     --marker-size-identity: 1.25rem; /* the name at the centre */
     --link-width: 1.375; /* connector stroke */

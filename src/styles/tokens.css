@@ -12,6 +12,9 @@
 
   /* Faint, decorative-only ink (rings, register mark); not used for text. */
   --ink-faint: #aaa;
+
+  /* The drawings on the map's texture; lighter still, and never text. */
+  --ink-decor: #ddd;
   --line-soft: rgb(0 0 0 / 4%);
   --line: rgb(0 0 0 / 8%);
   --line-strong: rgb(0 0 0 / 16%);

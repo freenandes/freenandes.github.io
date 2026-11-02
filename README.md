@@ -73,9 +73,9 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | Site URL and base path (`/portfolio` until launch) | `astro.config.mjs` |
 | `<head>`, metadata, CSP, JSON-LD, page shell | `src/layouts/Base.astro` |
 | Home page: markup and look | `src/pages/index.astro` |
-| Home page: texture, marker size, connector weight, card width, ring speed | the knobs at the top of the `<style>` in `src/pages/index.astro` |
+| Home page: texture, marker size, connector weight, card width, ring speed, size of the drawings on the texture | the knobs at the top of the `<style>` in `src/pages/index.astro` |
 | Home page: markers, card copy, what connects to what (the mini-map follows it) | `src/diagram.config.ts` |
-| Home page: spacing between markers, connector wiggle, where cards open, entrance timing, physics | `KNOBS` and `SIM` at the top of `src/scripts/nav-diagram.ts` |
+| Home page: spacing between markers, connector wiggle, where cards open, the drawings' clearance, entrance timing, physics | `KNOBS` and `SIM` at the top of `src/scripts/nav-diagram.ts` |
 | Home page: how the layout is solved | the rest of `src/scripts/nav-diagram.ts` |
 | About page: markup, look, its print rules | `src/pages/about.astro` |
 | About page: vertical rhythm (gaps between sections, titles, entries) | the `--cv-*` knobs at the top of the `<style>` in `src/pages/about.astro` |
@@ -83,6 +83,10 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | About page / CV: which fields exist | `src/content.config.ts` (`cv`) |
 | Case study: markup and look | `src/pages/projects/[...slug].astro` |
 | About and case studies: the mini-map that opens the footer, and its knobs | `src/components/MiniMap.astro` |
+| About and case studies: the pinned page nav, and the size and weight of the flag in it | `src/components/PageNav.astro` |
+| The drawings on the map's texture, the flag among them (the nav imports it as a component; it takes the text colour around it) | `src/assets/decor/` |
+| The colour of those drawings, and of the ruler | `--ink-decor` in `src/styles/tokens.css` |
+| The map's scale in the bottom right corner | `src/assets/ruler.svg`; its height is `--ruler-height` at the top of the `<style>` in `src/pages/index.astro` |
 | Case study: content | `src/content/projects/<slug>.mdx` |
 | Case study frontmatter fields | `src/content.config.ts` |
 | Passphrase gate | `src/components/PasswordGate.astro` |
@@ -115,6 +119,14 @@ Each page owns its markup and its styling, so changing how a page looks means op
 
 2. To put it on the home map, add a node with `kind: 'project'` to `src/diagram.config.ts`, using the file name as its `id`, and add that `id` to `diagramChain` so it gets connected. The node holds the card copy and placement; the label, tags and link come from the project's frontmatter. The build stops with a message if a node links to a page that doesn't exist, if a project node has no published project (a wrong `id`, or still a draft), or if `diagramChain` names an id no node has. Once it's on the map, it's also a stop on the mini-map at the foot of About and every case study.
 3. When it's ready, remove `draft: true`.
+
+### Add a drawing to the map
+
+1. Drop the SVG in `src/assets/decor/`. Every file there lands on the map, with nothing else to wire up.
+2. In the file, replace the drawing's fixed colour with `fill="currentColor"`, so `--ink-decor` colours it, and turn inline `style` attributes into plain ones. Keep its frame as drawn.
+3. Give it a width in the knobs at the top of the `<style>` in `src/pages/index.astro`, named after its file: `kraken.svg` takes `--decor-kraken`. One with no knob of its own takes its viewBox width times `--decor-scale`.
+
+Each drawing gets a random spot once the map has come to rest, clear of the markers, rings, connectors and the other drawings, starting with the biggest. It stays there, and only moves if a reshuffle or a resize runs into it. If the map leaves no room, it stays hidden until a later layout has some, which for a big drawing can mean it never shows on a phone.
 
 ### Lock a project behind a passphrase
 

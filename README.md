@@ -24,7 +24,7 @@ Before you push: run `npm run check`, `npm run lint:css` and `npm run build`. CI
 ## Setup (once per machine)
 
 1. Install Homebrew, then add it to your PATH. The installer prints the two lines to run under "Next steps".
-2. Install Node 22, the version in `.nvmrc`, and add it to your PATH:
+2. Install Node 22 and add it to your PATH. `.nvmrc` pins the exact version CI uses, which Astro's minimum sets:
 
    ```bash
    brew install node@22

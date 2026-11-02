@@ -1,0 +1,75 @@
+---
+title: Reading the Terrain
+description: "Query Analytics is where DBAs go when the database is slow. I learned how they really work, reframed it around what they can act on, and designed its real-time version with enterprise customers."
+date: 2022–2026
+order: 2
+role: Senior Product Designer & Design Engineer
+client: Percona
+tags: ['UX Research', 'Prototyping', 'Databases']
+---
+
+## In short
+
+### Team
+
+- Our PM (product manager), who made the vision videos with me.
+- Tech leads and about 4 engineers split between back-end, front-end, and QA (quality assurance), who shaped and built Real-time Analytics.
+- Me, the only designer: discovery, problem framing, wireframes, vision prototypes, MVP (minimum viable product) UX and UI, and production fixes.
+
+### Problem
+
+Under pressure, DBAs (database administrators) wrestled with filters, scrolled through lists, checked the too-many pre-made dashboards, and combed through the logs to find a slow query. Enterprise MongoDB teams also needed a live view of their queries before they could consider PMM (Percona Monitoring and Management) as a viable replacement for their tool stack.
+
+### What I did
+
+I learned how DBAs and our experts really work, showed customers PMM’s future in narrated videos, and designed Real-time Analytics with them, from concept to release.
+
+### What changed
+
+Real-time Analytics shipped in PMM 3.7, about 90% as we intended, and I closed the gaps with fixes in the following releases. The export and command-line tools customers asked for followed in 3.9, and they asked for more of PMM to feel this intuitive.
+
+---
+
+## Which query is slowing my database?
+
+That’s the question a DBA brings to Query Analytics, PMM’s screen for finding what slows a database. They narrow it down with filters, grab the query ID, and, if it really is the offender, kill it and flag it for optimization. On its old front-end, the screen got in the way. A colleague said it “feels like it’s from the ’90s,” meaning clunky, unappealing, unforgiving, and occasionally buggy.
+
+I had tried to fix its UX before. In 2023, I tested a redesign in wireframes with 13 colleagues: the Compare feature I introduced, which put different timeframes side by side, scored 8.5 out of 10 for usefulness but 6.4 for ease of use, still inside the UI borrowed from Grafana. Then the project stopped. It only really took off in 2025, and I brought those findings with me.
+
+## Experts first, screens later
+
+Before drawing screens, I mapped every bit of Query Analytics by what a user can see and do with it, listing all the “Lego” parts, and pulled years of backlog, interviews, and the 2023 findings into one discovery doc. There, the team could argue about problems, not pixels. Then I brought our experts together around a giant Miro board of wireframes and assumptions. The conversation unlocked fast: problems and technical limits surfaced before anyone wrote code.
+
+One of our support experts showed me how they really work. “Load,” a metric we had invented years before and put front and center in the old UI, was hard to read even for senior engineers; they barely looked at it. What an expert needs is time in plain seconds, variance, and rows examined. And the detail tabs worked only about 30% of the time.
+
+## Showing what the future could look like
+With our PM, I set out to give customers a vision of PMM’s future they could buy into. I collected real problems from DBAs, developers, and DevOps engineers, turned them into hypotheses, and made narrated videos: animated prototypes of PMM helping solve them, from AI-assisted query optimization to incident response.
+
+When we presented them to customers, they recognized their problems in those videos, “wanted it for tomorrow,” and asked us to prioritize all those fresh new ideas in the roadmap. Query Analytics stood out as what mattered most to them, and those conversations led straight to real-time analysis.
+
+## Features shaped with customers
+
+Enterprise MongoDB teams needed a live view of their queries before they could leave MongoDB Atlas and consider PMM a real alternative. I shaped the concept with our tech leads and put a prototype in front of our customers. One team, running about 1,100 servers, said, “It looks fantastic, actually.” What they valued most was that it only touches the database when someone starts a session, so it never adds load for nothing.
+
+Their feedback cut the MVP to 4 scenarios around one action: choosing what to watch. With 300+ clusters mixed with standalone services, that was the hard part. I put 3 options to the team, and the vote split 3–3–2, so I went back to the reasons. The tree won because it matched how they picture clusters and their nodes, after years of talking to database experts.
+
+## One page or two?
+
+A separate page for real time would ship faster than merging it into Query Analytics’ stored metrics, because mixing stored and live data would force us to pay down the legacy screen’s debt.
+
+We settled on tabs: stored metrics for historical analysis and the new Real-time Analytics for the queries running right now.
+
+When colleagues asked why someone who only runs MongoDB should see MySQL metrics, I kept the mix: one app can run on MySQL and PostgreSQL at once, and mixing is only noise when filters are bad. So filters had to be quick, searchable, and kept in the URL, ready to share. All of these were customer requests documented in interviews and focus groups, and having them at hand let us decide and build fast.
+
+## Shipped, and it kept growing
+Real-time Analytics shipped in PMM 3.7, for MongoDB first. Last-minute back-end and front-end constraints left it at about 90% of the designed UX, and in the following minor releases I fixed the cosmetic gaps in production code myself.
+
+In PMM 3.10, Real-time Analytics had matured beyond an experiment, and we had learned it is a different mode of investigation for database experts now. It deserved more visibility, so it got its own entry slot in the navigation for better discoverability of the feature.
+
+We also added export functionality, a command-line interface, and the ability to monitor live MySQL queries, with minimal review from design. It didn’t need more: built on Peak UI, with well-structured code and a layout designed to grow, it left room for incremental changes without anyone babysitting every decision, and development moved fast.
+
+Customers asked for more of PMM to feel like this, and inside Percona people started talking about a new era of UX for PMM. When work is structured this way, it’s not only faster to ship; it also motivates the team to grow their ideas for the product.
+
+## Looking back
+
+I’d show customers what we’re building again, early, as stories they recognize. What I’d change: bring everyday DBAs in more often, not just enterprise customers and our experts, with small tests on work in progress. It’s easy to skip when a team moves fast, and it’s my role to bring that perspective in.

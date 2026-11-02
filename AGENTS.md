@@ -56,7 +56,7 @@ To look at the site, use `npm run dev`. Pages are at http://localhost:4321/portf
 
 ## Known state
 
-- `atlas-design-system`, `field-notes` and `helio-banking` are placeholder projects (fictional clients, `example.com` links). They aren't on the map, but they still publish as pages, in `/llms.txt` and in the sitemap. The real case studies are `percona`, `design-at-scale`, `visionary`, and the locked demo `halcyon`.
+- `atlas-design-system`, `field-notes` and `helio-banking` are placeholder projects (fictional clients, `example.com` links). They aren't on the map, but they still publish as pages, in `/llms.txt` and in the sitemap. The real case studies are `percona-case-1`, `percona-case-2`, `tui-case`, and the locked demo `halcyon`.
 - `notes/` and `sources/` are local-only and may be missing.
 - `package-lock.json`, `public/topo-low.svg` (one 537 KB line) and `public/locked/*.json` are generated. Don't read them; `.ignore` keeps them out of search results.
 - Pending work (OG image, raster icons, self-hosted fonts) is tracked in README → To do and `SPEC-COMPLIANCE.md`.

@@ -83,36 +83,36 @@ export const diagramNodes: DiagramEntry[] = [
     landscape: { x: 0.12, y: 0.74 },
   },
   {
-    id: 'percona',
+    id: 'percona-case-1',
     kind: 'project',
     shape: 'triangle',
     tagline:
-      "The systems case. Giving a product its own interface, so it stops looking like someone else's",
+      "The systems case. Giving a product its own interface, so it stops looking like someone else’s.",
     lines: [
-      "I designed PMM's native UI, so it could ship its own features and own its UX instead of borrowing it from upstream, and built Peak UI, the design system Percona's teams build on.",
+      "I designed PMM’s native interface and built Peak UI, the design system under it. Grafana upgrades dropped from weeks of work to days, and 2 more teams now ship apps on it.",
     ],
     portrait: { x: 0.44, y: 0.5 },
     landscape: { x: 0.47, y: 0.4 },
   },
   {
-    id: 'design-at-scale',
+    id: 'percona-case-2',
     kind: 'project',
     shape: 'triangle',
-    tagline: 'The scale piece. Data-driven systems generating massive global business.',
+    tagline: 'The fluency case. Redesigning the screen DBAs open when the database is slow.',
     lines: [
-      'Designed the PageBuilder system that generated 100K+ destination pages and 4× organic traffic, and the Tagus design system unifying experiences across 5 global markets.',
+      'I reframed Query Analytics around what DBAs can act on and designed its real-time version with enterprise customers. It shipped, leaving customers asking for more.',
     ],
     portrait: { x: 0.56, y: 0.71 },
     landscape: { x: 0.68, y: 0.58 },
   },
   {
-    id: 'visionary',
+    id: 'tui-case',
     kind: 'project',
     shape: 'triangle',
     tagline:
-      'The zero-to-one piece. Visionary product definition, rapid prototyping, and creative execution.',
+      'The scale case. One template, and the rules behind 100,000 pages.',
     lines: [
-      'Designed and coded 4 interconnected products from scratch, showcased at CES, and secured European Community funding through pure product validation.',
+      'At TUI’s Lisbon hub, I designed PageBuilder: a destination page template and the rules for a generator that built 100K+ pages, growing organic traffic more than 4× where it launched. Plus Tagus, the design system that kept them coherent across 5 markets.',
     ],
     portrait: { x: 0.5, y: 0.92 },
     landscape: { x: 0.88, y: 0.46 },
@@ -152,7 +152,7 @@ export const diagramChain = [
   'contact',
   'about',
   'pedro',
-  'percona',
-  'design-at-scale',
-  'visionary',
+  'percona-case-1',
+  'percona-case-2',
+  'tui-case',
 ];

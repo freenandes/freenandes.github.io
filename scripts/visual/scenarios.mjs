@@ -52,10 +52,10 @@ export const scenarios = [
   { name: 'about-print', path: '/about/', media: 'print', fullPage: true },
   { name: 'about-scrolled', path: '/about/', act: scrollTo(1200) },
   { name: 'about-nav-pinned', path: '/about/', act: scrollTo(1200, 900) },
-  { name: 'project', path: '/projects/percona/' },
-  { name: 'project-scrolled', path: '/projects/percona/', act: scrollTo(600) },
+  { name: 'project', path: '/projects/percona-case-1/' },
+  { name: 'project-scrolled', path: '/projects/percona-case-1/', act: scrollTo(600) },
   // The foot of the page: the footer, opened by the mini-map.
-  { name: 'project-end', path: '/projects/percona/', act: scrollTo(100000) },
+  { name: 'project-end', path: '/projects/percona-case-1/', act: scrollTo(100000) },
   { name: 'locked', path: '/projects/halcyon/' },
   { name: 'locked-refused', path: '/projects/halcyon/', act: unlock('wrong-passphrase') },
   { name: 'unlocked', path: '/projects/halcyon/', act: unlock(LOCK_PASSWORD) },

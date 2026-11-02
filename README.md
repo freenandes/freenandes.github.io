@@ -124,7 +124,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 4. Run `npm run encrypt`, then commit `public/locked/<slug>.json`.
 5. Send the passphrase to whoever should read it.
 
-The demo project `halcyon` uses the passphrase `soft-club`. If a checkout has no plaintext files, encrypting leaves the committed files alone. How the encryption works, and what it doesn't protect against: `src/protected/README.md`.
+If a checkout has no plaintext files, encrypting leaves the committed files alone. How the encryption works, and what it doesn't protect against: `src/protected/README.md`.
 
 ### Update the About page / CV
 
@@ -175,7 +175,6 @@ The site is audited against [The Website Specification](https://specification.we
 ## To do
 
 - [ ] Create the content based on [the list](notes/content-strategy.md) (local-only, `notes/` is git-ignored)
-- [ ] Replace or draft the placeholder projects `atlas-design-system`, `field-notes` and `helio-banking`. They're live pages with fictional content.
 - [ ] Add `public/og.png` (1200×630). `og:image` already points to it, but the file is missing.
 - [ ] Add raster app icons (`favicon.ico`, `apple-touch-icon.png`, maskable PWA icon).
 - [ ] Self-host the fonts (currently Google Fonts).

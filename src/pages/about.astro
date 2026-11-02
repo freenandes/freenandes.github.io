@@ -6,6 +6,7 @@ import { getEntry } from 'astro:content';
 import { marked } from 'marked';
 import Base from '../layouts/Base.astro';
 import PageNav from '../components/PageNav.astro';
+import MiniMap from '../components/MiniMap.astro';
 import { site } from '../site.config';
 import { withBase } from '../lib/base';
 
@@ -81,7 +82,7 @@ const jsonLd = [
   <article data-print-title={`${name} — CV`}>
     <PageNav>
       <li><a href={withBase('/')}>Back to map</a></li>
-      <button slot="at-rest" class="link" type="button" data-print>Download PDF</button>
+      <li><button class="link" type="button" data-print>Download PDF</button></li>
     </PageNav>
 
     <header data-reveal>
@@ -182,11 +183,9 @@ const jsonLd = [
         ))
       }
     </section>
-
-    <div class="download no-print" data-reveal>
-      <button class="link" type="button" data-print>Download PDF</button>
-    </div>
   </article>
+
+  <MiniMap slot="footer" />
 </Base>
 
 <style>
@@ -196,6 +195,7 @@ const jsonLd = [
     --cv-section-gap: calc(var(--space-lg) + var(--space-md)); /* above a section title */
     --cv-title-gap: calc(var(--space-md) + var(--space-sm)); /* below the title's rule */
     --cv-entry-gap: calc(var(--space-md) + var(--space-sm)); /* between entries */
+    --cv-map-gap: var(--space-xl); /* extra room between the last section and the mini-map */
   }
 
   /* Name block, then the links below it, however short the headline is. */
@@ -248,6 +248,14 @@ const jsonLd = [
 
   section {
     margin-block-start: var(--cv-section-gap);
+  }
+
+  /* On screen only: the mini-map isn't printed, and a trailing margin could
+     spill onto a blank page. */
+  @media screen {
+    section:last-of-type {
+      margin-block-end: var(--cv-map-gap);
+    }
   }
 
   h2 {
@@ -334,10 +342,6 @@ const jsonLd = [
     .entry h2 {
       margin-block-end: calc(var(--cv-title-gap) - var(--space-sm));
     }
-  }
-
-  .download {
-    margin-block-start: var(--space-xl);
   }
 
   /* This page is the CV, so it has to fall onto A4 cleanly: no column limit, a

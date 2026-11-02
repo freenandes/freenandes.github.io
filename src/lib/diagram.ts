@@ -1,7 +1,8 @@
 /** The map's markers as the pages draw them: each case study's label, tags and
     link filled in from its project, and the set checked against what's
     published. The home map (`src/pages/index.astro`) and the mini-map that ends
-    every case study (`src/components/MiniMap.astro`) both render from here. */
+    About and every case study (`src/components/MiniMap.astro`) both render from
+    here. */
 
 import {
   diagramChain,

@@ -3,8 +3,9 @@ import { site } from './site.config';
 /**
  * The home page: every marker on the map and the order they connect in.
  * Rendered by `src/pages/index.astro`, laid out by `src/scripts/nav-diagram.ts`.
- * The mini-map at the foot of every case study (`src/components/MiniMap.astro`)
- * draws the same markers and chain, pulled straight.
+ * The mini-map at the foot of About and every case study
+ * (`src/components/MiniMap.astro`) draws the pages among them in the same order,
+ * pulled straight.
  */
 
 export type NodeKind = 'identity' | 'about' | 'contact' | 'project' | 'floating';

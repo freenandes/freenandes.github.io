@@ -1,7 +1,7 @@
 ---
-/** The mini-map that opens the footer of every case study: the home map's
-    chain pulled into one straight, static line, which also stands in for the
-    footer's rule. Each marker links to its page, and the page it's on is
+/** The mini-map that opens the footer of About and every case study: the home
+    map's pages pulled into one straight, static line, which also stands in for
+    the footer's rule. Each marker links to its page, and the page it's on is
     marked. The markers and their order are the map's own
     (`src/diagram.config.ts`, through `src/lib/diagram.ts`). */
 
@@ -9,14 +9,10 @@ import { diagramChain, type DiagramNode } from '../diagram.config';
 import { bare, withBase } from '../lib/base';
 import { getDiagramNodes, polygon } from '../lib/diagram';
 
-/** The name at the map's centre leads to the map, so here it's called that. */
-const homeLabel = 'Home';
-
-/** The page a marker stands for. The name at the centre stands for the map
-    itself. The contact card has no page (the footer carries its links), and
-    the floating rings are decoration. */
+/** The page a marker stands for. The name at the centre is the map itself, which
+    the pinned page nav always links to. The contact card has no page (the
+    footer carries its links), and the floating rings are decoration. */
 function pageOf(node: DiagramNode): string | undefined {
-  if (node.kind === 'identity') return '/';
   if (node.kind !== 'about' && node.kind !== 'project') return undefined;
   return node.link && !node.link.external ? node.link.href : undefined;
 }
@@ -35,7 +31,7 @@ const stops = (await getDiagramNodes())
   })
   .sort((a, b) => rank(a.node.id) - rank(b.node.id))
   .map(({ node, href }) => ({
-    label: node.kind === 'identity' ? homeLabel : node.label,
+    label: node.label,
     shape: node.shape,
     href,
     current: bare(href) === here,
@@ -46,7 +42,7 @@ const stops = (await getDiagramNodes())
     footer keeps its rule. */}
 {
   stops.length > 1 && (
-    <nav aria-label="Site map">
+    <nav aria-label="Pages">
       <ol role="list" style={`--stops: ${stops.length}`}>
         {stops.map(({ label, shape, href, current }) => (
           <li>
@@ -75,6 +71,7 @@ const stops = (await getDiagramNodes())
     --link-width: 1px; /* connector stroke, as thick as a divider */
     --link-color: var(--line-strong); /* and the same colour */
     --stop-pad: 0.75rem; /* air around a stop, inside its hit area */
+    --stack-pad: 1.5rem; /* air above and below a stop in the column */
     --label-gap: var(--space-md); /* least room between two labels in the row */
 
     container-type: inline-size;
@@ -124,7 +121,7 @@ const stops = (await getDiagramNodes())
     align-items: center;
     gap: var(--space-sm);
     min-width: 0;
-    padding: var(--stop-pad) var(--stop-pad) var(--stop-pad) 0;
+    padding: var(--stack-pad) var(--stop-pad) var(--stack-pad) 0;
     font: inherit;
     letter-spacing: inherit;
     text-transform: none;
@@ -199,6 +196,7 @@ const stops = (await getDiagramNodes())
     a {
       flex-direction: column;
       gap: var(--space-xs);
+      padding-block: var(--stop-pad);
       padding-inline: 0;
       text-align: center;
     }

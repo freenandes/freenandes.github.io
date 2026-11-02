@@ -2,7 +2,7 @@
 
 Pedro MC Fernandes's portfolio site. The home page is an interactive map that links to an About/CV page (which prints to PDF) and to a set of case studies, some of them unlocked with a passphrase.
 
-- Live (in development): https://www.pmcf.xyz/portfolio/. The old site stays at https://www.pmcf.xyz until launch.
+- Live: https://www.pmcf.xyz/. Links to the old https://www.pmcf.xyz/portfolio/ addresses forward to the same pages at the root (see [Old `/portfolio/` links](#old-portfolio-links)).
 - Repo: https://github.com/freenandes/portfolio (branch `main`)
 - Every push to `main` deploys to the live site.
 
@@ -10,7 +10,7 @@ Pedro MC Fernandes's portfolio site. The home page is an interactive map that li
 
 | Command | What it does |
 | --- | --- |
-| `npm run dev` | Local site at http://localhost:4321/portfolio/ with live reload |
+| `npm run dev` | Local site at http://localhost:4321/ with live reload |
 | `npm run build` | Encrypts locked projects, then builds to `./dist` |
 | `npm run preview` | Serves the last build from `./dist` |
 | `npm run check` | Type and template errors (`astro check`) |
@@ -53,7 +53,7 @@ No secrets are needed: the locked project's ciphertext is committed, and the vis
 ## How it's made
 
 - [Astro](https://astro.build) 7 builds a fully static site. Pages are `.astro` files, and case studies are MDX. There's no React or Tailwind, just Astro components, TypeScript and plain CSS.
-- The site lives under `/portfolio/` on GitHub Pages, so internal links go through `withBase()` (`src/lib/base.ts`). The domain `pmcf.xyz` belongs to the old site's repo (`freenandes.github.io`), which is why this repo shows up at `www.pmcf.xyz/portfolio/`.
+- GitHub Pages serves the site at the root of `www.pmcf.xyz`; the custom domain is set in this repo's Settings → Pages. Internal links go through `withBase()` (`src/lib/base.ts`), so the base path is set in one place. The site used to sit under `/portfolio/`, and its old addresses still forward to the new ones.
 - The home map takes its markers and card text from `src/diagram.config.ts`. A physics simulation in `src/scripts/nav-diagram.ts` positions the markers, so the layout varies a little on every load.
 - The footer of About and every case study opens with a mini-map instead of a rule: the map's pages in the same order, pulled into one straight line, with no physics and no script. In a row, each label takes the room it needs and the gaps between labels are equal, from one edge of the text to the other. Each marker links to its page, and the page you're on is filled in. The name at the centre isn't on it, because the page nav stays pinned to the top and always links back to the map. Contact isn't either, because its links are in the footer just below.
 - The About page, which doubles as the printable CV, renders `src/content/cv.md`, a list of fields in the same order as the page: location and languages (one small line under your name), headline, summary (Markdown), jobs, earlier work, education. You edit it by hand; the build rejects missing or misspelled fields.
@@ -70,7 +70,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | Colours, type scale, spacing, motion | `src/styles/tokens.css` |
 | How plain elements look everywhere (links, buttons, headings, lists, Markdown), shared print | `src/styles/global.css` |
 | Name, role, social links, OG image, theme colour, extra contact lines printed only on the PDF CV (`printContacts`) | `src/site.config.ts` |
-| Site URL and base path (`/portfolio` until launch) | `astro.config.mjs` |
+| Site URL, base path, redirects from the old `/portfolio/` addresses | `astro.config.mjs` |
 | `<head>`, metadata, CSP, JSON-LD, page shell | `src/layouts/Base.astro` |
 | Home page: markup and look | `src/pages/index.astro` |
 | Home page: texture, marker size, connector weight, card width, ring speed, size of the drawings on the texture | the knobs at the top of the `<style>` in `src/pages/index.astro` |
@@ -100,7 +100,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 
 ### Add a case study
 
-1. Create `src/content/projects/<slug>.mdx`. The file name becomes the URL, `/portfolio/projects/<slug>/`.
+1. Create `src/content/projects/<slug>.mdx`. The file name becomes the URL, `/projects/<slug>/`.
 
    ```mdx
    ---
@@ -141,7 +141,7 @@ If a checkout has no plaintext files, encrypting leaves the committed files alon
 ### Update the About page / CV
 
 1. Edit `src/content/cv.md`. A job is a block of `role`, `org`, `period`, an optional one-line `summary` and a list of `points`; newest goes first. `earlierWork` entries take the same fields minus `points`, for older jobs in one line each. The summary sits under `summary: |`, with every line indented by two spaces. It's Markdown, so blank lines make paragraphs and `- ` lines make a bulleted list. Outside the summary, if a value contains `: ` (like `software: observability`), wrap it in double quotes, or the page fails to load.
-2. Check it with `npm run dev` at `/portfolio/about/`. Use the page's Download PDF button to check the printed CV.
+2. Check it with `npm run dev` at `/about/`. Use the page's Download PDF button to check the printed CV.
 3. Commit and push.
 
 The portfolio is the original: change the wording here, then paste it into LinkedIn. `skills` isn't shown on the page; search engines read it. If the build fails, the error names the field in `cv.md` it didn't accept.
@@ -169,16 +169,17 @@ It builds both versions and screenshots the same pages and states at desktop and
 - A value you'll want to tune gets a name where it's used: a custom property at the top of the page's `<style>` (like `--cv-section-gap`), or an entry in `KNOBS` for the map's script. Add new ones there rather than as a bare number further down.
 - To stagger an entrance, use `data-reveal style="--reveal-step: 2"`. The step number is its place in the queue.
 
-### Launching at www.pmcf.xyz
+### Old `/portfolio/` links
 
-Not yet. While the old site lives at the root, keep this one under `/portfolio/`. When you're ready:
+The site used to be served from `www.pmcf.xyz/portfolio/`, while the old site's repo (`freenandes.github.io`) held the domain, and links to those addresses were shared. GitHub Pages can't send server redirects, so `redirects` in `astro.config.mjs` builds a small page at each old address that forwards to the new one:
 
-1. In the old site's repo (`freenandes.github.io`), go to Settings → Pages and remove the custom domain.
-2. In this repo, change the `BASE_PATH` default in `astro.config.mjs` to `'/'`. It's the only place it's set; CI and `npm run visual` read it from there.
-3. In this repo, go to Settings → Pages, set the custom domain to `www.pmcf.xyz` and tick "Enforce HTTPS".
-4. Push, then check https://www.pmcf.xyz/ and update the "Live" line and the base-path notes in this README and `AGENTS.md`.
+| Old | New |
+| --- | --- |
+| `/portfolio/` | `/` |
+| `/portfolio/about/` | `/about/` |
+| `/portfolio/projects/<slug>/` | `/projects/<slug>/` |
 
-`withBase()` makes every internal link follow the new base, so no page code changes. Once at the root, `robots.txt` and `/llms.txt` start being read by crawlers.
+Each one is an instant meta refresh plus a canonical link, with no script, so the CSP is unaffected. Browsers follow it at once and search engines treat it as a permanent move, though it isn't a true 301. Anything after `?` or `#` in the old link is dropped. The case-study line covers every project, new ones included. If you rename a page or a project's file, add its old address to the list too.
 
 ## Website Specification
 

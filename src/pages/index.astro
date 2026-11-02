@@ -4,6 +4,10 @@
     come from its project (`src/lib/diagram.ts`); the physics that places them
     is in `src/scripts/nav-diagram.ts`. */
 
+import { basename } from 'node:path';
+import type { ImageMetadata } from 'astro';
+import type { SvgComponent } from 'astro/types';
+import Ruler from '../assets/ruler.svg';
 import Base from '../layouts/Base.astro';
 import type { DiagramNode, NodeKind } from '../diagram.config';
 import { withBase } from '../lib/base';
@@ -11,6 +15,16 @@ import { getDiagramNodes, polygon } from '../lib/diagram';
 import { site } from '../site.config';
 
 const nodes = await getDiagramNodes();
+
+// Every drawing in this folder lands on the map's texture, with nothing else to
+// wire up. Each is drawn in `currentColor`, so `.decor` below colours them all,
+// and each has its own width knob below, named after its file.
+const decorations = Object.entries(
+  import.meta.glob<SvgComponent & ImageMetadata>('../assets/decor/*.svg', {
+    eager: true,
+    import: 'default',
+  }),
+).map(([path, Drawing]) => ({ Drawing, name: basename(path, '.svg') }));
 
 /** Circle just big enough to carry `label` once around, with a gap. */
 function ring(label: string) {
@@ -48,6 +62,17 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     aria-label={`Site map — ${site.name}`}
     style={`--topo-pattern: url('${withBase('/topo-low.svg')}')`}
   >
+    {
+      decorations.map(({ Drawing, name }) => (
+        <Drawing
+          class="decor"
+          style={`--decor-frame: ${Drawing.width}; --decor-width: var(--decor-${name})`}
+          aria-hidden="true"
+          focusable="false"
+        />
+      ))
+    }
+    <Ruler class="ruler" preserveAspectRatio="xMaxYMax meet" aria-hidden="true" focusable="false" />
     <svg class="links" aria-hidden="true" focusable="false"></svg>
     {
       runs.map((run) => (
@@ -209,6 +234,16 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     --card-width: 20rem; /* widest a card gets (never more than 90vw) */
     --ring-turn: 30s; /* one full turn of a floating ring */
 
+    /* Each drawing's width, named after its file in src/assets/decor/. */
+    --decor-flag: 3.5rem;
+    --decor-compass: 13rem;
+    --decor-kraken: 11rem;
+
+    /* The size of a drawing with no width above, per unit of its viewBox. */
+    --decor-scale: calc(4rem / 400);
+
+    --ruler-height: 2rem;
+
     position: relative;
     width: 100%;
     height: 100svh;
@@ -247,6 +282,49 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     .diagram::before {
       display: none;
     }
+  }
+
+  /* The drawings from src/assets/decor/ share the texture's layer and follow it
+     in the tree, so they sit on it and under everything else. The script gives
+     each a random spot clear of the map once the map has come to rest, and it
+     stays there. One with no room stays hidden. */
+
+  .decor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: var(--decor-width, calc(var(--decor-frame) * var(--decor-scale)));
+    color: var(--ink-decor);
+    pointer-events: none;
+    translate: var(--decor-x, 0) var(--decor-y, 0);
+    opacity: 0;
+  }
+
+  .decor[data-placed] {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .decor[data-placed] {
+      animation: node-in var(--dur) var(--ease);
+    }
+  }
+
+  /* The ruler is on the same layer, but it's the map's scale, so it keeps to its
+     corner and the script only keeps the drawings off it. A narrow screen shrinks
+     it to fit, against the same corner. */
+
+  .ruler {
+    position: absolute;
+    right: var(--space-md);
+    bottom: var(--space-md);
+    z-index: -1;
+    width: auto;
+    height: var(--ruler-height);
+    max-width: calc(100% - 2 * var(--space-md));
+    color: var(--ink-decor);
+    pointer-events: none;
   }
 
   .links {

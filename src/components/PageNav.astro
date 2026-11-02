@@ -1,12 +1,18 @@
 ---
 /** Page navigation. Sits at the top of the article in normal flow, then stays
     pinned to the viewport for the rest of the page, so the way back to the map
-    is always in reach. Children are the `<li>` items of the row. */
+    is always in reach. Children are the `<li>` items of the row; the flag at
+    its far end is a second link to the map. */
+import Flag from '../assets/decor/flag.svg';
+import { withBase } from '../lib/base';
 ---
 
 <div class="sentinel"></div>
 <ul class="page-nav" role="list">
   <slot />
+  <li>
+    <a href={withBase('/')} aria-label="Back to map"><Flag aria-hidden="true" /></a>
+  </li>
 </ul>
 
 <style>
@@ -19,10 +25,21 @@
   }
 
   .page-nav {
+    /* Knobs: the flag's square frame, and the stroke that gives the drawing
+       more weight, in the drawing's own units (306 to the frame), so it keeps
+       its proportion at any size. */
+    --flag-size: 1.75rem;
+    --flag-weight: 4;
+
+    /* Drops the flag to the middle of the links' visible height, from capitals
+       to underline, at any size. That middle sits 0.22rem below the row's, and
+       the drawing's own middle sits 3% of the frame below the frame's. */
+    --flag-shift: calc(0.22rem - 0.03 * var(--flag-size));
+
     /* Breathing room that exists only while pinned: `top` is a sticky offset,
        so it stays out of the layout when the bar sits in the flow. */
     position: sticky;
-    top: var(--space-sm);
+    top: var(--space-md);
     z-index: var(--z-sticky);
     margin-block-end: var(--space-lg);
   }
@@ -48,6 +65,27 @@
 
   .page-nav.is-pinned::before {
     opacity: 1;
+  }
+
+  /* The flag, at the far end of the row. Only this component's own `<li>`
+     matches: the slotted ones are in their pages' scope. The negative margins
+     take it out of the row's height, so the bar stays as tall as its text. Its
+     colour is the link's, hover included, through `currentColor`. */
+
+  li {
+    display: flex;
+    align-self: center;
+    margin-block: calc(var(--flag-size) / -2);
+    margin-inline-start: auto;
+    translate: 0 var(--flag-shift);
+  }
+
+  svg {
+    width: var(--flag-size);
+    height: var(--flag-size);
+    stroke: currentcolor;
+    stroke-width: var(--flag-weight);
+    stroke-linejoin: round;
   }
 
   /* Whatever the keyboard moves to lands clear of the pinned bar. */

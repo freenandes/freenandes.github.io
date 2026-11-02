@@ -1,6 +1,7 @@
 /* =============================================================================
    The home page's map: a small force layout that scatters the markers, keeps
    them from colliding, and routes the connectors between them without crossings.
+   It also finds the map's decorations free spots, outside the simulation.
 
    The markers, their copy and the chain they connect in are authored in
    `src/diagram.config.ts` — the same file the page renders from, so the layout
@@ -45,6 +46,10 @@ const KNOBS = {
    *  one along the chain. A connector starts `lineLag` after the later of its
    *  two markers; the floating rings land last, `ringStep` apart. */
   entrance: { first: 40, step: 50, lineLag: 40, ringStep: 90 },
+  /** The drawings on the texture: space each keeps from markers, rings,
+   *  connectors and the other drawings, and from the canvas edge, and how many
+   *  random spots it tries before staying hidden. Their size is in index.astro. */
+  decor: { gap: 8, edge: 8, tries: 400 },
   /** Pointer travel before a press on a marker becomes a drag. */
   dragThreshold: 6,
   /** Quiet time after a resize before the full re-layout runs. */
@@ -94,12 +99,23 @@ type EdgeShape = {
   points: { t: number; off: number }[];
 };
 
+/** A box by its centre and half-size, in pixels. */
+type Box = { x: number; y: number; halfX: number; halfY: number };
+
+/** A drawing on the texture, and where its centre sits once it has landed. */
+type Decor = { el: SVGSVGElement; spot: { x: number; y: number } | null };
+
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 export function initDiagram(root: HTMLElement) {
   const links = root.querySelector<SVGSVGElement>('.links');
   if (!links) return;
   const svgEl: SVGSVGElement = links;
+  const decor: Decor[] = [...root.querySelectorAll<SVGSVGElement>('.decor')].map((el) => ({
+    el,
+    spot: null,
+  }));
+  const ruler = root.querySelector<SVGSVGElement>('.ruler');
 
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -155,6 +171,7 @@ export function initDiagram(root: HTMLElement) {
 
   let W = 0;
   let H = 0;
+  let decorDue = false;
 
   function safeWidth(rect: DOMRect) {
     return rect.width > 1 ? rect.width : window.innerWidth;
@@ -175,6 +192,14 @@ export function initDiagram(root: HTMLElement) {
     return Math.max(0, Math.min(1, (1 - aspect) / 0.5));
   }
 
+  /** How far up from the canvas's bottom edge the ruler's drawing reaches. */
+  function rulerReach() {
+    if (!ruler) return 0;
+    const ink = measureDecor(ruler);
+    const top = ruler.getBoundingClientRect().top + ink.y - ink.halfY;
+    return root.getBoundingClientRect().bottom - top;
+  }
+
   function inset() {
     const narrow = narrowness();
     // Labels are centered under the dot and extend to each side, so the
@@ -182,7 +207,10 @@ export function initDiagram(root: HTMLElement) {
     const { x, y } = KNOBS.inset;
     const mx = Math.min((x.base + x.narrow * narrow) * W, x.max);
     const my = Math.max(y.min, Math.min((y.base + y.narrow * narrow) * H, y.max));
-    return { mx, my, iw: Math.max(1, W - 2 * mx), ih: Math.max(1, H - 2 * my) };
+    // The bottom margin holds even the tallest marker's box clear of the ruler.
+    const tallest = Math.max(...nodes.filter((n) => !n.floating).map((n) => nodeHalf(n).y));
+    const bottom = Math.max(my, rulerReach() + tallest + KNOBS.decor.gap);
+    return { mx, my, iw: Math.max(1, W - 2 * mx), ih: Math.max(1, H - my - bottom) };
   }
 
   /** The spot this marker was authored to prefer, for this orientation. */
@@ -494,7 +522,9 @@ export function initDiagram(root: HTMLElement) {
   function syncAnchorsFromSim() {
     const { mx, my, iw, ih } = inset();
     for (const n of nodes) {
-      if (n.dragging) continue;
+      // A ring at rest can be held in balance away from its anchor, which has
+      // to stay put for the balance to hold.
+      if (n.dragging || n.floating) continue;
       n.ax = n.x;
       n.ay = n.y;
       n.frac = {
@@ -586,6 +616,7 @@ export function initDiagram(root: HTMLElement) {
     const { mx, my, iw, ih } = inset();
     if (iw < 2 || ih < 2) return;
     const polys = edges.map(edgePolyline);
+    const floor = H - rulerReach() - KNOBS.decor.gap;
     for (let it = 0; it < iterations; it++) {
       let moved = 0;
       for (const n of floats) {
@@ -616,7 +647,10 @@ export function initDiagram(root: HTMLElement) {
         }
         if (!hit) continue;
         n.ax = Math.max(mx + 6, Math.min(mx + iw - 6, n.ax + pushX * 0.5));
-        n.ay = Math.max(my + 6, Math.min(my + ih - 6, n.ay + pushY * 0.5));
+        n.ay = Math.max(
+          my + 6,
+          Math.min(my + ih - 6, floor - nodeHalf(n).y, n.ay + pushY * 0.5),
+        );
         moved = Math.max(moved, Math.hypot(pushX, pushY));
       }
       if (moved < 0.5) break;
@@ -882,6 +916,99 @@ export function initDiagram(root: HTMLElement) {
     }
   }
 
+  /** Where a decoration's drawing sits inside its frame. The drawing is what has
+   *  to stay clear, not the empty margins around it. */
+  function measureDecor(el: SVGSVGElement): Box {
+    const frame = el.getBoundingClientRect();
+    const parts = [...el.children]
+      .map((part) => part.getBoundingClientRect())
+      .filter((r) => r.width > 0 || r.height > 0);
+    const left = Math.min(...parts.map((r) => r.left));
+    const right = Math.max(...parts.map((r) => r.right));
+    const top = Math.min(...parts.map((r) => r.top));
+    const bottom = Math.max(...parts.map((r) => r.bottom));
+    return {
+      x: (left + right) / 2 - frame.left,
+      y: (top + bottom) / 2 - frame.top,
+      halfX: (right - left) / 2,
+      halfY: (bottom - top) / 2,
+    };
+  }
+
+  /**
+   * Runs on a map at rest, after a new layout. The decorations belong to the
+   * texture, so the simulation doesn't know about them and one stays exactly
+   * where it is for as long as the map leaves it clear. Only one the new layout
+   * has run into moves, and one with no room left stays hidden.
+   */
+  function settleDecor() {
+    decorDue = false;
+    if (!decor.length) return;
+    const { gap, edge, tries } = KNOBS.decor;
+    const blocks: Box[] = nodes.map((n) => {
+      const half = nodeHalf(n);
+      return { x: n.x, y: n.y, halfX: half.x, halfY: half.y };
+    });
+    if (ruler) {
+      const canvas = root.getBoundingClientRect();
+      const frame = ruler.getBoundingClientRect();
+      const ink = measureDecor(ruler);
+      blocks.push({
+        ...ink,
+        x: frame.left - canvas.left + ink.x,
+        y: frame.top - canvas.top + ink.y,
+      });
+    }
+    // Closer together than the gap, so no connector slips between two of them.
+    const step = gap / 2;
+    const points = edges.flatMap(({ line }) =>
+      Array.from({ length: Math.ceil(line.getTotalLength() / step) + 1 }, (_, i) =>
+        line.getPointAtLength(i * step),
+      ),
+    );
+    const fits = (x: number, y: number, ink: Box) =>
+      x - ink.halfX >= edge &&
+      x + ink.halfX <= W - edge &&
+      y - ink.halfY >= edge &&
+      y + ink.halfY <= H - edge &&
+      blocks.every(
+        (b) =>
+          Math.abs(x - b.x) >= ink.halfX + b.halfX + gap ||
+          Math.abs(y - b.y) >= ink.halfY + b.halfY + gap,
+      ) &&
+      points.every(
+        (p) => Math.abs(x - p.x) >= ink.halfX + gap || Math.abs(y - p.y) >= ink.halfY + gap,
+      );
+
+    // The ones that can stay claim their spots first, for the rest to work
+    // around, and of the rest the biggest go first, while there's most room.
+    const moving = decor
+      .map((d) => ({ d, ink: measureDecor(d.el) }))
+      .filter(({ d, ink }) => {
+        if (!d.spot || !fits(d.spot.x, d.spot.y, ink)) return true;
+        blocks.push({ ...ink, ...d.spot });
+        return false;
+      })
+      .sort((a, b) => b.ink.halfX * b.ink.halfY - a.ink.halfX * a.ink.halfY);
+
+    for (const { d, ink } of moving) {
+      d.spot = null;
+      d.el.removeAttribute('data-placed');
+      for (let i = 0; i < tries && !d.spot; i++) {
+        const x = Math.random() * W;
+        const y = Math.random() * H;
+        if (fits(x, y, ink)) d.spot = { x, y };
+      }
+      if (!d.spot) continue;
+      blocks.push({ ...ink, ...d.spot });
+      d.el.style.setProperty('--decor-x', `${d.spot.x - ink.x}px`);
+      d.el.style.setProperty('--decor-y', `${d.spot.y - ink.y}px`);
+      // Reading layout ends the last fade, so this one starts from nothing.
+      void d.el.getBoundingClientRect();
+      d.el.setAttribute('data-placed', '');
+    }
+  }
+
   function relayout() {
     computeAnchors();
     relaxAnchors();
@@ -890,6 +1017,7 @@ export function initDiagram(root: HTMLElement) {
     relaxAnchors();
     computeAnchors();
     routeEdges();
+    decorDue = true;
   }
 
   function resetLayout() {
@@ -945,7 +1073,9 @@ export function initDiagram(root: HTMLElement) {
     }
   }
 
+  /** Spreads the anchors of markers left too close; returns the biggest step. */
   function resolveOverlaps(iterations = 50) {
+    let biggest = 0;
     for (let it = 0; it < iterations; it++) {
       let moved = 0;
       for (let i = 0; i < nodes.length; i++) {
@@ -955,17 +1085,19 @@ export function initDiagram(root: HTMLElement) {
           const a = nodes[i];
           const b = nodes[j];
           if (a.dragging || b.dragging) continue;
-          const s = separationPush(a, b, a.x, a.y, b.x, b.y);
+          const s = separationPush(a, b, a.ax, a.ay, b.ax, b.ay);
           if (!s.hit) continue;
           const hx = s.x * 0.5;
           const hy = s.y * 0.5;
-          a.x -= hx; a.y -= hy;
-          b.x += hx; b.y += hy;
+          a.ax -= hx; a.ay -= hy;
+          b.ax += hx; b.ay += hy;
           moved = Math.max(moved, Math.hypot(hx, hy));
         }
       }
+      biggest = Math.max(biggest, moved);
       if (moved < 0.3) break;
     }
+    return biggest;
   }
 
   let raf = 0;
@@ -1033,33 +1165,25 @@ export function initDiagram(root: HTMLElement) {
         anyDragging = true;
         continue;
       }
+      // Motion is how far it really went, not the forces on it: a ring held in
+      // balance between its anchor and a marker's push feels both for good
+      // without going anywhere.
+      const fromX = n.x;
+      const fromY = n.y;
       if (n.calm) {
-        const mx = n.ax - n.x;
-        const my = n.ay - n.y;
-        n.x += mx * SIM.calmPull;
-        n.y += my * SIM.calmPull;
+        n.x += (n.ax - n.x) * SIM.calmPull;
+        n.y += (n.ay - n.y) * SIM.calmPull;
         n.vx = 0;
         n.vy = 0;
-        maxMotion = Math.max(maxMotion, Math.abs(mx) + Math.abs(my));
-        continue;
+      } else {
+        n.x += (n.ax - n.x) * SIM.anchorPull;
+        n.y += (n.ay - n.y) * SIM.anchorPull;
+        n.vx = (n.vx + n.fx) * SIM.drag;
+        n.vy = (n.vy + n.fy) * SIM.drag;
+        n.x += n.vx;
+        n.y += n.vy;
       }
-      const tx = n.ax;
-      const ty = n.ay;
-      const homeX = tx - n.x;
-      const homeY = ty - n.y;
-      n.x += homeX * SIM.anchorPull;
-      n.y += homeY * SIM.anchorPull;
-      n.vx = (n.vx + n.fx) * SIM.drag;
-      n.vy = (n.vy + n.fy) * SIM.drag;
-      n.x += n.vx;
-      n.y += n.vy;
-      maxMotion = Math.max(
-        maxMotion,
-        Math.abs(n.vx) +
-          Math.abs(n.vy) +
-          Math.abs(homeX) * SIM.anchorPull +
-          Math.abs(homeY) * SIM.anchorPull
-      );
+      maxMotion = Math.max(maxMotion, Math.abs(n.x - fromX) + Math.abs(n.y - fromY));
     }
     render();
 
@@ -1070,13 +1194,24 @@ export function initDiagram(root: HTMLElement) {
     }
     settledFrames = maxMotion < SIM.settleMotion ? settledFrames + 1 : 0;
     if (settledFrames >= SIM.settleFrames) {
-      resolveOverlaps();
       syncAnchorsFromSim();
+      const pushed = resolveOverlaps();
+      recomputeRests();
+      // Markers left too close glide to their new anchors, rather than jump.
+      if (pushed > 1) {
+        settledFrames = 0;
+        raf = requestAnimationFrame(frame);
+        return;
+      }
       for (const n of nodes) {
+        // A ring's velocity is half of the balance that holds it (see
+        // syncAnchorsFromSim); zeroing it would make it dip on the next wake.
+        if (n.floating) continue;
         n.vx = 0;
         n.vy = 0;
       }
       render();
+      if (decorDue) settleDecor();
       running = false;
       raf = 0;
       return;
@@ -1337,6 +1472,7 @@ export function initDiagram(root: HTMLElement) {
       n.y = n.ay;
     }
     render();
+    settleDecor();
     return;
   }
 

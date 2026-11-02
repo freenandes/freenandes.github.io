@@ -97,6 +97,12 @@ p {
   text-wrap: pretty;
 }
 
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-strong);
+  margin-block-start: var(--step-2);
+}
+
 /* Small caps-and-mono print: dates, tags, the 404's kicker. */
 
 .meta {
@@ -285,6 +291,10 @@ main > section {
 .prose ul li::marker {
   font-size: var(--step--1);
   color: var(--ink-3);
+}
+
+.prose hr {
+  margin-block-start: var(--step-2);
 }
 
 /* --- Utilities ----------------------------------------------------------- */

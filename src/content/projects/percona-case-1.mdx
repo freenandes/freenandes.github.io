@@ -8,6 +8,28 @@ client: Percona
 tags: ['Design Systems', 'Information Architecture', 'Design Engineering']
 ---
 
+import navVideo from '../../assets/projects/percona-case-1/pmm-nav-v2.mp4';
+import navPoster from '../../assets/projects/percona-case-1/pmm-nav-v2.jpg';
+import reclaimVideo from '../../assets/projects/percona-case-1/reclaim-pmm.mp4';
+import reclaimPoster from '../../assets/projects/percona-case-1/reclaim-pmm.jpg';
+import updatesVideo from '../../assets/projects/percona-case-1/pmm-updates.mp4';
+import updatesPoster from '../../assets/projects/percona-case-1/pmm-updates.jpg';
+import navFlyout from '../../assets/projects/percona-case-1/pmm-nav-flyout.png';
+import navSearch from '../../assets/projects/percona-case-1/pmm-nav-search.png';
+import navHub from '../../assets/projects/percona-case-1/pmm-nav-hub.png';
+import peakIntro from '../../assets/projects/percona-case-1/peak-ui-intro.png';
+import peakEmptyState from '../../assets/projects/percona-case-1/peak-ui-empty-state.png';
+import peakFlyout from '../../assets/projects/percona-case-1/peak-ui-flyout.png';
+import beforeHome from '../../assets/projects/percona-case-1/pmm-before-home.png';
+import afterHome from '../../assets/projects/percona-case-1/pmm-after-home.png';
+import beforeSettings from '../../assets/projects/percona-case-1/pmm-before-settings.png';
+import afterSettings from '../../assets/projects/percona-case-1/pmm-after-settings.png';
+import navOptionGrafanaApp from '../../assets/projects/percona-case-1/nav-option-grafana-app.svg';
+import navOptionNativeFeatures from '../../assets/projects/percona-case-1/nav-option-native-features.svg';
+import treeTestResults from '../../assets/projects/percona-case-1/tree-test-results.svg';
+import treeTestHubPages from '../../assets/projects/percona-case-1/tree-test-hub-pages.svg';
+import Gallery from '../../components/Gallery.astro';
+
 ## In short
 
 ### Team
@@ -37,21 +59,93 @@ Grafana is excellent at managing dashboards, but PMM had grown into much more, a
 
 The decisive problems were maintenance: every Grafana upgrade, often a security fix, meant 2–3 weeks of rebuilding our changes, and PMM’s UX kept depending on decisions made upstream for Grafana’s users, not ours.
 
+<Gallery
+  density={2}
+  scale={0.13}
+  images={[
+    {
+      src: beforeHome,
+      alt: 'Before: the Home dashboard in PMM 3.5, inside Grafana’s interface. Grafana’s header and sidebar frame it, with Grafana’s own items (Home, Bookmarks, Starred, Dashboards, Drilldown) mixed in with PMM’s: Operating System, PostgreSQL, Query Analytics, Backup, Advisors, Alerting and PMM Configuration.',
+    },
+    {
+      src: afterHome,
+      alt: 'After: the same Home dashboard in PMM 3.8, in PMM’s own interface. The native sidebar starts with Home page, then lists PMM’s features: PostgreSQL, Operating system, All dashboards, Query Analytics, Explore, Alerts, Advisors, Inventory, Backups, Configuration, Users and access, Account and Help.',
+    },
+    {
+      src: beforeSettings,
+      alt: 'Before: Advanced Settings in PMM 3.5, a Grafana page with a second list of tabs beside the form, repeating the sidebar’s own Settings entries, and a bare column of toggles and fields.',
+    },
+    {
+      src: afterSettings,
+      alt: 'After: Settings in PMM 3.8, rebuilt on Peak UI as a native page, with tabs for metrics resolution, advanced settings and SSH key, and each setting under a heading that says what it does: public address, data retention, telemetry and feature management.',
+    },
+  ]}
+>
+  Before and after: the Home page and Settings in PMM 3.5, inside Grafana, then after 3.6: PMM’s own interface. Settings was rebuilt on Peak UI as a native page for 3.8.
+</Gallery>
+
 ## Clean up the house to make PMM shine
 
 In 2024, I pitched a way out called Reclaim PMM: take back PMM’s UX and keep Grafana as a contained, well-isolated component, with its features plugged into the PMM UI through APIs (application programming interfaces).
 
 The developers preferred turning Grafana into an isolated app tile, literally, which looked faster to build. I argued for the option Reclaim PMM described: a navigation that shows PMM’s features, whichever component renders them, built as a native UI wherever possible. A list of features is better than a list of components in this case.
 
+<Gallery
+  scale={0.37}
+  images={[
+    {
+      src: navOptionGrafanaApp,
+      alt: 'The option the developers preferred. The user enters PMM through its native navigation, which leads to four places: a Grafana app, the Help Center, Updates and a slot for the next app or feature. The Grafana app opens Grafana’s own navigation, which still holds Advisors, Alerting, Authentication, Backups, Dashboards, Inventory, QAN and Settings.',
+    },
+    {
+      src: navOptionNativeFeatures,
+      alt: 'The option I argued for. PMM’s native navigation leads straight to every feature: Advisors, Backups, Help Center, Inventory, QAN, Settings, Updates and a slot for the next feature, built as native UI, and Alerting, Authentication and Dashboards, still rendered by Grafana.',
+    },
+  ]}
+>
+  Left, the option the developers preferred: the native navigation opens Grafana as one app, with its own navigation inside. Right, the one I argued for: the native navigation surfaces every feature, including the ones Grafana still renders.
+</Gallery>
+
 To back up our claims, I interviewed 6 senior DBAs and SREs who had never used PMM. “Too many widgets, too many boxes, too many numbers,” and “context switching fatigue” were real problems for them, and a separate Grafana space would only deepen that.
 
 ## From prototype to shipping, on Peak UI
 
-Peak UI came first as a Figma asset for structured product development. That supported the vision designs to validate with the leadership and stakeholders. Later came the React design system we built and ran, and that served for some experimental, internal products but also for PMM, with the design intent and code architecture all in one place.
+Peak UI came first as a Figma asset for structured product development. That supported the vision designs, and a clickable prototype that won leadership and stakeholders over to Reclaim PMM. Later came [the React design system we built and ran](https://github.com/percona/peak-ui), and that served for some experimental, internal products but also for PMM, with the design intent and code architecture all in one place.
 
-I shared the new navigation as a prototype made with Peak UI, gathered critique asynchronously so quieter people could push back, and built the first mockups with 1 front-end engineer, later 3. I kept shipping intent in Storybook and the docs, plus fixes: animation, alignment, behavior, and accessibility. The new interface shipped in PMM 3.6.
+<figure>
+  <video src={reclaimVideo} poster={reclaimPoster.src} width="1620" height="1080" controls preload="metadata" playsinline></video>
+  <figcaption>The Reclaim PMM vision as a Figma prototype, made to win over leadership: PMM’s own navigation, with Grafana’s dashboards, Query Analytics and Explore opening inside it.</figcaption>
+</figure>
 
-To support this, we also designed and shipped what made the navigation work: a modular settings page and a help center (that replaced help bits scattered across Grafana and overridden in their code). But we also designed and created a full, self-served upgrade experience for the PMM server and the “clients” (the software installed next to each database), so new features could reach users faster.
+I shared the new navigation as a prototype made with Peak UI, gathered critique asynchronously so quieter people could push back, and built the first mockups with 1 front-end engineer, later 3. I kept shipping intent in [Storybook](https://percona.github.io/peak-ui/) and the docs, plus fixes: animation, alignment, behavior, and accessibility. The new interface shipped in PMM 3.6.
+
+<Gallery
+  density={2}
+  scale={0.215}
+  images={[
+    {
+      src: peakIntro,
+      alt: 'The Peak UI Storybook’s introduction page. It calls Storybook the coded source of truth and explains the maturity tags every component carries: Stable, production-ready and reviewed; Beta, intentionally early; To review, functional but not yet vetted; and Deprecated, on the way out. The sidebar lists components by group, each with its tag.',
+    },
+    {
+      src: peakEmptyState,
+      alt: 'The Empty State component’s docs, showing “No services yet” above a table of props. Each description says what to write or choose: the title is what this place shows when it has content, in a few words; the description is why it’s empty right now and what would fill it; size is small inside a card, table or section, and medium for a page or a whole section.',
+    },
+    {
+      src: peakFlyout,
+      alt: 'The Navigation Flyout component’s docs, tagged Beta: a collapsed rail of icons with an Inventory flyout open beside it, listing Services and Nodes, above its props, such as the label that heads the panel and names its navigation landmark, and the item the panel opens beside.',
+    },
+  ]}
+>
+  Peak UI’s Storybook: maturity tags tell other teams what’s safe to build on, and each prop’s description carries the design intent, down to what an empty state should say.
+</Gallery>
+
+To support this, we also designed and shipped what made the navigation work: a modular settings page and a help center (that replaced help bits scattered across Grafana and overridden in their code). But we also designed and created a full, self-served upgrade experience for the PMM server and the “clients” (the software installed next to each database), so new features could reach users faster. The updates came first, in PMM 3.0: shipping them on Peak UI forced us to put in the architecture and components a native interface would need, so by 3.6 the navigation could be built on foundations already in production.
+
+<figure>
+  <video src={updatesVideo} poster={updatesPoster.src} width="2400" height="1350" controls preload="metadata" playsinline></video>
+  <figcaption>The self-served updates, the first part of PMM built on Peak UI, shipped in 3.0 in January 2025: update the server, then see which clients still need updating.</figcaption>
+</figure>
 
 With the use of Peak UI and as AI coding assistants spread as well, I used a benchmarking tool to measure how well they followed the guidelines. The first part of a 6-step plan actually raised the score from 29.7 to 34.7 (out of 100), and that change could be seen in practice by testing and re-prompting.
 
@@ -67,11 +161,54 @@ By version 3.10, all those new apps were now crowding the sidebar, and users and
 
 After years of listening to DBAs, SREs, and other database professionals, I knew I had to propose a new navigation architecture that kept the look and feel but boosted its utility. After some conversations with experts, we decided on a flat sidebar, a hub page per technology, and a home page that shows the state of things, with drill-down into metrics and logs.
 
-I tested the architecture of such navigation with 17 people on a tree-testing tool I built on the fly. Of 6 tasks, 4 passed marks I set beforehand, and 15 of 17 expected each technology to open its hub page.
+To keep the decisions grounded, I distilled interviews, customer threads and support cases into four personas: a DBA, an SRE, an app developer and an engineering manager. Each one’s needs became a check on the architecture.
+
+I tested the architecture of such navigation with 17 people on [a tree-testing tool I built on the fly](https://freenandes.github.io/tree-test/) ([source](https://github.com/freenandes/tree-test)). Of 6 tasks, 4 passed marks I set beforehand, and 15 of 17 expected each technology to open its hub page.
+
+<Gallery
+  images={[
+    {
+      src: treeTestResults,
+      alt: 'Tree-test results, one dot per person for each of 6 tasks. Four tasks pass: did last night’s MongoDB backup complete (100%), which PostgreSQL queries are slowest (100%), which databases have a problem right now (80%), and get told when MongoDB replication lag is high (81%). Make PMM monitor a new MySQL server needs attention at 60%, and get a diagnostics bundle for Percona Support needs a redesign at 11%.',
+    },
+    {
+      src: treeTestHubPages,
+      alt: 'What should clicking a technology open? 15 of 17 people expect a summary page with health, clusters and links to apps and tools, 1 expects the main MySQL dashboard and 1 a list of dashboards.',
+    },
+  ]}
+>
+  The technology-first labels held up. Both misses came down to placement: adding a server sat behind Nodes vs Services, and the diagnostics bundle was hidden under Apps.
+</Gallery>
 
 But to save engineering time, the sidebar still shipped with the legacy information architecture, not the one I had tested.
 
 The work still paid off: I committed to that decision and split my coded prototype of the new navigation into small PRs (pull requests) for a “version 2.0” of the navigation. It included a section for favorite dashboards and apps, flyout submenus, CMD+K to search across PMM, and the technology hub pages template for the drill-down workflow. Part of it is already on track for future releases.
+
+<Gallery
+  density={2}
+  scale={0.17}
+  images={[
+    {
+      src: navSearch,
+      alt: 'The CMD+K panel over the Overview dashboard: a field to search pages, dashboards, settings and actions, recent pages such as MongoDB and Inventory, actions such as Add a service and Create an alert rule, and keyboard hints along the bottom.',
+    },
+    {
+      src: navFlyout,
+      alt: 'Close-up of the collapsed sidebar in the prototype, a column of icons, with the Alerts flyout open beside it over the Help Center: Status, Alert rules, Templates, Contact points, Notification policies, Silences, Alert groups and Alert settings.',
+    },
+    {
+      src: navHub,
+      alt: 'The MongoDB hub page, marked work in progress: links to clusters, instances, query analytics, real-time queries, backups and fleet; a summary that 23 of 60 clusters need attention, 17 alerts are firing and 3 backups failed; a Needs attention list of failing clusters, each linked to its summary; and Recommendations, such as setting up backups for 4 clusters.',
+    },
+  ]}
+>
+  Stills from the prototype: CMD+K reaches any page or action, the collapsed sidebar keeps every section one hover away, and a technology’s hub page opens on what needs attention.
+</Gallery>
+
+<figure>
+  <video src={navVideo} poster={navPoster.src} width="1822" height="1080" controls preload="metadata" playsinline></video>
+  <figcaption>My coded prototype of the navigation 2.0 (right) next to the shipped sidebar (left). Has some new requested features like favorites, flyout submenus and CMD+K search across PMM.</figcaption>
+</figure>
 
 ## Looking back
 

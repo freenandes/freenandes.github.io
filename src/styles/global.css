@@ -270,9 +270,16 @@ main > section {
   color: var(--ink-2);
 }
 
-.prose img {
+.prose img,
+.prose video {
   border-radius: var(--radius-sm);
   border: 1px solid var(--line);
+}
+
+.prose figcaption {
+  margin-block: var(--space-sm) var(--space-lg);
+  font-size: var(--step--1);
+  color: var(--ink-2);
 }
 
 .prose ul,

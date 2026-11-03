@@ -90,6 +90,8 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | The colour of those drawings, and of the ruler | `--ink-decor` in `src/styles/tokens.css` |
 | The map's scale in the bottom right corner | `src/assets/ruler.svg`; its height is `--ruler-height` at the top of the `<style>` in `src/pages/index.astro` |
 | Case study: content | `src/content/projects/<slug>.mdx` |
+| Case study: screenshots, their thumbnail size and the enlarged view | `src/components/Gallery.astro` and the knobs at the top of its `<style>` |
+| Case study: images and videos | `src/assets/projects/<slug>/` |
 | Case study frontmatter fields | `src/content.config.ts` |
 | Passphrase gate | `src/components/PasswordGate.astro` |
 | Page nav, footer | `src/components/PageNav.astro`, `src/components/Footer.astro` |
@@ -121,6 +123,23 @@ Each page owns its markup and its styling, so changing how a page looks means op
 
 2. To put it on the home map, add a node with `kind: 'project'` to `src/diagram.config.ts`, using the file name as its `id`, and add that `id` to `diagramChain` so it gets connected. The node holds the card copy and placement; the label, tags and link come from the project's frontmatter. The build stops with a message if a node links to a page that doesn't exist, if a project node has no published project (a wrong `id`, or still a draft), or if `diagramChain` names an id no node has. Once it's on the map, it's also a stop on the mini-map at the foot of About and every case study.
 3. When it's ready, remove `draft: true`.
+
+### Add screenshots or a video to a case study
+
+Put the files in `src/assets/projects/<slug>/` and import them at the top of the MDX, under the frontmatter.
+
+Screenshots go in a `Gallery`. Each one shows as a thumbnail at the same scale as the others, so their text matches: side by side, wider than the text when the window has room, and stacked when it doesn't. A click or tap opens it at the size it was on screen, which scrolls on a phone. Export every screenshot in a gallery at the same zoom, and tell the gallery which: `density={2}` for 2× exports (the default is 1). Large screenshots can take a smaller thumbnail scale with `scale={0.17}`, so a few still fit side by side. The text between the tags is the caption.
+
+```mdx
+import Gallery from '../../components/Gallery.astro';
+import results from '../../assets/projects/<slug>/results.png';
+
+<Gallery images={[{ src: results, alt: 'What the screenshot shows, numbers included' }]}>
+  The caption.
+</Gallery>
+```
+
+A video is a plain `<video>` in a `<figure>`. Compress it first, since every version committed stays in the repo, and give it a poster frame so it doesn't print blank. `percona-case-1.mdx` has one under "Lost the debate, kept the work".
 
 ### Add a drawing to the map
 

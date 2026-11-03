@@ -150,6 +150,14 @@ The portfolio is the original: change the wording here, then paste it into Linke
 
 Run `npm run email -- you@example.com`. It stores an obfuscated token in `src/site.config.ts`, so the address never appears as plain text in the repo or the HTML. Don't edit the token by hand: if it doesn't decode to a valid address, the build fails.
 
+### Change the link-preview image
+
+Every page shares one image when its link is posted (LinkedIn, Slack, X, WhatsApp and so on): `public/og.png`.
+
+1. Export a 1200×630 PNG (or JPEG) with no transparency, and keep the text inside the centre 630×630 square, since some apps crop to it. Keep it small: some apps skip images over a few hundred KB.
+2. Replace `public/og.png` with it. If the size or format changed, update `ogImage` in `src/site.config.ts` to match, and rewrite its `alt` whenever the words in the image change.
+3. Platforms keep a copy for days. To see the new one sooner, re-scrape a page in [LinkedIn's Post Inspector](https://www.linkedin.com/post-inspector/) and [Facebook's Sharing Debugger](https://developers.facebook.com/tools/debug/).
+
 ### Check you haven't changed the look
 
 ```bash
@@ -188,8 +196,7 @@ The site is audited against [The Website Specification](https://specification.we
 ## To do
 
 - [ ] Create the content based on [the list](notes/content-strategy.md) (local-only, `notes/` is git-ignored)
-- [ ] Add `public/og.png` (1200×630). `og:image` already points to it, but the file is missing.
 - [ ] Add raster app icons (`favicon.ico`, `apple-touch-icon.png`, maskable PWA icon).
 - [ ] Self-host the fonts (currently Google Fonts).
 
-The last three are the Website Specification items that wait on assets; `SPEC-COMPLIANCE.md` → Pending has what each one involves.
+The last two are the Website Specification items that wait on assets; `SPEC-COMPLIANCE.md` → Pending has what each one involves.

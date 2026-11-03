@@ -22,9 +22,14 @@ export interface SiteConfig {
   locale: string;
   /** Open Graph locale (underscore form, e.g. en_US). */
   ogLocale: string;
-  /** Paths under /public */
-  ogImage: string;
-  ogImageAlt: string;
+  /** The link preview (Open Graph and X cards): a file under /public. Keep it
+   *  a 1200×630 PNG or JPEG, small (some apps skip images over a few hundred
+   *  KB), with its text inside the centre square, which some apps crop to.
+   *  `width`, `height` and `type` must match the file: they let a platform draw
+   *  the card the first time a link is shared, before it has fetched the image.
+   *  `alt` reads out what the image says. */
+  ogImage: { path: string; width: number; height: number; type: string; alt: string };
+  /** Path under /public */
   favicon: string;
   /** Home-screen name, and the tint browsers paint their own UI with. */
   shortName: string;
@@ -45,8 +50,14 @@ export const site: SiteConfig = {
   printContacts: ['pmcf.xyz'],
   locale: 'en',
   ogLocale: 'en_US',
-  ogImage: '/og.png',
-  ogImageAlt: 'Pedro MC Fernandes — Senior Product Designer & Design Engineer',
+  ogImage: {
+    path: '/og.png',
+    width: 1200,
+    height: 630,
+    type: 'image/png',
+    alt:
+      'Pedro MC Fernandes, Senior Product Designer & Design Engineer: “I map complex technical software for the people who rely on it every day.” Set over a topographic map.',
+  },
   favicon: '/favicon.svg',
   shortName: 'PMCF',
   themeColor: '#ffffff',

@@ -62,17 +62,6 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     aria-label={`Site map — ${site.name}`}
     style={`--topo-pattern: url('${withBase('/topo-low.svg')}')`}
   >
-    {
-      decorations.map(({ Drawing, name }) => (
-        <Drawing
-          class="decor"
-          style={`--decor-frame: ${Drawing.width}; --decor-width: var(--decor-${name})`}
-          aria-hidden="true"
-          focusable="false"
-        />
-      ))
-    }
-    <Ruler class="ruler" preserveAspectRatio="xMaxYMax meet" aria-hidden="true" focusable="false" />
     <svg class="links" aria-hidden="true" focusable="false"></svg>
     {
       runs.map((run) => (
@@ -118,7 +107,14 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
                       aria-expanded={node.kind === 'identity' ? undefined : 'false'}
                       aria-controls={node.kind === 'identity' ? undefined : panelId}
                     >
-                      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                      {/* Sized for a page whose stylesheet hasn't loaded. */}
+                      <svg
+                        viewBox="0 0 20 20"
+                        width="16"
+                        height="16"
+                        aria-hidden="true"
+                        focusable="false"
+                      >
                         <polygon points={polygon(node.shape)} />
                       </svg>
                       <span>{node.label}</span>
@@ -167,6 +163,30 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
         </div>
       ))
     }
+    {/* The drawings and the ruler come after the markers, so a page that paints
+        before its stylesheet shows the map's content first. Their zero size
+        holds until the stylesheet gives them theirs, so they can't flash in
+        unstyled at full width. */}
+    {
+      decorations.map(({ Drawing, name }) => (
+        <Drawing
+          class="decor"
+          width="0"
+          height="0"
+          style={`--decor-frame: ${Drawing.width}; --decor-width: var(--decor-${name})`}
+          aria-hidden="true"
+          focusable="false"
+        />
+      ))
+    }
+    <Ruler
+      class="ruler"
+      width="0"
+      height="0"
+      preserveAspectRatio="xMaxYMax meet"
+      aria-hidden="true"
+      focusable="false"
+    />
   </nav>
 </Base>
 
@@ -285,7 +305,9 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
   }
 
   /* The drawings from src/assets/decor/ share the texture's layer and follow it
-     in the tree, so they sit on it and under everything else. The script gives
+     in the tree, so they sit on it and under everything else, though they come
+     after the markers. Their size here overrides the zero the markup gives them
+     (the height follows the width through the viewBox). The script gives
      each a random spot clear of the map once the map has come to rest, and it
      stays there. One with no room stays hidden. */
 
@@ -295,6 +317,7 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     left: 0;
     z-index: -1;
     width: var(--decor-width, calc(var(--decor-frame) * var(--decor-scale)));
+    height: auto;
     color: var(--ink-decor);
     pointer-events: none;
     translate: var(--decor-x, 0) var(--decor-y, 0);

@@ -121,7 +121,9 @@ export const styleProbes = [
 
   // The map
   '.diagram',
-  '.diagram > svg',
+  '.decor',
+  '.ruler',
+  '.links',
   '.link-line',
   '.node',
   '.node--identity',

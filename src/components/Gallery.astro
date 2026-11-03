@@ -68,8 +68,9 @@ const widest = Math.max(...items.map((item) => item.size));
   }
   <dialog aria-label="Enlarged image">
     <div>
-      <button type="button" class="link" data-zoom="out">Zoom out</button>
       <button type="button" class="link" data-zoom="in">Zoom in</button>
+      <button type="button" class="link" data-zoom="out"><span class="visually-hidden">Zoom </span>Out</button>
+      <button type="button" class="link" data-zoom="fit">Fit<span class="visually-hidden"> to window</span></button>
       <button type="button" class="link" data-close>Close</button>
     </div>
     <div data-stage></div>
@@ -79,10 +80,11 @@ const widest = Math.max(...items.map((item) => item.size));
 <script>
   // Opens a thumbnail's screenshot in its gallery's dialog, fitted to the
   // window, and zooms it there: a click or tap zooms in where it lands and the
-  // next one zooms back out; a pinch, Ctrl or ⌘ with the wheel, or the buttons
-  // zoom by degrees. A zoomed screenshot pans by scrolling, or by dragging it
-  // with the mouse. The browser's own pinch zoom is held off inside the
-  // dialog, since it would carry the buttons off screen. A click with a
+  // next one zooms back out; a pinch, Ctrl or ⌘ with the wheel, or the zoom
+  // buttons zoom by degrees, and the fit button fits it to the window again.
+  // A zoomed screenshot pans by scrolling, or by dragging it with the mouse.
+  // The browser's own pinch zoom is held off inside the dialog, since it
+  // would carry the buttons off screen. A click with a
   // modifier key still follows the link, to open the file in a new tab.
 
   /** A knob from the gallery's stylesheet. */
@@ -102,8 +104,9 @@ const widest = Math.max(...items.map((item) => item.size));
     const stage = dialog?.querySelector<HTMLElement>('[data-stage]');
     const zoomIn = dialog?.querySelector('[data-zoom="in"]');
     const zoomOut = dialog?.querySelector('[data-zoom="out"]');
+    const zoomFit = dialog?.querySelector('[data-zoom="fit"]');
     const close = dialog?.querySelector<HTMLButtonElement>('[data-close]');
-    if (!dialog || !stage || !zoomIn || !zoomOut || !close) continue;
+    if (!dialog || !stage || !zoomIn || !zoomOut || !zoomFit || !close) continue;
 
     const step = knob(figure, '--lightbox-zoom-step', 1.5);
     const most = knob(figure, '--lightbox-max-zoom', 2);
@@ -137,8 +140,12 @@ const widest = Math.max(...items.map((item) => item.size));
         stage.scrollTop += box.top + fy * box.height - y;
       }
       zoomOut.setAttribute('aria-disabled', String(zoom === 1));
+      zoomFit.setAttribute('aria-disabled', String(zoom === 1));
       zoomIn.setAttribute('aria-disabled', String(zoom >= limit() / 1.02));
     };
+
+    /** Back to the size that fits the window. */
+    const reset = () => zoomAt(1, 0, 0, 0, 0);
 
     /** Zooms to `next`, keeping the point at (x, y) on screen where it is. */
     const zoomTo = (next: number, x: number, y: number) => {
@@ -169,13 +176,14 @@ const widest = Math.max(...items.map((item) => item.size));
         stage.replaceChildren(shown);
         dialog.showModal();
         close.focus();
-        zoomAt(1, 0, 0, 0, 0);
+        reset();
       });
     }
 
     close.addEventListener('click', () => dialog.close());
     zoomIn.addEventListener('click', () => zoomBy(step));
     zoomOut.addEventListener('click', () => zoomBy(1 / step));
+    zoomFit.addEventListener('click', reset);
     window.addEventListener('resize', () => {
       if (dialog.open) zoomBy(1);
     });
@@ -405,8 +413,9 @@ const widest = Math.max(...items.map((item) => item.size));
     padding: var(--space-md) var(--gutter);
   }
 
+  /* A button that can't act takes the faint ink, lighter than any text. */
   dialog > div:first-child > button[aria-disabled='true'] {
-    color: var(--ink-3);
+    color: var(--ink-faint);
     cursor: default;
   }
 

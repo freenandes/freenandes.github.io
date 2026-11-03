@@ -11,7 +11,10 @@ import { withBase } from '../lib/base';
 <ul class="page-nav" role="list">
   <slot />
   <li>
-    <a href={withBase('/')} aria-label="Back to map"><Flag aria-hidden="true" /></a>
+    {/* The size holds only until the stylesheet loads, so the flag can't paint at full width. */}
+    <a href={withBase('/')} aria-label="Back to map">
+      <Flag width="28" height="28" aria-hidden="true" />
+    </a>
   </li>
 </ul>
 

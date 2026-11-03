@@ -47,7 +47,8 @@ const stops = (await getDiagramNodes())
         {stops.map(({ label, shape, href, current }) => (
           <li>
             <a href={href} aria-current={current ? 'page' : undefined}>
-              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+              {/* Sized for a page whose stylesheet hasn't loaded. */}
+              <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false">
                 <polygon points={polygon(shape)} />
               </svg>
               <span>{label}</span>

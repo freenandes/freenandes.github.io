@@ -17,6 +17,7 @@ Legend: ✅ done · 🟙 platform-provided · ⏳ pending · ➖ not applicable
 | Open Graph protocol | foundations | Added `og:site_name`, `og:locale`, per-page `og:type` (`website`/`profile`/`article`), `og:image:alt`, and full `twitter:*` title/description/image/alt. |
 | Open Graph / Twitter image | foundations | `public/og.png`: 1200×630 (1.91:1), opaque, 70 KB, text inside the centre square for apps that crop. Absolute HTTPS URL with `og:image:type`, `og:image:width` and `og:image:height`, so platforms draw the card on the first share, and `summary_large_image` for X. Set in `src/site.config.ts`. |
 | Web app manifest | resilience | Generated at `/manifest.webmanifest` (base-aware) and linked from `<head>`. |
+| Favicons & app icons | foundations / resilience | `public/favicon.svg` (512×512) plus what `npm run icons` draws from it: `favicon.ico` (16, 32, 48), `apple-touch-icon.png` (180×180, opaque), and 192 and 512 PNGs and a 512 **maskable** PNG in the manifest. The `.ico` link claims `sizes="32x32"` so Chrome picks the SVG. One list in `src/lib/icons.mjs` feeds the script, `<head>` and the manifest. |
 | Structured data (JSON-LD) | seo / agent-readiness | `@graph` with `WebSite` + `Person` site-wide, `ProfilePage` on About, `CreativeWork` per project, and `BreadcrumbList` on sub-pages. |
 | Meta robots | seo | Explicit `index, follow`. |
 | robots.txt | seo / agent-readiness | Generated with sitemap reference and explicit allow rules for named AI crawlers (GPTBot, ClaudeBot, PerplexityBot, …). |
@@ -52,7 +53,6 @@ These are satisfied by hosting and need no code, but are **not configurable** fr
 
 | Spec | Category | What's needed |
 | --- | --- | --- |
-| **Favicons & app icons** | foundations / resilience | Only `favicon.svg` exists. Add `favicon.ico` (legacy fallback), `apple-touch-icon.png` (180×180), and a **maskable** PNG (512×512) for the PWA manifest, then wire the `<link rel="apple-touch-icon">` and add the maskable entry to `manifest.webmanifest`. |
 | **Self-hosted web fonts** | performance / security / privacy | Fonts load from Google Fonts today. Self-hosting WOFF2 (subset, `font-display: swap`) removes a third-party request, unblocks **Subresource Integrity**, and lets the CSP drop the `fonts.googleapis.com`/`fonts.gstatic.com` allowances. Needs the font binaries committed. |
 
 ---

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="284" viewBox="0 0 600 284" font-family="'Atkinson Hyperlegible Next', system-ui, -apple-system, 'Segoe UI', roboto, sans-serif">
+<rect width="600" height="284" fill="#fff"/>
+<text x="40" y="64" font-size="24" fill="#111" font-weight="700">What should clicking a technology open?</text>
+<text x="40" y="104" font-size="17" fill="#555">15 of 17 expect a summary page with health, clusters</text>
+<text x="40" y="130" font-size="17" fill="#555">and links to apps and tools. This backs building hub</text>
+<text x="40" y="156" font-size="17" fill="#555">pages rather than dashboard folders.</text>
+<circle cx="49.5" cy="200" r="9.5" fill="#286f50"/><circle cx="75.5" cy="200" r="9.5" fill="#286f50"/><circle cx="101.5" cy="200" r="9.5" fill="#286f50"/><circle cx="127.5" cy="200" r="9.5" fill="#286f50"/><circle cx="153.5" cy="200" r="9.5" fill="#286f50"/><circle cx="179.5" cy="200" r="9.5" fill="#286f50"/><circle cx="205.5" cy="200" r="9.5" fill="#286f50"/><circle cx="231.5" cy="200" r="9.5" fill="#286f50"/><circle cx="257.5" cy="200" r="9.5" fill="#286f50"/><circle cx="283.5" cy="200" r="9.5" fill="#286f50"/><circle cx="309.5" cy="200" r="9.5" fill="#286f50"/><circle cx="335.5" cy="200" r="9.5" fill="#286f50"/><circle cx="361.5" cy="200" r="9.5" fill="#286f50"/><circle cx="387.5" cy="200" r="9.5" fill="#286f50"/><circle cx="413.5" cy="200" r="9.5" fill="#286f50"/><circle cx="439.5" cy="200" r="9.5" fill="#bec6d1"/><circle cx="465.5" cy="200" r="9.5" fill="#bec6d1"/>
+<text x="40" y="244" font-size="15" fill="#6f6f6f">15 summary page · 1 main MySQL dashboard · 1 list of dashboards</text>
+</svg>

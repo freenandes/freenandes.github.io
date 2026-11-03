@@ -1,0 +1,247 @@
+---
+/** Screenshots in a case study, shown as thumbnails that open full size. Every
+    screenshot keeps the same scale, so their text reads at one size: side by
+    side past the text's edges when the window has room, stacked when it
+    doesn't. A thumbnail opens its screenshot in a dialog, at its own size or
+    shrunk to fit; without the script, it's a plain link to the image. An
+    SVG is drawn inline instead, so its text takes the site's font and stays
+    sharp at any size; its viewBox units count as on-screen pixels. The
+    caption is the default slot. */
+
+import { getImage } from 'astro:assets';
+import type { SvgComponent } from 'astro/types';
+
+interface Props {
+  images: { src: ImageMetadata | (SvgComponent & ImageMetadata); alt: string }[];
+  /** Pixels per CSS pixel the screenshots were taken at: 2 for a 2× export.
+      The enlarged view shows them at the size they were on screen. SVGs
+      ignore it. */
+  density?: number;
+  /** Overrides the `--gallery-scale` knob for this gallery, so large
+      screenshots can still sit side by side as thumbnails. */
+  scale?: number;
+}
+
+const { images, density = 1, scale } = Astro.props;
+
+const items = await Promise.all(
+  images.map(async ({ src, alt }) => {
+    const Svg = src.format === 'svg' ? (src as SvgComponent & ImageMetadata) : undefined;
+    return {
+      Svg,
+      url: Svg ? src.src : (await getImage({ src, format: 'webp' })).src,
+      alt,
+      width: src.width,
+      height: src.height,
+      size: Svg ? src.width : src.width / density,
+    };
+  }),
+);
+const widest = Math.max(...items.map((item) => item.size));
+---
+
+<figure data-gallery style={`--w-max: ${widest}` + (scale ? `; --gallery-scale: ${scale}` : '')}>
+  <div>
+    {
+      items.map((item) => (
+        <a href={item.url} style={`--w: ${item.size}`}>
+          <span class="visually-hidden">Enlarge image:</span>
+          {item.Svg ? (
+            <item.Svg role="img" aria-label={item.alt} />
+          ) : (
+            <img src={item.url} alt={item.alt} width={item.width} height={item.height} loading="lazy" decoding="async" />
+          )}
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9" />
+          </svg>
+        </a>
+      ))
+    }
+  </div>
+  {
+    Astro.slots.has('default') && (
+      <figcaption>
+        <slot />
+      </figcaption>
+    )
+  }
+  <dialog aria-label="Enlarged image">
+    <button type="button" class="link">Close</button>
+  </dialog>
+</figure>
+
+<script>
+  // Opens a thumbnail's screenshot in its gallery's dialog: the image file, or
+  // a copy of an inline SVG. A click with a modifier key still follows the
+  // link, to open the file in a new tab.
+  for (const figure of document.querySelectorAll('[data-gallery]')) {
+    const dialog = figure.querySelector('dialog');
+    const close = dialog?.querySelector('button');
+    if (!dialog || !close) continue;
+    const full = new Image();
+
+    for (const link of figure.querySelectorAll<HTMLAnchorElement>(':scope > div > a')) {
+      link.addEventListener('click', (event) => {
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        const art = link.querySelector<SVGSVGElement>('svg[role="img"]');
+        const shown = art ? (art.cloneNode(true) as SVGSVGElement) : full;
+        if (!art) {
+          full.src = link.href;
+          full.alt = link.querySelector('img')?.alt ?? '';
+        }
+        shown.style.setProperty('--w', link.style.getPropertyValue('--w'));
+        dialog.replaceChildren(close, shown);
+        dialog.showModal();
+        dialog.scrollTo(0, 0);
+      });
+    }
+
+    close.addEventListener('click', () => dialog.close());
+    // The dialog fills the window, so a click beside the screenshot lands on it.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+  }
+</script>
+
+<style>
+  figure {
+    /* Thumbnails: the fraction of its on-screen size every screenshot shows
+       at, when the window has room. A narrow window shrinks them all alike. */
+    --gallery-scale: 0.5;
+
+    /* How wide the row of thumbnails may grow past the text's edges. */
+    --gallery-max: 66rem;
+    --gallery-gap: var(--space-sm);
+
+    /* The enlarge marker in each thumbnail's corner. */
+    --gallery-chip: 2rem;
+
+    /* Enlarged: a screenshot shrinks to fit the window, but never below this
+       fraction of its size. Past that, the dialog scrolls instead. */
+    --lightbox-min-scale: 0.75;
+  }
+
+  /* The row is centred on the text and as wide as the window allows. */
+  figure > div {
+    --row: max(100%, min(100vw - 2 * var(--gutter), var(--gallery-max)));
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: var(--gallery-gap);
+    width: var(--row);
+    margin-inline: calc((100% - var(--row)) / 2);
+  }
+
+  /* Each width is the screenshot's own (`--w`) times one shared scale: the
+     knob, or whatever lets the widest fit the row. */
+  figure > div > a {
+    position: relative;
+    display: block;
+    flex: none;
+    width: min(calc(var(--w) * var(--gallery-scale) * 1px), calc(var(--w) / var(--w-max) * 100%));
+    cursor: zoom-in;
+  }
+
+  figure > div > a img,
+  figure > div > a > :global(svg[role='img']) {
+    width: 100%;
+    transition: border-color var(--dur-fast) var(--ease);
+  }
+
+  figure > div > a:hover img,
+  figure > div > a:hover > :global(svg[role='img']) {
+    border-color: var(--line-strong);
+  }
+
+  /* An inline SVG takes the frame `.prose img` gives screenshots, and the
+     site's font in place of the fallback its file names. */
+  figure :global(svg[role='img']) {
+    height: auto;
+    font-family: var(--font-sans);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+
+  figure > div > a > svg[aria-hidden='true'] {
+    position: absolute;
+    inset-block-start: var(--space-xs);
+    inset-inline-end: var(--space-xs);
+    width: var(--gallery-chip);
+    height: var(--gallery-chip);
+    padding: calc(var(--gallery-chip) / 5);
+    color: var(--ink-2);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    transition: color var(--dur-fast) var(--ease);
+  }
+
+  figure > div > a:hover > svg[aria-hidden='true'] {
+    color: var(--accent);
+  }
+
+  dialog {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: var(--space-xl) var(--gutter) var(--gutter);
+    border: 0;
+    background: var(--paper);
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  dialog[open] {
+    display: grid;
+    animation: lightbox-in var(--dur-fast) var(--ease);
+  }
+
+  dialog::backdrop {
+    background: var(--paper);
+  }
+
+  /* Auto margins centre it while it fits and let it scroll from its start
+     once it doesn't. */
+  dialog > :global(img),
+  dialog > :global(svg) {
+    margin: auto;
+    width: clamp(calc(var(--w) * var(--lightbox-min-scale) * 1px), 100%, calc(var(--w) * 1px));
+    max-width: none;
+  }
+
+  dialog button {
+    position: fixed;
+    inset-block-start: var(--space-md);
+    inset-inline-end: var(--gutter);
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--paper);
+  }
+
+  :global(html:has(dialog[open])) {
+    overflow: hidden;
+  }
+
+  @keyframes lightbox-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @media print {
+    figure > div {
+      justify-content: flex-start;
+      width: auto;
+      margin-inline: 0;
+    }
+
+    figure > div > a > svg[aria-hidden='true'] {
+      display: none;
+    }
+  }
+</style>

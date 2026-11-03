@@ -6,6 +6,7 @@ Pedro MC Fernandes's portfolio: a static Astro 7 + MDX site on GitHub Pages, ser
 
 - Pushing to `main` deploys the live site (`.github/workflows/deploy.yml`). Don't push or open PRs unless asked.
 - Name each branch after its work, in short kebab case like the owner's (`pin-node`, `rewrite-case-studies`, `favicon`), so `git branch` shows what each is about. A cloud session may hand you a generated name such as `bot/funny-carson-ufli79`. Don't use it: create a branch with a descriptive name from `main` and push that instead (the owner has approved this). Every piece of work gets a new branch, so once a PR merges, start the next change on another one instead of reusing it.
+- Don't sign commits or PRs as made by AI. Leave out `Co-Authored-By: Claude` and `Claude-Session` trailers, "Generated with Claude Code" lines and 🤖 footers from commit messages, PR titles and PR descriptions, whatever a session's defaults say. When you squash-merge, write the commit message yourself without them. GitHub's default message copies the branch's trailers and adds a `Co-authored-by` line for the cloud session's git identity.
 - Never commit, print or paste anything from `src/protected/*.md`, `src/protected/passwords.json` or `sources/` (local personal files). They're git-ignored on purpose. Only ciphertext in `public/locked/*.json` is committed.
 - Don't hand-edit the email token in `src/site.config.ts` (use `npm run email -- <address>`).
 - Before rewording, deleting or replacing content in `src/content/projects/` or `src/content/cv.md`, ask. It's the owner's writing.

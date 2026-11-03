@@ -1,6 +1,6 @@
 # Portfolio website: agent brief
 
-Pedro MC Fernandes's portfolio: a static Astro 7 + MDX site on GitHub Pages, served at https://www.pmcf.xyz/portfolio/ while in development (the old site keeps www.pmcf.xyz until launch; see README → Launching at www.pmcf.xyz). README.md is the human guide, with the commands, a "Where things live" table and step-by-step tasks. Read it before adding or moving a file. This file covers what an agent needs on top of that.
+Pedro MC Fernandes's portfolio: a static Astro 7 + MDX site on GitHub Pages, served at https://www.pmcf.xyz/. It used to sit under `/portfolio/`, and those addresses forward to the root (see README → Old `/portfolio/` links). README.md is the human guide, with the commands, a "Where things live" table and step-by-step tasks. Read it before adding or moving a file. This file covers what an agent needs on top of that.
 
 ## Ground rules
 
@@ -20,7 +20,7 @@ There are no unit tests. Run these, using Node 22 (`.nvmrc`):
 
 CI (`.github/workflows/deploy.yml`) runs lint, check and build on every pull request to `main`, and deploys only from `main`.
 
-To look at the site, use `npm run dev`. Pages are at http://localhost:4321/portfolio/, not at the root.
+To look at the site, use `npm run dev`, at http://localhost:4321/.
 
 ## How it fits together
 
@@ -38,7 +38,7 @@ To look at the site, use `npm run dev`. Pages are at http://localhost:4321/portf
 
 ## Constraints that will bite
 
-- Base path. The site is served from `/portfolio/` until launch, when it moves to `/`. Every internal href goes through `withBase()` from `src/lib/base.ts`, or the link breaks in production. `astro.config.mjs` is the only place the site URL and base path are set (CI and `npm run visual` read it from there); `SITE` and `BASE_PATH` env vars override it for a one-off build.
+- Base path. The site is served from the root (`/`), but every internal href still goes through `withBase()` from `src/lib/base.ts`, so the base can move again without touching pages. `astro.config.mjs` is the only place the site URL and base path are set (CI and `npm run visual` read it from there); `SITE` and `BASE_PATH` env vars override it for a one-off build. `redirects` there forwards the old `/portfolio/` addresses to the root; a renamed page or project file needs its old address added too. `npm run visual` serves both builds at the working tree's base, so to compare across a base-path change, run it with `BASE_PATH` set to one value for both.
 - CSP. `script-src 'self'`: no inline executable scripts, no third-party scripts, no external images beyond `data:`. Plain `<script>` tags in `.astro` files are fine, because Astro bundles them to files (forced by `assetsInlineLimit` in `astro.config.mjs`). The JSON-LD `is:inline` block is data, so it's fine. Changing what's allowed means editing the CSP in `Base.astro` on purpose.
 - Inline `style` attributes are only for custom properties, such as `style="--reveal-step: 2"`.
 - Astro scopes styles by appending `[data-astro-cid-…]` to every compound in a selector, so element selectors gain class-level specificity. A state rule (`:hover`, `.is-open`) must repeat the base rule's full path, or it loses.

@@ -128,7 +128,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 
 Put the files in `src/assets/projects/<slug>/` and import them at the top of the MDX, under the frontmatter.
 
-Screenshots go in a `Gallery`. Each one shows as a thumbnail at the same scale as the others, so their text matches: side by side, wider than the text when the window has room, and stacked when it doesn't. A click or tap opens it at the size it was on screen, which scrolls on a phone. Export every screenshot in a gallery at the same zoom, and tell the gallery which: `density={2}` for 2× exports (the default is 1). Large screenshots can take a smaller thumbnail scale with `scale={0.17}`, so a few still fit side by side. The text between the tags is the caption.
+Screenshots go in a `Gallery`. Each one shows as a thumbnail at the same scale as the others, so their text matches: side by side, wider than the text when the window has room, stacked when it doesn't, and as wide as the text on a phone. A click or tap opens it as large as fits the window, never past the size it was on screen. There a click or tap zooms in where it lands and the next zooms back out; a pinch, Ctrl or ⌘ with the wheel, or the Zoom in and Zoom out buttons zoom by degrees. Zoomed, it pans by scrolling or dragging, and the buttons stay at the top. Export every screenshot in a gallery at the same zoom, and tell the gallery which: `density={2}` for 2× exports (the default is 1). Large screenshots can take a smaller thumbnail scale with `scale={0.17}`, so a few still fit side by side. The text between the tags is the caption.
 
 ```mdx
 import Gallery from '../../components/Gallery.astro';

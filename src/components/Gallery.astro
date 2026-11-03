@@ -2,11 +2,12 @@
 /** Screenshots in a case study, shown as thumbnails that open full size. Every
     screenshot keeps the same scale, so their text reads at one size: side by
     side past the text's edges when the window has room, stacked when it
-    doesn't. A thumbnail opens its screenshot in a dialog, at its own size or
-    shrunk to fit; without the script, it's a plain link to the image. An
-    SVG is drawn inline instead, so its text takes the site's font and stays
-    sharp at any size; its viewBox units count as on-screen pixels. The
-    caption is the default slot. */
+    doesn't, and as wide as the text on a phone. A thumbnail opens its
+    screenshot in a dialog, as large as fits the window but never past its own
+    size, and zooms from there; without the script, it's a plain link to the
+    image. An SVG is drawn inline instead, so its text takes the site's font
+    and stays sharp at any size; its viewBox units count as on-screen pixels.
+    The caption is the default slot. */
 
 import { getImage } from 'astro:assets';
 import type { SvgComponent } from 'astro/types';
@@ -44,7 +45,7 @@ const widest = Math.max(...items.map((item) => item.size));
   <div>
     {
       items.map((item) => (
-        <a href={item.url} style={`--w: ${item.size}`}>
+        <a href={item.url} style={`--w: ${item.size}; --ratio: ${item.width / item.height}`}>
           <span class="visually-hidden">Enlarge image:</span>
           {item.Svg ? (
             <item.Svg role="img" aria-label={item.alt} />
@@ -66,41 +67,216 @@ const widest = Math.max(...items.map((item) => item.size));
     )
   }
   <dialog aria-label="Enlarged image">
-    <button type="button" class="link">Close</button>
+    <div>
+      <button type="button" class="link" data-zoom="out">Zoom out</button>
+      <button type="button" class="link" data-zoom="in">Zoom in</button>
+      <button type="button" class="link" data-close>Close</button>
+    </div>
+    <div data-stage></div>
   </dialog>
 </figure>
 
 <script>
-  // Opens a thumbnail's screenshot in its gallery's dialog: the image file, or
-  // a copy of an inline SVG. A click with a modifier key still follows the
-  // link, to open the file in a new tab.
+  // Opens a thumbnail's screenshot in its gallery's dialog, fitted to the
+  // window, and zooms it there: a click or tap zooms in where it lands and the
+  // next one zooms back out; a pinch, Ctrl or ⌘ with the wheel, or the buttons
+  // zoom by degrees. A zoomed screenshot pans by scrolling, or by dragging it
+  // with the mouse. The browser's own pinch zoom is held off inside the
+  // dialog, since it would carry the buttons off screen. A click with a
+  // modifier key still follows the link, to open the file in a new tab.
+
+  /** A knob from the gallery's stylesheet. */
+  const knob = (element: Element, name: string, fallback: number) =>
+    Number.parseFloat(getComputedStyle(element).getPropertyValue(name)) || fallback;
+
+  /** How far apart two fingers are, and the point halfway between them. */
+  const spread = (touches: TouchList) =>
+    Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
+  const middle = (touches: TouchList) => ({
+    x: (touches[0].clientX + touches[1].clientX) / 2,
+    y: (touches[0].clientY + touches[1].clientY) / 2,
+  });
+
   for (const figure of document.querySelectorAll('[data-gallery]')) {
     const dialog = figure.querySelector('dialog');
-    const close = dialog?.querySelector('button');
-    if (!dialog || !close) continue;
-    const full = new Image();
+    const stage = dialog?.querySelector<HTMLElement>('[data-stage]');
+    const zoomIn = dialog?.querySelector('[data-zoom="in"]');
+    const zoomOut = dialog?.querySelector('[data-zoom="out"]');
+    const close = dialog?.querySelector<HTMLButtonElement>('[data-close]');
+    if (!dialog || !stage || !zoomIn || !zoomOut || !close) continue;
+
+    const step = knob(figure, '--lightbox-zoom-step', 1.5);
+    const most = knob(figure, '--lightbox-max-zoom', 2);
+
+    /** The enlarged copy, its own width in CSS pixels, and how many times the
+        size that fits the window it's shown at. */
+    let shown: HTMLElement | SVGSVGElement | undefined;
+    let own = 0;
+    let zoom = 1;
+
+    /** The size that fits the window, and the furthest zoom from it. */
+    const fit = () => (shown ? shown.getBoundingClientRect().width / zoom : own);
+    const limit = () => Math.max(1, (own * most) / fit());
+
+    /** Zooms to `next`, putting the point at fractions (fx, fy) across the
+        screenshot at (x, y) on screen. A zoom that nearly reaches either end
+        lands on it. The stage only scrolls while zoomed, since a fitted
+        screenshot has nothing to scroll to; so the state is set before the
+        screenshot is measured, once any scrollbars are in. */
+    const zoomAt = (next: number, fx: number, fy: number, x: number, y: number) => {
+      if (!shown) return;
+      const max = limit();
+      zoom = next < 1.02 ? 1 : next > max / 1.02 ? max : next;
+      stage.style.setProperty('--zoom', String(zoom));
+      dialog.toggleAttribute('data-zoomed', zoom > 1);
+      if (zoom === 1) {
+        stage.scrollTo(0, 0);
+      } else {
+        const box = shown.getBoundingClientRect();
+        stage.scrollLeft += box.left + fx * box.width - x;
+        stage.scrollTop += box.top + fy * box.height - y;
+      }
+      zoomOut.setAttribute('aria-disabled', String(zoom === 1));
+      zoomIn.setAttribute('aria-disabled', String(zoom >= limit() / 1.02));
+    };
+
+    /** Zooms to `next`, keeping the point at (x, y) on screen where it is. */
+    const zoomTo = (next: number, x: number, y: number) => {
+      if (!shown) return;
+      const box = shown.getBoundingClientRect();
+      zoomAt(next, (x - box.left) / box.width, (y - box.top) / box.height, x, y);
+    };
+
+    /** Zooms by `factor` about the middle of the stage. */
+    const zoomBy = (factor: number) => {
+      const box = stage.getBoundingClientRect();
+      zoomTo(zoom * factor, box.left + stage.clientWidth / 2, box.top + stage.clientHeight / 2);
+    };
 
     for (const link of figure.querySelectorAll<HTMLAnchorElement>(':scope > div > a')) {
       link.addEventListener('click', (event) => {
         if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const art = link.querySelector<HTMLImageElement | SVGSVGElement>('img, svg[role="img"]');
+        if (!art) return;
         event.preventDefault();
-        const art = link.querySelector<SVGSVGElement>('svg[role="img"]');
-        const shown = art ? (art.cloneNode(true) as SVGSVGElement) : full;
-        if (!art) {
-          full.src = link.href;
-          full.alt = link.querySelector('img')?.alt ?? '';
+        shown = art.cloneNode(true) as HTMLImageElement | SVGSVGElement;
+        if (shown instanceof HTMLImageElement) {
+          shown.loading = 'eager';
+          shown.draggable = false;
         }
-        shown.style.setProperty('--w', link.style.getPropertyValue('--w'));
-        dialog.replaceChildren(close, shown);
+        for (const name of ['--w', '--ratio']) shown.style.setProperty(name, link.style.getPropertyValue(name));
+        own = Number.parseFloat(link.style.getPropertyValue('--w'));
+        stage.replaceChildren(shown);
         dialog.showModal();
-        dialog.scrollTo(0, 0);
+        close.focus();
+        zoomAt(1, 0, 0, 0, 0);
       });
     }
 
     close.addEventListener('click', () => dialog.close());
-    // The dialog fills the window, so a click beside the screenshot lands on it.
-    dialog.addEventListener('click', (event) => {
-      if (event.target === dialog) dialog.close();
+    zoomIn.addEventListener('click', () => zoomBy(step));
+    zoomOut.addEventListener('click', () => zoomBy(1 / step));
+    window.addEventListener('resize', () => {
+      if (dialog.open) zoomBy(1);
+    });
+
+    // A click on the screenshot zooms in to its own size, or by a step if
+    // that's further. Once zoomed, any click zooms back out; beside a fitted
+    // screenshot, it closes the dialog.
+    let dragged = false;
+    stage.addEventListener('click', (event) => {
+      if (dragged) return;
+      if (zoom > 1) zoomTo(1, event.clientX, event.clientY);
+      else if (shown?.contains(event.target as Node)) zoomTo(Math.max(own / fit(), step), event.clientX, event.clientY);
+      else dialog.close();
+    });
+
+    // The mouse drags a zoomed screenshot around; a drag isn't a click.
+    let drag: { x: number; y: number; left: number; top: number } | undefined;
+    stage.addEventListener('pointerdown', (event) => {
+      dragged = false;
+      if (event.pointerType !== 'mouse' || event.button !== 0 || zoom === 1) return;
+      if (!shown?.contains(event.target as Node)) return;
+      drag = { x: event.clientX, y: event.clientY, left: stage.scrollLeft, top: stage.scrollTop };
+      stage.setPointerCapture(event.pointerId);
+    });
+    stage.addEventListener('pointermove', (event) => {
+      if (!drag) return;
+      const dx = event.clientX - drag.x;
+      const dy = event.clientY - drag.y;
+      if (!dragged && Math.hypot(dx, dy) < 4) return;
+      dragged = true;
+      dialog.toggleAttribute('data-dragging', true);
+      stage.scrollLeft = drag.left - dx;
+      stage.scrollTop = drag.top - dy;
+    });
+    const drop = () => {
+      drag = undefined;
+      dialog.removeAttribute('data-dragging');
+    };
+    stage.addEventListener('pointerup', drop);
+    stage.addEventListener('pointercancel', drop);
+
+    // Ctrl or ⌘ with the wheel zooms about the pointer, and so does a pinch on
+    // a trackpad, which Chrome and Firefox send as Ctrl with the wheel.
+    dialog.addEventListener(
+      'wheel',
+      (event) => {
+        if (!event.ctrlKey && !event.metaKey) return;
+        event.preventDefault();
+        const delta = event.deltaMode === WheelEvent.DOM_DELTA_LINE ? event.deltaY * 16 : event.deltaY;
+        zoomTo(zoom * Math.exp(-Math.max(-50, Math.min(50, delta)) / 100), event.clientX, event.clientY);
+      },
+      { passive: false },
+    );
+
+    // Two fingers zoom, and the point first between them stays between them,
+    // so they can pan as they pinch. One finger scrolls as usual.
+    let pinch: { zoom: number; spread: number; fx: number; fy: number } | undefined;
+    dialog.addEventListener(
+      'touchstart',
+      (event) => {
+        if (event.touches.length !== 2 || !shown) return;
+        const { x, y } = middle(event.touches);
+        const box = shown.getBoundingClientRect();
+        pinch = {
+          zoom,
+          spread: Math.max(1, spread(event.touches)),
+          fx: (x - box.left) / box.width,
+          fy: (y - box.top) / box.height,
+        };
+      },
+      { passive: true },
+    );
+    dialog.addEventListener(
+      'touchmove',
+      (event) => {
+        if (!pinch || event.touches.length !== 2) return;
+        event.preventDefault();
+        const { x, y } = middle(event.touches);
+        zoomAt((pinch.zoom * spread(event.touches)) / pinch.spread, pinch.fx, pinch.fy, x, y);
+      },
+      { passive: false },
+    );
+    const lift = (event: TouchEvent) => {
+      if (event.touches.length < 2) pinch = undefined;
+    };
+    dialog.addEventListener('touchend', lift);
+    dialog.addEventListener('touchcancel', lift);
+
+    // Safari pinches with its own gesture events: on a trackpad they zoom
+    // here; on a touch screen the touch events above already do, so these
+    // only keep Safari from zooming the page.
+    let gesture = 1;
+    dialog.addEventListener('gesturestart', (event) => {
+      event.preventDefault();
+      gesture = zoom;
+    });
+    dialog.addEventListener('gesturechange', (event) => {
+      event.preventDefault();
+      if (pinch) return;
+      const { scale, clientX, clientY } = event as Event & { scale: number; clientX: number; clientY: number };
+      zoomTo(gesture * scale, clientX, clientY);
     });
   }
 </script>
@@ -108,7 +284,9 @@ const widest = Math.max(...items.map((item) => item.size));
 <style>
   figure {
     /* Thumbnails: the fraction of its on-screen size every screenshot shows
-       at, when the window has room. A narrow window shrinks them all alike. */
+       at, when the window has room. A narrow window shrinks them all alike,
+       and a phone's (under 40rem, in the media query below) fills the text's
+       width with each. */
     --gallery-scale: 0.5;
 
     /* How wide the row of thumbnails may grow past the text's edges. */
@@ -118,9 +296,12 @@ const widest = Math.max(...items.map((item) => item.size));
     /* The enlarge marker in each thumbnail's corner. */
     --gallery-chip: 2rem;
 
-    /* Enlarged: a screenshot shrinks to fit the window, but never below this
-       fraction of its size. Past that, the dialog scrolls instead. */
-    --lightbox-min-scale: 0.75;
+    /* Enlarged: a screenshot fits the window, never past its own size. Each
+       zoom button multiplies its size by the step, and a click zooms it to
+       its own size, or by a step if that's further. Nothing zooms past the
+       max, in times its own size. The script reads these two. */
+    --lightbox-zoom-step: 1.5;
+    --lightbox-max-zoom: 2;
   }
 
   /* The row is centred on the text and as wide as the window allows. */
@@ -144,6 +325,13 @@ const widest = Math.max(...items.map((item) => item.size));
     flex: none;
     width: min(calc(var(--w) * var(--gallery-scale) * 1px), calc(var(--w) / var(--w-max) * 100%));
     cursor: zoom-in;
+  }
+
+  /* A phone has room for one at a time, so each takes the text's width. */
+  @media (width < 40rem) {
+    figure > div > a {
+      width: 100%;
+    }
   }
 
   figure > div > a img,
@@ -184,21 +372,25 @@ const widest = Math.max(...items.map((item) => item.size));
     color: var(--accent);
   }
 
+  /* The dialog fills the visible window: the buttons along the top, and
+     below them the stage, which scrolls a zoomed screenshot. Neither allows
+     the browser's pinch zoom; the script zooms the screenshot instead. */
   dialog {
     width: 100%;
-    height: 100%;
+    height: 100dvh;
     max-width: none;
     max-height: none;
     margin: 0;
-    padding: var(--space-xl) var(--gutter) var(--gutter);
+    padding: 0;
     border: 0;
     background: var(--paper);
-    overflow: auto;
-    overscroll-behavior: contain;
+    overflow: hidden;
+    touch-action: pan-x pan-y;
   }
 
   dialog[open] {
     display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
     animation: lightbox-in var(--dur-fast) var(--ease);
   }
 
@@ -206,21 +398,53 @@ const widest = Math.max(...items.map((item) => item.size));
     background: var(--paper);
   }
 
-  /* Auto margins centre it while it fits and let it scroll from its start
-     once it doesn't. */
-  dialog > :global(img),
-  dialog > :global(svg) {
-    margin: auto;
-    width: clamp(calc(var(--w) * var(--lightbox-min-scale) * 1px), 100%, calc(var(--w) * 1px));
-    max-width: none;
+  dialog > div:first-child {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--gutter);
   }
 
-  dialog button {
-    position: fixed;
-    inset-block-start: var(--space-md);
-    inset-inline-end: var(--gutter);
-    padding: var(--space-xs) var(--space-sm);
-    background: var(--paper);
+  dialog > div:first-child > button[aria-disabled='true'] {
+    color: var(--ink-3);
+    cursor: default;
+  }
+
+  dialog > div:last-child {
+    container-type: size;
+    display: grid;
+    padding: 0 var(--gutter) var(--gutter);
+    overflow: hidden;
+    overscroll-behavior: contain;
+    touch-action: pan-x pan-y;
+  }
+
+  dialog[data-zoomed] > div:last-child {
+    overflow: auto;
+  }
+
+  /* The size that fits is the smallest of its own size (`--w`), the stage's
+     width, and the width its height allows; the script's `--zoom` multiplies
+     it. Auto margins centre it while it fits and let it scroll from its start
+     once it doesn't. */
+  dialog > div:last-child > :global(img),
+  dialog > div:last-child > :global(svg) {
+    width: calc(min(var(--w) * 1px, 100cqi, 100cqb * var(--ratio)) * var(--zoom, 1));
+    max-width: none;
+    margin: auto;
+    cursor: zoom-in;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  dialog[data-zoomed] > div:last-child > :global(img),
+  dialog[data-zoomed] > div:last-child > :global(svg) {
+    cursor: zoom-out;
+  }
+
+  dialog[data-dragging] > div:last-child > :global(img),
+  dialog[data-dragging] > div:last-child > :global(svg) {
+    cursor: grabbing;
   }
 
   :global(html:has(dialog[open])) {

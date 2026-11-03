@@ -5,6 +5,7 @@
 import '../styles/global.css';
 import { site } from '../site.config';
 import { withBase } from '../lib/base';
+import { svgIcon, icoIcon, appleTouchIcon } from '../lib/icons.mjs';
 import Footer from '../components/Footer.astro';
 
 interface Props {
@@ -131,7 +132,10 @@ const csp = [
       href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:ital,wght@0,200..800;1,200..800&family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800&display=swap"
     />
 
-    <link rel="icon" href={withBase(site.favicon)} type="image/svg+xml" />
+    {/* The .ico claims 32×32 so Chrome picks the SVG over it. */}
+    <link rel="icon" href={withBase(icoIcon.path)} sizes="32x32" />
+    <link rel="icon" href={withBase(svgIcon)} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={withBase(appleTouchIcon.path)} />
     <link rel="manifest" href={withBase('/manifest.webmanifest')} />
     <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
 

@@ -18,6 +18,7 @@ Pedro MC Fernandes's portfolio site. The home page is an interactive map that li
 | `npm run visual` | Compares this working tree's look with `origin/main` (see below) |
 | `npm run encrypt` | Re-encrypts locked projects (also part of `build`) |
 | `npm run email -- you@example.com` | Changes the contact email |
+| `npm run icons` | Redraws the favicon's PNG and .ico versions from `public/favicon.svg` |
 
 Before you push: run `npm run check`, `npm run lint:css` and `npm run build`. CI runs the same three on every pull request to `main`, and a push to `main` doesn't deploy if one of them fails.
 
@@ -70,6 +71,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | Colours, type scale, spacing, motion | `src/styles/tokens.css` |
 | How plain elements look everywhere (links, buttons, headings, lists, Markdown), shared print | `src/styles/global.css` |
 | Name, role, social links, OG image, theme colour, extra contact lines printed only on the PDF CV (`printContacts`) | `src/site.config.ts` |
+| The favicon and app icons: the SVG they're drawn from, and the list of files made from it | `public/favicon.svg`, `src/lib/icons.mjs` |
 | Site URL, base path, redirects from the old `/portfolio/` addresses | `astro.config.mjs` |
 | `<head>`, metadata, CSP, JSON-LD, page shell | `src/layouts/Base.astro` |
 | Home page: markup and look | `src/pages/index.astro` |
@@ -93,7 +95,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | Page nav, footer | `src/components/PageNav.astro`, `src/components/Footer.astro` |
 | Print button, email decoding, reveal-on-print | `src/scripts/site.ts` |
 | 404, `/llms.txt`, `/robots.txt`, manifest | `src/pages/` |
-| Build scripts (encrypt, email, visual check) | `scripts/` |
+| Build scripts (encrypt, email, icons, visual check) | `scripts/` |
 | CI and deploy | `.github/workflows/deploy.yml` |
 
 ## Common tasks
@@ -158,6 +160,17 @@ Every page shares one image when its link is posted (LinkedIn, Slack, X, WhatsAp
 2. Replace `public/og.png` with it. If the size or format changed, update `ogImage` in `src/site.config.ts` to match, and rewrite its `alt` whenever the words in the image change.
 3. Platforms keep a copy for days. To see the new one sooner, re-scrape a page in [LinkedIn's Post Inspector](https://www.linkedin.com/post-inspector/) and [Facebook's Sharing Debugger](https://developers.facebook.com/tools/debug/).
 
+### Change the favicon
+
+Every browser tab, bookmark, home screen and installed app shows an icon drawn from `public/favicon.svg`.
+
+1. Export a square SVG, 512×512, with a `viewBox`, so browsers can scale it down. Keep its background inside the drawing: tabs can be light or dark.
+2. Replace `public/favicon.svg` with it.
+3. Run `npm run icons`. It redraws `favicon.ico`, `apple-touch-icon.png` and the manifest's PNGs in `public/` from the SVG. Commit them with it.
+4. If the drawing reaches further from the centre than the old one, check `public/icon-maskable-512.png`: Android may crop it to a circle 80% of its width. `MASKABLE_SCALE` at the top of `scripts/icons.mjs` shrinks the drawing to fit.
+
+Browsers keep icons for a long time. To see the new one, open the site in a private window.
+
 ### Check you haven't changed the look
 
 ```bash
@@ -196,7 +209,6 @@ The site is audited against [The Website Specification](https://specification.we
 ## To do
 
 - [ ] Create the content based on [the list](notes/content-strategy.md) (local-only, `notes/` is git-ignored)
-- [ ] Add raster app icons (`favicon.ico`, `apple-touch-icon.png`, maskable PWA icon).
 - [ ] Self-host the fonts (currently Google Fonts).
 
-The last two are the Website Specification items that wait on assets; `SPEC-COMPLIANCE.md` → Pending has what each one involves.
+The last one is the Website Specification item that waits on assets; `SPEC-COMPLIANCE.md` → Pending has what it involves.

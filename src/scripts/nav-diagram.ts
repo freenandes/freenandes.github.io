@@ -1,7 +1,8 @@
 /* =============================================================================
    The home page's map: a small force layout that scatters the markers, keeps
    them from colliding, and routes the connectors between them without crossings.
-   It also finds the map's decorations free spots, outside the simulation.
+   Outside the simulation, it finds free spots for the map's decorations and
+   for each card as it opens.
 
    The markers, their copy and the chain they connect in are authored in
    `src/diagram.config.ts` — the same file the page renders from, so the layout
@@ -37,8 +38,18 @@ const KNOBS = {
   wave: { bends: [4, 6], swing: [10, 20] },
   /** How far a jagged connector's corners stray from the straight line. */
   jag: { min: 16, max: 60 },
-  /** Room a card needs to open beside its marker, or above or below it; on a
-   *  phone, above and below get up to `narrowBias` of extra preference. */
+  /** Where a card opens. It never covers its own marker, stays wholly in view
+   *  if any spot can, and then keeps `gap` clear of every other marker if any
+   *  spot can. It abuts its marker's box on one
+   *  side, sliding along it while it still reaches `grip` past the marker's
+   *  centre; if no such spot is clear, it may stand off up to `drift` from the
+   *  marker instead. Among spots equally clear of markers, each step down the
+   *  order of roomiest sides costs as much as sliding `sideStep`, and covering a
+   *  whole ring as much as sliding `ring`. */
+  cardClear: { gap: 8, grip: 24, drift: 120, sideStep: 64, ring: 120 },
+  /** Room a card needs beside its marker, or above or below it, when ranking
+   *  the sides from roomiest; on a phone, above and below get up to
+   *  `narrowBias` of extra preference. */
   cardRoom: { side: 220, vertical: 80, narrowBias: 80 },
   /** Gap a card keeps from the edge of the viewport. */
   cardEdge: 12,
@@ -73,6 +84,10 @@ type Node = {
   el: HTMLElement;
   cfg: DiagramEntry;
   id: string;
+  /** The marker's button, and the card it opens. The name has no card, and a
+   *  ring has neither. */
+  button: HTMLButtonElement | null;
+  panel: HTMLElement | null;
 
   frac: { x: number; y: number };
   x: number;
@@ -102,6 +117,12 @@ type EdgeShape = {
 /** A box by its centre and half-size, in pixels. */
 type Box = { x: number; y: number; halfX: number; halfY: number };
 
+/** A box by its edges, in viewport pixels, as `getBoundingClientRect` gives. */
+type Rect = { left: number; top: number; right: number; bottom: number };
+
+/** The side of its marker a card opens on. */
+type Side = 'bottom' | 'top' | 'right' | 'left';
+
 /** A drawing on the texture, and where its centre sits once it has landed. */
 type Decor = { el: SVGSVGElement; spot: { x: number; y: number } | null };
 
@@ -127,6 +148,8 @@ export function initDiagram(root: HTMLElement) {
       el,
       cfg,
       id: cfg.id,
+      button: el.querySelector('button'),
+      panel: el.querySelector('.panel'),
       frac: { x: 0.5, y: 0.5 },
       x: 0,
       y: 0,
@@ -531,7 +554,6 @@ export function initDiagram(root: HTMLElement) {
         x: Math.max(0, Math.min(1, (n.x - mx) / iw)),
         y: Math.max(0, Math.min(1, (n.y - my) / ih)),
       };
-      n.el.dataset.place = placeFor(n);
     }
     recomputeRests();
   }
@@ -657,7 +679,6 @@ export function initDiagram(root: HTMLElement) {
     }
     for (const n of floats) {
       n.frac = clampFrac((n.ax - mx) / iw, (n.ay - my) / ih);
-      n.el.dataset.place = placeFor(n);
     }
   }
 
@@ -680,8 +701,6 @@ export function initDiagram(root: HTMLElement) {
     const tAx = a.ax, tAy = a.ay, tFx = a.frac.x, tFy = a.frac.y;
     a.ax = b.ax; a.ay = b.ay; a.frac = { x: b.frac.x, y: b.frac.y };
     b.ax = tAx; b.ay = tAy; b.frac = { x: tFx, y: tFy };
-    a.el.dataset.place = placeFor(a);
-    b.el.dataset.place = placeFor(b);
   }
 
   function edgePolyline(e: { a: Node; b: Node; shape: EdgeShape }): { x: number; y: number }[] {
@@ -867,23 +886,24 @@ export function initDiagram(root: HTMLElement) {
     relaxFloatingFromEdges();
   }
 
-  function placeFor(n: Node): string {
-    const right = W - n.ax;
-    const left = n.ax;
-    const top = n.ay;
-    const bottom = H - n.ay;
+  /** The sides a card could open on, roomiest first. This only breaks ties:
+   *  placePanel takes a side where the card is clear of the other markers over
+   *  a roomier one where it isn't. */
+  function sideOrder(own: DOMRect): Side[] {
+    const cx = (own.left + own.right) / 2;
+    const cy = (own.top + own.bottom) / 2;
     const needH = KNOBS.cardRoom.side;
     const needV = KNOBS.cardRoom.vertical;
     const narrow = narrowness();
     const vBoost = KNOBS.cardRoom.narrowBias * narrow;
-    const opts: [string, number][] = [
-      ['right', right - needH],
-      ['left', left - needH],
-      ['bottom', bottom - needV + vBoost],
-      ['top', top - needV + vBoost],
+    const opts: [Side, number][] = [
+      ['right', window.innerWidth - cx - needH],
+      ['left', cx - needH],
+      ['bottom', window.innerHeight - cy - needV + vBoost],
+      ['top', cy - needV + vBoost],
     ];
     opts.sort((p, q) => q[1] - p[1]);
-    return opts[0][0];
+    return opts.map(([side]) => side);
   }
 
   function computeAnchors(first = false) {
@@ -902,7 +922,6 @@ export function initDiagram(root: HTMLElement) {
         n.x = n.ax + (Math.random() - 0.5) * SIM.initialScatter;
         n.y = n.ay + (Math.random() - 0.5) * SIM.initialScatter;
       }
-      n.el.dataset.place = placeFor(n);
     }
     recomputeRests();
   }
@@ -1220,79 +1239,178 @@ export function initDiagram(root: HTMLElement) {
   }
 
   function setCalm(n: Node) {
-    n.calm = n.hover || n.focus || n.el.classList.contains('is-open');
-  }
-  /**
-   * Pulls a card back inside the viewport when its node sits near an edge.
-   *
-   * This runs at the moment a card is asked for, which is also the moment its
-   * fade begins — so it must not touch the card's transition. Instead of
-   * neutralising it to get a clean measurement, the resting position is derived
-   * from the panel's layout box (the live rect with its `transform` matrix taken
-   * back out), which reads the same whether or not a transition is in flight.
-   * The correction is written to `translate`, which isn't transitioned, so it
-   * lands in one frame.
-   */
-  function clampPanel(n: Node) {
-    const panel = n.el.querySelector<HTMLElement>('.panel');
-    if (!panel) return;
-    panel.style.setProperty('--panel-nudge-x', '0px');
-    panel.style.setProperty('--panel-nudge-y', '0px');
-    const rect = panel.getBoundingClientRect();
-    const matrix = getComputedStyle(panel).transform;
-    const placement =
-      matrix && matrix !== 'none' ? new DOMMatrixReadOnly(matrix) : null;
-    const boxX = rect.left - (placement ? placement.m41 : 0);
-    const boxY = rect.top - (placement ? placement.m42 : 0);
-    // Once open, the placement transform is only the centring half-step
-    // (`--shift` is 0), so that is all that goes back on.
-    const acrossNode = n.el.dataset.place === 'bottom' || n.el.dataset.place === 'top';
-    const left = boxX - (acrossNode ? rect.width / 2 : 0);
-    const top = boxY - (acrossNode ? 0 : rect.height / 2);
-    const M = KNOBS.cardEdge;
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    let nx = 0;
-    let ny = 0;
-    if (left < M) nx = M - left;
-    else if (left + rect.width > vw - M) nx = (vw - M) - (left + rect.width);
-    if (top < M) ny = M - top;
-    else if (top + rect.height > vh - M) ny = (vh - M) - (top + rect.height);
-    panel.style.setProperty('--panel-nudge-x', `${Math.round(nx)}px`);
-    panel.style.setProperty('--panel-nudge-y', `${Math.round(ny)}px`);
+    n.calm = n.hover || n.focus || isOpen(n);
   }
 
-  function clampVisiblePanels() {
-    for (const n of nodes) {
-      if (n.el.classList.contains('is-open') || n.hover || n.focus) clampPanel(n);
+  function overlap(a: Rect, b: Rect) {
+    const w = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+    const h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+    return w > 0 && h > 0 ? w * h : 0;
+  }
+
+  /**
+   * Picks where a card opens, toward free space. Each side of its marker is
+   * tried, with the card centred on it and then slid along it, always inside
+   * the visible part of the map. The card abuts its marker's box, so it never
+   * covers it. The spot that pokes least out of view wins, since a card cut off
+   * at the edge can't be read; then the one that covers least of the other
+   * markers; then the roomiest side, the shortest slide and the fewest rings
+   * covered (KNOBS.cardClear). Only when every such spot covers a marker or
+   * pokes out of view does the card stand off from its own.
+   *
+   * The spot is written as the card's offset from its marker's box, which
+   * isn't transitioned, so it lands at once; `data-place` names the side, so
+   * the card arrives from it. Sizes come from layout, not the live rect, so
+   * they read the same while the card is hidden or fading.
+   */
+  function placePanel(n: Node) {
+    const panel = n.panel;
+    if (!panel) return;
+    const own = n.el.getBoundingClientRect();
+    const map = root.getBoundingClientRect();
+    const w = panel.offsetWidth;
+    const h = panel.offsetHeight;
+    const { gap, grip, drift, sideStep, ring } = KNOBS.cardClear;
+    const M = KNOBS.cardEdge;
+    // The visual viewport leaves out what a phone's browser bars cover.
+    const vv = window.visualViewport;
+    const view: Rect = {
+      left: Math.max(map.left, 0, vv?.offsetLeft ?? 0) + M,
+      top: Math.max(map.top, 0, vv?.offsetTop ?? 0) + M,
+      right: Math.min(map.right, window.innerWidth, vv ? vv.offsetLeft + vv.width : Infinity) - M,
+      bottom: Math.min(map.bottom, window.innerHeight, vv ? vv.offsetTop + vv.height : Infinity) - M,
+    };
+    const markers: Rect[] = [];
+    const rings: DOMRect[] = [];
+    for (const o of nodes) {
+      if (o === n) continue;
+      const r = o.el.getBoundingClientRect();
+      if (o.floating) rings.push(r);
+      else markers.push({ left: r.left - gap, top: r.top - gap, right: r.right + gap, bottom: r.bottom + gap });
     }
+    const cx = (own.left + own.right) / 2;
+    const cy = (own.top + own.bottom) / 2;
+    const STEPS = 8;
+    type Spot = { side: Side; x: number; y: number; out: number; covered: number; soft: number };
+    // Compared in order, each within a pixel's worth: out of view, markers
+    // covered, then the rest.
+    const beats = (a: Spot, b: Spot) =>
+      a.out < b.out - 1 ||
+      (a.out <= b.out + 1 &&
+        (a.covered < b.covered - 1 || (a.covered <= b.covered + 1 && a.soft < b.soft)));
+    let best: Spot = { side: 'bottom', x: cx - w / 2, y: own.bottom, out: Infinity, covered: Infinity, soft: Infinity };
+    sideOrder(own).forEach((side, rank) => {
+      const vertical = side === 'bottom' || side === 'top';
+      const reach = Math.max(0, (vertical ? w : h) / 2 - grip);
+      for (let i = -STEPS; i <= STEPS; i++) {
+        const slide = (reach * i) / STEPS;
+        let x: number;
+        let y: number;
+        if (vertical) {
+          x = Math.max(view.left, Math.min(view.right - w, cx - w / 2 + slide));
+          y = side === 'bottom' ? own.bottom : own.top - h;
+        } else {
+          x = side === 'right' ? own.right : own.left - w;
+          y = Math.max(view.top, Math.min(view.bottom - h, cy - h / 2 + slide));
+        }
+        const card: Rect = { left: x, top: y, right: x + w, bottom: y + h };
+        const out = w * h - overlap(card, view);
+        let covered = 0;
+        for (const m of markers) covered += overlap(card, m);
+        let soft = rank * sideStep + (vertical ? Math.abs(x + w / 2 - cx) : Math.abs(y + h / 2 - cy));
+        for (const r of rings) soft += (ring * overlap(card, r)) / (r.width * r.height || 1);
+        const spot = { side, x, y, out, covered, soft };
+        if (beats(spot, best)) best = spot;
+      }
+    });
+    // No clear spot touches the marker, so take the clear spot nearest to it,
+    // within `drift`. Where there is none either, as on a phone, the card stays
+    // against its marker, in view if it fits, covering as little as it can.
+    if (best.out > 1 || best.covered > 1) {
+      const SCAN = 8;
+      let near: Spot | null = null;
+      const top = Math.max(view.top, own.top - drift - h);
+      const left = Math.max(view.left, own.left - drift - w);
+      const bottom = Math.min(view.bottom, own.bottom + drift + h);
+      const right = Math.min(view.right, own.right + drift + w);
+      for (let y = top; y <= bottom - h; y += SCAN) {
+        for (let x = left; x <= right - w; x += SCAN) {
+          const card: Rect = { left: x, top: y, right: x + w, bottom: y + h };
+          if (overlap(card, own) > 0 || markers.some((m) => overlap(card, m) > 0)) continue;
+          const dx = Math.max(0, card.left - own.right, own.left - card.right);
+          const dy = Math.max(0, card.top - own.bottom, own.top - card.bottom);
+          let soft = Math.hypot(dx, dy);
+          if (soft > drift) continue;
+          for (const r of rings) soft += (ring * overlap(card, r)) / (r.width * r.height || 1);
+          if (near && soft >= near.soft) continue;
+          const side: Side =
+            card.top >= own.bottom ? 'bottom'
+            : card.bottom <= own.top ? 'top'
+            : card.left >= own.right ? 'right'
+            : 'left';
+          near = { side, x, y, out: 0, covered: 0, soft };
+        }
+      }
+      if (near) best = near;
+    }
+    n.el.dataset.place = best.side;
+    panel.style.setProperty('--panel-x', `${Math.round(best.x - own.left)}px`);
+    panel.style.setProperty('--panel-y', `${Math.round(best.y - own.top)}px`);
+  }
+
+  /** `aria-expanded` is the one record of which card is open; the page's CSS
+   *  shows a card from it, and nothing else does. */
+  function isOpen(n: Node) {
+    return n.button?.getAttribute('aria-expanded') === 'true';
+  }
+
+  function openNode() {
+    return nodes.find(isOpen);
   }
 
   function setOpen(n: Node, open: boolean) {
-    n.el.classList.toggle('is-open', open);
-    n.el.querySelector('button')?.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (open) clampPanel(n);
+    if (!n.button || !n.panel) return;
+    if (open) placePanel(n);
+    n.button.setAttribute('aria-expanded', open ? 'true' : 'false');
     setCalm(n);
     wake();
   }
+
   function closeAll(except?: Node) {
-    for (const n of nodes) if (n !== except) setOpen(n, false);
+    for (const n of nodes) if (n !== except && isOpen(n)) setOpen(n, false);
   }
 
-  root.addEventListener('pointerdown', (ev) => {
-    if (!(ev.target as HTMLElement).closest('[data-id]')) closeAll();
+  /** Re-places the open card after the map under it has moved. */
+  function placeOpenPanel() {
+    const n = openNode();
+    if (n) placePanel(n);
+  }
+
+  // A card closes on a press anywhere outside its marker and itself, and on
+  // Escape wherever focus is. Escape hands focus back to the marker, unless
+  // focus has already moved on somewhere else.
+  document.addEventListener('pointerdown', (ev) => {
+    const n = openNode();
+    if (n && !(ev.target instanceof Element && n.el.contains(ev.target))) setOpen(n, false);
   });
-  root.addEventListener('keydown', (ev) => {
-    if (ev.key === 'Escape') closeAll();
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key !== 'Escape') return;
+    const n = openNode();
+    if (!n) return;
+    const focused = document.activeElement;
+    const reclaim = !focused || focused === document.body || n.el.contains(focused);
+    setOpen(n, false);
+    if (reclaim) n.button?.focus();
   });
 
   for (const n of nodes) {
     const hit = n.el.querySelector<HTMLButtonElement>('button');
     if (!hit) continue;
 
+    // Hover and focus only hold a marker still, so it doesn't drift from under
+    // the pointer; a card opens on a click, or on Enter or Space.
     n.el.addEventListener('pointerenter', () => {
       n.hover = true;
-      clampPanel(n);
       setCalm(n);
       wake();
     });
@@ -1303,7 +1421,6 @@ export function initDiagram(root: HTMLElement) {
     });
     n.el.addEventListener('focusin', () => {
       n.focus = true;
-      clampPanel(n);
       setCalm(n);
       wake();
     });
@@ -1364,7 +1481,7 @@ export function initDiagram(root: HTMLElement) {
         n.ax = n.x;
         n.ay = n.y;
         recomputeRests();
-        n.el.dataset.place = placeFor(n);
+        if (isOpen(n)) placePanel(n);
         decrossEdges();
         refineCurveCrossings();
         wake();
@@ -1384,7 +1501,7 @@ export function initDiagram(root: HTMLElement) {
         closeAll();
         return;
       }
-      const wasOpen = n.el.classList.contains('is-open');
+      const wasOpen = isOpen(n);
       closeAll(n);
       setOpen(n, !wasOpen);
     });
@@ -1407,7 +1524,7 @@ export function initDiagram(root: HTMLElement) {
     requestAnimationFrame(() => {
       resizeScheduled = false;
       computeAnchors();
-      clampVisiblePanels();
+      placeOpenPanel();
       wake();
     });
   };
@@ -1429,7 +1546,8 @@ export function initDiagram(root: HTMLElement) {
     measureDotOffsets();
     relayout();
     seedFromAnchors();
-    clampVisiblePanels();
+    render();
+    placeOpenPanel();
     wake();
   };
 

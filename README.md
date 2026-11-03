@@ -128,7 +128,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 
 Put the files in `src/assets/projects/<slug>/` and import them at the top of the MDX, under the frontmatter.
 
-Screenshots go in a `Gallery`. Each one shows as a thumbnail at the same scale as the others, so their text matches: side by side, wider than the text when the window has room, stacked when it doesn't, and as wide as the text on a phone. A click or tap opens it as large as fits the window, never past the size it was on screen. There a click or tap zooms in where it lands and the next zooms back out; a pinch, Ctrl or ⌘ with the wheel, or the Zoom in and Zoom out buttons zoom by degrees. Zoomed, it pans by scrolling or dragging, and the buttons stay at the top. Export every screenshot in a gallery at the same zoom, and tell the gallery which: `density={2}` for 2× exports (the default is 1). Large screenshots can take a smaller thumbnail scale with `scale={0.17}`, so a few still fit side by side. The text between the tags is the caption.
+Screenshots go in a `Gallery`. Each one shows as a thumbnail at the same scale as the others, so their text matches: side by side, wider than the text when the window has room, stacked when it doesn't, and as wide as the text on a phone. A click or tap opens it as large as fits the window, never past the size it was on screen. There a click or tap zooms in where it lands, up to that size and no further (`--lightbox-max-zoom`), and the next zooms back out; a pinch, Ctrl or ⌘ with the wheel, or the Zoom in and Zoom out buttons zoom by degrees. Zoomed, it pans by scrolling or dragging, and the buttons stay at the top. Export every screenshot in a gallery at the same zoom, and tell the gallery which: `density={2}` for 2× exports (the default is 1). Large screenshots can take a smaller thumbnail scale with `scale={0.17}`, so a few still fit side by side. The text between the tags is the caption.
 
 ```mdx
 import Gallery from '../../components/Gallery.astro';
@@ -139,7 +139,13 @@ import results from '../../assets/projects/<slug>/results.png';
 </Gallery>
 ```
 
-A video is a plain `<video>` in a `<figure>`. Compress it first, since every version committed stays in the repo, and give it a poster frame so it doesn't print blank. `percona-case-1.mdx` has one under "Lost the debate, kept the work".
+A video is a plain `<video>` in a `<figure>`, with a poster frame so it doesn't print blank. `percona-case-1.mdx` has one under "Lost the debate, kept the work". Export it at the size it was recorded at (a 2× screen recording stays 2×, so it's sharp full screen), then encode it for a fixed quality rather than a fixed bitrate: a screen recording barely changes from frame to frame, so it stays small without starving the text. A low bitrate is what blurs UI text, at any resolution. Every version committed stays in the repo, and GitHub refuses a file over 100 MB, so keep each one well under that:
+
+```bash
+ffmpeg -i master.mp4 -vf "scale=out_range=tv:flags=lanczos,format=yuv420p" -c:v libx264 -preset slow -tune animation -crf 22 -level:v 5.2 -x264-params aq-mode=3 -an -movflags +faststart out.mp4
+```
+
+A lower `-crf` is sharper and bigger: 22 suits a short video, and a long, busy one can go up to about 29 before text softens. `-level:v 5.2` keeps a 4K, 60 fps video within what phones' and laptops' hardware decoders accept. `-an` drops the sound, which these demos don't have. Take the poster from the same master, at the same moment, so it doesn't change when the video starts.
 
 ### Add a drawing to the map
 

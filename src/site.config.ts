@@ -29,8 +29,6 @@ export interface SiteConfig {
    *  the card the first time a link is shared, before it has fetched the image.
    *  `alt` reads out what the image says. */
   ogImage: { path: string; width: number; height: number; type: string; alt: string };
-  /** Path under /public */
-  favicon: string;
   /** Home-screen name, and the tint browsers paint their own UI with. */
   shortName: string;
   themeColor: string;
@@ -58,7 +56,6 @@ export const site: SiteConfig = {
     alt:
       'Pedro MC Fernandes, Senior Product Designer & Design Engineer: “I map complex technical software for the people who rely on it every day.” Set over a topographic map.',
   },
-  favicon: '/favicon.svg',
   shortName: 'PMCF',
   themeColor: '#ffffff',
 };

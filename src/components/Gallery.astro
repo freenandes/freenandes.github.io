@@ -142,6 +142,8 @@ const widest = Math.max(...items.map((item) => item.size));
       zoomOut.setAttribute('aria-disabled', String(zoom === 1));
       zoomFit.setAttribute('aria-disabled', String(zoom === 1));
       zoomIn.setAttribute('aria-disabled', String(zoom >= limit() / 1.02));
+      // A screenshot the window already shows at its furthest zoom has none.
+      dialog.toggleAttribute('data-unzoomable', limit() < 1.02);
     };
 
     /** Back to the size that fits the window. */
@@ -307,9 +309,11 @@ const widest = Math.max(...items.map((item) => item.size));
     /* Enlarged: a screenshot fits the window, never past its own size. Each
        zoom button multiplies its size by the step, and a click zooms it to
        its own size, or by a step if that's further. Nothing zooms past the
-       max, in times its own size. The script reads these two. */
+       max, in times its own size: at 1, the furthest zoom is the size it was
+       on screen, pixel for pixel on the display it was taken on, so it reads
+       as well as the real thing and no better. The script reads these two. */
     --lightbox-zoom-step: 1.5;
-    --lightbox-max-zoom: 2;
+    --lightbox-max-zoom: 1;
   }
 
   /* The row is centred on the text and as wide as the window allows. */
@@ -449,6 +453,11 @@ const widest = Math.max(...items.map((item) => item.size));
   dialog[data-zoomed] > div:last-child > :global(img),
   dialog[data-zoomed] > div:last-child > :global(svg) {
     cursor: zoom-out;
+  }
+
+  dialog[data-unzoomable] > div:last-child > :global(img),
+  dialog[data-unzoomable] > div:last-child > :global(svg) {
+    cursor: auto;
   }
 
   dialog[data-dragging] > div:last-child > :global(img),

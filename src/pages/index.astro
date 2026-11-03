@@ -202,7 +202,7 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
       position: static !important;
       opacity: 1 !important;
       visibility: visible !important;
-      transform: none !important;
+      translate: none !important;
       pointer-events: auto !important;
       margin-block-start: var(--space-sm);
     }
@@ -416,9 +416,7 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     will-change: transform;
   }
 
-  .node:hover,
-  .node:focus-within,
-  .node.is-open,
+  .node:has(button[aria-expanded='true']),
   .node.is-dragging {
     z-index: 6;
   }
@@ -478,15 +476,18 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     stroke-width: 2;
   }
 
+  /* Hover and keyboard focus only light a marker up; a card opens on a click,
+     or on Enter or Space, and the script records it in `aria-expanded`. */
+
   .node button:hover svg,
-  .node:focus-within button svg,
-  .node.is-open button svg {
+  .node button:focus-visible svg,
+  .node button[aria-expanded='true'] svg {
     transform: scale(1.25);
   }
 
   .node button:hover polygon,
-  .node:focus-within button polygon,
-  .node.is-open button polygon {
+  .node button:focus-visible polygon,
+  .node button[aria-expanded='true'] polygon {
     fill: var(--accent);
     stroke: var(--accent-ink);
   }
@@ -513,8 +514,8 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
   }
 
   .node button:hover span,
-  .node:focus-within button span,
-  .node.is-open button span {
+  .node button:focus-visible span,
+  .node button[aria-expanded='true'] span {
     color: var(--ink);
   }
 
@@ -572,15 +573,16 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
   /* --- Cards ------------------------------------------------------------ */
 
   .panel {
-    /* How far the card sits from its marker before it is asked for. */
+    /* How far out the card starts when it is asked for, and goes back to as
+       it leaves. */
     --shift: 0.5rem;
 
-    /* The script sets these to pull a card back inside the viewport when its
-       marker sits near an edge (see clampPanel). 0 = no correction needed. */
-    --panel-nudge-x: 0px;
-    --panel-nudge-y: 0px;
-
     position: absolute;
+
+    /* The script works out where the card opens (see placePanel) and writes it
+       as an offset from its marker's box. */
+    left: var(--panel-x, 0);
+    top: var(--panel-y, 100%);
     width: max-content;
     max-width: min(90vw, var(--card-width));
     padding: 0.875rem 1rem;
@@ -591,65 +593,51 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
+    translate: var(--arrive, 0);
 
-    /* The viewport correction rides on `translate`, which is left out of the
-       transition below: it must land instantly, or a card near an edge would
-       appear to slide in from the wrong place. */
-    translate: var(--panel-nudge-x) var(--panel-nudge-y);
-
-    /* Leaving is quicker than arriving: a card you have moved away from should
-       get out of the way, a card you asked for should settle. */
+    /* Leaving is quicker than arriving: a card you have closed should get out
+       of the way, a card you asked for should settle. */
     transition: opacity var(--dur-fast) var(--ease),
-      visibility var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+      visibility var(--dur-fast) var(--ease), translate var(--dur-fast) var(--ease);
   }
 
-  /* `data-place` is set by the script, on whichever side has the most room. */
+  /* `data-place` is the side of its marker the script opened the card on. */
 
   .node[data-place='bottom'] .panel {
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(var(--shift));
+    --arrive: 0 var(--shift);
   }
 
   .node[data-place='top'] .panel {
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(calc(-1 * var(--shift)));
+    --arrive: 0 calc(-1 * var(--shift));
   }
 
   .node[data-place='right'] .panel {
-    left: 100%;
-    top: 50%;
-    transform: translateY(-50%) translateX(var(--shift));
+    --arrive: var(--shift) 0;
   }
 
   .node[data-place='left'] .panel {
-    right: 100%;
-    top: 50%;
-    transform: translateY(-50%) translateX(calc(-1 * var(--shift)));
+    --arrive: calc(-1 * var(--shift)) 0;
   }
 
-  .node:hover .panel,
-  .node:focus-within .panel,
-  .node.is-open .panel {
-    --shift: 0px;
+  /* The card shows only while its button is expanded. It turns visible at
+     once, so focus can move into it straight away, and fades in. It arrives by
+     animation, not transition, so a card the script has just moved to another
+     side arrives from that side. */
 
+  .node:has(button[aria-expanded='true']) .panel {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
+    translate: 0;
+    transition-property: opacity;
     transition-duration: var(--dur);
+    animation: card-in var(--dur) var(--ease);
   }
 
-  /* Hover intent: a pointer crossing the map shouldn't trip every card on the
-     way. Deliberate opens — click, or keyboard focus — never wait. */
-
-  .node:hover .panel {
-    transition-delay: var(--delay-hover);
-  }
-
-  .node:focus-within .panel,
-  .node.is-open .panel {
-    transition-delay: 0s;
+  @keyframes card-in {
+    from {
+      translate: var(--arrive, 0);
+    }
   }
 
   .panel p {

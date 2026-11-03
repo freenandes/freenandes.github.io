@@ -66,10 +66,6 @@
   --dur: 333ms;
   --dur-slow: 667ms;
 
-  /* Hover intent: long enough that a pointer crossing the map doesn't trip
-     every card it passes, short enough to feel immediate when aimed. */
-  --delay-hover: 80ms;
-
   /* Gap between one revealed block and the next (see `--reveal-step`). */
   --reveal-stagger: 80ms;
 

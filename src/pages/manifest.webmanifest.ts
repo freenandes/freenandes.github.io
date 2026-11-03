@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { site } from '../site.config';
 import { withBase } from '../lib/base';
+import { svgIcon, manifestIcons } from '../lib/icons.mjs';
 
 /** Web app manifest. Generated so icon/start paths respect the configured base. */
 export const GET: APIRoute = () => {
@@ -15,12 +16,13 @@ export const GET: APIRoute = () => {
     background_color: site.themeColor,
     theme_color: site.themeColor,
     icons: [
-      {
-        src: withBase(site.favicon),
-        type: 'image/svg+xml',
-        sizes: 'any',
-        purpose: 'any',
-      },
+      { src: withBase(svgIcon), type: 'image/svg+xml', sizes: 'any', purpose: 'any' },
+      ...manifestIcons.map(({ path, size, purpose }) => ({
+        src: withBase(path),
+        type: 'image/png',
+        sizes: `${size}x${size}`,
+        purpose,
+      })),
     ],
   };
 

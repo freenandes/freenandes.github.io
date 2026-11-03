@@ -15,7 +15,8 @@
     "prebuild": "node scripts/encrypt-projects.mjs",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "icons": "node scripts/icons.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^8.1.2",
@@ -29,6 +30,7 @@
     "pngjs": "^7.0.0",
     "postcss-html": "^1.8.1",
     "puppeteer-core": "^25.4.0",
+    "sharp": "^0.35.5",
     "stylelint": "^17.13.0",
     "stylelint-config-html": "^1.1.0",
     "stylelint-config-standard": "^40.0.0",

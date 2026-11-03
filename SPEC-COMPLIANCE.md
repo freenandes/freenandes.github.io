@@ -15,6 +15,7 @@ Legend: ✅ done · 🟙 platform-provided · ⏳ pending · ➖ not applicable
 | --- | --- | --- |
 | `<meta name="color-scheme">` | foundations | Declared `light` (the site is intentionally light-only) to stop dark-UA form/scrollbar mismatches. |
 | Open Graph protocol | foundations | Added `og:site_name`, `og:locale`, per-page `og:type` (`website`/`profile`/`article`), `og:image:alt`, and full `twitter:*` title/description/image/alt. |
+| Open Graph / Twitter image | foundations | `public/og.png`: 1200×630 (1.91:1), opaque, 70 KB, text inside the centre square for apps that crop. Absolute HTTPS URL with `og:image:type`, `og:image:width` and `og:image:height`, so platforms draw the card on the first share, and `summary_large_image` for X. Set in `src/site.config.ts`. |
 | Web app manifest | resilience | Generated at `/manifest.webmanifest` (base-aware) and linked from `<head>`. |
 | Structured data (JSON-LD) | seo / agent-readiness | `@graph` with `WebSite` + `Person` site-wide, `ProfilePage` on About, `CreativeWork` per project, and `BreadcrumbList` on sub-pages. |
 | Meta robots | seo | Explicit `index, follow`. |
@@ -51,7 +52,6 @@ These are satisfied by hosting and need no code, but are **not configurable** fr
 
 | Spec | Category | What's needed |
 | --- | --- | --- |
-| **Open Graph / Twitter image** | foundations | `public/og.png` (1200×630) **does not exist** — `og:image` currently points at a missing file, so social/link previews are broken. Add a branded PNG (or approve an auto-generated one). The meta tags are already wired up and will work the moment the asset lands. |
 | **Favicons & app icons** | foundations / resilience | Only `favicon.svg` exists. Add `favicon.ico` (legacy fallback), `apple-touch-icon.png` (180×180), and a **maskable** PNG (512×512) for the PWA manifest, then wire the `<link rel="apple-touch-icon">` and add the maskable entry to `manifest.webmanifest`. |
 | **Self-hosted web fonts** | performance / security / privacy | Fonts load from Google Fonts today. Self-hosting WOFF2 (subset, `font-display: swap`) removes a third-party request, unblocks **Subresource Integrity**, and lets the CSP drop the `fonts.googleapis.com`/`fonts.gstatic.com` allowances. Needs the font binaries committed. |
 

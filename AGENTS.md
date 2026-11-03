@@ -63,4 +63,4 @@ To look at the site, use `npm run dev`, at http://localhost:4321/.
 - The case studies are `percona-case-1`, `percona-case-2` and `tui-case`, all on the map.
 - `notes/` and `sources/` are local-only and may be missing.
 - `package-lock.json`, `public/topo-low.svg` (one 537 KB line) and `public/locked/*.json` are generated. Don't read them; `.ignore` keeps them out of search results.
-- Pending work (OG image, raster icons, self-hosted fonts) is tracked in README → To do and `SPEC-COMPLIANCE.md`.
+- Pending work (raster icons, self-hosted fonts) is tracked in README → To do and `SPEC-COMPLIANCE.md`.

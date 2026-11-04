@@ -4,16 +4,26 @@
     with the mini-map, linking every page on the map. */
 
 import { render } from 'astro:content';
-import Base from '../../layouts/Base.astro';
-import MiniMap from '../../components/MiniMap.astro';
-import PageNav from '../../components/PageNav.astro';
-import PasswordGate from '../../components/PasswordGate.astro';
-import { getProjects } from '../../lib/projects';
-import { withBase } from '../../lib/base';
-import { site } from '../../site.config';
+import Base from '../layouts/Base.astro';
+import MiniMap from '../components/MiniMap.astro';
+import PageNav from '../components/PageNav.astro';
+import PasswordGate from '../components/PasswordGate.astro';
+import { getProjects } from '../lib/projects';
+import { withBase } from '../lib/base';
+import { site } from '../site.config';
 
 export async function getStaticPaths() {
   const projects = await getProjects();
+  // Case studies share the root with the other pages, and a page file wins over
+  // this route, so a project named like one would silently never be built.
+  const pages = Object.keys(import.meta.glob('./*.{astro,ts}')).map((file) =>
+    file.replace(/^\.\//, '').replace(/\.(astro|ts)$/, '')
+  );
+  for (const { id } of projects) {
+    if (pages.includes(id)) {
+      throw new Error(`src/content/projects/${id}.mdx: "/${id}/" is already a page. Rename the file.`);
+    }
+  }
   return projects.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
 }
 

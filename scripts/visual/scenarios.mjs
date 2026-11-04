@@ -42,10 +42,10 @@ export const scenarios = [
   { name: 'about-print', path: '/about/', media: 'print', fullPage: true },
   { name: 'about-scrolled', path: '/about/', act: scrollTo(1200) },
   { name: 'about-nav-pinned', path: '/about/', act: scrollTo(1200, 900) },
-  { name: 'project', path: '/projects/percona-case-1/' },
-  { name: 'project-scrolled', path: '/projects/percona-case-1/', act: scrollTo(600) },
+  { name: 'project', path: '/peak-systems-at-percona/' },
+  { name: 'project-scrolled', path: '/peak-systems-at-percona/', act: scrollTo(600) },
   // The foot of the page: the footer, opened by the mini-map.
-  { name: 'project-end', path: '/projects/percona-case-1/', act: scrollTo(100000) },
+  { name: 'project-end', path: '/peak-systems-at-percona/', act: scrollTo(100000) },
   // A locked project gets three more here: as it loads, then with a wrong and
   // the right passphrase typed into `.lock input` and sent by `.lock form button`.
   { name: 'error-404', path: '/404.html' },

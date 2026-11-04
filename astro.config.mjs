@@ -9,6 +9,15 @@ import sitemap from '@astrojs/sitemap';
 const SITE = process.env.SITE ?? 'https://www.pmcf.xyz';
 const BASE_PATH = process.env.BASE_PATH ?? '/';
 
+// Case studies moved from /projects/<old slug>/ (and, before that,
+// /portfolio/projects/<old slug>/) to /<slug>/. Old slug → current file name.
+// A renamed project file adds its old name here.
+const MOVED_PROJECTS = {
+  'percona-case-1': 'peak-systems-at-percona',
+  'percona-case-2': 'reading-the-terrain-at-percona',
+  'tui-case': '100000-pages-high-at-tui-group',
+};
+
 export default defineConfig({
   site: SITE,
   base: BASE_PATH,
@@ -16,11 +25,16 @@ export default defineConfig({
   // root, and links to those addresses were shared. GitHub Pages can't send
   // server redirects, so each old address gets a page that forwards to the new
   // one (an instant meta refresh plus a canonical link; no script, so the CSP
-  // is unaffected). The case-study line covers every project, new ones too.
+  // is unaffected). The same goes for the case studies' old addresses.
   redirects: {
     '/portfolio': '/',
     '/portfolio/about': '/about',
-    '/portfolio/projects/[...slug]': '/projects/[...slug]',
+    ...Object.fromEntries(
+      Object.entries(MOVED_PROJECTS).flatMap(([old, slug]) => [
+        [`/projects/${old}`, `/${slug}/`],
+        [`/portfolio/projects/${old}`, `/${slug}/`],
+      ])
+    ),
   },
   integrations: [mdx(), sitemap()],
   markdown: {

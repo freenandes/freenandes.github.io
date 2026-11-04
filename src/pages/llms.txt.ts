@@ -31,7 +31,7 @@ export const GET: APIRoute = async ({ site: astroSite }) => {
     '',
     ...projects.map((p) => {
       const locked = p.data.locked ? ' (full write-up password-protected)' : '';
-      return `- [${p.data.title} (${p.data.date.label})](${abs(`/projects/${p.id}/`)}): ${p.data.description}${locked}`;
+      return `- [${p.data.title} (${p.data.date.label})](${abs(`/${p.id}/`)}): ${p.data.description}${locked}`;
     }),
     '',
     '## Contact',

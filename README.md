@@ -83,7 +83,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | About page: vertical rhythm (gaps between sections, titles, entries) | the `--cv-*` knobs at the top of the `<style>` in `src/pages/about.astro` |
 | About page / CV: content | `src/content/cv.md` |
 | About page / CV: which fields exist | `src/content.config.ts` (`cv`) |
-| Case study: markup and look | `src/pages/projects/[...slug].astro` |
+| Case study: markup and look | `src/pages/[slug].astro` |
 | About and case studies: the mini-map that opens the footer, and its knobs | `src/components/MiniMap.astro` |
 | About and case studies: the pinned page nav | `src/components/PageNav.astro` |
 | The drawings on the map's texture, the flag among them (each takes the text colour around it) | `src/assets/decor/` |
@@ -107,7 +107,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 
 ### Add a case study
 
-1. Create `src/content/projects/<slug>.mdx`. The file name becomes the URL, `/projects/<slug>/`.
+1. Create `src/content/projects/<slug>.mdx`. The file name becomes the URL, `/<slug>/`, so name it for the work, not its order (`peak-systems-at-percona`). It sits at the site's root beside `/about/`, and the build stops if it clashes with a page in `src/pages/`. A title can change later without moving the page; renaming the file does move it, so see Old links below.
 
    ```mdx
    ---
@@ -142,7 +142,7 @@ import results from '../../assets/projects/<slug>/results.png';
 </Gallery>
 ```
 
-A video is a plain `<video>` in a `<figure>`, with a poster frame so it doesn't print blank. `percona-case-1.mdx` has one under "Lost the debate, kept the work". Export it at the size it was recorded at (a 2× screen recording stays 2×, so it's sharp full screen), then encode it for a fixed quality rather than a fixed bitrate: a screen recording barely changes from frame to frame, so it stays small without starving the text. A low bitrate is what blurs UI text, at any resolution. Every version committed stays in the repo, and GitHub refuses a file over 100 MB, so keep each one well under that:
+A video is a plain `<video>` in a `<figure>`, with a poster frame so it doesn't print blank. `peak-systems-at-percona.mdx` has one under "Lost the debate, kept the work". Export it at the size it was recorded at (a 2× screen recording stays 2×, so it's sharp full screen), then encode it for a fixed quality rather than a fixed bitrate: a screen recording barely changes from frame to frame, so it stays small without starving the text. A low bitrate is what blurs UI text, at any resolution. Every version committed stays in the repo, and GitHub refuses a file over 100 MB, so keep each one well under that:
 
 ```bash
 ffmpeg -i master.mp4 -vf "scale=out_range=tv:flags=lanczos,format=yuv420p" -c:v libx264 -preset slow -tune animation -crf 22 -level:v 5.2 -x264-params aq-mode=3 -an -movflags +faststart out.mp4
@@ -218,7 +218,7 @@ It builds both versions and screenshots the same pages and states at desktop and
 - A value you'll want to tune gets a name where it's used: a custom property at the top of the page's `<style>` (like `--cv-section-gap`), or an entry in `KNOBS` for the map's script. Add new ones there rather than as a bare number further down.
 - To stagger an entrance, use `data-reveal style="--reveal-step: 2"`. The step number is its place in the queue.
 
-### Old `/portfolio/` links
+### Old links
 
 The site used to be served from `www.pmcf.xyz/portfolio/`, while the old site's repo (`freenandes.github.io`) held the domain, and links to those addresses were shared. GitHub Pages can't send server redirects, so `redirects` in `astro.config.mjs` builds a small page at each old address that forwards to the new one:
 
@@ -226,9 +226,13 @@ The site used to be served from `www.pmcf.xyz/portfolio/`, while the old site's 
 | --- | --- |
 | `/portfolio/` | `/` |
 | `/portfolio/about/` | `/about/` |
-| `/portfolio/projects/<slug>/` | `/projects/<slug>/` |
+| `/projects/percona-case-1/`, `/portfolio/projects/percona-case-1/` | `/peak-systems-at-percona/` |
+| `/projects/percona-case-2/`, `/portfolio/projects/percona-case-2/` | `/reading-the-terrain-at-percona/` |
+| `/projects/tui-case/`, `/portfolio/projects/tui-case/` | `/100000-pages-high-at-tui-group/` |
 
-Each one is an instant meta refresh plus a canonical link, with no script, so the CSP is unaffected. Browsers follow it at once and search engines treat it as a permanent move, though it isn't a true 301. Anything after `?` or `#` in the old link is dropped. The case-study line covers every project, new ones included. If you rename a page or a project's file, add its old address to the list too.
+Case studies later moved from `/projects/<slug>/` to `/<slug>/`, under new names; `MOVED_PROJECTS` in `astro.config.mjs` maps each old name to its file and builds both of its old addresses.
+
+Each one is an instant meta refresh plus a canonical link, with no script, so the CSP is unaffected. Browsers follow it at once and search engines treat it as a permanent move, though it isn't a true 301. Anything after `?` or `#` in the old link is dropped. If you rename a page, add its old address to `redirects`; if you rename a project's file, add its old name to `MOVED_PROJECTS`.
 
 ## Website Specification
 

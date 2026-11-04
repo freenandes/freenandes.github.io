@@ -8,6 +8,26 @@ client: Percona
 tags: ['UX Research', 'Prototyping', 'Databases']
 ---
 
+import qanPartsMap from '../../assets/projects/percona-case-2/qan-parts-map.webp';
+import qanWireframes from '../../assets/projects/percona-case-2/qan-wireframes.webp';
+import qanLegacy from '../../assets/projects/percona-case-2/qan-legacy.webp';
+import aiVideo from '../../assets/projects/percona-case-2/ai-incident-response.mp4';
+import aiPoster from '../../assets/projects/percona-case-2/ai-incident-response.jpg';
+import selectionOptions from '../../assets/projects/percona-case-2/real-time-selection-options.webp';
+import realTimeVideo from '../../assets/projects/percona-case-2/qan-real-time.mp4';
+import realTimePoster from '../../assets/projects/percona-case-2/qan-real-time.jpg';
+import mergedTimePicker from '../../assets/projects/percona-case-2/merged-time-picker.webp';
+import mergedRealTime from '../../assets/projects/percona-case-2/merged-real-time.webp';
+import sessionsVideo from '../../assets/projects/percona-case-2/real-time-sessions.mp4';
+import sessionsPoster from '../../assets/projects/percona-case-2/real-time-sessions.jpg';
+import qanVideo from '../../assets/projects/percona-case-2/qan-revamp.mp4';
+import qanPoster from '../../assets/projects/percona-case-2/qan-revamp.jpg';
+import qanOverview from '../../assets/projects/percona-case-2/qan-overview.webp';
+import qanDetails from '../../assets/projects/percona-case-2/qan-details.webp';
+import advisorsBefore from '../../assets/projects/percona-case-2/advisors-before.webp';
+import advisorsAfter from '../../assets/projects/percona-case-2/advisors-after.webp';
+import Gallery from '../../components/Gallery.astro';
+
 ## In short
 
 ### Team
@@ -34,16 +54,49 @@ Real-time Analytics shipped in PMM 3.7, about 90% as we intended, and I closed t
 
 That’s the question a DBA brings to Query Analytics, PMM’s screen for finding what slows a database. They narrow it down with filters, grab the query ID, and, if it really is the offender, kill it and flag it for optimization. On its old front-end, the screen got in the way. A colleague said it “feels like it’s from the ’90s,” meaning clunky, unappealing, unforgiving, and occasionally buggy.
 
+<Gallery
+  scale={0.325}
+  images={[
+    {
+      src: qanLegacy,
+      alt: 'Before: the old Query Analytics, a dashboard inside Grafana’s interface, titled PMM Query Analytics. A long column of filter checkboxes for environment, cluster and replication set sits beside a list of queries, such as SELECT datid, datname, numbackends, each with a bar chart under Load and the same value, <0.01 load, on every row. One row is highlighted in bright blue, and below the list a details panel with Details, Examples, Tables and Plan tabs shows a query time distribution of Other: 99.99% above a table of metrics.',
+    },
+  ]}
+>
+  Before: Query Analytics inside Grafana, with Load front and center, reading “{'<'}0.01 load” on every row.
+</Gallery>
+
 I had tried to fix its UX before. In 2023, I tested a redesign in wireframes with 13 colleagues: the Compare feature I introduced, which put different timeframes side by side, scored 8.5 out of 10 for usefulness but 6.4 for ease of use, still inside the UI borrowed from Grafana. Then the project stopped. It only really took off in 2025, and I brought those findings with me.
 
 ## Experts first, screens later
 
 Before drawing screens, I mapped every bit of Query Analytics by what a user can see and do with it, listing all the “Lego” parts, and pulled years of backlog, interviews, and the 2023 findings into one discovery doc. There, the team could argue about problems, not pixels. Then I brought our experts together around a giant Miro board of wireframes and assumptions. The conversation unlocked fast: problems and technical limits surfaced before anyone wrote code.
 
+<Gallery
+  scale={0.22}
+  images={[
+    {
+      src: qanPartsMap,
+      alt: 'A close-up of the parts map on a FigJam board: Item Details, with arrows out to its Example, Tables & Indexes and Explain tabs, broken into boxes for Activity Time Distribution, with a chip per kind of wait such as Acquire locks, Blocks read and InnoDB wait queue; a Histogram graph; Metrics, each a label with its value, sum and value per query, as a figure, a graph or a total share, with Info; Top query; and Metadata, a list of labels and values.',
+    },
+    {
+      src: qanWireframes,
+      alt: 'Five grey, low-fidelity wireframes of Query Analytics, labelled Overview, Filters tab open, Details tab fully open, and two of Filters tab open + Details. The overview has a search field, a PostgreSQL filter chip and a list of queries with query count and query time; filters open as a column of checkboxes for environment, cluster, replication set and database beside the list; details open over the list with tabs for Preview & Metrics, Example, Tables & Indexes, Explain/Plan, Top Query and Metadata, the query’s text and a query time distribution bar.',
+    },
+  ]}
+>
+  Left, the parts first: the details panel mapped by what a user can see and do in it. Right, the early wireframes, from February 2025: the overview, filters in a side column, and a details panel that opens over the list.
+</Gallery>
+
 One of our support experts showed me how they really work. “Load,” a metric we had invented years before and put front and center in the old UI, was hard to read even for senior engineers; they barely looked at it. What an expert needs is time in plain seconds, variance, and rows examined. And the detail tabs worked only about 30% of the time.
 
 ## Showing what the future could look like
 With our PM, I set out to give customers a vision of PMM’s future they could buy into. I collected real problems from DBAs, developers, and DevOps engineers, turned them into hypotheses, and made narrated videos: animated prototypes of PMM helping solve them, from AI-assisted query optimization to incident response.
+
+<figure>
+  <video src={aiVideo} poster={aiPoster.src} width="3840" height="2160" controls preload="metadata" playsinline></video>
+  <figcaption>One of a few narrated demos of prototypes set in real use cases: an AI-assisted incident response, from the alert in Slack to the root cause, the rollback and the report.</figcaption>
+</figure>
 
 When we presented them to customers, they recognized their problems in those videos, “wanted it for tomorrow,” and asked us to prioritize all those fresh new ideas in the roadmap. Query Analytics stood out as what mattered most to them, and those conversations led straight to real-time analysis.
 
@@ -53,15 +106,77 @@ Enterprise MongoDB teams needed a live view of their queries before they could l
 
 Their feedback cut the MVP to 4 scenarios around one action: choosing what to watch. With 300+ clusters mixed with standalone services, that was the hard part. I put 3 options to the team, and the vote split 3–3–2, so I went back to the reasons. The tree won because it matched how they picture clusters and their nodes, after years of talking to database experts.
 
+<Gallery
+  scale={0.325}
+  images={[
+    {
+      src: selectionOptions,
+      alt: 'Three boards, one per option for choosing what to watch, each in numbered steps from an empty picker to Start session. Scenario A: pick a cluster or service from one mixed list in alphabetical order; a cluster opens a second box, Cluster node, for all its nodes or one of them; several services inside a cluster can’t be picked. Scenario B: first choose Clustered or Standalone, then pick a cluster and its services, or one standalone service. Scenario C: one searchable list where each cluster holds its services as a tree with checkboxes, so any mix of clusters, nodes and standalone services can be picked at once; the picks show as a list or as chips, and move to the top when the list opens again.',
+    },
+  ]}
+>
+  The 3 options I put to the team for choosing what to watch: A, a classic cascade; B, a choice between clustered and standalone before diving in; and C, the tree, with multiple selection.
+</Gallery>
+
+<figure>
+  <video src={realTimeVideo} poster={realTimePoster.src} width="1920" height="1080" controls preload="metadata" playsinline></video>
+  <figcaption>The Real-time Analytics prototype after the vote, picking several services at once: it refreshes every 1 to 5 seconds, pauses on a snapshot or while the pointer is on the table, and refreshes on demand.</figcaption>
+</figure>
+
 ## One page or two?
 
 A separate page for real time would ship faster than merging it into Query Analytics’ stored metrics, because mixing stored and live data would force us to pay down the legacy screen’s debt.
 
+<Gallery
+  scale={0.22}
+  images={[
+    {
+      src: mergedTimePicker,
+      alt: 'The merged iteration of Query Analytics, with its time picker open over the list: start and end times above two October 2026 calendars, a time zone, and a list of presets that starts with Real-time, marked with a lightning bolt, above Last 5 minutes through Last 2 days from now, with Last 12 hours selected.',
+    },
+    {
+      src: mergedRealTime,
+      alt: 'The same list after picking Real-time: the time control reads Real-Time, with a Pause button beside it, the Environment and Node filters stay, and the columns change to State and Elapsed time, such as SELECT * FROM users ORDER BY signup_date, Running for 1785.23 ms, and a MySQL query Blocked for 1052.89 ms.',
+    },
+  ]}
+>
+  The merged iteration, from November 2025: Real-time as one more range in the time picker, turning the same list into live queries with their state and elapsed time.
+</Gallery>
+
 We settled on tabs: stored metrics for historical analysis and the new Real-time Analytics for the queries running right now.
+
+<figure>
+  <video src={sessionsVideo} poster={sessionsPoster.src} width="3840" height="2160" controls preload="metadata" playsinline></video>
+  <figcaption>An earlier iteration: the legacy screen kept apart in its own tab, and Real-time Analytics beside it, with sessions started from a cluster, filters built into the list, the query’s full data, and sessions stopped one at a time or all at once.</figcaption>
+</figure>
 
 When colleagues asked why someone who only runs MongoDB should see MySQL metrics, I kept the mix: one app can run on MySQL and PostgreSQL at once, and mixing is only noise when filters are bad. So filters had to be quick, searchable, and kept in the URL, ready to share. All of these were customer requests documented in interviews and focus groups, and having them at hand let us decide and build fast.
 
+In parallel, I pitched engineering a revamp of the stored metrics themselves, as the architecture and foundations to build on, and showed it to users on many occasions.
+
+<figure>
+  <video src={qanVideo} poster={qanPoster.src} width="1920" height="1080" controls preload="metadata" playsinline></video>
+  <figcaption>The stored metrics revamp, now on the roadmap: filters as structured search, a customizable overview, and a details panel with next and previous, full screen and revised tabs.</figcaption>
+</figure>
+
+<Gallery
+  scale={0.22}
+  images={[
+    {
+      src: qanOverview,
+      alt: 'The revamped Query Analytics overview, on the Stored metrics tab beside Real-time. A filter for Environment =~ ^prod.* and an Add filter button sit above a list of query fingerprints from several databases, each tagged Vk, Pg or Mo, such as SMEMBERS massive:event:attendees:2024 and SELECT * FROM users u JOIN orders o. Each row has a bar chart of its activity, then its load, query count and query time, such as 12.01, 125.67 QPS and 15.25 µs, each with a small bar to compare it with the other rows.',
+    },
+    {
+      src: qanDetails,
+      alt: 'The details panel expanded over the list, with tabs for Details, Example, Explain and Tables & Indexes. The query is formatted over 11 lines, beside its cluster, database, environment, node, replication set, service and user. Below, Query time distribution splits its time into I/O wait (74.4%), execution and CPU (17.9%), planning and optimization (5.2%), function execution (5.1%) and others, above charts of query count, query time and I/O read time.',
+    },
+  ]}
+>
+  Stills from the revamp: the overview, where every metric carries a bar to compare rows at a glance, and the details panel expanded, splitting a query’s time by where it goes.
+</Gallery>
+
 ## Shipped, and it kept growing
+
 Real-time Analytics shipped in PMM 3.7, for MongoDB first. Last-minute back-end and front-end constraints left it at about 90% of the designed UX, and in the following minor releases I fixed the cosmetic gaps in production code myself.
 
 In PMM 3.10, Real-time Analytics had matured beyond an experiment, and we had learned it is a different mode of investigation for database experts now. It deserved more visibility, so it got its own entry slot in the navigation for better discoverability of the feature.
@@ -69,6 +184,26 @@ In PMM 3.10, Real-time Analytics had matured beyond an experiment, and we had le
 Up until then, we also added export functionality, a command-line interface, and the ability to monitor live MySQL queries, with minimal review from design. It didn’t need more: built on Peak UI, with well-structured code and a layout designed to grow, it left room for incremental changes without anyone babysitting every decision, and development moved fast.
 
 Customers asked for more of PMM to feel like this, and inside Percona people started talking about a new era of UX for PMM. When work is structured this way, it’s not only faster to ship; it also motivates the team to grow their ideas for the product.
+
+Advisors came next. Its insights page found problems but left users alone with them. It only showed a generic description and a doc link that was often broken, with no sign of when a check last ran, in a list to browse service by service, which customers with 1,000+ servers can’t do.
+
+A customer was firming up their contract on a tight timeline, so the fix had to ask little of the back-end. I sketched one page for every check, treated like an email inbox: each insight says what’s wrong and what to do next, can be marked as done, re-checked or shared, and opens into details such as the current value and how long it has been failing. Stakeholders approved the prototype, and it’s now in development.
+
+<Gallery
+  scale={0.22}
+  images={[
+    {
+      src: advisorsBefore,
+      alt: 'Before: Advisor Insights in PMM, a two-column table with one row per service, such as mongo-60-cfg-0 and percona-server-80-0-mysql, and its fail count by severity, such as Warning 4, or Error 1, Warning 7 and Notice 5.',
+    },
+    {
+      src: advisorsAfter,
+      alt: 'After: the Advisor insights prototype. A list filtered to the prod environment gives each insight’s severity, what it found, its node and service, and when it was checked, such as Error, PostgreSQL is not enforcing SSL for client connections, on pgsql-replica-02. A row’s menu offers View details, Mark as done, Re-check now, Edit check intervals, Copy as text and Disable advisor. Below, the details panel gives the description, the current value, ssl = off, and the recommendation: enable SSL in postgresql.conf and require it for non-local connections.',
+    },
+  ]}
+>
+  Advisor insights before, as fail counts per service, and the prototype stakeholders approved, now in development: each insight carries its own actions and says what to do next.
+</Gallery>
 
 ## Looking back
 

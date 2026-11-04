@@ -112,6 +112,8 @@ export const diagramNodes: DiagramEntry[] = [
     lines: [
       'I reframed Query Analytics around what DBAs can act on and designed its real-time version with enterprise customers. It shipped, leaving customers asking for more.',
     ],
+    preview:
+      'Query Analytics on its Real-Time tab, watching the mc-global-analytics cluster: the live queries running right now, each with its service, elapsed time and state, such as Sorting result, Running, Waiting or Blocked, beside controls to pause fetching or stop the agents.',
     portrait: { x: 0.56, y: 0.71 },
     landscape: { x: 0.68, y: 0.58 },
   },

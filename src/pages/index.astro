@@ -354,10 +354,10 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     --ruler-height: 2.25rem;
 
     /* A marker's preview: the screen that floats beside it while a desktop
-       pointer is on it, above everything on the map, and its deep shadow. */
+       pointer is on it, above everything on the map, and how much of the map
+       shows through it. */
     --preview-width: clamp(18rem, 26vw, 26rem);
-    --preview-shadow: 0 1.75rem 3.5rem -0.75rem rgb(0 0 0 / 38%),
-      0 0.75rem 1.5rem -0.25rem rgb(0 0 0 / 18%);
+    --preview-opacity: 0.9;
 
     /* On a touch screen a card opens as a popup in the middle of the screen
        instead, this wide at most, with at least this much room around it to
@@ -795,9 +795,6 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     display: none;
     width: var(--preview-width);
     height: auto;
-    border-radius: var(--radius-md);
-    outline: 1px solid var(--line-soft);
-    box-shadow: var(--preview-shadow);
     pointer-events: none;
     translate: var(--preview-x, 0) var(--preview-y, 0);
     transform-origin: var(--preview-origin, left center);
@@ -815,7 +812,7 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
   }
 
   .preview[data-shown] {
-    opacity: 1;
+    opacity: var(--preview-opacity);
     visibility: visible;
     scale: 1;
   }

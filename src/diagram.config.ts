@@ -26,6 +26,14 @@ export interface DiagramNode {
   tags?: string[];
   link?: { label: string; href: string; external?: boolean };
   /**
+   * Alt text for the marker's preview: a screen from the project, in
+   * `src/assets/previews/` and named after the marker's id. On a desktop it
+   * floats beside the marker while the pointer is on it; on a touch screen it
+   * heads the card. The build stops if the image and this text don't come as
+   * a pair.
+   */
+  preview?: string;
+  /**
    * Where the marker would like to sit, as a fraction (0..1) of the canvas.
    * The layout starts from a random walk and leans back toward these, so they
    * are a preference, not a position.
@@ -91,6 +99,8 @@ export const diagramNodes: DiagramEntry[] = [
     lines: [
       "I designed PMM’s native interface and built Peak UI, the design system under it. Grafana upgrades dropped from weeks of work to days, and 2 more teams now ship apps on it.",
     ],
+    preview:
+      'PMM’s Updates page once an update has finished: the server is up to date, and every client in the list reads “Up to date”.',
     portrait: { x: 0.44, y: 0.5 },
     landscape: { x: 0.47, y: 0.4 },
   },

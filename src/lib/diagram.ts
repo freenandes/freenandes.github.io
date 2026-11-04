@@ -31,11 +31,11 @@ export async function getDiagramNodes(): Promise<DiagramNode[]> {
       );
     }
     const { title, tags } = project.data;
-    const link = { label: projectLinkLabel, href: `/projects/${node.id}/` };
+    const link = { label: projectLinkLabel, href: `/${node.id}/` };
     return { ...node, label: title, tags, link };
   });
 
-  const pages = new Set(['/', '/about', ...projects.map((p) => `/projects/${p.id}`)]);
+  const pages = new Set(['/', '/about', ...projects.map((p) => `/${p.id}`)]);
   for (const node of nodes) {
     if (node.link && !node.link.external && !pages.has(bare(node.link.href))) {
       throw new Error(

@@ -91,7 +91,7 @@ export const diagramNodes: DiagramEntry[] = [
     landscape: { x: 0.12, y: 0.74 },
   },
   {
-    id: 'percona-case-1',
+    id: 'peak-systems-at-percona',
     kind: 'project',
     shape: 'triangle',
     tagline:
@@ -105,7 +105,7 @@ export const diagramNodes: DiagramEntry[] = [
     landscape: { x: 0.47, y: 0.4 },
   },
   {
-    id: 'percona-case-2',
+    id: 'reading-the-terrain-at-percona',
     kind: 'project',
     shape: 'triangle',
     tagline: 'The fluency case. Redesigning the screen DBAs open when the database is slow.',
@@ -118,7 +118,7 @@ export const diagramNodes: DiagramEntry[] = [
     landscape: { x: 0.68, y: 0.58 },
   },
   {
-    id: 'tui-case',
+    id: '100000-pages-high-at-tui-group',
     kind: 'project',
     shape: 'triangle',
     tagline:
@@ -164,7 +164,7 @@ export const diagramChain = [
   'contact',
   'about',
   'pedro',
-  'percona-case-1',
-  'percona-case-2',
-  'tui-case',
+  'peak-systems-at-percona',
+  'reading-the-terrain-at-percona',
+  '100000-pages-high-at-tui-group',
 ];

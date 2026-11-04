@@ -89,6 +89,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | The drawings on the map's texture, the flag among them (each takes the text colour around it) | `src/assets/decor/` |
 | The colour of those drawings, and of the ruler | `--ink-decor` in `src/styles/tokens.css` |
 | The portrait sticker in the map's top left corner: the image, and its size, spacing, random roam, tilt and shadow | `src/assets/sticker.png`; the `--sticker-*` knobs at the top of the `<style>` in `src/pages/index.astro` |
+| A marker's preview (the screen that floats beside it on hover, and heads its card on a touch screen) | the image in `src/assets/previews/`, named after the marker's id; its alt text is `preview` in `src/diagram.config.ts`; its size and shadow, and the touch popup's width and gap, are the `--preview-*` and `--popup-*` knobs in `src/pages/index.astro` |
 | The drawings' sizes on small and on large screens | the `--decor-*` and `--decor-*-wide` knobs at the top of the `<style>` in `src/pages/index.astro` |
 | The map's scale in the bottom right corner | `src/assets/ruler.svg`; its height is `--ruler-height` at the top of the `<style>` in `src/pages/index.astro` |
 | Case study: content | `src/content/projects/<slug>.mdx` |

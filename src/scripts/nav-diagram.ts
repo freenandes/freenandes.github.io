@@ -53,6 +53,13 @@ const KNOBS = {
   cardRoom: { side: 220, vertical: 80, narrowBias: 80 },
   /** Gap a card keeps from the edge of the viewport. */
   cardEdge: 12,
+  /** Screens where a card opens as a popup in the middle of the screen, with
+   *  its preview on top, instead of beside its marker: those without a pointer
+   *  that can hover. Everywhere else, a marker's preview floats beside it
+   *  while the pointer is on it. Its sizes are in index.astro. */
+  popupQuery: '(hover: none) and (pointer: coarse)',
+  /** Space a floating preview keeps from its marker's button. */
+  previewGap: 16,
   /** The entrance: delay before the first marker, then the step to each next
    *  one along the chain. A connector starts `lineLag` after the later of its
    *  two markers; the floating rings land last, `ringStep` apart. */
@@ -90,6 +97,8 @@ type Node = {
    *  ring has neither. */
   button: HTMLButtonElement | null;
   panel: HTMLElement | null;
+  /** The screen that floats beside the marker on hover, if it has one. */
+  preview: HTMLElement | null;
 
   frac: { x: number; y: number };
   x: number;
@@ -122,8 +131,9 @@ type Box = { x: number; y: number; halfX: number; halfY: number };
 /** A box by its edges, in viewport pixels, as `getBoundingClientRect` gives. */
 type Rect = { left: number; top: number; right: number; bottom: number };
 
-/** The side of its marker a card opens on. */
-type Side = 'bottom' | 'top' | 'right' | 'left';
+/** The side of its marker a card opens on, or the middle of the screen for a
+ *  popup. */
+type Side = 'bottom' | 'top' | 'right' | 'left' | 'center';
 
 /** A drawing on the texture, and where its centre sits once it has landed. */
 type Decor = { el: SVGSVGElement; spot: { x: number; y: number } | null };
@@ -150,6 +160,13 @@ export function initDiagram(root: HTMLElement) {
 
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // How cards open here: beside their marker, with a preview on hover, or as
+  // a popup with the preview on top. The page's CSS styles both from
+  // `data-cards`, so this is the one place that decides.
+  const popupMedia = window.matchMedia(KNOBS.popupQuery);
+  const isPopup = () => popupMedia.matches;
+  root.dataset.cards = isPopup() ? 'popup' : 'flyout';
+
   const nodes: Node[] = [];
   for (const cfg of diagramNodes) {
     const el = root.querySelector<HTMLElement>(`[data-id="${cfg.id}"]`);
@@ -160,6 +177,7 @@ export function initDiagram(root: HTMLElement) {
       id: cfg.id,
       button: el.querySelector('button'),
       panel: el.querySelector('.panel'),
+      preview: root.querySelector(`[data-preview-for="${cfg.id}"]`),
       frac: { x: 0.5, y: 0.5 },
       x: 0,
       y: 0,
@@ -1323,7 +1341,8 @@ export function initDiagram(root: HTMLElement) {
   }
 
   /**
-   * Picks where a card opens, toward free space. Each side of its marker is
+   * Picks where a card opens, toward free space. A popup (KNOBS.popupQuery)
+   * simply takes the middle of the screen. Each side of its marker is
    * tried, with the card centred on it and then slid along it, always inside
    * the visible part of the map. The card abuts its marker's box, so it never
    * covers it. The spot that pokes least out of view wins, since a card cut off
@@ -1337,23 +1356,37 @@ export function initDiagram(root: HTMLElement) {
    * the card arrives from it. Sizes come from layout, not the live rect, so
    * they read the same while the card is hidden or fading.
    */
-  function placePanel(n: Node) {
-    const panel = n.panel;
-    if (!panel) return;
-    const own = n.el.getBoundingClientRect();
+  /** The part of the map in view, less `KNOBS.cardEdge`, in viewport pixels.
+   *  The visual viewport leaves out what a phone's browser bars cover. */
+  function viewRect(): Rect {
     const map = root.getBoundingClientRect();
-    const w = panel.offsetWidth;
-    const h = panel.offsetHeight;
-    const { gap, grip, drift, sideStep, ring } = KNOBS.cardClear;
     const M = KNOBS.cardEdge;
-    // The visual viewport leaves out what a phone's browser bars cover.
     const vv = window.visualViewport;
-    const view: Rect = {
+    return {
       left: Math.max(map.left, 0, vv?.offsetLeft ?? 0) + M,
       top: Math.max(map.top, 0, vv?.offsetTop ?? 0) + M,
       right: Math.min(map.right, window.innerWidth, vv ? vv.offsetLeft + vv.width : Infinity) - M,
       bottom: Math.min(map.bottom, window.innerHeight, vv ? vv.offsetTop + vv.height : Infinity) - M,
     };
+  }
+
+  function placePanel(n: Node) {
+    const panel = n.panel;
+    if (!panel) return;
+    const own = n.el.getBoundingClientRect();
+    const w = panel.offsetWidth;
+    const h = panel.offsetHeight;
+    const view = viewRect();
+    // A popup takes the middle of the screen, wherever its marker is.
+    if (isPopup()) {
+      const x = Math.max(view.left, (view.left + view.right - w) / 2);
+      const y = Math.max(view.top, (view.top + view.bottom - h) / 2);
+      n.el.dataset.place = 'center';
+      panel.style.setProperty('--panel-x', `${Math.round(x - own.left)}px`);
+      panel.style.setProperty('--panel-y', `${Math.round(y - own.top)}px`);
+      return;
+    }
+    const { gap, grip, drift, sideStep, ring } = KNOBS.cardClear;
     const markers: Rect[] = [];
     const rings: DOMRect[] = [];
     for (const o of nodes) {
@@ -1444,7 +1477,10 @@ export function initDiagram(root: HTMLElement) {
 
   function setOpen(n: Node, open: boolean) {
     if (!n.button || !n.panel) return;
-    if (open) placePanel(n);
+    if (open) {
+      hidePreview(n);
+      placePanel(n);
+    }
     n.button.setAttribute('aria-expanded', open ? 'true' : 'false');
     setCalm(n);
     wake();
@@ -1460,12 +1496,94 @@ export function initDiagram(root: HTMLElement) {
     if (n) placePanel(n);
   }
 
+  /* --- Previews ------------------------------------------------------
+     While a desktop pointer is on a marker's button, its preview floats
+     beside the button, on whichever side has room, and moves with the
+     pointer: it keeps the pointer's offset from the button's near edge, so
+     however the pointer moves over the button the preview never covers it. */
+
+  type Hovered = { n: Node; side: 'right' | 'left'; x: number; y: number };
+  let hovered: Hovered | null = null;
+  let previewFrame = 0;
+
+  function positionPreview() {
+    previewFrame = 0;
+    const h = hovered;
+    const el = h?.n.preview;
+    if (!h || !el || !h.n.button) return;
+    const own = h.n.button.getBoundingClientRect();
+    const map = root.getBoundingClientRect();
+    const view = viewRect();
+    const pw = el.offsetWidth;
+    const ph = el.offsetHeight;
+    const gap = KNOBS.previewGap;
+    const x =
+      h.side === 'right' ? own.right + gap + (h.x - own.left) : own.left - gap - (own.right - h.x) - pw;
+    const y = Math.max(view.top, Math.min(view.bottom - ph, h.y - ph / 2));
+    el.style.setProperty('--preview-x', `${Math.round(x - map.left)}px`);
+    el.style.setProperty('--preview-y', `${Math.round(y - map.top)}px`);
+  }
+
+  function showPreview(n: Node, ev: PointerEvent) {
+    const el = n.preview;
+    if (!el || !n.button || isPopup() || ev.pointerType !== 'mouse' || isOpen(n) || n.dragging) return;
+    // The side is picked once, as the pointer arrives, so the preview doesn't
+    // jump across the marker while the pointer is on it: the right if it fits
+    // there wherever the pointer goes on the button, else whichever is roomier.
+    const own = n.button.getBoundingClientRect();
+    const view = viewRect();
+    const need = KNOBS.previewGap + own.width + el.offsetWidth;
+    const right = view.right - own.right;
+    const left = own.left - view.left;
+    const side = right >= need || right >= left ? 'right' : 'left';
+    hovered = { n, side, x: ev.clientX, y: ev.clientY };
+    el.style.setProperty('--preview-origin', side === 'right' ? 'left center' : 'right center');
+    positionPreview();
+    el.dataset.shown = '';
+  }
+
+  function movePreview(n: Node, ev: PointerEvent) {
+    if (hovered?.n !== n) return;
+    hovered.x = ev.clientX;
+    hovered.y = ev.clientY;
+    if (!previewFrame) previewFrame = requestAnimationFrame(positionPreview);
+  }
+
+  function hidePreview(n: Node) {
+    if (hovered?.n === n) hovered = null;
+    n.preview?.removeAttribute('data-shown');
+  }
+
   // A card closes on a press anywhere outside its marker and itself, and on
   // Escape wherever focus is. Escape hands focus back to the marker, unless
-  // focus has already moved on somewhere else.
+  // focus has already moved on somewhere else. A press that closes a popup
+  // does only that: the click it makes doesn't also open what was under it.
+  let swallowClick = false;
   document.addEventListener('pointerdown', (ev) => {
+    swallowClick = false;
     const n = openNode();
-    if (n && !(ev.target instanceof Element && n.el.contains(ev.target))) setOpen(n, false);
+    if (n && !(ev.target instanceof Element && n.el.contains(ev.target))) {
+      swallowClick = isPopup();
+      setOpen(n, false);
+    }
+  });
+  document.addEventListener(
+    'click',
+    (ev) => {
+      if (!swallowClick) return;
+      swallowClick = false;
+      ev.preventDefault();
+      ev.stopPropagation();
+    },
+    true,
+  );
+  // Switching between a hovering pointer and touch (a tablet docked to a
+  // keyboard, a resized emulator) changes how cards open, so any open card
+  // closes and is placed afresh next time.
+  popupMedia.addEventListener('change', () => {
+    root.dataset.cards = isPopup() ? 'popup' : 'flyout';
+    for (const n of nodes) hidePreview(n);
+    closeAll();
   });
   document.addEventListener('keydown', (ev) => {
     if (ev.key !== 'Escape') return;
@@ -1509,7 +1627,14 @@ export function initDiagram(root: HTMLElement) {
     let moved = false;
     let pid: number | null = null;
 
+    // The preview follows a mouse over the button and goes when it leaves or
+    // presses; a click then opens the card.
+    hit.addEventListener('pointerenter', (ev) => showPreview(n, ev));
+    hit.addEventListener('pointermove', (ev) => movePreview(n, ev));
+    hit.addEventListener('pointerleave', () => hidePreview(n));
+
     hit.addEventListener('pointerdown', (ev) => {
+      hidePreview(n);
       if (reduce) return;
       pid = ev.pointerId;
       downX = ev.clientX;

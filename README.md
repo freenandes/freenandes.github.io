@@ -85,9 +85,11 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | About page / CV: which fields exist | `src/content.config.ts` (`cv`) |
 | Case study: markup and look | `src/pages/projects/[...slug].astro` |
 | About and case studies: the mini-map that opens the footer, and its knobs | `src/components/MiniMap.astro` |
-| About and case studies: the pinned page nav, and the size and weight of the flag in it | `src/components/PageNav.astro` |
-| The drawings on the map's texture, the flag among them (the nav imports it as a component; it takes the text colour around it) | `src/assets/decor/` |
+| About and case studies: the pinned page nav | `src/components/PageNav.astro` |
+| The drawings on the map's texture, the flag among them (each takes the text colour around it) | `src/assets/decor/` |
 | The colour of those drawings, and of the ruler | `--ink-decor` in `src/styles/tokens.css` |
+| The portrait sticker in the map's top left corner: the image, and its size, spacing, random roam, tilt and shadow | `src/assets/sticker.png`; the `--sticker-*` knobs at the top of the `<style>` in `src/pages/index.astro` |
+| The drawings' sizes on small and on large screens | the `--decor-*` and `--decor-*-wide` knobs at the top of the `<style>` in `src/pages/index.astro` |
 | The map's scale in the bottom right corner | `src/assets/ruler.svg`; its height is `--ruler-height` at the top of the `<style>` in `src/pages/index.astro` |
 | Case study: content | `src/content/projects/<slug>.mdx` |
 | Case study: screenshots, their thumbnail size and the enlarged view | `src/components/Gallery.astro` and the knobs at the top of its `<style>` |

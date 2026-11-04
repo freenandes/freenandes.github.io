@@ -60,6 +60,9 @@ const KNOBS = {
   popupQuery: '(hover: none) and (pointer: coarse)',
   /** Space a floating preview keeps from its marker's button. */
   previewGap: 16,
+  /** The sides of its marker a floating preview tries, in order: the first
+   *  where it fits wholly in view wins. */
+  previewSides: ['right', 'left', 'bottom', 'top'],
   /** The entrance: delay before the first marker, then the step to each next
    *  one along the chain. A connector starts `lineLag` after the later of its
    *  two markers; the floating rings land last, `ringStep` apart. */
@@ -1498,13 +1501,23 @@ export function initDiagram(root: HTMLElement) {
 
   /* --- Previews ------------------------------------------------------
      While a desktop pointer is on a marker's button, its preview floats
-     beside the button, on whichever side has room, and moves with the
-     pointer: it keeps the pointer's offset from the button's near edge, so
-     however the pointer moves over the button the preview never covers it. */
+     beside the button and moves with the pointer: it keeps the pointer's
+     offset from the button's near edge, so however the pointer moves over
+     the button the preview never covers it. Across that, it centres on the
+     pointer, held inside the view. */
 
-  type Hovered = { n: Node; side: 'right' | 'left'; x: number; y: number };
+  type PreviewSide = 'right' | 'left' | 'bottom' | 'top';
+  type Hovered = { n: Node; side: PreviewSide; x: number; y: number };
   let hovered: Hovered | null = null;
   let previewFrame = 0;
+
+  /** Grows from the side that faces the marker. */
+  const PREVIEW_ORIGIN: Record<PreviewSide, string> = {
+    right: 'left center',
+    left: 'right center',
+    bottom: 'center top',
+    top: 'center bottom',
+  };
 
   function positionPreview() {
     previewFrame = 0;
@@ -1517,27 +1530,43 @@ export function initDiagram(root: HTMLElement) {
     const pw = el.offsetWidth;
     const ph = el.offsetHeight;
     const gap = KNOBS.previewGap;
-    const x =
-      h.side === 'right' ? own.right + gap + (h.x - own.left) : own.left - gap - (own.right - h.x) - pw;
-    const y = Math.max(view.top, Math.min(view.bottom - ph, h.y - ph / 2));
+    const alongX = Math.max(view.left, Math.min(view.right - pw, h.x - pw / 2));
+    const alongY = Math.max(view.top, Math.min(view.bottom - ph, h.y - ph / 2));
+    let x = alongX;
+    let y = alongY;
+    if (h.side === 'right') x = own.right + gap + (h.x - own.left);
+    else if (h.side === 'left') x = own.left - gap - (own.right - h.x) - pw;
+    else if (h.side === 'bottom') y = own.bottom + gap + (h.y - own.top);
+    else y = own.top - gap - (own.bottom - h.y) - ph;
     el.style.setProperty('--preview-x', `${Math.round(x - map.left)}px`);
     el.style.setProperty('--preview-y', `${Math.round(y - map.top)}px`);
+  }
+
+  /**
+   * The side is picked once, as the pointer arrives, so the preview doesn't
+   * jump across the marker while the pointer is on it. The first side in
+   * KNOBS.previewSides where it stays wholly in view wherever the pointer goes
+   * on the button wins; where none does, the one it overflows least.
+   */
+  function previewSide(own: DOMRect, pw: number, ph: number): PreviewSide {
+    const view = viewRect();
+    const gap = KNOBS.previewGap;
+    const spare: Record<PreviewSide, number> = {
+      right: view.right - own.right - (gap + own.width + pw),
+      left: own.left - view.left - (gap + own.width + pw),
+      bottom: view.bottom - own.bottom - (gap + own.height + ph),
+      top: own.top - view.top - (gap + own.height + ph),
+    };
+    const sides = KNOBS.previewSides;
+    return sides.find((side) => spare[side] >= 0) ?? sides.reduce((a, b) => (spare[b] > spare[a] ? b : a));
   }
 
   function showPreview(n: Node, ev: PointerEvent) {
     const el = n.preview;
     if (!el || !n.button || isPopup() || ev.pointerType !== 'mouse' || isOpen(n) || n.dragging) return;
-    // The side is picked once, as the pointer arrives, so the preview doesn't
-    // jump across the marker while the pointer is on it: the right if it fits
-    // there wherever the pointer goes on the button, else whichever is roomier.
-    const own = n.button.getBoundingClientRect();
-    const view = viewRect();
-    const need = KNOBS.previewGap + own.width + el.offsetWidth;
-    const right = view.right - own.right;
-    const left = own.left - view.left;
-    const side = right >= need || right >= left ? 'right' : 'left';
+    const side = previewSide(n.button.getBoundingClientRect(), el.offsetWidth, el.offsetHeight);
     hovered = { n, side, x: ev.clientX, y: ev.clientY };
-    el.style.setProperty('--preview-origin', side === 'right' ? 'left center' : 'right center');
+    el.style.setProperty('--preview-origin', PREVIEW_ORIGIN[side]);
     positionPreview();
     el.dataset.shown = '';
   }

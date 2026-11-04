@@ -2,7 +2,7 @@
    The home page's map: a small force layout that scatters the markers, keeps
    them from colliding, and routes the connectors between them without crossings.
    Outside the simulation, it finds free spots for the map's decorations and
-   for each card as it opens.
+   for each card as it opens, and keeps all of it off the portrait sticker.
 
    The markers, their copy and the chain they connect in are authored in
    `src/diagram.config.ts` — the same file the page renders from, so the layout
@@ -61,6 +61,8 @@ const KNOBS = {
    *  connectors and the other drawings, and from the canvas edge, and how many
    *  random spots it tries before staying hidden. Their size is in index.astro. */
   decor: { gap: 8, edge: 8, tries: 400 },
+  /** Space markers and rings keep from the portrait sticker's box. */
+  stickerGap: 12,
   /** Pointer travel before a press on a marker becomes a drag. */
   dragThreshold: 6,
   /** Quiet time after a resize before the full re-layout runs. */
@@ -137,6 +139,14 @@ export function initDiagram(root: HTMLElement) {
     spot: null,
   }));
   const ruler = root.querySelector<SVGSVGElement>('.ruler');
+  const sticker = root.querySelector<HTMLElement>('.sticker');
+  // The sticker's spot and tilt within the ranges index.astro gives them, picked
+  // once per page load, before anything measures it.
+  if (sticker) {
+    sticker.style.setProperty('--sticker-rx', Math.random().toFixed(3));
+    sticker.style.setProperty('--sticker-ry', Math.random().toFixed(3));
+    sticker.style.setProperty('--sticker-rt', (Math.random() * 2 - 1).toFixed(3));
+  }
 
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -221,6 +231,44 @@ export function initDiagram(root: HTMLElement) {
     const ink = measureDecor(ruler);
     const top = ruler.getBoundingClientRect().top + ink.y - ink.halfY;
     return root.getBoundingClientRect().bottom - top;
+  }
+
+  /** The portrait sticker's box on the canvas, cut to the canvas, as it stands
+   *  in its corner. It never moves, so the map works around it. */
+  function stickerBox(): Box | null {
+    if (!sticker) return null;
+    const canvas = root.getBoundingClientRect();
+    const r = sticker.getBoundingClientRect();
+    const left = Math.max(0, r.left - canvas.left);
+    const top = Math.max(0, r.top - canvas.top);
+    const right = Math.min(W, r.right - canvas.left);
+    const bottom = Math.min(H, r.bottom - canvas.top);
+    if (right <= left || bottom <= top) return null;
+    return {
+      x: (left + right) / 2,
+      y: (top + bottom) / 2,
+      halfX: (right - left) / 2,
+      halfY: (bottom - top) / 2,
+    };
+  }
+
+  /** How far to move a box of half-size `half` at (x, y) so it clears the
+   *  sticker: out past its right edge or its bottom one, whichever is nearer,
+   *  since the sticker keeps to the top left corner. */
+  function stickerPush(
+    box: Box | null,
+    x: number,
+    y: number,
+    half: { x: number; y: number },
+  ): { x: number; y: number } | null {
+    if (!box) return null;
+    const gap = KNOBS.stickerGap;
+    const reachX = box.halfX + half.x + gap;
+    const reachY = box.halfY + half.y + gap;
+    if (Math.abs(x - box.x) >= reachX || Math.abs(y - box.y) >= reachY) return null;
+    const ox = box.x + reachX - x;
+    const oy = box.y + reachY - y;
+    return ox < oy ? { x: ox, y: 0 } : { x: 0, y: oy };
   }
 
   function inset() {
@@ -449,6 +497,7 @@ export function initDiagram(root: HTMLElement) {
     if (iw < 2 || ih < 2) return;
     const px = nodes.map((n) => mx + n.frac.x * iw);
     const py = nodes.map((n) => my + n.frac.y * ih);
+    const portrait = stickerBox();
     for (let it = 0; it < iterations; it++) {
       let moved = 0;
       for (let i = 0; i < nodes.length; i++) {
@@ -468,6 +517,12 @@ export function initDiagram(root: HTMLElement) {
       }
       for (let i = 0; i < nodes.length; i++) {
         if (nodes[i].floating) continue;
+        const off = stickerPush(portrait, px[i], py[i], nodeHalf(nodes[i]));
+        if (off) {
+          px[i] += off.x;
+          py[i] += off.y;
+          moved = Math.max(moved, Math.hypot(off.x, off.y));
+        }
         px[i] = Math.max(mx + 6, Math.min(mx + iw - 6, px[i]));
         py[i] = Math.max(my + 6, Math.min(my + ih - 6, py[i]));
       }
@@ -639,6 +694,7 @@ export function initDiagram(root: HTMLElement) {
     if (iw < 2 || ih < 2) return;
     const polys = edges.map(edgePolyline);
     const floor = H - rulerReach() - KNOBS.decor.gap;
+    const portrait = stickerBox();
     for (let it = 0; it < iterations; it++) {
       let moved = 0;
       for (const n of floats) {
@@ -665,6 +721,12 @@ export function initDiagram(root: HTMLElement) {
           if (!s.hit) continue;
           pushX += s.x * 0.5;
           pushY += s.y * 0.5;
+          hit = true;
+        }
+        const off = stickerPush(portrait, n.ax, n.ay, nodeHalf(n));
+        if (off) {
+          pushX += off.x * 2;
+          pushY += off.y * 2;
           hit = true;
         }
         if (!hit) continue;
@@ -968,6 +1030,8 @@ export function initDiagram(root: HTMLElement) {
       const half = nodeHalf(n);
       return { x: n.x, y: n.y, halfX: half.x, halfY: half.y };
     });
+    const portrait = stickerBox();
+    if (portrait) blocks.push(portrait);
     if (ruler) {
       const canvas = root.getBoundingClientRect();
       const frame = ruler.getBoundingClientRect();
@@ -1092,11 +1156,21 @@ export function initDiagram(root: HTMLElement) {
     }
   }
 
-  /** Spreads the anchors of markers left too close; returns the biggest step. */
+  /** Spreads the anchors of markers left too close, and moves any left on the
+   *  sticker off it; returns the biggest step. */
   function resolveOverlaps(iterations = 50) {
     let biggest = 0;
+    const portrait = stickerBox();
     for (let it = 0; it < iterations; it++) {
       let moved = 0;
+      for (const n of nodes) {
+        if (n.floating || n.dragging) continue;
+        const off = stickerPush(portrait, n.ax, n.ay, nodeHalf(n));
+        if (!off) continue;
+        n.ax += off.x;
+        n.ay += off.y;
+        moved = Math.max(moved, Math.hypot(off.x, off.y));
+      }
       for (let i = 0; i < nodes.length; i++) {
         if (nodes[i].floating) continue;
         for (let j = i + 1; j < nodes.length; j++) {

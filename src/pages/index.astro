@@ -7,12 +7,14 @@
 import { basename } from 'node:path';
 import type { ImageMetadata } from 'astro';
 import type { SvgComponent } from 'astro/types';
+import { Image } from 'astro:assets';
 import Ruler from '../assets/ruler.svg';
 import Base from '../layouts/Base.astro';
 import type { DiagramNode, NodeKind } from '../diagram.config';
 import { withBase } from '../lib/base';
 import { getDiagramNodes, polygon } from '../lib/diagram';
 import { site } from '../site.config';
+import portrait from '../assets/sticker.png';
 
 const nodes = await getDiagramNodes();
 
@@ -187,6 +189,20 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
       aria-hidden="true"
       focusable="false"
     />
+    {/* The portrait sticker sits on the drawings, under the map, so it comes
+        last among them. Its width and height give a page with no stylesheet
+        a small picture, not a full-size one. */}
+    <Image
+      class="sticker"
+      src={portrait}
+      alt={`Sticker of ${site.name} in a training suit and a cap that says "Run"`}
+      width={160}
+      densities={[1, 2, 3]}
+      format="webp"
+      loading="eager"
+      decoding="async"
+      draggable="false"
+    />
   </nav>
 </Base>
 
@@ -254,15 +270,47 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     --card-width: 20rem; /* widest a card gets (never more than 90vw) */
     --ring-turn: 30s; /* one full turn of a floating ring */
 
-    /* Each drawing's width, named after its file in src/assets/decor/. */
+    /* Each drawing's width, named after its file in src/assets/decor/, and
+       its width on a large screen (from 64rem wide, below). */
     --decor-flag: 4rem;
+    --decor-flag-wide: 5rem;
     --decor-compass: 14rem;
-    --decor-kraken: 11rem;
+    --decor-compass-wide: 20rem;
+    --decor-kraken: 12rem;
+    --decor-kraken-wide: 16rem;
 
-    /* The size of a drawing with no width above, per unit of its viewBox. */
+    /* The size of a drawing with no width above, per unit of its viewBox, and
+       on a large screen. */
     --decor-scale: calc(4rem / 400);
+    --decor-scale-wide: calc(5rem / 400);
 
     --ruler-height: 2.25rem;
+
+    /* The portrait sticker in the top left corner. Each page load drops it
+       somewhere in a small area there and gives it a slightly different
+       tilt; the script picks once, so it never moves after that. */
+    --sticker-width: clamp(7.5rem, 22vw, 10rem);
+
+    /* Where the area starts: the least space kept from the canvas's top and
+       left edges. It grows with the screen, between its min and max. */
+    --sticker-top: clamp(var(--space-md), 3vw, var(--space-xl));
+    --sticker-left: clamp(var(--space-md), 3vw, var(--space-xl));
+
+    /* How far past that start it may land, rightwards and downwards. Zero
+       pins it to the start. */
+    --sticker-roam-x: clamp(0rem, 6vw, 6rem);
+    --sticker-roam-y: clamp(0rem, 3vw, 3rem);
+
+    /* Its tilt: the middle of the range, and how far either side it may go.
+       Negative leans it left. */
+    --sticker-tilt: -2deg;
+    --sticker-tilt-range: 5deg;
+
+    /* Its drop shadow. */
+    --sticker-shadow-x: 0;
+    --sticker-shadow-y: 0.125rem;
+    --sticker-shadow-blur: 0.25rem;
+    --sticker-shadow-color: rgb(0 0 0 / 33%);
 
     position: relative;
     width: 100%;
@@ -270,6 +318,18 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     min-height: 34rem;
     overflow: hidden;
     touch-action: pan-y;
+  }
+
+  /* A large screen swaps in each drawing's wide size. A new drawing with a
+     wide knob needs its line here too. */
+
+  @media (width >= 64rem) {
+    .diagram {
+      --decor-flag: var(--decor-flag-wide);
+      --decor-compass: var(--decor-compass-wide);
+      --decor-kraken: var(--decor-kraken-wide);
+      --decor-scale: var(--decor-scale-wide);
+    }
   }
 
   /* Full-bleed: the map opts out of the reading column every other page has
@@ -348,6 +408,54 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     max-width: calc(100% - 2 * var(--space-md));
     color: var(--ink-decor);
     pointer-events: none;
+  }
+
+  /* The portrait sticker keeps to its corner, on the drawings' layer and after
+     them in the tree, so it covers them and nothing else covers less. The
+     script keeps markers, rings and drawings off it, so it never moves with
+     the map. It fades in with the markers. */
+
+  .sticker {
+    position: absolute;
+
+    /* The script sets `--sticker-rx` and `--sticker-ry` (0 to 1) and
+       `--sticker-rt` (-1 to 1) once per page load. */
+    top: calc(var(--sticker-top) + var(--sticker-ry, 0) * var(--sticker-roam-y));
+    left: calc(var(--sticker-left) + var(--sticker-rx, 0) * var(--sticker-roam-x));
+    z-index: -1;
+    width: var(--sticker-width);
+    height: auto;
+    rotate: calc(var(--sticker-tilt) + var(--sticker-rt, 0) * var(--sticker-tilt-range));
+    filter: drop-shadow(
+      var(--sticker-shadow-x) var(--sticker-shadow-y) var(--sticker-shadow-blur)
+        var(--sticker-shadow-color)
+    );
+    pointer-events: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* On a phone the corner is tight, so the sticker slips past the canvas's
+     left edge and the viewport crops its shoulder, never its face. It roams
+     less, so it can't wander into the map. */
+
+  @media (width < 30rem) {
+    .diagram {
+      --sticker-top: var(--space-lg);
+      --sticker-left: calc(-0.22 * var(--sticker-width));
+      --sticker-roam-x: var(--space-md);
+      --sticker-roam-y: var(--space-sm);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .sticker {
+      animation: node-in var(--dur-slow) var(--ease) backwards paused;
+    }
+
+    .diagram.is-mounted .sticker {
+      animation-play-state: running;
+    }
   }
 
   .links {

@@ -54,7 +54,7 @@ export const site: SiteConfig = {
     height: 630,
     type: 'image/png',
     alt:
-      'Pedro MC Fernandes, Senior Product Designer & Design Engineer: “I map complex technical software for the people who rely on it every day.” Set over a topographic map.',
+      'Pedro MC Fernandes, Senior Product Designer & Design Engineer, pmcf.xyz. Set over a topographic map crossed by a route of map markers.',
   },
   shortName: 'PMCF',
   themeColor: '#ffffff',

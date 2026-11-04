@@ -28,6 +28,38 @@ const decorations = Object.entries(
   }),
 ).map(([path, Drawing]) => ({ Drawing, name: basename(path, '.svg') }));
 
+// A marker's preview is the image in this folder named after its id, with its
+// alt text in diagram.config.ts. One without the other is a mistake, so the
+// build stops instead of shipping a preview with no alt, or none at all.
+const previews = new Map(
+  Object.entries(
+    import.meta.glob<ImageMetadata>('../assets/previews/*.{jpg,jpeg,png,webp}', {
+      eager: true,
+      import: 'default',
+    }),
+  ).map(([path, image]) => [basename(path).replace(/\.[^.]+$/, ''), image]),
+);
+for (const id of previews.keys()) {
+  const node = nodes.find((n) => n.id === id);
+  if (!node?.preview) {
+    throw new Error(
+      `src/assets/previews/${id}: no marker in diagram.config.ts has that id and a \`preview\` alt text.`,
+    );
+  }
+}
+for (const node of nodes) {
+  if (node.preview && !previews.has(node.id)) {
+    throw new Error(
+      `diagram.config.ts: "${node.id}" has a \`preview\` alt text but no image in src/assets/previews/.`,
+    );
+  }
+}
+const withPreview = nodes.filter((n) => previews.has(n.id));
+
+// The preview is served at these widths; the card and the floating copy share
+// them, so a browser that shows both fetches one file.
+const previewWidths = [480, 800, 1200, 1680];
+
 /** Circle just big enough to carry `label` once around, with a gap. */
 function ring(label: string) {
   const FONT = 12;
@@ -127,6 +159,21 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
 
                 {node.kind !== 'identity' && !circle && (
                   <div class="panel" id={panelId} role="group" aria-label={node.label}>
+                    {/* Shown only when the card opens as a popup (touch
+                        screens); a desktop shows it beside the marker on
+                        hover instead (`.preview`, below). */}
+                    {previews.has(node.id) && (
+                      <Image
+                        src={previews.get(node.id)!}
+                        alt={node.preview ?? ''}
+                        widths={previewWidths}
+                        sizes="min(100vw, 28rem)"
+                        format="webp"
+                        loading="lazy"
+                        decoding="async"
+                        draggable="false"
+                      />
+                    )}
                     {node.tagline && <p class="lead">{node.tagline}</p>}
                     {node.lines?.map((line) => <p>{line}</p>)}
                     {!!node.tags?.length && (
@@ -203,6 +250,26 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
       decoding="async"
       draggable="false"
     />
+    {/* Each marker's preview floats over everything while the pointer is on
+        the marker, so it's the last thing in the map. It only entices: the
+        card says the same in words, so it's hidden from assistive tech. */}
+    {
+      withPreview.map((node) => (
+        <Image
+          class="preview"
+          data-preview-for={node.id}
+          src={previews.get(node.id)!}
+          alt=""
+          widths={previewWidths}
+          sizes="26rem"
+          format="webp"
+          loading="lazy"
+          decoding="async"
+          draggable="false"
+          aria-hidden="true"
+        />
+      ))
+    }
   </nav>
 </Base>
 
@@ -285,6 +352,18 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     --decor-scale-wide: calc(5rem / 400);
 
     --ruler-height: 2.25rem;
+
+    /* A marker's preview: the screen that floats beside it while a desktop
+       pointer is on it, above everything on the map, and how much of the map
+       shows through it. */
+    --preview-width: clamp(18rem, 26vw, 26rem);
+    --preview-opacity: 0.8;
+
+    /* On a touch screen a card opens as a popup in the middle of the screen
+       instead, this wide at most, with at least this much room around it to
+       tap and close it. */
+    --popup-width: 28rem;
+    --popup-gap: 1.5rem;
 
     /* The portrait sticker in the top left corner. Each page load drops it
        somewhere in a small area there and gives it a slightly different
@@ -701,12 +780,57 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     }
   }
 
+  /* --- Previews -------------------------------------------------------- */
+
+  /* The script shows a marker's preview while a desktop pointer is on the
+     marker (`data-shown`) and writes where it sits, beside the marker and
+     moving with the pointer, so it never covers the marker or its label.
+     Touch screens never get it: their card carries the image instead. */
+
+  .preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    display: none;
+    width: var(--preview-width);
+    height: auto;
+    pointer-events: none;
+    translate: var(--preview-x, 0) var(--preview-y, 0);
+    transform-origin: var(--preview-origin, left center);
+    opacity: 0;
+    visibility: hidden;
+    scale: 0.96;
+    transition: opacity var(--dur-fast) var(--ease),
+      visibility var(--dur-fast) var(--ease), scale var(--dur-fast) var(--ease);
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .diagram[data-cards='flyout'] .preview {
+    display: block;
+  }
+
+  .preview[data-shown] {
+    opacity: var(--preview-opacity);
+    visibility: visible;
+    scale: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .preview {
+      scale: 1;
+    }
+  }
+
   /* --- Cards ------------------------------------------------------------ */
 
   .panel {
     /* How far out the card starts when it is asked for, and goes back to as
        it leaves. */
     --shift: 0.5rem;
+    --pad-y: 0.875rem;
+    --pad-x: 1rem;
 
     position: absolute;
 
@@ -716,7 +840,7 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     top: var(--panel-y, 100%);
     width: max-content;
     max-width: min(90vw, var(--card-width));
-    padding: 0.875rem 1rem;
+    padding: var(--pad-y) var(--pad-x);
     background: var(--paper);
     outline: 1px solid var(--line-soft);
     border-radius: var(--radius-md);
@@ -769,6 +893,37 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     from {
       translate: var(--arrive, 0);
     }
+  }
+
+  /* A card opened as a popup (touch screens, `data-cards='popup'`) sits in
+     the middle of the screen, wide, and scrolls if it's taller than the
+     screen. The script centres it; it rises into place. */
+
+  .diagram[data-cards='popup'] .panel {
+    width: min(100vw - 2 * var(--popup-gap), var(--popup-width));
+    max-width: none;
+    max-height: calc(100svh - 2 * var(--popup-gap));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .node[data-place='center'] .panel {
+    --arrive: 0 var(--shift);
+  }
+
+  /* The preview heads a popup card, edge to edge, and only there. */
+
+  .panel > img {
+    display: none;
+    width: calc(100% + 2 * var(--pad-x));
+    max-width: none;
+    height: auto;
+    margin: calc(-1 * var(--pad-y)) calc(-1 * var(--pad-x)) var(--pad-y);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+  }
+
+  .diagram[data-cards='popup'] .panel > img {
+    display: block;
   }
 
   .panel p {

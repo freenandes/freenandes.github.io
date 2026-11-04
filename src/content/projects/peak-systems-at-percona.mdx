@@ -1,6 +1,6 @@
 ---
 title: Peak Systems
-description: 'PMM was built on Grafana, and it looked like it. I gave it its own interface and the design system underneath.'
+description: 'I led the UX direction for PMM’s move beyond Grafana’s interface and helped build Peak UI, the design system that supported it.'
 date: 2022–2026
 order: 1
 role: Senior Product Designer & Design Engineer
@@ -30,34 +30,23 @@ import treeTestResults from '../../assets/projects/peak-systems-at-percona/tree-
 import treeTestHubPages from '../../assets/projects/peak-systems-at-percona/tree-test-hub-pages.svg';
 import Gallery from '../../components/Gallery.astro';
 
-## In short
+## At a glance
 
-### Team
+**Problem:** PMM’s interface inherited Grafana’s navigation and constraints. Users struggled to distinguish the two products, PMM features were difficult to surface, and Grafana upgrades required weeks of reworking customizations.
 
-- 1 front-end engineer at first, later 3. They designed the architecture and implemented the tech stack.
-- Me, the only designer: research, information architecture, interaction design, coded prototypes, UX reviews, front-end fixes in production, and the Peak UI design system.
+**My role:** As the only designer, I proposed the product direction and worked across research, information architecture, interaction design, coded prototypes, component documentation, UX reviews and front-end fixes. I worked with one front-end engineer initially, and later three, who owned the software architecture and implementation of the tech stack.
 
-### Problem
+**The outcome:** PMM 3.6 shipped with its own interface for the first time. Grafana upgrade work fell from 2–3 weeks to 1–2 days. Two teams outside PMM built on this new foundation, bringing six preview apps into PMM 3.10.
 
-New users couldn’t tell PMM (Percona Monitoring and Management) apart from Grafana, one of its components. Key features got lost in the UX inherited from upstream, and every upgrade or security fix meant reworking our customizations, burning a lot of engineering hours.
+## A monitoring product inside a dashboard tool
 
-### What I did
+PMM (Percona Monitoring and Management) helps DBAs (database administrators), SREs (site reliability engineers) and developers monitor databases and investigate problems.
 
-I made the case for a PMM-native interface built around the features users actually asked for, designed it, and built Peak UI to hold it together.
+Grafana provided its dashboards, but PMM had grown to include query analytics, backups, inventory, advisors and other workflows. Its interface still exposed the structure of the underlying components, making PMM’s own capabilities harder to understand. It was not uncommon to find a customer surprised that feature X existed until we mentioned it directly.
 
-### What changed
+That dependency also affected delivery. Every Grafana upgrade, often prompted by a security fix, meant rebuilding our customizations. The work took 2–3 weeks, and PMM’s experience remained tied to decisions made for Grafana’s users.
 
-PMM 3.6 shipped with its own interface, and Grafana upgrades dropped from 2–3 weeks of work to 1–2 days. With this new foundation, 2 teams outside PMM started building apps inside it, and 6 of them reached PMM 3.10 as previews for users to explore.
-
----
-
-## PMM wearing a mask
-
-PMM monitors MySQL, MariaDB, PostgreSQL, MongoDB, Redis, and more, mainly for DBAs (database administrators), SREs (site reliability engineers), and app developers. PMM 3 launched with a revamped back-end, but the UI still looked like Grafana, so even first-time users weren’t sure where they were: in PMM or in Grafana?
-
-Grafana is excellent at managing dashboards, but PMM had grown into much more, and users needed to see the rest of it clearly so they’d adopt its features.
-
-The decisive problems were maintenance: every Grafana upgrade, often a security fix, meant 2–3 weeks of rebuilding our changes, and PMM’s UX kept depending on decisions made upstream for Grafana’s users, not ours.
+We needed control over PMM’s navigation and interface while retaining the Grafana capabilities the product depended on.
 
 <Gallery
   density={2}
@@ -81,14 +70,16 @@ The decisive problems were maintenance: every Grafana upgrade, often a security 
     },
   ]}
 >
-  Before and after: the Home page and Settings in PMM 3.5, inside Grafana, then after 3.6: PMM’s own interface. Settings was rebuilt on Peak UI as a native page for 3.8.
+  Home page before and after PMM’s native interface, followed by Settings page before and after.
 </Gallery>
 
-## Clean up the house to make PMM shine
+## One product navigation across different components
 
-In 2024, I pitched a way out called Reclaim PMM: take back PMM’s UX and keep Grafana as a contained, well-isolated component, with its features plugged into the PMM UI through APIs (application programming interfaces).
+In 2024, I proposed “Reclaim PMM”: a native interface with Grafana contained underneath it, exposing its capabilities through APIs where possible.
 
-The developers preferred turning Grafana into an isolated app tile, literally, which looked faster to build. I argued for the option Reclaim PMM described: a navigation that shows PMM’s features, whichever component renders them, built as a native UI wherever possible. A list of features is better than a list of components in this case.
+There were two approaches. The engineering team initially favored making Grafana a separate app inside PMM because it looked faster to deliver. I argued for a shared navigation that exposed PMM’s features directly, regardless of which component rendered them.
+
+The distinction mattered to the user’s task. Finding alerting or dashboards should not require understanding which software component provides them.
 
 <Gallery
   scale={0.37}
@@ -103,21 +94,46 @@ The developers preferred turning Grafana into an isolated app tile, literally, w
     },
   ]}
 >
-  Left, the option the developers preferred: the native navigation opens Grafana as one app, with its own navigation inside. Right, the one I argued for: the native navigation surfaces every feature, including the ones Grafana still renders.
+  Two approaches: Grafana as a separate app with its own navigation, and the alternative, PMM’s features accessible through one shared navigation, regardless of the underlying component.
 </Gallery>
 
-To back up our claims, I interviewed 6 senior DBAs and SREs who had never used PMM. “Too many widgets, too many boxes, too many numbers,” and “context switching fatigue” were real problems for them, and a separate Grafana space would only deepen that.
+Interviews with six senior DBAs and SREs who had never used PMM highlighted information overload (“too many widgets, too many boxes, too many numbers”) and fatigue from switching contexts, so I used those findings to argue for a more coherent experience across the product.
 
-## From prototype to shipping, on Peak UI
-
-Peak UI came first as a Figma asset for structured product development. That supported the vision designs, and a clickable prototype that won leadership and stakeholders over to Reclaim PMM. Later came [the React design system we built and ran](https://github.com/percona/peak-ui), and that served for some experimental, internal products but also for PMM, with the design intent and code architecture all in one place.
+I developed the direction into a clickable Figma prototype. It showed PMM’s own navigation opening dashboards, Query Analytics and Explore within the same interface, and helped secure leadership and stakeholder support.
 
 <figure>
   <video src={reclaimVideo} poster={reclaimPoster.src} width="3240" height="2160" controls preload="metadata" playsinline></video>
-  <figcaption>The Reclaim PMM vision as a Figma prototype, made to win over leadership: PMM’s own navigation, with Grafana’s dashboards, Query Analytics and Explore opening inside it.</figcaption>
+  <figcaption>The Reclaim PMM vision prototype in Figma: dashboards, Query Analytics and Explore within PMM’s own navigation. I used it to make the proposed direction concrete for leadership.</figcaption>
 </figure>
 
-I shared the new navigation as a prototype made with Peak UI, gathered critique asynchronously so quieter people could push back, and built the first mockups with 1 front-end engineer, later 3. I kept shipping intent in [Storybook](https://percona.github.io/peak-ui/) and the docs, plus fixes: animation, alignment, behavior, and accessibility. The new interface shipped in PMM 3.6.
+## Build the foundation through real releases
+
+Peak UI began as a Figma library supporting the vision and prototypes. It later became a [React design system](https://github.com/percona/peak-ui), developed with the front-end engineers and used in PMM and other internal Percona products.
+
+We introduced that foundation incrementally:
+
+- PMM 3.0 (January 2025): the server and client update experience became the first PMM workflow built on Peak UI.
+- PMM 3.6: PMM’s native interface and navigation shipped.
+- PMM 3.8: Settings was rebuilt as a native Peak UI page.
+
+The update workflow gave the components and architecture a production use before the wider interface depended on them. Users could update the PMM server, then identify which clients — the software installed alongside databases — still needed updating.
+
+<figure>
+  <video src={updatesVideo} poster={updatesPoster.src} width="2400" height="1350" controls preload="metadata" playsinline></video>
+  <figcaption>The first PMM workflow built on Peak UI, shipped in January 2025 with PMM 3.0: update the server, then help the user identify which clients still need updating.</figcaption>
+</figure>
+
+For the native navigation, I shared prototypes and gathered critique asynchronously, giving people space to question the direction. Alongside the engineers, I worked through interaction details and front-end fixes covering behavior, animation, alignment and accessibility.
+
+We also brought the Settings page (shown above) and a consolidated Help Center page into the native interface, replacing help content scattered across Grafana customizations.
+
+## Keep design intent available in code
+
+As Peak UI grew, I kept design intent in [Storybook](https://percona.github.io/peak-ui/) and the component documentation so teams could use it during implementation.
+
+For example, the Empty State documentation explains what a title should communicate, how the description should explain the absence of content, and when to use each size. Those decisions sit alongside the component’s props and examples.
+
+Components also carry maturity tags: Stable, Beta, To review and Deprecated. These make their readiness visible to teams choosing what to build on.
 
 <Gallery
   density={2}
@@ -137,33 +153,32 @@ I shared the new navigation as a prototype made with Peak UI, gathered critique 
     },
   ]}
 >
-  Peak UI’s Storybook: maturity tags tell other teams what’s safe to build on, and each prop’s description carries the design intent, down to what an empty state should say.
+  First, component maturity tags; then Empty State guidance; and finally Navigation Flyout documentation. Usage rules sit alongside component APIs to guide implementation.
 </Gallery>
 
-To support this, we also designed and shipped what made the navigation work: a modular settings page and a help center (that replaced help bits scattered across Grafana and overridden in their code). But we also designed and created a full, self-served upgrade experience for the PMM server and the “clients” (the software installed next to each database), so new features could reach users faster. The updates came first, in PMM 3.0: shipping them on Peak UI forced us to put in the architecture and components a native interface would need, so by 3.6 the navigation could be built on foundations already in production.
+This was part of my contribution between design and engineering: making interaction and content decisions available where implementation happened, then reviewing and fixing details as the product developed.
 
-<figure>
-  <video src={updatesVideo} poster={updatesPoster.src} width="2400" height="1350" controls preload="metadata" playsinline></video>
-  <figcaption>The self-served updates, the first part of PMM built on Peak UI, shipped in 3.0 in January 2025: update the server, then see which clients still need updating.</figcaption>
-</figure>
+## Other teams built on the foundation
 
-With the use of Peak UI and as AI coding assistants spread as well, I used a benchmarking tool to measure how well they followed the guidelines. The first part of a 6-step plan actually raised the score from 29.7 to 34.7 (out of 100), and that change could be seen in practice by testing and re-prompting.
+The internal Services team had developed a tooling framework using Peak UI. The native interface gave that work a faster lane into PMM, where it was branded as Extensions and contributed two preview apps in PMM 3.10. The MongoDB team contributed four more.
 
-## Other teams wanted in
+This was a concrete sign of adoption: two additional teams could build applications inside the product using the shared foundation, with the plasticity to deliver their software through UI.
 
-Alongside these changes, the internal Services team had built their own tooling framework on Peak UI, and so, quickly, it found a home inside PMM, branded as PMM Extensions, a way to add apps to PMM. That brought 4 more engineers into the PMM team, who released 2 apps in PMM 3.10.
+My work extended to reviewing those experiences. For Operations for MongoDB, I reviewed every screen and deliberately broke a running replica set to inspect the failure states. I then documented the critical UX issues for the team to address before release.
 
-With the same excitement to have more flexibility to build UI-based apps, on the MongoDB team, 3 engineers shipped 4 more apps in 3.10. The native interface inspired those developers to build more and compete with existing tooling for MongoDB. When their Operations for MongoDB reached early access, I reviewed every screen and broke a running replica set on purpose to see what the failures looked like. I documented every critical UX issue so they could easily pick them up and fix them in time for the release.
+## The platform grew, but the navigation needed another step
 
-## Lost the debate, kept the work
+The first native interface retained much of the pre-existing information architecture to avoid disorienting users or making them relearn it. By PMM 3.10, the growing list of apps exposed its limits: it couldn’t scale.
 
-By version 3.10, all those new apps were now crowding the sidebar, and users and customers noticed. It came up in 2 complaints: the collapsed sidebar had lost its flyout submenus, and the list kept growing with items that not everyone needed. We had carried Grafana’s information architecture over into the native navigation to avoid disorienting users but never gave it room to scale.
+Feedback highlighted two problems: the collapsed sidebar had lost its flyout submenus, and the navigation was filling with items that were irrelevant to some users, while still being relevant to others.
 
-After years of listening to DBAs, SREs, and other database professionals, I knew I had to propose a new navigation architecture that kept the look and feel but boosted its utility. After some conversations with experts, we decided on a flat sidebar, a hub page per technology, and a home page that shows the state of things, with drill-down into metrics and logs.
+The next challenge was organizing a broader product around the work people needed to do.
 
-To keep the decisions grounded, I distilled interviews, customer threads and support cases into four personas: a DBA, an SRE, an app developer and an engineering manager. Each one’s needs became a check on the architecture.
+I proposed a flat sidebar with a hub page for each database technology and an overview page showing the current state of the environment, with drill-down paths into metrics and logs. Here, the past interviews, customer discussions and support cases that informed our four documented personas — DBA, SRE, application developer and engineering manager — came in handy to check the architecture against different needs.
 
-I tested the architecture of such navigation with 17 people on [a tree-testing tool I built on the fly](https://freenandes.github.io/tree-test/) ([source](https://github.com/freenandes/tree-test)). Of 6 tasks, 4 passed marks I set beforehand, and 15 of 17 expected each technology to open its hub page.
+## Test the structure and expose the weak points
+
+I tested the proposed architecture with 17 people using [a tree-testing tool I built](https://www.pmcf.xyz/tree-test/). Four of six tasks met the success and directness criteria I had set beforehand.
 
 <Gallery
   images={[
@@ -177,12 +192,20 @@ I tested the architecture of such navigation with 17 people on [a tree-testing t
     },
   ]}
 >
-  The technology-first labels held up. Both misses came down to placement: adding a server sat behind Nodes vs Services, and the diagnostics bundle was hidden under Apps.
+  Left: six navigation tasks exposed weak paths to server setup and support diagnostics. Right: 15 of 17 participants expected a technology to open a summary page.
 </Gallery>
 
-But to save engineering time, the sidebar still shipped with the legacy information architecture, not the one I had tested.
+The test also exposed two weak points. Adding a monitored server was difficult to locate within the distinction between Nodes and Services. Finding a diagnostics bundle for Percona Support performed particularly poorly under Apps.
 
-The work still paid off: I committed to that decision and split my coded prototype of the new navigation into small PRs (pull requests) for a “version 2.0” of the navigation. It included a section for favorite dashboards and apps, flyout submenus, CMD+K to search across PMM, and the technology hub pages template for the drill-down workflow. Part of it is already on track for future releases.
+Those results identified placements that needed revision. Separately, 15 of 17 participants expected clicking a database technology to open a summary page, supporting the direction of technology hubs.
+
+The test gave us evidence about the proposed structure and specific problems to address before implementation.
+
+## Turn the proposal into smaller deliveries
+
+The tree test took place while the sidebar was already shipping. To save engineering time, the team released it with the existing information architecture.
+
+I worked within that decision and split my coded navigation prototype into smaller PRs for future releases. The work covered favorite dashboards and apps, flyout submenus, CMD+K search across PMM, and a technology hub template.
 
 <Gallery
   density={2}
@@ -202,16 +225,20 @@ The work still paid off: I committed to that decision and split my coded prototy
     },
   ]}
 >
-  Stills from the prototype: CMD+K reaches any page or action, the collapsed sidebar keeps every section one hover away, and a technology’s hub page opens on what needs attention.
+  Navigation 2.0 prototype: first, CMD+K search; then flyout submenus in the collapsed sidebar; and finally a MongoDB hub highlighting issues that need attention.
 </Gallery>
+
+This second phase allowed us to produce a tested architecture, a functional prototype and smaller implementation proposals.
 
 <figure>
   <video src={navVideo} poster={navPoster.src} width="3644" height="2160" controls preload="metadata" playsinline></video>
-  <figcaption>My coded prototype of the navigation 2.0 (right) next to the shipped sidebar (left). Has some new requested features like favorites, flyout submenus and CMD+K search across PMM.</figcaption>
+  <figcaption>The shipped sidebar (left) beside my coded navigation 2.0 prototype (right), demonstrating proposed interactions including favorites, flyout submenus and CMD+K search across PMM.</figcaption>
 </figure>
 
 ## Looking back
 
-I’d build the design system first again: it’s why 2 other teams could ship apps inside PMM within months.
+I would build the shared foundation early again. Peak UI supported the move to a native interface and gave two other teams a way to build inside PMM.
 
-What I’d change: use evidence to get buy-in even sooner. My tree test came while the new sidebar was already shipping; it’s always preferable to run user validation in parallel with prototyping so the data arrives while changing course is still cheap.
+I would change when I tested the next information architecture. The evidence arrived while the sidebar was already shipping, limiting its influence on that release. Next time, I would test the structure alongside the first prototypes, while there was still room to change the delivery scope.
+
+I would also make navigation growth an explicit part of the initial scope: how new apps enter the product, who needs to see them, and when they belong within an existing workflow or hub.

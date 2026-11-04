@@ -95,9 +95,9 @@ export const diagramNodes: DiagramEntry[] = [
     kind: 'project',
     shape: 'triangle',
     tagline:
-      "The systems case. Giving a product its own interface, so it stops looking like someone else’s.",
+      "The systems case. Giving PMM its own interface and a foundation for new apps.",
     lines: [
-      "I designed PMM’s native interface and built Peak UI, the design system under it. Grafana upgrades dropped from weeks of work to days, and 2 more teams now ship apps on it.",
+      "I designed a native interface for Percona’s database monitoring platform and helped build Peak UI design system. Grafana upgrade work fell from weeks to days, and two more teams shipped six preview apps.",
     ],
     preview:
       'PMM’s Updates page once an update has finished: the server is up to date, and every client in the list reads “Up to date”.',

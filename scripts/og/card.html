@@ -1,0 +1,166 @@
+<!doctype html>
+<!--
+  The link-preview card: what `npm run og` photographs into public/og.png.
+
+  Lay it out here like any page. The script fills the name and role from
+  src/site.config.ts (the text below is only a stand-in for opening this file
+  in a browser) and fails if anything lands outside the centre square, which
+  some apps crop to. Colours and fonts come from the site's tokens.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Link-preview card</title>
+    <link rel="stylesheet" href="../../src/styles/tokens.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@200..800&display=block"
+    />
+    <style>
+      /* Knobs ------------------------------------------------------------ */
+      :root {
+        --og-width: 1200px; /* the script sets these from site.config.ts */
+        --og-height: 630px;
+        --og-topo-size: 3000px; /* width of one tile of the contour texture */
+        --og-topo-opacity: 0.16;
+        --og-topo-position: -520px -260px; /* which patch of the map shows */
+        --og-text-inset: 30px; /* text's margin inside the centre square */
+        --og-text-top: 80px;
+        --og-name-size: 99px;
+        --og-role-size: 42px;
+        --og-domain-size: 42px;
+        --og-tracking: 0.12em; /* role and domain */
+        --og-weight: 780; /* every line of type; the font goes up to 800 */
+        --og-route-ink: var(--ink-faint);
+        --og-marker-ink: var(--ink-2);
+      }
+
+      /* ------------------------------------------------------------------ */
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+
+      html,
+      body {
+        width: var(--og-width);
+        height: var(--og-height);
+        overflow: hidden;
+        background: var(--paper);
+      }
+
+      body {
+        position: relative;
+        isolation: isolate;
+        color: var(--ink);
+        font-family: var(--font-sans);
+      }
+
+      /* Contour texture, as behind the home page's map. */
+      body::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -2;
+        background-image: url('../../public/topo-low.svg');
+        background-repeat: repeat;
+        background-position: var(--og-topo-position);
+        background-size: var(--og-topo-size) auto;
+        opacity: var(--og-topo-opacity);
+      }
+
+      /* The route of map markers, drawn in a 1200×630 box. */
+      svg {
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        width: 100%;
+        height: 100%;
+      }
+
+      polyline {
+        fill: none;
+        stroke: var(--og-route-ink);
+        stroke-width: 2;
+        stroke-linejoin: round;
+      }
+
+      symbol polygon {
+        fill: var(--paper);
+        stroke: var(--og-marker-ink);
+        stroke-width: 1.5;
+      }
+
+      /* The words, kept inside the centre square. */
+      main {
+        position: absolute;
+        top: var(--og-text-top);
+        left: calc((var(--og-width) - var(--og-height)) / 2 + var(--og-text-inset));
+        width: calc(var(--og-height) - 2 * var(--og-text-inset));
+      }
+
+      h1 {
+        font-size: var(--og-name-size);
+        font-weight: var(--og-weight);
+        line-height: 0.9;
+        letter-spacing: var(--tracking-tight);
+        text-transform: uppercase;
+      }
+
+      p {
+        font-weight: var(--og-weight);
+        line-height: var(--leading-tight);
+        letter-spacing: var(--og-tracking);
+        text-transform: uppercase;
+      }
+
+      p[data-og='role'] {
+        margin-top: 85px;
+        font-size: var(--og-role-size);
+        color: var(--ink-faint);
+      }
+
+      /* Each part of "X & Y" on its own line, the ampersand leading. */
+      p[data-og='role'] span {
+        display: block;
+      }
+
+      p[data-og='domain'] {
+        margin-top: 50px;
+        font-size: var(--og-domain-size);
+      }
+    </style>
+  </head>
+  <body>
+    <svg viewBox="0 0 1200 630" aria-hidden="true">
+      <!-- The map's marker outlines, from polygon() in src/lib/diagram.ts. -->
+      <symbol id="triangle" viewBox="0 0 20 20" overflow="visible">
+        <polygon points="10.00,1.60 17.27,14.20 2.73,14.20" />
+      </symbol>
+      <symbol id="square" viewBox="0 0 20 20" overflow="visible">
+        <polygon points="15.94,4.06 15.94,15.94 4.06,15.94 4.06,4.06" />
+      </symbol>
+      <symbol id="pentagon" viewBox="0 0 20 20" overflow="visible">
+        <polygon points="10.00,1.60 17.99,7.40 14.94,16.80 5.06,16.80 2.01,7.40" />
+      </symbol>
+      <symbol id="hexagon" viewBox="0 0 20 20" overflow="visible">
+        <polygon points="10.00,1.60 17.27,5.80 17.27,14.20 10.00,18.40 2.73,14.20 2.73,5.80" />
+      </symbol>
+
+      <!-- The route: each marker sits on a corner of the line, centred on it
+           (x and y are its top left: half its 26-unit size back). -->
+      <polyline points="-20,360 52,370 180,408 202,485 268,455 376,550 590,575 912,520 1037,335 1110,370 1220,400" />
+      <use href="#square" x="39" y="357" width="26" height="26" />
+      <use href="#hexagon" x="363" y="537" width="26" height="26" />
+      <use href="#pentagon" x="899" y="507" width="26" height="26" />
+      <use href="#triangle" x="1024" y="322" width="26" height="26" />
+    </svg>
+
+    <main>
+      <h1 data-og="name">Pedro MC Fernandes</h1>
+      <p data-og="role"><span>Product Designer</span> <span>&amp; Design Engineer</span></p>
+      <p data-og="domain">pmcf.xyz</p>
+    </main>
+  </body>
+</html>

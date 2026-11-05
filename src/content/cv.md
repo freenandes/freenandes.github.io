@@ -17,7 +17,7 @@ languages:
   - Portuguese
   - English
 
-headline: "Senior Product Designer & Design Engineer"
+headline: "Product Designer & Design Engineer"
 
 summary: |
   I specialize in building interfaces for complex technical software: observability, databases, and developer tools. It’s a world I navigate with ease. I know its terminology, its workflows, and I understand the people who use these tools every day: DBAs, SREs and software developers.

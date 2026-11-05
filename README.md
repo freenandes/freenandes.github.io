@@ -19,6 +19,7 @@ Pedro MC Fernandes's portfolio site. The home page is an interactive map that li
 | `npm run encrypt` | Re-encrypts locked projects (also part of `build`) |
 | `npm run email -- you@example.com` | Changes the contact email |
 | `npm run icons` | Redraws the favicon's PNG and .ico versions from `public/favicon.svg` |
+| `npm run og` | Redraws the link-preview image, `public/og.png`, from `scripts/og/card.html` and the name and role in `src/site.config.ts` |
 
 Before you push: run `npm run check`, `npm run lint:css` and `npm run build`. CI runs the same three on every pull request to `main`, and a push to `main` doesn't deploy if one of them fails.
 
@@ -183,10 +184,10 @@ Run `npm run email -- you@example.com`. It stores an obfuscated token in `src/si
 
 ### Change the link-preview image
 
-Every page shares one image when its link is posted (LinkedIn, Slack, X, WhatsApp and so on): `public/og.png`.
+Every page shares one image when its link is posted (LinkedIn, Slack, X, WhatsApp and so on): `public/og.png`. It's drawn from a page, `scripts/og/card.html`, so it's edited like the site.
 
-1. Export a 1200×630 PNG (or JPEG) with no transparency, and keep the text inside the centre 630×630 square, since some apps crop to it. Keep it small: some apps skip images over a few hundred KB.
-2. Replace `public/og.png` with it. If the size or format changed, update `ogImage` in `src/site.config.ts` to match, and rewrite its `alt` whenever the words in the image change.
+1. To change the words, edit `name` or `role` in `src/site.config.ts`; the image's `alt` follows them. To change the look, edit `scripts/og/card.html` (its knobs are at the top of its `<style>`; open the file in a browser to see it). It uses the site's tokens, fonts and contour texture.
+2. Run `npm run og`. It photographs the card at the size `ogImage` gives into `public/og.png`, and writes nothing if the fonts didn't load or any text leaves the centre 630×630 square, which some apps crop to. It needs Chrome, found the same way as for `npm run visual`. Commit the new PNG. If you change what the image shows beyond the name and role, rewrite the rest of `alt` in `src/site.config.ts` to match.
 3. Platforms keep a copy for days. To see the new one sooner, re-scrape a page in [LinkedIn's Post Inspector](https://www.linkedin.com/post-inspector/) and [Facebook's Sharing Debugger](https://developers.facebook.com/tools/debug/).
 
 ### Change the favicon

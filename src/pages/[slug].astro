@@ -2,8 +2,11 @@
 /** A case study. Body copy lives in `src/content/projects/<slug>.mdx`; locked
     projects add the passphrase gate below the public teaser. One enlarged
     view serves every screenshot and video on the page. The footer opens with
-    the mini-map, linking every page on the map. */
+    the mini-map, linking every page on the map. A published locked project
+    fails the build until its ciphertext is in `public/locked/`. */
 
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 import { render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Lightbox from '../components/Lightbox.astro';
@@ -25,6 +28,30 @@ export async function getStaticPaths() {
     if (pages.includes(id)) {
       throw new Error(`src/content/projects/${id}.mdx: "/${id}/" is already a page. Rename the file.`);
     }
+  }
+  /** Why `public/locked/<slug>.json` can't be decrypted, or nothing if it can. */
+  function lockedPayloadProblem(slug: string): string | undefined {
+    const file = path.resolve('public', 'locked', `${slug}.json`);
+    if (!existsSync(file)) return `public/locked/${slug}.json doesn't exist.`;
+    try {
+      const payload = JSON.parse(readFileSync(file, 'utf8'));
+      const fields = ['salt', 'iv', 'ct'].every((key) => typeof payload[key] === 'string');
+      if (fields && typeof payload.iter === 'number') return undefined;
+    } catch {
+      // Falls through to the same answer as a payload missing its fields.
+    }
+    return `public/locked/${slug}.json isn't a payload \`npm run encrypt\` wrote.`;
+  }
+  // CI never sees the plaintext or passwords, so a locked project's committed
+  // ciphertext is all the live gate has. Without it, the right passphrase is
+  // refused. Dev only warns, so a teaser can be drafted before it's encrypted.
+  for (const { id, data } of projects) {
+    if (!data.locked) continue;
+    const problem = lockedPayloadProblem(id);
+    if (!problem) continue;
+    const message = `src/content/projects/${id}.mdx is locked, but ${problem} Run \`npm run encrypt\` and commit public/locked/${id}.json.`;
+    if (import.meta.env.PROD) throw new Error(message);
+    console.warn(message);
   }
   return projects.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
 }

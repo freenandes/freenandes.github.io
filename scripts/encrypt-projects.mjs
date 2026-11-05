@@ -14,7 +14,8 @@
    (PBKDF2) and decrypts with AES-GCM. See src/components/PasswordGate.astro.
 
    This runs automatically before `astro build` (npm "prebuild") and can be
-   run on demand with `npm run encrypt`.
+   run on demand with `npm run encrypt`. A plaintext file with no password
+   fails the run, so the build never goes on with stale or missing ciphertext.
    ========================================================================= */
 
 import { readFile, readdir, writeFile, mkdir } from 'node:fs/promises';
@@ -89,7 +90,7 @@ async function main() {
     try {
       fileMap = JSON.parse(await readFile(PASSWORDS_FILE, 'utf8'));
     } catch (err) {
-      console.warn('[encrypt] Could not parse passwords.json:', err.message);
+      throw new Error(`Could not parse src/protected/passwords.json: ${err.message}`);
     }
   }
 
@@ -105,19 +106,14 @@ async function main() {
   await mkdir(OUT_DIR, { recursive: true });
 
   let done = 0;
-  let skipped = 0;
+  const missing = [];
 
   for (const file of entries) {
     const slug = file.replace(/\.md$/, '');
     const password = resolvePassword(slug, fileMap);
 
     if (!password) {
-      console.warn(
-        `[encrypt] ⚠ No password for "${slug}" (set LOCK_PASSWORD_${slug
-          .toUpperCase()
-          .replace(/[^A-Z0-9]/g, '_')} or add it to passwords.json) — skipped.`
-      );
-      skipped += 1;
+      missing.push(slug);
       continue;
     }
 
@@ -129,7 +125,19 @@ async function main() {
     done += 1;
   }
 
-  console.log(`[encrypt] Done. ${done} encrypted, ${skipped} skipped.`);
+  if (missing.length) {
+    for (const slug of missing) {
+      console.error(
+        `[encrypt] ✗ No password for "${slug}": set LOCK_PASSWORD_${slug
+          .toUpperCase()
+          .replace(/[^A-Z0-9]/g, '_')} or add it to src/protected/passwords.json.`
+      );
+    }
+    console.error(`[encrypt] ${done} encrypted, ${missing.length} without a password.`);
+    process.exit(1);
+  }
+
+  console.log(`[encrypt] Done. ${done} encrypted.`);
 }
 
 main().catch((err) => {

@@ -126,6 +126,8 @@ export const diagramNodes: DiagramEntry[] = [
     lines: [
       'At TUI’s Lisbon hub, I designed PageBuilder: a destination page template and the rules for a generator that built 100K+ pages, growing organic traffic more than 4× where it launched. Plus Tagus, the design system that kept them coherent across 5 markets.',
     ],
+    preview:
+      'The All destinations homepage on stay.tui.com: a hero of four destinations, with Santorini opened wide beside Venice, Dubrovnik and Moscow, a search for destinations, dates and guests, and Featured destinations below.',
     portrait: { x: 0.5, y: 0.92 },
     landscape: { x: 0.88, y: 0.46 },
   },

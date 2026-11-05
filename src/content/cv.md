@@ -80,7 +80,7 @@ earlierWork:
   - role: Product Designer
     org: Stricker
     period: 2010 — 2013
-    summary: "Designed modular systems for 50+ B2B products and structured their digital catalogues, with extensive field research at trade shows."
+    summary: "Designed modular systems for 50+ B2B products and structured their digital catalogs, with extensive field research at trade shows."
 
   - role: Illustrator & Graphic Designer
     org: Freelance

@@ -27,19 +27,24 @@ export interface SiteConfig {
    *  KB), with its text inside the centre square, which some apps crop to.
    *  `width`, `height` and `type` must match the file: they let a platform draw
    *  the card the first time a link is shared, before it has fetched the image.
-   *  `alt` reads out what the image says. */
+   *  `alt` reads out what the image says. `npm run og` draws the image from
+   *  `name` and `role` (see `scripts/og/card.html`), and `alt` is built from
+   *  the same two, so the three can't drift apart. */
   ogImage: { path: string; width: number; height: number; type: string; alt: string };
   /** Home-screen name, and the tint browsers paint their own UI with. */
   shortName: string;
   themeColor: string;
 }
 
+const name = 'Pedro MC Fernandes';
+const role = 'Product Designer & Design Engineer';
+
 export const site: SiteConfig = {
-  name: 'Pedro MC Fernandes',
-  role: 'Senior Product Designer & Design Engineer',
+  name,
+  role,
   description:
     'I build interfaces for complex technical software: observability, databases, and developer tools. From research to design systems and front-end code.',
-  availability: 'Open to remote Senior Product Designer and Design Engineer roles in complex technical products.',
+  availability: 'Open to remote Product Designer and Design Engineer roles in complex technical products.',
   socials: [
     { label: 'Email', token: 'b3c3d6d7c1dcf3c3ded0d59dcbcac9' },
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/pmcfernandes' },
@@ -53,8 +58,7 @@ export const site: SiteConfig = {
     width: 1200,
     height: 630,
     type: 'image/png',
-    alt:
-      'Pedro MC Fernandes, Senior Product Designer & Design Engineer, pmcf.xyz. Set over a topographic map crossed by a route of map markers.',
+    alt: `${name}, ${role}, pmcf.xyz. Set over a topographic map crossed by a route of map markers.`,
   },
   shortName: 'PMCF',
   themeColor: '#ffffff',

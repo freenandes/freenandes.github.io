@@ -34,12 +34,19 @@ interface Props {
 
 const { images, density = 1, scale, narrow = false, fill = false } = Astro.props;
 
+/** A WebP, JPEG or AVIF is already compressed, so it's served as it is:
+    compressing it again only loses detail, and UI text shows it first. A PNG
+    is compressed once, to WebP at this quality. */
+const COMPRESSED = ['webp', 'jpg', 'jpeg', 'avif'];
+const PNG_QUALITY = 90;
+
 const items = await Promise.all(
   images.map(async ({ src, alt }) => {
     const Svg = src.format === 'svg' ? (src as SvgComponent & ImageMetadata) : undefined;
+    const asIs = Svg || COMPRESSED.includes(src.format);
     return {
       Svg,
-      url: Svg ? src.src : (await getImage({ src, format: 'webp' })).src,
+      url: asIs ? src.src : (await getImage({ src, format: 'webp', quality: PNG_QUALITY })).src,
       alt,
       width: src.width,
       height: src.height,

@@ -54,6 +54,9 @@
   --measure: 66ch;
   --gutter: 1rem;
 
+  /* How much of the reading column an inset figure takes, centred. */
+  --figure-inset: 80%;
+
   /* Shape, depth, motion. Keep durations in ms: PasswordGate.astro reads
      --dur-fast as a number of milliseconds. */
   --radius-sm: 0.1875rem;

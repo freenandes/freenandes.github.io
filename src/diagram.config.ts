@@ -108,9 +108,9 @@ export const diagramNodes: DiagramEntry[] = [
     id: 'reading-the-terrain-at-percona',
     kind: 'project',
     shape: 'triangle',
-    tagline: 'The fluency case. Redesigning the screen DBAs open when the database is slow.',
+    tagline: 'The fluency case. Turning database expertise into a live investigation workflow.',
     lines: [
-      'I reframed Query Analytics around what DBAs can act on and designed its real-time version with enterprise customers. It shipped, leaving customers asking for more.',
+      'I worked with database experts and enterprise customers to design Real-time Analytics for PMM, from choosing services to inspecting live operations.',
     ],
     preview:
       'Query Analytics on its Real-Time tab, watching the mc-global-analytics cluster: the live queries running right now, each with its service, elapsed time and state, such as Sorting result, Running, Waiting or Blocked, beside controls to pause fetching or stop the agents.',

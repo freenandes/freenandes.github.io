@@ -1,11 +1,11 @@
 ---
 title: Reading the Terrain
-description: "Query Analytics is where DBAs go when the database is slow. I learned how they really work, reframed it around what they can act on, and designed its real-time version with enterprise customers."
+description: "I worked with database experts and enterprise customers to design PMM’s Real-time Analytics: a workflow for choosing what to monitor, inspecting live operations and keeping control of a changing view."
 date: 2022–2026
 order: 2
 role: Senior Product Designer & Design Engineer
 client: Percona
-tags: ['UX Research', 'Prototyping', 'Databases']
+tags: ['UX Research', 'Interaction Design', 'Prototyping']
 ---
 
 import qanPartsMap from '../../assets/projects/reading-the-terrain-at-percona/qan-parts-map.webp';
@@ -28,31 +28,23 @@ import advisorsBefore from '../../assets/projects/reading-the-terrain-at-percona
 import advisorsAfter from '../../assets/projects/reading-the-terrain-at-percona/advisors-after.webp';
 import Gallery from '../../components/Gallery.astro';
 
-## In short
+## At a glance
 
-### Team
+**The problem:** Query Analytics helped teams investigate completed queries. Enterprise MongoDB teams also needed to see operations while they were running, with control over when additional collection started and stopped.
 
-- Our PM (product manager), who made the vision videos with me.
-- Tech leads and about 4 engineers split between back-end, front-end, and QA (quality assurance), who shaped and built Real-time Analytics.
-- Me, the only designer: discovery, problem framing, wireframes, vision prototypes, MVP (minimum viable product) UX and UI, and production fixes.
+**My role:** As the only designer, I led discovery synthesis, problem framing, interaction design and prototypes. I worked with our product manager, technical leads, engineers and QA, and followed the release with front-end fixes.
 
-### Problem
+**The delivery:** Real-time Analytics first shipped for MongoDB in PMM 3.7. CSV export followed in PMM 3.9, extending the workflow with a way to preserve evidence from an investigation.
 
-Under pressure, DBAs (database administrators) wrestled with filters, scrolled through lists, checked the too-many pre-made dashboards, and combed through the logs to find a slow query. Enterprise MongoDB teams also needed a live view of their queries before they could consider PMM (Percona Monitoring and Management) as a viable replacement for their tool stack.
+## Two questions behind a slow database
 
-### What I did
+PMM (Percona Monitoring and Management) helps database teams monitor performance and investigate problems. Its Query Analytics screen shows patterns in completed queries: what was slow, how often it ran and where it spent time.
 
-I learned how DBAs and our experts really work, showed customers PMM’s future in narrated videos, and designed Real-time Analytics with them, from concept to release.
+An active incident brings a different question: what is running right now?
 
-### What changed
+Enterprise MongoDB teams needed that live view before PMM could replace more of their monitoring toolset. Meanwhile, the existing historical interface had its own problems: dense filters, difficult comparisons and detail views that experts found unreliable. A colleague said it “feels like it’s from the ’90s.”
 
-Real-time Analytics shipped in PMM 3.7, about 90% as we intended, and I closed the gaps with fixes in the following releases. The export and command-line tools customers asked for followed in 3.9, and they asked for more of PMM to feel this intuitive.
-
----
-
-## Which query is slowing my database?
-
-That’s the question a DBA brings to Query Analytics, PMM’s screen for finding what slows a database. They narrow it down with filters, grab the query ID, and, if it really is the offender, kill it and flag it for optimization. On its old front-end, the screen got in the way. A colleague said it “feels like it’s from the ’90s,” meaning clunky, unappealing, unforgiving, and occasionally buggy.
+The wider redesign began with those problems. Real-time Analytics became the part we could deliver first.
 
 <Gallery
   scale={0.325}
@@ -63,14 +55,18 @@ That’s the question a DBA brings to Query Analytics, PMM’s screen for findin
     },
   ]}
 >
-  Before: Query Analytics inside Grafana, with Load front and center, reading “{'<'}0.01 load” on every row.
+  The existing Query Analytics screen combined dense filters, query metrics and a details panel. Its prominent Load metric did not match how the support expert I worked with assessed a slow query.
 </Gallery>
 
-I had tried to fix its UX before. In 2023, I tested a redesign in wireframes with 13 colleagues: the Compare feature I introduced, which put different timeframes side by side, scored 8.5 out of 10 for usefulness but 6.4 for ease of use, still inside the UI borrowed from Grafana. Then the project stopped. It only really took off in 2025, and I brought those findings with me.
+## Learn how experts investigate
 
-## Experts first, screens later
+I brought together earlier interviews, support knowledge, the backlog and findings from a 2023 wireframe evaluation with 13 colleagues. That earlier work had explored historical comparisons as a feature. It gave us useful starting points when the redesign resumed in 2025.
 
-Before drawing screens, I mapped every bit of Query Analytics by what a user can see and do with it, listing all the “Lego” parts, and pulled years of backlog, interviews, and the 2023 findings into one discovery doc. There, the team could argue about problems, not pixels. Then I brought our experts together around a giant Miro board of wireframes and assumptions. The conversation unlocked fast: problems and technical limits surfaced before anyone wrote code.
+I mapped Query Analytics into the information users could inspect and the actions they could take. This gave the team a shared model of the screen before we committed to a new layout.
+
+I then used wireframes in workshops with our internal database experts to surface assumptions and technical constraints. A walkthrough with a support specialist was especially useful: the prominent Load metric contributed little to their investigation. They reasoned through query duration, variation and rows examined.
+
+That changed the question I was designing around: which information helps someone judge the problem and decide what to inspect next?
 
 <Gallery
   scale={0.22}
@@ -81,30 +77,35 @@ Before drawing screens, I mapped every bit of Query Analytics by what a user can
     },
     {
       src: qanWireframes,
-      alt: 'Five grey, low-fidelity wireframes of Query Analytics, labelled Overview, Filters tab open, Details tab fully open, and two of Filters tab open + Details. The overview has a search field, a PostgreSQL filter chip and a list of queries with query count and query time; filters open as a column of checkboxes for environment, cluster, replication set and database beside the list; details open over the list with tabs for Preview & Metrics, Example, Tables & Indexes, Explain/Plan, Top Query and Metadata, the query’s text and a query time distribution bar.',
+      alt: 'Five gray, low-fidelity wireframes of Query Analytics, labeled Overview, Filters tab open, Details tab fully open, and two of Filters tab open + Details. The overview has a search field, a PostgreSQL filter chip and a list of queries with query count and query time; filters open as a column of checkboxes for environment, cluster, replication set and database beside the list; details open over the list with tabs for Preview & Metrics, Example, Tables & Indexes, Explain/Plan, Top Query and Metadata, the query’s text and a query time distribution bar.',
     },
   ]}
 >
-  Left, the parts first: the details panel mapped by what a user can see and do in it. Right, the early wireframes, from February 2025: the overview, filters in a side column, and a details panel that opens over the list.
+  I mapped the information and actions in Query Analytics, then used early wireframes to discuss filters, query inspection and technical constraints with database experts.
 </Gallery>
 
-One of our support experts showed me how they really work. “Load,” a metric we had invented years before and put front and center in the old UI, was hard to read even for senior engineers; they barely looked at it. What an expert needs is time in plain seconds, variance, and rows examined. And the detail tabs worked only about 30% of the time.
+## Make customer conversations specific
 
-## Showing what the future could look like
-With our PM, I set out to give customers a vision of PMM’s future they could buy into. I collected real problems from DBAs, developers, and DevOps engineers, turned them into hypotheses, and made narrated videos: animated prototypes of PMM helping solve them, from AI-assisted query optimization to incident response.
+With our product manager, I turned problems raised by DBAs, developers and DevOps engineers into narrated prototype videos. These showed recognizable investigation scenarios and gave customers something concrete to respond to.
+
+Customers recognized their own problems in the videos and “wanted it for tomorrow.” The conversations also helped identify priorities. Customers wanted better query investigation, and enterprise MongoDB teams made the need for live operations particularly clear. Their feedback also exposed a practical constraint: additional collection had to be under their control.
+
+The prototypes helped us discuss what to build and why. Detailed interaction decisions came next, as we narrowed the scope with customers and technical leads. When I showed an early live-view prototype to one enterprise team running about 1,100 servers, they said, “It looks fantastic, actually.”
 
 <figure>
   <video src={aiVideo} poster={aiPoster.src} width="3840" height="2160" controls preload="metadata" playsinline></video>
-  <figcaption>One of a few narrated demos of prototypes set in real use cases: an AI-assisted incident response, from the alert in Slack to the root cause, the rollback and the report.</figcaption>
+  <figcaption>A vision prototype used in customer conversations: an AI-assisted investigation from a Slack alert to a proposed response and incident report. This was a concept for discussion, not a released workflow.</figcaption>
 </figure>
 
-When we presented them to customers, they recognized their problems in those videos, “wanted it for tomorrow,” and asked us to prioritize all those fresh new ideas in the roadmap. Query Analytics stood out as what mattered most to them, and those conversations led straight to real-time analysis.
+## Choose services without losing the cluster structure
 
-## Features shaped with customers
+One customer environment had more than 300 clusters alongside standalone services. Starting a live investigation meant selecting the right services from that structure to avoid performance issues.
 
-Enterprise MongoDB teams needed a live view of their queries before they could leave MongoDB Atlas and consider PMM a real alternative. I shaped the concept with our tech leads and put a prototype in front of our customers. One team, running about 1,100 servers, said, “It looks fantastic, actually.” What they valued most was that it only touches the database when someone starts a session, so it never adds load for nothing.
+I explored three approaches: a cascading selection, an initial choice between clustered and standalone services, and a searchable tree with multiple selection.
 
-Their feedback cut the MVP to 4 scenarios around one action: choosing what to watch. With 300+ clusters mixed with standalone services, that was the hard part. I put 3 options to the team, and the vote split 3–3–2, so I went back to the reasons. The tree won because it matched how they picture clusters and their nodes, after years of talking to database experts.
+An internal review produced no clear preference. I compared the options against the task and the cluster-and-node model I had learned from database experts. I chose the tree because it kept that relationship visible while allowing people to select several services together.
+
+The decision connected domain knowledge to a concrete interaction: users could search for a service, understand where it belonged and select the scope of their investigation in the same control.
 
 <Gallery
   scale={0.325}
@@ -115,17 +116,27 @@ Their feedback cut the MVP to 4 scenarios around one action: choosing what to wa
     },
   ]}
 >
-  The 3 options I put to the team for choosing what to watch: A, a classic cascade; B, a choice between clustered and standalone before diving in; and C, the tree, with multiple selection.
+  Three approaches to selecting services: cascading fields, separate paths for clustered and standalone services, and a searchable tree. I chose the tree to preserve cluster context while supporting multiple selection.
 </Gallery>
+
+## Keep a live view usable while it changes
+
+A live table can lose the operation someone is trying to inspect at the next refresh. The workflow needed to balance current data with a stable view for investigation.
+
+I designed controls for a refresh interval of one to five seconds, explicit pause and resume, and manual refresh. The prototype also explored a temporary pause while the pointer was over the table.
+
+Pausing the view and stopping collection were separate actions. A paused view lets someone inspect a snapshot; session controls manage the additional collection running against the selected services.
+
+Making that distinction visible was part of making the workflow understandable under pressure.
 
 <figure>
   <video src={realTimeVideo} poster={realTimePoster.src} width="1920" height="1080" controls preload="metadata" playsinline></video>
-  <figcaption>The Real-time Analytics prototype after the vote, picking several services at once: it refreshes every 1 to 5 seconds, pauses on a snapshot or while the pointer is on the table, and refreshes on demand.</figcaption>
+  <figcaption>Interaction prototype: adjustable refresh, pause and resume, manual refresh, and a temporary pause on hover. These controls let users inspect a changing list without immediately losing the operation they are reading.</figcaption>
 </figure>
 
-## One page or two?
+## Separate the first release from the wider redesign
 
-A separate page for real time would ship faster than merging it into Query Analytics’ stored metrics, because mixing stored and live data would force us to pay down the legacy screen’s debt.
+I explored combining historical and live analysis in one list, with Real-time available through the time picker. That approach would also require substantial changes to the legacy historical screen.
 
 <Gallery
   scale={0.22}
@@ -140,24 +151,33 @@ A separate page for real time would ship faster than merging it into Query Analy
     },
   ]}
 >
-  The merged iteration, from November 2025: Real-time as one more range in the time picker, turning the same list into live queries with their state and elapsed time.
+  An alternative I explored: switching the same query list between historical and live data through the time picker. We kept the first release in separate tabs to avoid coupling it to the wider historical redesign.
 </Gallery>
 
-We settled on tabs: stored metrics for historical analysis and the new Real-time Analytics for the queries running right now.
+We chose separate tabs for the first release. This let the team introduce live investigation while retaining the existing historical experience.
+
+The session workflow covered starting collection, inspecting an operation and its raw data, and stopping individual sessions or all sessions together. I used prototypes to work through these behaviors with the technical leads and engineers.
 
 <figure>
   <video src={sessionsVideo} poster={sessionsPoster.src} width="3840" height="2160" controls preload="metadata" playsinline></video>
-  <figcaption>An earlier iteration: the legacy screen kept apart in its own tab, and Real-time Analytics beside it, with sessions started from a cluster, filters built into the list, the query’s full data, and sessions stopped one at a time or all at once.</figcaption>
+  <figcaption>An earlier version of the session-management prototype: start a live investigation, inspect operation details and raw data, then stop individual sessions or all sessions together.</figcaption>
 </figure>
 
-When colleagues asked why someone who only runs MongoDB should see MySQL metrics, I kept the mix: one app can run on MySQL and PostgreSQL at once, and mixing is only noise when filters are bad. So filters had to be quick, searchable, and kept in the URL, ready to share. All of these were customer requests documented in interviews and focus groups, and having them at hand let us decide and build fast.
+## Ship the workflow, then extend it
 
-In parallel, I pitched engineering a revamp of the stored metrics themselves, as the architecture and foundations to build on, and showed it to users on many occasions.
+Real-time Analytics first shipped for MongoDB in PMM 3.7, in April 2026. Implementation constraints left some differences from the design, and I followed the release with cosmetic fixes in the production front-end.
 
-<figure>
-  <video src={qanVideo} poster={qanPoster.src} width="1920" height="1080" controls preload="metadata" playsinline></video>
-  <figcaption>The stored metrics revamp, now on the roadmap: filters as structured search, a customizable overview, and a details panel with next and previous, full screen and revised tabs.</figcaption>
-</figure>
+CSV export followed in PMM 3.9, in July 2026. It gave teams a way to preserve a snapshot of operations that might disappear from the live view. Command-line session controls also supported investigations outside the interface.
+
+Customers then asked for other parts of PMM to work in a similar way and become as user-friendly. That was useful qualitative feedback alongside a concrete delivery: a new investigation workflow, followed by capabilities requested by customers.
+
+The work also benefited from Peak UI, the shared foundation. Engineers could extend the established layout and components as the feature developed, so export and the command-line controls shipped with minimal review from design.
+
+## Carry the learning into the next work
+
+The wider redesign of historical Query Analytics remained on the roadmap at the end of my involvement. I proposed structured filters, a customizable overview and a details panel that could expand without losing the surrounding investigation.
+
+For that proposal, I kept mixed database environments in scope. Customer research supported the preference for searchable filters and shareable URLs, so people could focus on the relevant services and hand the investigation to a colleague.
 
 <Gallery
   scale={0.22}
@@ -172,22 +192,21 @@ In parallel, I pitched engineering a revamp of the stored metrics themselves, as
     },
   ]}
 >
-  Stills from the revamp: the overview, where every metric carries a bar to compare rows at a glance, and the details panel expanded, splitting a query’s time by where it goes.
+  Proposed historical overview and expanded query details. The design supports scanning query metrics and inspecting where a query spends time without leaving the investigation.
 </Gallery>
 
-## Shipped, and it kept growing
+<figure>
+  <video src={qanVideo} poster={qanPoster.src} width="1920" height="1080" controls preload="metadata" playsinline></video>
+  <figcaption>Historical Query Analytics redesign proposal: structured filters, a customizable overview and an expandable details panel.</figcaption>
+</figure>
 
-Real-time Analytics shipped in PMM 3.7, for MongoDB first. Last-minute back-end and front-end constraints left it at about 90% of the designed UX, and in the following minor releases I fixed the cosmetic gaps in production code myself.
+## A related application: Advisors
 
-In PMM 3.10, Real-time Analytics had matured beyond an experiment, and we had learned it is a different mode of investigation for database experts now. It deserved more visibility, so it got its own entry slot in the navigation for better discoverability of the feature.
+I applied a similar question to Advisors: once the product identifies a problem, does it help someone act on it?
 
-Up until then, we also added export functionality, a command-line interface, and the ability to monitor live MySQL queries, with minimal review from design. It didn’t need more: built on Peak UI, with well-structured code and a layout designed to grow, it left room for incremental changes without anyone babysitting every decision, and development moved fast.
+The existing view listed failure counts by service. For customers with more than 1,000 servers, reviewing services individually was impractical. On a tight delivery timeline, I proposed an inbox-like list of findings with an explanation, a recommendation and actions to mark a finding as done, re-check it or share it.
 
-Customers asked for more of PMM to feel like this, and inside Percona people started talking about a new era of UX for PMM. When work is structured this way, it’s not only faster to ship; it also motivates the team to grow their ideas for the product.
-
-Advisors came next. Its insights page found problems but left users alone with them. It only showed a generic description and a doc link that was often broken, with no sign of when a check last ran, in a list to browse service by service, which customers with 1,000+ servers can’t do.
-
-A customer was firming up their contract on a tight timeline, so the fix had to ask little of the back-end. I sketched one page for every check, treated like an email inbox: each insight says what’s wrong and what to do next, can be marked as done, re-checked or shared, and opens into details such as the current value and how long it has been failing. Stakeholders approved the prototype, and it’s now in development.
+Stakeholders approved the prototype, and it was in development at the end of my involvement.
 
 <Gallery
   scale={0.22}
@@ -202,9 +221,13 @@ A customer was firming up their contract on a tight timeline, so the fix had to 
     },
   ]}
 >
-  Advisor insights before, as fail counts per service, and the prototype stakeholders approved, now in development: each insight carries its own actions and says what to do next.
+  Advisors before, organized as failure counts per service, and the approved redesign prototype, organized around actionable findings.
 </Gallery>
 
 ## Looking back
 
-I’d show customers what we’re building again, early, as stories they recognize. What I’d change: bring everyday DBAs in more often, not just enterprise customers and our experts, with small tests on work in progress. It’s easy to skip when a team moves fast, and it’s my role to bring that perspective in.
+The strongest part of this project was translating technical knowledge into decisions about selection, refresh, inspection and session control.
+
+I would use recognizable investigation scenarios with customers again. They helped turn an abstract product direction into discussions about concrete needs and constraints. With AI, they’re also cheaper to produce, and they give the team the drive and ambition to aim for something better, further ahead.
+
+I would bring a wider range of everyday DBAs into shorter task-based tests more often. Internal experts and enterprise customers gave us depth, but the work also needed regular checks of how people could complete the interaction without guidance. I would also agree on how to measure the investigation workflow after release.

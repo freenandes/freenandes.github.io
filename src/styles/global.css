@@ -277,9 +277,10 @@ main > section {
 }
 
 /* An inset figure is narrower than the column and centred, for media that
-   would tower over the text at full width, like a portrait video. */
+   would tower over the text at full width, like a portrait video. One whose
+   source is only sharp up to a size sets `--inset-max` to it. */
 .prose figure.inset {
-  width: var(--figure-inset);
+  width: min(var(--figure-inset), var(--inset-max, 100%));
   margin-inline: auto;
 }
 
@@ -291,7 +292,7 @@ main > section {
    like a gallery's thumbnails there. */
 @media (width < 40rem) {
   .prose figure.inset {
-    width: 100%;
+    width: min(100%, var(--inset-max, 100%));
   }
 }
 

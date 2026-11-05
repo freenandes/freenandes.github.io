@@ -8,6 +8,27 @@ client: TUI Group
 tags: ['Design Systems', 'E-commerce', 'Multi-market']
 ---
 
+import contextFlow from '../../assets/projects/100000-pages-high-at-tui-group/all-destinations-context-flow.webp';
+import studioWhiteboard from '../../assets/projects/100000-pages-high-at-tui-group/studio-whiteboard.webp';
+import studioPrintedDesigns from '../../assets/projects/100000-pages-high-at-tui-group/studio-printed-designs.webp';
+import hotelPageVideo from '../../assets/projects/100000-pages-high-at-tui-group/hotel-page-prototype.mp4';
+import hotelPagePoster from '../../assets/projects/100000-pages-high-at-tui-group/hotel-page-prototype.jpg';
+import allDestinationsDesktop from '../../assets/projects/100000-pages-high-at-tui-group/all-destinations-desktop.webp';
+import madridDesktop from '../../assets/projects/100000-pages-high-at-tui-group/madrid-desktop.webp';
+import stayHomepageDesktop from '../../assets/projects/100000-pages-high-at-tui-group/stay-homepage-desktop.webp';
+import tuiBlueDesktop from '../../assets/projects/100000-pages-high-at-tui-group/tui-blue-desktop.webp';
+import liveMadridTop from '../../assets/projects/100000-pages-high-at-tui-group/live-madrid-top.webp';
+import liveMadridHotels from '../../assets/projects/100000-pages-high-at-tui-group/live-madrid-hotels.webp';
+import flySearchResults from '../../assets/projects/100000-pages-high-at-tui-group/fly-search-results-desktop.webp';
+import enjoyActivities from '../../assets/projects/100000-pages-high-at-tui-group/enjoy-activities-desktop.webp';
+import tagusHome from '../../assets/projects/100000-pages-high-at-tui-group/tagus-home.webp';
+import tagusAlertBanner from '../../assets/projects/100000-pages-high-at-tui-group/tagus-alert-banner.webp';
+import tagusDesigningComponents from '../../assets/projects/100000-pages-high-at-tui-group/tagus-designing-components.webp';
+import backOfficeMarkets from '../../assets/projects/100000-pages-high-at-tui-group/back-office-markets.webp';
+import backOfficeNewMarket from '../../assets/projects/100000-pages-high-at-tui-group/back-office-new-market.webp';
+import backOfficePageSettings from '../../assets/projects/100000-pages-high-at-tui-group/back-office-page-settings.webp';
+import Gallery from '../../components/Gallery.astro';
+
 ## In short
 
 ### Team
@@ -44,25 +65,163 @@ Our small Lisbon hub was meant as an ideas lab for TUI’s e-commerce. We pitche
 
 So, with this problem at hand and the leeway the company gave us, we rolled up our sleeves and designed one template and the rules to fill it in. We called it PageBuilder. We wanted a flexible system of fast-loading static sites, with content generated from geo data plus information and images about each place. The output still had to be appealing and competitive: pages that inspire people to book a stay somewhere beautiful.
 
+<Gallery
+  narrow
+  images={[
+    {
+      src: contextFlow,
+      alt: 'How people reach the All destinations homepage and move on to a booking. They arrive directly at the stay.tui.com homepage, or from an external search engine such as Google or a referral such as a blog. From All destinations, the priority flow leads to a destination page, hotel search results, hotel details and checkout, and All destinations also links straight to hotel search results and hotel details. Other paths lead from the search engine to the homepage, and from a destination page to a places list and another destination page, which lead back to hotel search results and hotel details.',
+    },
+  ]}
+>
+  The context flow from our PageBuilder workshop: where people would come from to reach the All destinations homepage, and the paths from there to checkout.
+</Gallery>
+
 This project was never meant to be local. The template had to survive different cultures and markets for a site that could grow globally. As a team dedicated to discovery and experimentation, we wanted to pitch a unified TUI Group website built on Tagus, the design system we were creating from scratch.
 
 We grounded the work in what travelers needed: a nice destination, a comfortable hotel, memorable experiences, and recommendations to make the most of the stay. We benchmarked Expedia, Booking.com, Agoda, Airbnb, and all the other usual suspects and adapted Baymard’s e-commerce findings to travel, so we could set our guardrails for good travel UX.
+
+<Gallery
+  narrow
+  fill
+  images={[
+    {
+      src: studioWhiteboard,
+      alt: 'A whiteboard in the studio covered in marker sketches of a room and guest picker: steps for adding rooms, adults and children, a numbered proposal with an edit control, star-rating checkboxes, and arrows leading to boxes labelled Vision, Lisbon and “MVP”.',
+    },
+    {
+      src: studioPrintedDesigns,
+      alt: 'A printed vision design pinned to the studio wall, seen at an angle: recommended destination cards for Santorini, Riviera Maya, Saint Lucia, Albufeira, Clearwater Bay and Turks and Caicos, each with an average price per night, and a mobile version of the page printed beside it.',
+    },
+  ]}
+>
+  Brainstorming on the studio wall. We sketched together on the whiteboard and printed the designs on paper to critique them as a team.
+</Gallery>
 
 ## Blue sky, then down to earth
 
 We tested wireframes with real users, reading the heatmaps and their unbiased interactions, and used them as a base for the metrics we would later track on the live pages. From critique sessions and usability tests, we crafted the vision interface: blue-sky thinking about what we would love to build. It was ambitious: weather forecasts, bookable activities, and more of what travelers want from a destination page.
 
+<figure class="inset">
+  <video src={hotelPageVideo} poster={hotelPagePoster.src} width="1440" height="1920" controls preload="metadata" playsinline></video>
+  <figcaption>A vision prototype of the mobile hotel page: the menu, then Reserve opening the reservation summary, with dates, guests and rooms ready to change before payment.</figcaption>
+</figure>
+
 Then we set out to build it and hit limitations that forced us to adapt. We iterated in code prototypes and cut each page to what it could answer well in a first version: what the place looks like, where it is, where to stay, and what to visit. The ambition still paid off: in some cases we pushed the limits and built composite back-end systems to support the idea and honor the vision designs.
+
+<Gallery
+  fill
+  images={[
+    {
+      src: stayHomepageDesktop,
+      alt: 'A vision design of the stay.tui.com homepage on desktop, with Fly, Stay, Drive and Enjoy in the menu. A hero of a man resting his arms on the edge of an infinity pool, with the headline Think of a nice place to stay, beside a search for more than 11k properties worldwide. Below it Best hotels, Fantastic offers and For you, an Exclusive deals club newsletter sign-up, and the footer.',
+    },
+    {
+      src: tuiBlueDesktop,
+      alt: 'A vision design of a brand page for TUI Blue hotels on desktop: the TUI Blue logo and introduction beside a photo of a couple on sun loungers by a pool, a Hotels designed for you button and a Play video tile, then TUI Blue for all and the start of TUI Blue concept.',
+    },
+  ]}
+>
+  Vision designs: the stay.tui.com homepage and a brand page for TUI Blue hotels.
+</Gallery>
+
+<Gallery
+  fill
+  images={[
+    {
+      src: allDestinationsDesktop,
+      alt: 'The All destinations homepage on stay.tui.com in a desktop browser. A hero of four destinations, Venice, Santorini, Dubrovnik and Moscow, with Santorini opened wide to show a short introduction and a View page link. Below it a search for destinations, dates and guests, then Featured destinations: Bali and Bora Bora, each with three themes.',
+    },
+    {
+      src: madridDesktop,
+      alt: 'The Madrid destination page on stay.tui.com in a desktop browser. A hero photo of the city at dusk with a Europe, Spain, Madrid breadcrumb and a short description in Spanish, beside a Find your perfect stay search. Below it an introduction to the city’s culture and neighbourhoods, a map of Madrid with clusters of hotels, and the start of Best hotels in Madrid.',
+    },
+  ]}
+>
+  The streamlined designs, once we had cut the vision down to what we could build first. On desktop: the All destinations homepage, with Santorini open in its hero, and the Madrid destination page, with its map of where to stay.
+</Gallery>
 
 ## Tagus, a design system with global ambitions
 
 None of this would hold together without a design system, so Tagus was one of the first things we did: we designed and built it from scratch, in parallel with the vision designs. It allowed us to keep the generated pages and the booking journey—from inspiration to checkout—cohesive across the different markets, with every component documented for designers and developers.
 
+<Gallery
+  fill
+  images={[
+    {
+      src: tagusHome,
+      alt: 'The home page of the Tagus documentation site: an aerial photo of a resort with pools, and the title Tagus, version 0.571, described as the design system for building TUI GDN products, making interfaces systemic, cohesive and easier to understand. The menu links to About & Resources, Foundations and Components.',
+    },
+    {
+      src: tagusAlertBanner,
+      alt: 'The Alert Banner page in the Tagus documentation: a sidebar listing atoms and components, from buttons, dropdowns and tags to cards, datepicker, dialogs and the top bar, and guidance on when to use the banner, with a hotel card that carries a Special price banner.',
+    },
+    {
+      src: tagusDesigningComponents,
+      alt: 'The Designing components page in the Tagus documentation: a diagram of the states a component goes through, from draft and high fidelity to a reusable design in the library, then specifications, tokens and assets that become a front-end component, followed by a table describing each state.',
+    },
+  ]}
+>
+  Tagus documented: its home, one of its components, and how a component goes from draft to a reusable design and on to code.
+</Gallery>
+
+<Gallery
+  fill
+  images={[
+    {
+      src: flySearchResults,
+      alt: 'A vision design of flight search results on fly.tui.com, with Fly, Stay, Drive and Enjoy in the menu. A search bar for a round trip from London to Paris, price graphs for outbound and return dates, filters for airports and take-off times, and result cards for TUI, Air France and British Airways flights, each with times, a price per passenger and a Select button.',
+    },
+    {
+      src: enjoyActivities,
+      alt: 'A vision design of an activities page on enjoy.tui.com for the Louvre Museum: a hero photo of the glass pyramid with a breadcrumb, a short story about the Mona Lisa and a search by travel dates, then Activities around Louvre Museum, with quick filters and cards for tickets and tours, each with a rating, duration, perks and a price per person.',
+    },
+  ]}
+>
+  The vision went past stays: flights on fly.tui.com and activities on enjoy.tui.com, under one menu for Fly, Stay, Drive and Enjoy, all built from Tagus, like the stay pages.
+</Gallery>
+
 ## Just 100,000 pages in one click
 
-Wired end to end, the proof of concept generated 100,000 pages, a first step toward the millions of pages we wanted to target in our hypothesis across 5 markets: Portugal, Spain, Brazil, Italy, and Malaysia. Each page was a real place with TUI offers and a complete booking and payment flow. An outsourced team built the checkout flow, with front-end QA from me to keep it true to the design, while our first in-house engineers were hired to work exclusively on PageBuilder.
+Wired end to end, the proof of concept generated 100,000 pages, a first step toward the millions of pages we wanted to target in our hypothesis across 5 markets: Portugal, Spain, Brazil, Italy, and Greece. Each page was a real place with TUI offers and a complete booking and payment flow. An outsourced team built the checkout flow, with front-end QA from me to keep it true to the design, while our first in-house engineers were hired to work exclusively on PageBuilder.
 
 The plan was to open all 5 markets. We launched in Portugal and Spain first, 175 destinations, with the other 3 markets to follow, after experimenting: A/B tests on the order of the content, session recordings to watch real interaction, and a chatbot to keep hearing from people.
+
+<Gallery
+  fill
+  images={[
+    {
+      src: backOfficeMarkets,
+      alt: 'The PageBuilder back office, branded GDN: a card for each market, Brazil, Portugal, Spain, Greece, Italy, the United States and Turkey, each with its status, from draft and development to staging, ready to go live and live, a preview link and an Edit configuration button, and a last card to add a new market.',
+    },
+    {
+      src: backOfficeNewMarket,
+      alt: 'Setting up a new market in the back office, step by step from base configuration through payments, customer care, global content, pages and additional products to integrations. This step configures the booking supplier with its URL and IDs, and switches the Trivago and Tripadvisor integrations on or off.',
+    },
+    {
+      src: backOfficePageSettings,
+      alt: 'Page settings in the back office for the Spanish market: the search results page with its title, Buscar Hoteles, its URL path on stay.tui.com/es, and its description in Spanish, beside a menu of environments, configuration, site-wide content, page settings, additional products and integrations.',
+    },
+  ]}
+>
+  The PageBuilder back office: every market and its status at a glance, a step-by-step setup for a new one, and the settings of each page, here search results in Spain.
+</Gallery>
+
+<Gallery
+  fill
+  images={[
+    {
+      src: liveMadridTop,
+      alt: 'The live Madrid page on stay.tui.com in Spanish: a hero photo of the city with a breadcrumb from all destinations through Europe, Spain and the Community of Madrid, a short description, and a search for a stay. Below it Sobre Madrid, an introduction to the city with photos of the Royal Palace, a statue and a street at night.',
+    },
+    {
+      src: liveMadridHotels,
+      alt: 'Further down the live Madrid page: Los mejores hoteles en Madrid, a map of the Madrid region with hotel markers beside cards for hotels such as NH Collection Madrid Palacio de Tepa and Puerta América Madrid, each with stars, amenities and a link to see the offer. One card shows a placeholder where the hotel had no photo.',
+    },
+  ]}
+>
+  The Madrid page live in Spain, captured from the browser: the hero and the introduction to the city, then the best hotels in Madrid beside their map.
+</Gallery>
 
 ## Setting the standard for TUI Group
 

@@ -2,7 +2,9 @@
 /** Screenshots in a case study, shown as thumbnails that open full size. Every
     screenshot keeps the same scale, so their text reads at one size: side by
     side past the text's edges when the window has room, stacked when it
-    doesn't, and as wide as the text on a phone. A thumbnail opens its
+    doesn't, and as wide as the text on a phone. A filled gallery lays its
+    images out as one row instead, as wide as the row may grow and all at the
+    same height, so rows of mixed shapes line up. A thumbnail opens its
     screenshot in a dialog, as large as fits the window but never past its own
     size, and zooms from there; without the script, it's a plain link to the
     image. An SVG is drawn inline instead, so its text takes the site's font
@@ -21,9 +23,16 @@ interface Props {
   /** Overrides the `--gallery-scale` knob for this gallery, so large
       screenshots can still sit side by side as thumbnails. */
   scale?: number;
+  /** Keeps the row to the text's width instead of letting it grow past the
+      text's edges, for an image that would look oversized wider. */
+  narrow?: boolean;
+  /** Lays the images out as one row as wide as the gallery may grow, each at
+      the same height, in place of one shared scale. Rows of mixed shapes
+      then line up with each other and with other filled galleries. */
+  fill?: boolean;
 }
 
-const { images, density = 1, scale } = Astro.props;
+const { images, density = 1, scale, narrow = false, fill = false } = Astro.props;
 
 const items = await Promise.all(
   images.map(async ({ src, alt }) => {
@@ -39,13 +48,23 @@ const items = await Promise.all(
   }),
 );
 const widest = Math.max(...items.map((item) => item.size));
+
+/** In a filled row, each image's share of the row's width, less its gaps,
+    is its aspect ratio over the row's total, so all come out the same height. */
+const ratios = items.map((item) => item.width / item.height);
+const total = ratios.reduce((sum, ratio) => sum + ratio, 0);
+const fillWidth = (index: number) =>
+  `; --fill-width: calc((100% - ${items.length - 1} * var(--gallery-gap)) * ${ratios[index] / total})`;
 ---
 
-<figure data-gallery style={`--w-max: ${widest}` + (scale ? `; --gallery-scale: ${scale}` : '')}>
+<figure
+  data-gallery
+  style={`--w-max: ${widest}` + (scale ? `; --gallery-scale: ${scale}` : '') + (narrow ? '; --gallery-max: 0px' : '')}
+>
   <div>
     {
-      items.map((item) => (
-        <a href={item.url} style={`--w: ${item.size}; --ratio: ${item.width / item.height}`}>
+      items.map((item, index) => (
+        <a href={item.url} style={`--w: ${item.size}; --ratio: ${item.width / item.height}` + (fill ? fillWidth(index) : '')}>
           <span class="visually-hidden">Enlarge image:</span>
           {item.Svg ? (
             <item.Svg role="img" aria-label={item.alt} />
@@ -330,12 +349,13 @@ const widest = Math.max(...items.map((item) => item.size));
   }
 
   /* Each width is the screenshot's own (`--w`) times one shared scale: the
-     knob, or whatever lets the widest fit the row. */
+     knob, or whatever lets the widest fit the row. A filled row gives each
+     its share of the row instead (`--fill-width`). */
   figure > div > a {
     position: relative;
     display: block;
     flex: none;
-    width: min(calc(var(--w) * var(--gallery-scale) * 1px), calc(var(--w) / var(--w-max) * 100%));
+    width: var(--fill-width, min(calc(var(--w) * var(--gallery-scale) * 1px), calc(var(--w) / var(--w-max) * 100%)));
     cursor: zoom-in;
   }
 

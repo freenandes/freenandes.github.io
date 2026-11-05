@@ -276,8 +276,28 @@ main > section {
   border: 1px solid var(--line);
 }
 
+/* An inset figure is narrower than the column and centred, for media that
+   would tower over the text at full width, like a portrait video. */
+.prose figure.inset {
+  width: var(--figure-inset);
+  margin-inline: auto;
+}
+
+.prose figure.inset > video {
+  width: 100%;
+}
+
+/* A phone's column is narrow enough already, so an inset figure fills it,
+   like a gallery's thumbnails there. */
+@media (width < 40rem) {
+  .prose figure.inset {
+    width: 100%;
+  }
+}
+
 .prose figcaption {
   margin-block: var(--space-sm) var(--space-lg);
+  text-align: center;
   font-size: var(--step--1);
   color: var(--ink-2);
 }

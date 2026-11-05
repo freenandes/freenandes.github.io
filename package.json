@@ -16,7 +16,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "icons": "node scripts/icons.mjs"
+    "icons": "node scripts/icons.mjs",
+    "og": "node scripts/og-image.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^8.1.2",

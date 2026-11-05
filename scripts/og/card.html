@@ -30,6 +30,7 @@
         --og-role-size: 42px;
         --og-domain-size: 42px;
         --og-tracking: 0.12em; /* role and domain */
+        --og-weight: 780; /* every line of type; the font goes up to 800 */
         --og-route-ink: var(--ink-faint);
         --og-marker-ink: var(--ink-2);
       }
@@ -101,14 +102,14 @@
 
       h1 {
         font-size: var(--og-name-size);
-        font-weight: var(--weight-bold);
+        font-weight: var(--og-weight);
         line-height: 0.9;
         letter-spacing: var(--tracking-tight);
         text-transform: uppercase;
       }
 
       p {
-        font-weight: var(--weight-bold);
+        font-weight: var(--og-weight);
         line-height: var(--leading-tight);
         letter-spacing: var(--og-tracking);
         text-transform: uppercase;
@@ -149,11 +150,11 @@
 
       <!-- The route: each marker sits on a corner of the line, centred on it
            (x and y are its top left: half its 26-unit size back). -->
-      <polyline points="-20,480 52,470 180,432 202,355 268,385 376,290 590,265 912,320 1037,505 1110,470 1220,440" />
-      <use href="#square" x="39" y="457" width="26" height="26" />
-      <use href="#hexagon" x="363" y="277" width="26" height="26" />
-      <use href="#pentagon" x="899" y="307" width="26" height="26" />
-      <use href="#triangle" x="1024" y="492" width="26" height="26" />
+      <polyline points="-20,360 52,370 180,408 202,485 268,455 376,550 590,575 912,520 1037,335 1110,370 1220,400" />
+      <use href="#square" x="39" y="357" width="26" height="26" />
+      <use href="#hexagon" x="363" y="537" width="26" height="26" />
+      <use href="#pentagon" x="899" y="507" width="26" height="26" />
+      <use href="#triangle" x="1024" y="322" width="26" height="26" />
     </svg>
 
     <main>

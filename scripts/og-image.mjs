@@ -28,7 +28,7 @@ import { findChrome } from './visual/capture.mjs';
 /** Warn above this: some apps skip preview images over a few hundred KB. */
 const MAX_BYTES = 300_000;
 /** The fonts the card must be set in, checked once the page has loaded. */
-const FONTS = ['680 99px "Atkinson Hyperlegible Next"'];
+const FONTS = ['780 99px "Atkinson Hyperlegible Next"'];
 
 /* ------------------------------------------------------------------------- */
 

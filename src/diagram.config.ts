@@ -100,7 +100,7 @@ export const diagramNodes: DiagramEntry[] = [
       "I designed a native interface for Percona’s database monitoring platform and helped build Peak UI design system. Grafana upgrade work fell from weeks to days, and two more teams shipped six preview apps.",
     ],
     preview:
-      'PMM’s Updates page once an update has finished: the server is up to date, and every client in the list reads “Up to date”.',
+      'PMM’s Updates page while an update runs: step 1 of 2, updating PMM Server to 3.0.2, with its progress bar and a Cancel Update link.',
     portrait: { x: 0.44, y: 0.5 },
     landscape: { x: 0.47, y: 0.4 },
   },
@@ -113,7 +113,7 @@ export const diagramNodes: DiagramEntry[] = [
       'I worked with database experts and enterprise customers to design Real-time Analytics for PMM, from choosing services to inspecting live operations.',
     ],
     preview:
-      'Query Analytics on its Real-Time tab, watching the mc-global-analytics cluster: the live queries running right now, each with its service, elapsed time and state, such as Sorting result, Running, Waiting or Blocked, beside controls to pause fetching or stop the agents.',
+      'Query Analytics on its Real-Time tab, watching the mc-global-analytics cluster: the live queries running right now, each with its service, elapsed time and state, such as Sorting result, Running, Waiting or Blocked, with fetching paused beside controls to resume it or stop the agents.',
     portrait: { x: 0.56, y: 0.71 },
     landscape: { x: 0.68, y: 0.58 },
   },
@@ -122,9 +122,9 @@ export const diagramNodes: DiagramEntry[] = [
     kind: 'project',
     shape: 'triangle',
     tagline:
-      'The scale case. One template, and the rules behind 100,000 pages.',
+      'The scale case. One destination template, 100,000 generated pages.',
     lines: [
-      'At TUI’s Lisbon hub, I designed PageBuilder: a destination page template and the rules for a generator that built 100K+ pages, growing organic traffic more than 4× where it launched. Plus Tagus, the design system that kept them coherent across 5 markets.',
+      'I designed PageBuilder’s template and generation rules, supported by the Tagus design system. The first launch covered 175 destinations in Portugal and Spain, where our analytics team reported more than 4× organic traffic growth.',
     ],
     preview:
       'The All destinations homepage on stay.tui.com: a hero of four destinations, with Santorini opened wide beside Venice, Dubrovnik and Moscow, a search for destinations, dates and guests, and Featured destinations below.',

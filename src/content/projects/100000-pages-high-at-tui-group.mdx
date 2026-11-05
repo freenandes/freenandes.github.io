@@ -1,6 +1,6 @@
 ---
 title: '100,000 Pages High'
-description: 'TUI lived on low-margin metasearch traffic. I designed one destination page and the rules to generate 100K+ of them, and organic traffic grew 4× where they went live.'
+description: 'I designed the destination template and generation rules for PageBuilder, an experiment in growing TUI’s organic discovery. Its PoC generated 100,000 pages; the first launch covered 175 destinations in Portugal and Spain.'
 date: 2019–2021
 order: 3
 role: Senior Product Designer
@@ -8,65 +8,63 @@ client: TUI Group
 tags: ['Design Systems', 'E-commerce', 'Multi-market']
 ---
 
-import contextFlow from '../../assets/projects/100000-pages-high-at-tui-group/all-destinations-context-flow.webp';
+import contextFlow from '../../assets/projects/100000-pages-high-at-tui-group/all-destinations-context-flow.png';
 import studioWhiteboard from '../../assets/projects/100000-pages-high-at-tui-group/studio-whiteboard.webp';
 import studioPrintedDesigns from '../../assets/projects/100000-pages-high-at-tui-group/studio-printed-designs.webp';
 import hotelPageVideo from '../../assets/projects/100000-pages-high-at-tui-group/hotel-page-prototype.mp4';
 import hotelPagePoster from '../../assets/projects/100000-pages-high-at-tui-group/hotel-page-prototype.jpg';
-import allDestinationsDesktop from '../../assets/projects/100000-pages-high-at-tui-group/all-destinations-desktop.webp';
-import madridDesktop from '../../assets/projects/100000-pages-high-at-tui-group/madrid-desktop.webp';
-import stayHomepageDesktop from '../../assets/projects/100000-pages-high-at-tui-group/stay-homepage-desktop.webp';
-import tuiBlueDesktop from '../../assets/projects/100000-pages-high-at-tui-group/tui-blue-desktop.webp';
-import liveMadridTop from '../../assets/projects/100000-pages-high-at-tui-group/live-madrid-top.webp';
-import liveMadridHotels from '../../assets/projects/100000-pages-high-at-tui-group/live-madrid-hotels.webp';
-import flySearchResults from '../../assets/projects/100000-pages-high-at-tui-group/fly-search-results-desktop.webp';
-import enjoyActivities from '../../assets/projects/100000-pages-high-at-tui-group/enjoy-activities-desktop.webp';
-import tagusHome from '../../assets/projects/100000-pages-high-at-tui-group/tagus-home.webp';
-import tagusAlertBanner from '../../assets/projects/100000-pages-high-at-tui-group/tagus-alert-banner.webp';
-import tagusDesigningComponents from '../../assets/projects/100000-pages-high-at-tui-group/tagus-designing-components.webp';
-import backOfficeMarkets from '../../assets/projects/100000-pages-high-at-tui-group/back-office-markets.webp';
-import backOfficeNewMarket from '../../assets/projects/100000-pages-high-at-tui-group/back-office-new-market.webp';
-import backOfficePageSettings from '../../assets/projects/100000-pages-high-at-tui-group/back-office-page-settings.webp';
+import allDestinationsDesktop from '../../assets/projects/100000-pages-high-at-tui-group/all-destinations-desktop.png';
+import madridDesktop from '../../assets/projects/100000-pages-high-at-tui-group/madrid-desktop.png';
+import stayHomepageDesktop from '../../assets/projects/100000-pages-high-at-tui-group/stay-homepage-desktop.png';
+import tuiBlueDesktop from '../../assets/projects/100000-pages-high-at-tui-group/tui-blue-desktop.png';
+import liveMadridTop from '../../assets/projects/100000-pages-high-at-tui-group/live-madrid-top.png';
+import liveMadridHotels from '../../assets/projects/100000-pages-high-at-tui-group/live-madrid-hotels.png';
+import flySearchResults from '../../assets/projects/100000-pages-high-at-tui-group/fly-search-results-desktop.png';
+import enjoyActivities from '../../assets/projects/100000-pages-high-at-tui-group/enjoy-activities-desktop.png';
+import tagusHome from '../../assets/projects/100000-pages-high-at-tui-group/tagus-home.png';
+import tagusAlertBanner from '../../assets/projects/100000-pages-high-at-tui-group/tagus-alert-banner.png';
+import tagusDesigningComponents from '../../assets/projects/100000-pages-high-at-tui-group/tagus-designing-components.png';
+import backOfficeMarkets from '../../assets/projects/100000-pages-high-at-tui-group/back-office-markets.png';
+import backOfficeNewMarket from '../../assets/projects/100000-pages-high-at-tui-group/back-office-new-market.png';
+import backOfficePageSettings from '../../assets/projects/100000-pages-high-at-tui-group/back-office-page-settings.png';
 import Gallery from '../../components/Gallery.astro';
 
-## In short
+## At a glance
 
-### Team
+**The problem:** The existing website relied heavily on metasearch, a channel associated with some of our lowest margins. We needed a way to reach people while they were discovering destinations and planning a trip.
 
-- The head of e-commerce and me at the start, creating and pitching the base concepts in a Lisbon hub that grew to about 10 people across product, SEO (search engine optimization), data, back-end and machine learning, front-end, and design.
-- An outsourced team for the checkout flow and our first in-house engineers, hired exclusively for the PageBuilder project.
-- Me, the designer: destination template design, generation rules, UX and UI, front-end QA (quality assurance), and the Tagus design system.
+**My role:** I designed the destination template, generation rules and interface, helped create the Tagus design system, and reviewed the front-end implementation of the booking journey. I worked with the head of e-commerce and colleagues across SEO, product, data and engineering.
 
-### Problem
+**The outcome:** The team demonstrated generation at scale and launched in Portugal and Spain. Our analytics team reported more than 4× organic traffic growth in those markets and reduced dependence on metasearch. Expansion to five markets remained the wider plan.
 
-TUI’s existing website relied on metasearch for revenue: a skinny slice of the market, a dangerously homogeneous customer base, and our thinnest margins. The new website needed organic traffic, and competitors already ranked high with destination pages.
+<Gallery
+  density={2}
+  fill
+  images={[
+    {
+      src: liveMadridTop,
+      alt: 'The live Madrid page on stay.tui.com in Spanish: a hero photo of the city with a breadcrumb from all destinations through Europe, Spain and the Community of Madrid, a short description, and a search for a stay. Below it Sobre Madrid, an introduction to the city with photos of the Royal Palace, a statue and a street at night.',
+    },
+    {
+      src: liveMadridHotels,
+      alt: 'Further down the live Madrid page: Los mejores hoteles en Madrid, a map of the Madrid region with hotel markers beside cards for hotels such as NH Collection Madrid Palacio de Tepa and Puerta América Madrid, each with stars, amenities and a link to see the offer. One card shows a placeholder where the hotel had no photo.',
+    },
+  ]}
+>
+  The Madrid destination page live in Spain: an introduction to the city, followed by hotel options and their locations on a map.
+</Gallery>
 
-### What I did
+## Reach travelers before they compare prices
 
-I designed PageBuilder: one destination template and the rules for a generator, fed by geo and place data, that built a page for every real place where TUI could sell a stay. And we built Tagus from scratch, the design system that kept every page and booking flow coherent.
+A new TUI e-commerce website was already in development, but its acquisition strategy still depended heavily on metasearch. That concentrated how people reached us and left limited room to compete on the travel experience itself.
 
-### What changed
+Competitors attracted organic visitors through destination pages: places to explore, accommodation to consider and things to do.
 
-An experiment for 100K+ pages for 175 destinations in Portugal and Spain, with the idea to expand to 5 markets, each with a complete booking flow. The result: organic traffic grew more than 4× and metasearch dependence fell.
-
----
-
-## A site nobody found unless we paid
-
-We had a new TUI e-commerce website in the pipeline to replace the legacy one, but no way yet to bring real people in. The existing website relied heavily on metasearch traffic to survive: a skinny slice of the market and a dangerously homogeneous customer base.
-
-We knew that to reclaim better margins, we had to get off metasearch and bring in more organic traffic from people already in a traveling mindset. Competitors already did that, with destination pages that helped those people get to know a place and choose what to do, where to stay, and what’s worth seeing.
-
-So we framed our hypothesis: with millions of destination pages indexed by search engines, we would increase traffic and drive more sales from new types of customers, more drawn to the travel experience itself, and a more natural fit for TUI Group.
-
-## One template, millions of places
-
-Our small Lisbon hub was meant as an ideas lab for TUI’s e-commerce. We pitched concepts driven by instinct and the courage to try different ways of doing things, looking for disruptive products.
-
-So, with this problem at hand and the leeway the company gave us, we rolled up our sleeves and designed one template and the rules to fill it in. We called it PageBuilder. We wanted a flexible system of fast-loading static sites, with content generated from geo data plus information and images about each place. The output still had to be appealing and competitive: pages that inspire people to book a stay somewhere beautiful.
+Our hypothesis was that useful destination content could bring people into TUI earlier in their planning, then connect that interest to a bookable stay. PageBuilder would let us explore that approach across many places without designing every page separately.
 
 <Gallery
   narrow
+  density={2}
   images={[
     {
       src: contextFlow,
@@ -74,12 +72,29 @@ So, with this problem at hand and the leeway the company gave us, we rolled up o
     },
   ]}
 >
-  The context flow from our PageBuilder workshop: where people would come from to reach the All destinations homepage, and the paths from there to checkout.
+  Workshop context flow: possible entry points into destination discovery and the paths from the All destinations homepage toward booking and checkout.
 </Gallery>
 
-This project was never meant to be local. The template had to survive different cultures and markets for a site that could grow globally. As a team dedicated to discovery and experimentation, we wanted to pitch a unified TUI Group website built on Tagus, the design system we were creating from scratch.
+## Design the page and the system behind it
 
-We grounded the work in what travelers needed: a nice destination, a comfortable hotel, memorable experiences, and recommendations to make the most of the stay. We benchmarked Expedia, Booking.com, Agoda, Airbnb, and all the other usual suspects and adapted Baymard’s e-commerce findings to travel, so we could set our guardrails for good travel UX.
+I worked on two connected parts: the destination experience a traveler would see, and the rules used to populate that experience for different places.
+
+PageBuilder combined geographic data, place information, imagery and TUI offers through a shared template. The aim was a repeatable structure with content specific to each destination.
+
+The first version needed to answer four questions:
+
+- What does this place look like?
+- Where is it?
+- Where could I stay?
+- What could I visit?
+
+That gave us a practical scope for the page. It also connected content generation to a customer journey: discovering a place, considering accommodation and moving toward a reservation.
+
+## Explore the larger experience then define the first release
+
+We benchmarked travel platforms and adapted established e-commerce research databases to the travel and booking context. We tested wireframes with users, reviewed interaction heatmaps and critiqued designs together as a team.
+
+The wider vision included weather, bookable activities, branded hotel experiences and richer destination content. These prototypes helped us explore how these ideas could fit into one travel experience.
 
 <Gallery
   narrow
@@ -95,21 +110,11 @@ We grounded the work in what travelers needed: a nice destination, a comfortable
     },
   ]}
 >
-  Brainstorming on the studio wall. We sketched together on the whiteboard and printed the designs on paper to critique them as a team.
+  Sketches and printed designs used in team critique sessions to discuss the destination experience and develop the initial concepts.
 </Gallery>
 
-## Blue sky, then down to earth
-
-We tested wireframes with real users, reading the heatmaps and their unbiased interactions, and used them as a base for the metrics we would later track on the live pages. From critique sessions and usability tests, we crafted the vision interface: blue-sky thinking about what we would love to build. It was ambitious: weather forecasts, bookable activities, and more of what travelers want from a destination page.
-
-<figure class="inset">
-  <video src={hotelPageVideo} poster={hotelPagePoster.src} width="1440" height="1920" controls preload="metadata" playsinline></video>
-  <figcaption>A vision prototype of the mobile hotel page: the menu, then Reserve opening the reservation summary, with dates, guests and rooms ready to change before payment.</figcaption>
-</figure>
-
-Then we set out to build it and hit limitations that forced us to adapt. We iterated in code prototypes and cut each page to what it could answer well in a first version: what the place looks like, where it is, where to stay, and what to visit. The ambition still paid off: in some cases we pushed the limits and built composite back-end systems to support the idea and honor the vision designs.
-
 <Gallery
+  density={2}
   fill
   images={[
     {
@@ -122,10 +127,15 @@ Then we set out to build it and hit limitations that forced us to adapt. We iter
     },
   ]}
 >
-  Vision designs: the stay.tui.com homepage and a brand page for TUI Blue hotels.
+  Vision designs for the stay.tui.com homepage and a TUI Blue brand page, exploring a broader discovery experience around destinations and accommodation.
 </Gallery>
 
+Implementation exposed constraints in the available data and underlying systems. We iterated through coded prototypes and reduced the first release to the information we could support well: the place, its location, accommodation and nearby attractions.
+
+Some ideas required new back-end capabilities; others remained part of the longer-term vision. The work became more concrete as designers and engineers worked together on what the first version could deliver.
+
 <Gallery
+  density={2}
   fill
   images={[
     {
@@ -138,14 +148,21 @@ Then we set out to build it and hit limitations that forced us to adapt. We iter
     },
   ]}
 >
-  The streamlined designs, once we had cut the vision down to what we could build first. On desktop: the All destinations homepage, with Santorini open in its hero, and the Madrid destination page, with its map of where to stay.
+  Template designs scoped for the first release: the All destinations homepage and the Madrid destination page, with accommodation shown alongside its location.
 </Gallery>
 
-## Tagus, a design system with global ambitions
+## Keep discovery and booking connected with Tagus
 
-None of this would hold together without a design system, so Tagus was one of the first things we did: we designed and built it from scratch, in parallel with the vision designs. It allowed us to keep the generated pages and the booking journey—from inspiration to checkout—cohesive across the different markets, with every component documented for designers and developers.
+We developed Tagus design system alongside the page designs. It provided shared components and guidance for the destination pages and the booking journey.
+
+I helped define and document the system for designers and developers, including how components moved from draft designs toward reusable implementations.
+
+This shared foundation also supported collaboration with an external team responsible for checkout. I reviewed the front-end implementation to keep the booking experience aligned with the design.
+
+Tagus gave us a way to carry the same interaction patterns through discovery, accommodation selection and reservation, while preparing the product for more markets.
 
 <Gallery
+  density={2}
   fill
   images={[
     {
@@ -162,32 +179,28 @@ None of this would hold together without a design system, so Tagus was one of th
     },
   ]}
 >
-  Tagus documented: its home, one of its components, and how a component goes from draft to a reusable design and on to code.
+  Tagus documentation: shared component guidance and the path from an initial draft to reusable design and code.
 </Gallery>
 
-<Gallery
-  fill
-  images={[
-    {
-      src: flySearchResults,
-      alt: 'A vision design of flight search results on fly.tui.com, with Fly, Stay, Drive and Enjoy in the menu. A search bar for a round trip from London to Paris, price graphs for outbound and return dates, filters for airports and take-off times, and result cards for TUI, Air France and British Airways flights, each with times, a price per passenger and a Select button.',
-    },
-    {
-      src: enjoyActivities,
-      alt: 'A vision design of an activities page on enjoy.tui.com for the Louvre Museum: a hero photo of the glass pyramid with a breadcrumb, a short story about the Mona Lisa and a search by travel dates, then Activities around Louvre Museum, with quick filters and cards for tickets and tours, each with a rating, duration, perks and a price per person.',
-    },
-  ]}
->
-  The vision went past stays: flights on fly.tui.com and activities on enjoy.tui.com, under one menu for Fly, Stay, Drive and Enjoy, all built from Tagus, like the stay pages.
-</Gallery>
+<figure class="inset" style="--inset-max: 28rem">
+  <video src={hotelPageVideo} poster={hotelPagePoster.src} width="1440" height="1920" controls controlslist="nofullscreen" preload="metadata" playsinline></video>
+  <figcaption>Mobile hotel-page vision prototype: opening the menu and reservation summary, then reviewing dates, guests and rooms before payment.</figcaption>
+</figure>
 
-## Just 100,000 pages in one click
+## Generate at scale, launch in two markets
 
-Wired end to end, the proof of concept generated 100,000 pages, a first step toward the millions of pages we wanted to target in our hypothesis across 5 markets: Portugal, Spain, Brazil, Italy, and Greece. Each page was a real place with TUI offers and a complete booking and payment flow. An outsourced team built the checkout flow, with front-end QA from me to keep it true to the design, while our first in-house engineers were hired to work exclusively on PageBuilder.
+The proof of concept generated 100,000 pages. That demonstrated the team’s ability to produce pages from the shared template and data, rather than assemble them individually.
 
-The plan was to open all 5 markets. We launched in Portugal and Spain first, 175 destinations, with the other 3 markets to follow, after experimenting: A/B tests on the order of the content, session recordings to watch real interaction, and a chatbot to keep hearing from people.
+The initial launch covered 175 destinations in Portugal and Spain, with a complete path into booking and payment.
+
+The wider plan covered five markets: Portugal, Spain, Brazil, Italy and Greece.
+
+PageBuilder also had a back office for configuring markets and pages. This made the work an operational product as well as a customer-facing template.
+
+The rollout included experiments with content order, session recordings and a feedback chatbot to keep learning from people using the pages.
 
 <Gallery
+  density={2}
   fill
   images={[
     {
@@ -204,33 +217,46 @@ The plan was to open all 5 markets. We launched in Portugal and Spain first, 175
     },
   ]}
 >
-  The PageBuilder back office: every market and its status at a glance, a step-by-step setup for a new one, and the settings of each page, here search results in Spain.
+  The PageBuilder back office: market status, setup for a new market and page configuration, shown here for search results in Spain.
 </Gallery>
 
+## What the launch showed
+
+Our analytics team reported organic traffic growing more than 4× in Portugal and Spain, alongside reduced dependence on metasearch.
+
+The project also left reusable capabilities: a geographic data lake, content-generation tooling and cleaner schemas for the legacy back ends. Those were team outcomes that supported the page-generation work.
+
+We presented the approach to colleagues in the Nordics, the UK and Germany to discuss wider adoption across TUI Group.
+
+The broader vision went beyond accommodation, exploring flights and activities within a shared navigation and design language. That remained an ambition for expansion; a change in leadership brought different priorities before we could continue.
+
 <Gallery
+  density={2}
   fill
   images={[
     {
-      src: liveMadridTop,
-      alt: 'The live Madrid page on stay.tui.com in Spanish: a hero photo of the city with a breadcrumb from all destinations through Europe, Spain and the Community of Madrid, a short description, and a search for a stay. Below it Sobre Madrid, an introduction to the city with photos of the Royal Palace, a statue and a street at night.',
+      src: flySearchResults,
+      alt: 'A vision design of flight search results on fly.tui.com, with Fly, Stay, Drive and Enjoy in the menu. A search bar for a round trip from London to Paris, price graphs for outbound and return dates, filters for airports and take-off times, and result cards for TUI, Air France and British Airways flights, each with times, a price per passenger and a Select button.',
     },
     {
-      src: liveMadridHotels,
-      alt: 'Further down the live Madrid page: Los mejores hoteles en Madrid, a map of the Madrid region with hotel markers beside cards for hotels such as NH Collection Madrid Palacio de Tepa and Puerta América Madrid, each with stars, amenities and a link to see the offer. One card shows a placeholder where the hotel had no photo.',
+      src: enjoyActivities,
+      alt: 'A vision design of an activities page on enjoy.tui.com for the Louvre Museum: a hero photo of the glass pyramid with a breadcrumb, a short story about the Mona Lisa and a search by travel dates, then Activities around Louvre Museum, with quick filters and cards for tickets and tours, each with a rating, duration, perks and a price per person.',
     },
   ]}
 >
-  The Madrid page live in Spain, captured from the browser: the hero and the introduction to the city, then the best hotels in Madrid beside their map.
+  Vision concepts for flights and activities, extending the shared design language beyond stays. These illustrate the proposed direction for a broader TUI experience.
 </Gallery>
 
-## Setting the standard for TUI Group
+## Just 100,000 pages in one click
 
-Our analytics team measured organic traffic growing more than 4× in Portugal and Spain, and our dependence on metasearch engines dropped significantly, saving money from the ads. The work left reusable assets too: a geo-data lake, a content generation tool, and cleaner data schemas for the legacy back ends we had to work with.
+Wired end to end, the proof of concept generated 100,000 pages, a first step toward the millions of pages we wanted to target in our hypothesis across 5 markets: Portugal, Spain, Brazil, Italy, and Greece. Each page was a real place with TUI offers and a complete booking and payment flow. An outsourced team built the checkout flow, with front-end QA from me to keep it true to the design, while our first in-house engineers were hired to work exclusively on PageBuilder.
 
-Because the design was global from the start, we took it on tour across TUI, presenting it to the Nordics, the UK, and Germany, home to TUI’s headquarters, to replicate it for the whole TUI Group—the ambition was high.
+The plan was to open all 5 markets. We launched in Portugal and Spain first, 175 destinations, with the other 3 markets to follow, after experimenting: A/B tests on the order of the content, session recordings to watch real interaction, and a chatbot to keep hearing from people.
 
 ## Looking back
 
-I’d keep the same attitude: not be afraid to start from zero, look for radical new concepts that answer people’s needs, and build the structure that will lead us to that output.
+I would keep the combination of a reusable page framework and a concrete customer journey. Designing the template, generation rules and booking experience together gave the experiment a path from discovery to purchase that could be reused in other products.
 
-What I’d change: bring better data to enrich the pages, pitch our ideas more often, push to build with our engineers from the start, and get more flexibility to create our own solutions. When the engineers finally sat next to us, we started to gain traction, and many stakeholders backed the project, but a change in leadership brought different priorities before we could continue.
+I would involve engineers earlier as we did with the few that sat on opposite desks, while the concepts were still taking shape. Working side by side helped us understand the data and delivery constraints and make progress on the first release. I would also agree the content and data requirements earlier, so each generated page had a clearer standard for usefulness.
+
+For a similar project, I would define acquisition and booking measures together from the start: not only whether more people arrived, but whether the pages helped them find a suitable stay and complete a reservation.

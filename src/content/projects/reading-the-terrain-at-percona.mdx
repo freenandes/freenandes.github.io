@@ -10,22 +10,22 @@ tags: ['UX Research', 'Interaction Design', 'Prototyping']
 
 import qanPartsMap from '../../assets/projects/reading-the-terrain-at-percona/qan-parts-map.webp';
 import qanWireframes from '../../assets/projects/reading-the-terrain-at-percona/qan-wireframes.webp';
-import qanLegacy from '../../assets/projects/reading-the-terrain-at-percona/qan-legacy.webp';
+import qanLegacy from '../../assets/projects/reading-the-terrain-at-percona/qan-legacy.png';
 import aiVideo from '../../assets/projects/reading-the-terrain-at-percona/ai-incident-response.mp4';
 import aiPoster from '../../assets/projects/reading-the-terrain-at-percona/ai-incident-response.jpg';
-import selectionOptions from '../../assets/projects/reading-the-terrain-at-percona/real-time-selection-options.webp';
+import selectionOptions from '../../assets/projects/reading-the-terrain-at-percona/real-time-selection-options.png';
 import realTimeVideo from '../../assets/projects/reading-the-terrain-at-percona/qan-real-time.mp4';
 import realTimePoster from '../../assets/projects/reading-the-terrain-at-percona/qan-real-time.jpg';
-import mergedTimePicker from '../../assets/projects/reading-the-terrain-at-percona/merged-time-picker.webp';
-import mergedRealTime from '../../assets/projects/reading-the-terrain-at-percona/merged-real-time.webp';
+import mergedTimePicker from '../../assets/projects/reading-the-terrain-at-percona/merged-time-picker.png';
+import mergedRealTime from '../../assets/projects/reading-the-terrain-at-percona/merged-real-time.png';
 import sessionsVideo from '../../assets/projects/reading-the-terrain-at-percona/real-time-sessions.mp4';
 import sessionsPoster from '../../assets/projects/reading-the-terrain-at-percona/real-time-sessions.jpg';
 import qanVideo from '../../assets/projects/reading-the-terrain-at-percona/qan-revamp.mp4';
 import qanPoster from '../../assets/projects/reading-the-terrain-at-percona/qan-revamp.jpg';
-import qanOverview from '../../assets/projects/reading-the-terrain-at-percona/qan-overview.webp';
-import qanDetails from '../../assets/projects/reading-the-terrain-at-percona/qan-details.webp';
-import advisorsBefore from '../../assets/projects/reading-the-terrain-at-percona/advisors-before.webp';
-import advisorsAfter from '../../assets/projects/reading-the-terrain-at-percona/advisors-after.webp';
+import qanOverview from '../../assets/projects/reading-the-terrain-at-percona/qan-overview.png';
+import qanDetails from '../../assets/projects/reading-the-terrain-at-percona/qan-details.png';
+import advisorsBefore from '../../assets/projects/reading-the-terrain-at-percona/advisors-before.png';
+import advisorsAfter from '../../assets/projects/reading-the-terrain-at-percona/advisors-after.png';
 import Gallery from '../../components/Gallery.astro';
 
 ## At a glance
@@ -47,7 +47,8 @@ Enterprise MongoDB teams needed that live view before PMM could replace more of 
 The wider redesign began with those problems. Real-time Analytics became the part we could deliver first.
 
 <Gallery
-  scale={0.325}
+  density={2}
+  scale={0.3385}
   images={[
     {
       src: qanLegacy,
@@ -108,7 +109,8 @@ An internal review produced no clear preference. I compared the options against 
 The decision connected domain knowledge to a concrete interaction: users could search for a service, understand where it belonged and select the scope of their investigation in the same control.
 
 <Gallery
-  scale={0.325}
+  density={2}
+  scale={0.3727}
   images={[
     {
       src: selectionOptions,
@@ -139,7 +141,8 @@ Making that distinction visible was part of making the workflow understandable u
 I explored combining historical and live analysis in one list, with Real-time available through the time picker. That approach would also require substantial changes to the legacy historical screen.
 
 <Gallery
-  scale={0.22}
+  density={2}
+  scale={0.2292}
   images={[
     {
       src: mergedTimePicker,
@@ -180,7 +183,8 @@ The wider redesign of historical Query Analytics remained on the roadmap at the 
 For that proposal, I kept mixed database environments in scope. Customer research supported the preference for searchable filters and shareable URLs, so people could focus on the relevant services and hand the investigation to a colleague.
 
 <Gallery
-  scale={0.22}
+  density={2}
+  scale={0.2292}
   images={[
     {
       src: qanOverview,
@@ -209,7 +213,8 @@ The existing view listed failure counts by service. For customers with more than
 Stakeholders approved the prototype, and it was in development at the end of my involvement.
 
 <Gallery
-  scale={0.22}
+  density={2}
+  scale={0.2292}
   images={[
     {
       src: advisorsBefore,

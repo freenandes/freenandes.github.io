@@ -168,7 +168,7 @@ Each drawing gets a random spot once the map has come to rest, clear of the mark
 4. Run `npm run encrypt`, then commit `public/locked/<slug>.json`.
 5. Send the passphrase to whoever should read it.
 
-If a checkout has no plaintext files, encrypting leaves the committed files alone. How the encryption works, and what it doesn't protect against: `src/protected/README.md`.
+If a checkout has no plaintext files, encrypting leaves the committed files alone. Encrypting fails if a plaintext file has no passphrase, and the build fails if a published locked project has no `public/locked/<slug>.json`, so a forgotten step can't ship a gate that never opens. How the encryption works, and what it doesn't protect against: `src/protected/README.md`.
 
 ### Update the About page / CV
 

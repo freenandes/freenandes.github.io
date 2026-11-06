@@ -123,10 +123,11 @@
       zoomTo(zoom * factor, box.left + stage.clientWidth / 2, box.top + stage.clientHeight / 2);
     };
 
-    /** Fetches a screenshot ahead of time, so stepping to it shows it at once. */
+    /** Fetches a screenshot's full image ahead of time, so stepping to it
+        shows it at once. */
     const warm = (index: number) => {
-      const image = items[index]?.querySelector('img');
-      if (image) new Image().src = image.currentSrc || image.src;
+      const item = items[index];
+      if (item instanceof HTMLAnchorElement && item.querySelector('img')) new Image().src = item.href;
     };
 
     /** Shows item `index`: a copy of its screenshot or video, fitted to the
@@ -147,10 +148,18 @@
       } else {
         const art = item.querySelector<HTMLImageElement | SVGSVGElement>('img, svg[role="img"]');
         if (!art) return;
-        const copy = art.cloneNode(true) as HTMLImageElement | SVGSVGElement;
-        if (copy instanceof HTMLImageElement) {
-          copy.loading = 'eager';
+        // The thumbnail may have loaded a smaller copy (`Gallery.astro`), so a
+        // screenshot is a new image of the link's full file, not a clone that
+        // would carry the thumbnail's choice of sizes along.
+        let copy: HTMLImageElement | SVGSVGElement;
+        if (art instanceof HTMLImageElement) {
+          copy = document.createElement('img');
+          for (const name of ['alt', 'width', 'height']) copy.setAttribute(name, art.getAttribute(name) ?? '');
+          copy.decoding = 'async';
           copy.draggable = false;
+          copy.src = (item as HTMLAnchorElement).href;
+        } else {
+          copy = art.cloneNode(true) as SVGSVGElement;
         }
         for (const name of ['--w', '--ratio']) copy.style.setProperty(name, item.style.getPropertyValue(name));
         own = Number.parseFloat(item.style.getPropertyValue('--w'));

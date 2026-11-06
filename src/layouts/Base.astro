@@ -75,7 +75,10 @@ const structuredData = {
 // `style="--…"` custom-property attributes and for the small stylesheets Astro
 // inlines into the page; scripts are all bundled to files (see the
 // assetsInlineLimit note in astro.config.mjs), so script-src needs nothing but
-// 'self'.
+// 'self'. upgrade-insecure-requests is left out of the dev server: it would
+// send every request to https, and while browsers exempt localhost from it,
+// a phone reaching `npm run dev -- --host` at the Mac's network address
+// would load no images, videos or scripts.
 const csp = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -87,7 +90,7 @@ const csp = [
   "connect-src 'self'",
   "form-action 'self'",
   "manifest-src 'self'",
-  'upgrade-insecure-requests',
+  ...(import.meta.env.DEV ? [] : ['upgrade-insecure-requests']),
 ].join('; ');
 ---
 

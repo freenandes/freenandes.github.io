@@ -1717,9 +1717,16 @@ export function initDiagram(root: HTMLElement) {
     };
     hit.addEventListener('pointerup', endDrag);
     hit.addEventListener('pointercancel', endDrag);
+    // A cancelled press sends no click, so nothing would consume the flag.
+    hit.addEventListener('pointercancel', () => {
+      moved = false;
+    });
 
     hit.addEventListener('click', (ev) => {
+      // Swallow only the click that ends a drag, so Enter and Space, which
+      // click without a pointer press, still open the card afterwards.
       if (moved) {
+        moved = false;
         ev.preventDefault();
         return;
       }

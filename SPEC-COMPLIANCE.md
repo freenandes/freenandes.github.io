@@ -26,7 +26,7 @@ Legend: ✅ done · 🟙 platform-provided · ⏳ pending · ➖ not applicable
 | Referrer-Policy | security | `strict-origin-when-cross-origin` via `<meta name="referrer">`. |
 | Colour contrast | accessibility | Tertiary text token darkened `#aaa → #6f6f6f` (≈5:1 on paper, WCAG AA). Decorative-only ink kept faint via a separate `--ink-faint`. |
 | Custom error page (404) | resilience | `/404.html` with plain-language copy and routes back into the site. |
-| Graceful degradation | resilience | Reveal animations run off CSS alone and always play to completion, so content never depends on JS to appear; a `<noscript>` style block switches the motion off entirely when scripting is unavailable. |
+| Graceful degradation | resilience | Reveal animations run off CSS alone and always play to completion, so content never depends on JS to appear; a `<noscript>` style block switches the motion off entirely when scripting is unavailable. On the home map, whose markers wait for its script, a plain list of the map's links replaces them if the script fails to load or throws. |
 | Scrollbar gutter | performance | `scrollbar-gutter: stable` to remove cross-page horizontal shift. |
 
 ---

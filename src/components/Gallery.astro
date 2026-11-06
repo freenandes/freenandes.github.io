@@ -7,7 +7,9 @@
     same height, so rows of mixed shapes line up. A thumbnail opens its
     screenshot in the page's enlarged view (`Lightbox.astro`), which steps
     through the rest from there; without the script, it's a plain link to
-    the image. An SVG is drawn inline instead, so its text takes the site's font
+    the image. The thumbnail itself comes in smaller sizes too, so a phone
+    doesn't download a full screenshot to show it a few hundred pixels wide;
+    the link, and so the enlarged view, keeps the full image. An SVG is drawn inline instead, so its text takes the site's font
     and stays sharp at any size; its viewBox units count as on-screen pixels.
     The caption is the default slot. */
 
@@ -40,13 +42,32 @@ const { images, density = 1, scale, narrow = false, fill = false } = Astro.props
 const COMPRESSED = ['webp', 'jpg', 'jpeg', 'avif'];
 const PNG_QUALITY = 90;
 
+/** Widths, in image pixels, of the smaller copies a thumbnail can load in
+    place of the full image, at the same quality. Each copy is resized from
+    the original, so a WebP or JPEG is compressed again only where it shrinks
+    enough to hide it. The browser picks the smallest that covers the
+    thumbnail at the screen's density, and the full image tops the list. */
+const THUMB_WIDTHS = [640, 960, 1280, 1920, 2560];
+
+/** For the browser's guess at a thumbnail's width before layout: the
+    `--gallery-scale` and `--gallery-max` knobs below, in pixels. A browser
+    that supports `sizes="auto"` measures the real width instead. */
+const SCALE_HINT = 0.5;
+const ROW_MAX_HINT = 66 * 16;
+/** The text column's width in pixels (`--measure`), which a row never goes under. */
+const TEXT_HINT = 700;
+
 const items = await Promise.all(
   images.map(async ({ src, alt }) => {
     const Svg = src.format === 'svg' ? (src as SvgComponent & ImageMetadata) : undefined;
     const asIs = Svg || COMPRESSED.includes(src.format);
+    const url = asIs ? src.src : (await getImage({ src, format: 'webp', quality: PNG_QUALITY })).src;
+    const widths = Svg ? [] : THUMB_WIDTHS.filter((width) => width < src.width);
+    const thumbs = widths.length ? await getImage({ src, widths, format: 'webp', quality: PNG_QUALITY }) : undefined;
     return {
       Svg,
-      url: asIs ? src.src : (await getImage({ src, format: 'webp', quality: PNG_QUALITY })).src,
+      url,
+      srcset: thumbs && [thumbs.srcSet.attribute, `${url} ${src.width}w`].join(', '),
       alt,
       width: src.width,
       height: src.height,
@@ -62,6 +83,17 @@ const ratios = items.map((item) => item.width / item.height);
 const total = ratios.reduce((sum, ratio) => sum + ratio, 0);
 const fillWidth = (index: number) =>
   `; --fill-width: calc((100% - ${items.length - 1} * var(--gallery-gap)) * ${ratios[index] / total})`;
+
+/** A thumbnail's widest on-screen width, mirroring the CSS below: the text's
+    width on a phone, else its share of the widest row. Guessing high only
+    costs a larger copy, never a blurry one. */
+const rowMax = narrow ? 0 : ROW_MAX_HINT;
+const sizes = (index: number) => {
+  const share = fill ? ratios[index] / total : items[index].size / widest;
+  const room = Math.max(rowMax, TEXT_HINT) * share;
+  const own = fill ? room : Math.min(items[index].size * (scale ?? SCALE_HINT), room);
+  return `auto, (width < 40rem) 100vw, min(${Math.ceil(own)}px, ${Math.ceil(share * 100)}vw)`;
+};
 ---
 
 <figure
@@ -76,7 +108,16 @@ const fillWidth = (index: number) =>
           {item.Svg ? (
             <item.Svg role="img" aria-label={item.alt} />
           ) : (
-            <img src={item.url} alt={item.alt} width={item.width} height={item.height} loading="lazy" decoding="async" />
+            <img
+              src={item.url}
+              srcset={item.srcset}
+              sizes={item.srcset && sizes(index)}
+              alt={item.alt}
+              width={item.width}
+              height={item.height}
+              loading="lazy"
+              decoding="async"
+            />
           )}
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
             <path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9" />

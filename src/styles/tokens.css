@@ -60,8 +60,9 @@
   /* How much of the reading column an inset figure takes, centred. */
   --figure-inset: 80%;
 
-  /* Shape, depth, motion. Keep durations in ms: PasswordGate.astro reads
-     --dur-fast as a number of milliseconds. */
+  /* Shape, depth, motion. Scripts read some durations (PasswordGate.astro,
+     Lightbox.astro), so mind the unit there: the build's minifier rewrites
+     `333ms` as `.333s`. */
   --radius-sm: 0.1875rem;
   --radius-md: 0.5rem;
   --radius-pill: 999px;

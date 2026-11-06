@@ -342,10 +342,17 @@
     --lightbox-zoom-step: 1.5;
     --lightbox-max-zoom: 1;
 
-    /* The previous and next buttons at the window's sides. From 40rem the
-       stage keeps clear of them; on a phone they sit over the edges. */
-    --lightbox-nav: 2.75rem;
+    /* The previous and next buttons at the window's sides: the square's
+       size, the arrow's size, and the gap from the window's edge. From 40rem
+       the stage keeps clear of them. Below that, on a phone or a narrow
+       window, they sit over the screenshot's edges and take the `-narrow`
+       values instead. */
+    --lightbox-nav: 2.5rem;
     --lightbox-nav-icon: 1.25rem;
+    --lightbox-nav-inset: var(--gutter);
+    --lightbox-nav-narrow: 2rem;
+    --lightbox-nav-icon-narrow: 1.25rem;
+    --lightbox-nav-inset-narrow: var(--space-xs);
 
     /* The dialog fills the visible window: the counter and buttons along
        the top, below them the stage, which scrolls a zoomed screenshot, and
@@ -411,7 +418,7 @@
 
   @media (width >= 40rem) {
     dialog > div:last-of-type {
-      padding-inline: calc(var(--lightbox-nav) + 2 * var(--gutter));
+      padding-inline: calc(var(--lightbox-nav-inset) + var(--lightbox-nav) + var(--gutter));
     }
   }
 
@@ -473,11 +480,11 @@
   }
 
   dialog > button:nth-of-type(1) {
-    inset-inline-start: var(--gutter);
+    inset-inline-start: var(--lightbox-nav-inset);
   }
 
   dialog > button:nth-of-type(2) {
-    inset-inline-end: var(--gutter);
+    inset-inline-end: var(--lightbox-nav-inset);
   }
 
   dialog > button:hover {
@@ -498,6 +505,26 @@
   dialog > button > svg {
     width: var(--lightbox-nav-icon);
     height: var(--lightbox-nav-icon);
+  }
+
+  @media (width < 40rem) {
+    dialog > button {
+      width: var(--lightbox-nav-narrow);
+      height: var(--lightbox-nav-narrow);
+    }
+
+    dialog > button:nth-of-type(1) {
+      inset-inline-start: var(--lightbox-nav-inset-narrow);
+    }
+
+    dialog > button:nth-of-type(2) {
+      inset-inline-end: var(--lightbox-nav-inset-narrow);
+    }
+
+    dialog > button > svg {
+      width: var(--lightbox-nav-icon-narrow);
+      height: var(--lightbox-nav-icon-narrow);
+    }
   }
 
   :global(html:has(dialog[open])) {

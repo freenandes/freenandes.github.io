@@ -88,6 +88,24 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
   { label: 'Selected projects', nodes: pick('project') },
   { nodes: pick('floating') },
 ];
+
+// The map's destinations as plain links, for the fallback below: every marker
+// with a page, then the socials that work without the script (the email
+// address needs it to be decoded).
+const fallbackLinks = [
+  ...nodes.flatMap((node) =>
+    node.link
+      ? [
+          {
+            label: node.label,
+            href: node.link.external ? node.link.href : withBase(node.link.href),
+            rel: undefined,
+          },
+        ]
+      : [],
+  ),
+  ...site.socials.flatMap((s) => (s.href ? [{ label: s.label, href: s.href, rel: 'me' }] : [])),
+];
 ---
 
 <Base footer={false} mainClass="home">
@@ -212,6 +230,23 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
         </div>
       ))
     }
+    {/* If the map never starts (its script failed to load or threw), its
+        markers stay hidden, so this plain list of where it leads takes their
+        place after a delay. A working map removes the wait before it ends. */}
+    <div class="fallback">
+      <p>The map couldn’t load. Here’s where it leads:</p>
+      <ul>
+        {
+          fallbackLinks.map((link) => (
+            <li>
+              <a href={link.href} rel={link.rel}>
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
     {/* The drawings and the ruler come after the markers, so a page that paints
         before its stylesheet shows the map's content first. Their zero size
         holds until the stylesheet gives them theirs, so they can't flash in
@@ -317,6 +352,16 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     .node button svg {
       animation: none !important;
     }
+
+    /* The list above already reads like the fallback, so it stays out. */
+
+    .run {
+      animation: none !important;
+    }
+
+    .fallback {
+      display: none !important;
+    }
   </style>
 </noscript>
 
@@ -352,6 +397,10 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     --decor-scale-wide: calc(5rem / 400);
 
     --ruler-height: 2.25rem;
+
+    /* How long the map may take to start before its markers give way to a
+       plain list of its links (see "Fallback", below). */
+    --fallback-delay: 4s;
 
     /* A marker's preview: the screen that floats beside it while a desktop
        pointer is on it, above everything on the map, and how much of the map
@@ -613,6 +662,49 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
     to {
       stroke-dasharray: 1;
       stroke-dashoffset: 0;
+    }
+  }
+
+  /* --- Fallback --------------------------------------------------------- */
+
+  /* The markers wait for the script, so a map that never starts would leave
+     nothing to click. Unless the script has mounted the map by
+     `--fallback-delay`, the markers are hidden and a plain list of their links
+     shows instead; if the script fails outright, it swaps them at once.
+     Hidden, the list neither shows, takes a click nor reaches a screen
+     reader. */
+
+  .fallback {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: grid;
+    place-content: center;
+    padding: var(--space-md);
+    visibility: hidden;
+  }
+
+  .diagram:not(.is-mounted) .run {
+    animation: fallback-hide 0s var(--fallback-delay) forwards;
+  }
+
+  .diagram:not(.is-mounted) .fallback {
+    animation: fallback-show 0s var(--fallback-delay) forwards;
+  }
+
+  .diagram:not(.is-mounted)[data-failed] :is(.run, .fallback) {
+    animation-delay: 0s;
+  }
+
+  @keyframes fallback-hide {
+    to {
+      visibility: hidden;
+    }
+  }
+
+  @keyframes fallback-show {
+    to {
+      visibility: visible;
     }
   }
 
@@ -950,5 +1042,14 @@ const runs: { label?: string; nodes: DiagramNode[] }[] = [
   import { initDiagram } from '../scripts/nav-diagram';
 
   const root = document.querySelector<HTMLElement>('.diagram');
-  if (root) initDiagram(root);
+  if (root) {
+    try {
+      initDiagram(root);
+    } catch (error) {
+      // Swap in the plain list of links now rather than after the delay
+      // (see "Fallback" in the styles), and still report the error.
+      root.dataset.failed = '';
+      throw error;
+    }
+  }
 </script>

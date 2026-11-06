@@ -50,8 +50,11 @@
   --space-lg: 2rem;
   --space-xl: 4rem;
 
-  /* Width of the reading column, and the air either side of it. */
-  --measure: 66ch;
+  /* Width of the reading column, and the air either side of it. The column
+     is 66 characters of Atkinson Hyperlegible Next at 16px, written in rem
+     rather than `ch` so it doesn't widen when the web font replaces the
+     fallback on load. */
+  --measure: 42.65rem;
   --gutter: 1rem;
 
   /* How much of the reading column an inset figure takes, centred. */

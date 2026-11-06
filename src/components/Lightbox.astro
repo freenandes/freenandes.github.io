@@ -45,6 +45,15 @@
   const knob = (element: Element, name: string, fallback: number) =>
     Number.parseFloat(getComputedStyle(element).getPropertyValue(name)) || fallback;
 
+  /** A duration knob, in ms, whichever unit it's written in: the build's
+      minifier turns `333ms` into `.333s`. */
+  const duration = (element: Element, name: string, fallback: number) => {
+    const value = getComputedStyle(element).getPropertyValue(name).trim();
+    const number = Number.parseFloat(value);
+    if (!Number.isFinite(number)) return fallback;
+    return value.endsWith('ms') ? number : value.endsWith('s') ? number * 1000 : number;
+  };
+
   /** How far apart two fingers are, and the point halfway between them. */
   const spread = (touches: TouchList) =>
     Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
@@ -375,7 +384,7 @@
     const slide = async (el: Element & ElementCSSInlineStyle, from: number, to: number) => {
       el.style.translate = to ? `${to}px 0` : '';
       const motion = el.animate([{ translate: `${from}px 0` }, { translate: `${to}px 0` }], {
-        duration: still.matches ? 0 : knob(dialog, '--lightbox-slide', 333),
+        duration: still.matches ? 0 : duration(dialog, '--lightbox-slide', 333),
         easing: getComputedStyle(dialog).getPropertyValue('--ease').trim() || 'ease-out',
       });
       // Cancelled when the dialog closes mid-slide; that's an end like any other.

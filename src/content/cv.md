@@ -100,7 +100,8 @@ education:
 # What colleagues wrote about working with you, newest first, quoted exactly.
 # `date` is shown as written. The quote goes under `text: |`, every line
 # indented by six spaces; blank lines make paragraphs. Leave out the quotation
-# marks: the page adds them.
+# marks: the page adds them. Every one prints on the PDF CV too, unless it has
+# `print: false`, which keeps it on the page only.
 recommendations:
   - name: Peter Farkas
     role: CEO
@@ -113,6 +114,7 @@ recommendations:
     role: Senior Software Developer
     org: Percona
     date: March 2025
+    print: false
     text: |
       Pedro is an amazing designer and a fantastic teammate. He tackles complex problems with ease and creates outstanding designs that truly serve the user.
 

@@ -172,7 +172,7 @@ If a checkout has no plaintext files, encrypting leaves the committed files alon
 
 ### Update the About page / CV
 
-1. Edit `src/content/cv.md`. A job is a block of `role`, `org`, `period`, an optional one-line `summary` and a list of `points`; newest goes first. `earlierWork` entries take the same fields minus `points`, for older jobs in one line each. A recommendation is `name`, `role`, an optional `org`, a `date` shown as written, and the quote under `text: |`, without quotation marks (the page adds them); newest goes first. The summary sits under `summary: |`, with every line indented by two spaces. It's Markdown, so blank lines make paragraphs and `- ` lines make a bulleted list. Outside the summary, if a value contains `: ` (like `software: observability`), wrap it in double quotes, or the page fails to load.
+1. Edit `src/content/cv.md`. A job is a block of `role`, `org`, `period`, an optional one-line `summary` and a list of `points`; newest goes first. `earlierWork` entries take the same fields minus `points`, for older jobs in one line each. A recommendation is `name`, `role`, an optional `org`, a `date` shown as written, and the quote under `text: |`, without quotation marks (the page adds them); newest goes first. Every recommendation prints on the PDF too, unless you add `print: false`, which keeps it on the page only. The summary sits under `summary: |`, with every line indented by two spaces. It's Markdown, so blank lines make paragraphs and `- ` lines make a bulleted list. Outside the summary, if a value contains `: ` (like `software: observability`), wrap it in double quotes, or the page fails to load.
 2. Check it with `npm run dev` at `/about/`. Use the page's Download PDF button to check the printed CV.
 3. Commit and push.
 

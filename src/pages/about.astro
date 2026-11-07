@@ -35,6 +35,8 @@ const facts = [cv.location, fluentIn].filter((part): part is string => !!part);
 // one read as a space.
 const paragraphs = (text: string) =>
   text.trim().split(/\n\s*\n/).map((p) => p.replace(/\s*\n\s*/g, ' '));
+// The first recommendation that goes on paper, or -1 if none does.
+const firstPrinted = cv.recommendations.findIndex((rec) => rec.print);
 
 const origin = Astro.site ?? Astro.url;
 const abs = (path: string) => new URL(withBase(path), origin).toString();
@@ -189,14 +191,17 @@ const jsonLd = [
     </section>
 
     {/* Each quote is a figure, the recommender its caption. A whole
-        recommendation stays on one printed page. */}
+        recommendation stays on one printed page, and one marked
+        `print: false` stays off it. When the first is off paper, the title
+        is repeated for print in the first one that isn't. */}
     {
       cv.recommendations.length > 0 && (
-        <section id="recommendations" data-reveal>
+        <section id="recommendations" class:list={{ 'no-print': firstPrinted < 0 }} data-reveal>
           {cv.recommendations.map((rec, i) => (
-            <div class="entry">
+            <div class:list={['entry', { 'no-print': !rec.print }]}>
               <div class="entry-keep">
                 {i === 0 && <h2>Recommendations</h2>}
+                {i > 0 && i === firstPrinted && <h2 class="print-only">Recommendations</h2>}
                 <p class="period">{rec.date}</p>
                 <figure>
                   <blockquote>
@@ -425,7 +430,7 @@ const jsonLd = [
 
     /* One row of contacts. The dots are drawn here, with --contact-gap on each
        side; a long row wraps between contacts, the dot ending the line. */
-    .print-only {
+    header .print-only {
       --contact-gap: var(--space-md);
 
       display: flex;
@@ -437,11 +442,11 @@ const jsonLd = [
       border-block: 1px solid #000;
     }
 
-    .print-only span {
+    header .print-only span {
       white-space: nowrap;
     }
 
-    .print-only span:not(:last-child)::after {
+    header .print-only span:not(:last-child)::after {
       content: '·';
       margin-inline-start: var(--contact-gap);
     }
@@ -509,6 +514,12 @@ const jsonLd = [
 
     .entry li::marker {
       color: #000;
+    }
+
+    /* When the recommendations before it stay off paper, the first printed
+       one carries the title, so it sits where a section's first entry does. */
+    #recommendations .entry:has(h2.print-only) {
+      margin-block-start: 0;
     }
   }
 </style>

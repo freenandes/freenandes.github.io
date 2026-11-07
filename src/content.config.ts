@@ -70,7 +70,8 @@ const cv = defineCollection({
       }).strict()
     ),
     // Quoted as written; the page adds the quotation marks. `text` is plain
-    // text, with blank lines between paragraphs.
+    // text, with blank lines between paragraphs. `print: false` keeps one on
+    // the page but off the PDF.
     recommendations: z
       .array(
         z.object({
@@ -79,6 +80,7 @@ const cv = defineCollection({
           org: z.string().optional(),
           date: z.string(),
           text: z.string(),
+          print: z.boolean().default(true),
         }).strict()
       )
       .default([]),

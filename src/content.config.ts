@@ -33,7 +33,8 @@ const projects = defineCollection({
 });
 
 // One entry: src/content/cv.md, all frontmatter, in the order the About page
-// shows it. `summary` is Markdown, rendered by the page. `.strict()` turns a
+// shows it. `summary` is Markdown, rendered by the page; a recommendation's
+// `text` is plain paragraphs. `.strict()` turns a
 // misspelled field into a build error instead of silently dropping it.
 const cv = defineCollection({
   loader: glob({ pattern: 'cv.md', base: './src/content' }),
@@ -68,6 +69,21 @@ const cv = defineCollection({
         note: z.string().optional(),
       }).strict()
     ),
+    // Quoted as written; the page adds the quotation marks. `text` is plain
+    // text, with blank lines between paragraphs. `print: false` keeps one on
+    // the page but off the PDF.
+    recommendations: z
+      .array(
+        z.object({
+          name: z.string(),
+          role: z.string(),
+          org: z.string().optional(),
+          date: z.string(),
+          text: z.string(),
+          print: z.boolean().default(true),
+        }).strict()
+      )
+      .default([]),
     skills: z.array(z.string()).default([]),
     languages: z.array(z.string()).default([]),
   }).strict(),

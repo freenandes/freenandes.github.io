@@ -97,6 +97,31 @@ education:
     org: Escola Universitária das Artes de Coimbra
     period: 2002 — 2007
 
+# What colleagues wrote about working with you, newest first, quoted exactly.
+# `date` is shown as written. The quote goes under `text: |`, every line
+# indented by six spaces; blank lines make paragraphs. Leave out the quotation
+# marks: the page adds them. Every one prints on the PDF CV too, unless it has
+# `print: false`, which keeps it on the page only.
+recommendations:
+  - name: Peter Farkas
+    role: CEO
+    org: Percona
+    date: October 2026
+    text: |
+      Pedro’s impact at Percona extended far beyond product design. Instead of settling for one-off fixes, he spearheaded initiatives that created scalable systems and frameworks. Thanks to his forward thinking approach, our team will continue to benefit from the foundation he built for years to come. Pedro is a kind, inspiring colleague, and I would jump at the opportunity to work with him again.
+
+  - name: Sedanur Yıldız
+    role: Senior Software Developer
+    org: Percona
+    date: March 2025
+    print: false
+    text: |
+      Pedro is an amazing designer and a fantastic teammate. He tackles complex problems with ease and creates outstanding designs that truly serve the user.
+
+      He always goes the extra mile—doing the right research, making informed decisions, and helping whenever needed. His deep understanding of the target user sets him apart.
+
+      It was a joy to work with him, and any team would be lucky to have him!
+
 # Not shown on the page. Search engines read it from the page's structured data.
 skills:
   - Design Systems

@@ -34,6 +34,11 @@ export interface SiteConfig {
   /** Home-screen name, and the tint browsers paint their own UI with. */
   shortName: string;
   themeColor: string;
+  /** GoatCounter's count endpoint. Every page loads it as a hidden image, with
+   *  no script and no cookie: GoatCounter reads the country and browser from
+   *  that one request. Only builds with COUNT_VISITS=true (the deploy) carry
+   *  it, so local builds and `npm run visual` never add to the numbers. */
+  visitCounter: string;
 }
 
 const name = 'Pedro MC Fernandes';
@@ -62,6 +67,7 @@ export const site: SiteConfig = {
   },
   shortName: 'PMCF',
   themeColor: '#ffffff',
+  visitCounter: 'https://freenandes.goatcounter.com/count',
 };
 
 // This module only loads server-side (build/dev), so a token that no longer

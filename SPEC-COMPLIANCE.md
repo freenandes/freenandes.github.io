@@ -77,8 +77,10 @@ Re-evaluate if the site grows to include these:
 - **Captions/transcripts** (no audio/video), **accessible data tables** (no tables),
   **feed discovery/hygiene** (no RSS/Atom feed), **breadcrumb UI** (single-level depth; JSON-LD
   breadcrumbs are present).
-- **Privacy policy / cookie consent / GPC / analytics**: the site collects no personal data,
-  sets no cookies, and runs no analytics. Add a privacy policy if/when any of that changes.
+- **Privacy policy / cookie consent / GPC**: the site sets no cookies and stores nothing in the
+  browser. Visits are counted by GoatCounter through a hidden image with no script: it sees the
+  page, the browser and the country from that one request, and keeps no IP address. Add a
+  privacy policy if the site ever collects more.
 - **Internationalisation** (hreflang, RTL, language switcher, locale formatting, plural rules):
   the site is single-language (`en`). `<html lang>` and `og:locale` are set.
 - **Form labels/errors, mobile input types**: the only form is the passphrase gate, which already

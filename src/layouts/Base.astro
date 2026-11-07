@@ -81,12 +81,12 @@ const structuredData = {
 // would load no images, videos or scripts.
 //
 // GoatCounter is the one third-party script: cookieless page-view counts.
-// count.js loads from its CDN and sends each hit to the site's endpoint, with
-// sendBeacon (connect-src) or, in old browsers, an image (img-src). It skips
-// localhost, so `npm run dev` and `npm run visual` aren't counted.
+// count.js loads from its CDN and sends each hit to the site's endpoint with
+// sendBeacon, which connect-src governs. It files each page under the path of
+// its canonical link, and skips localhost, so `npm run dev` and
+// `npm run visual` aren't counted.
 const countScript = 'https://gc.zgo.at/count.js';
 const countEndpoint = 'https://freenandes.goatcounter.com/count';
-const countOrigin = new URL(countEndpoint).origin;
 
 const csp = [
   "default-src 'self'",
@@ -95,8 +95,8 @@ const csp = [
   `script-src 'self' ${new URL(countScript).origin}`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
-  `img-src 'self' data: ${countOrigin}`,
-  `connect-src 'self' ${countOrigin}`,
+  "img-src 'self' data:",
+  `connect-src 'self' ${new URL(countEndpoint).origin}`,
   "form-action 'self'",
   "manifest-src 'self'",
   ...(import.meta.env.DEV ? [] : ['upgrade-insecure-requests']),

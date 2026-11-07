@@ -22,7 +22,7 @@ Legend: ✅ done · 🟙 platform-provided · ⏳ pending · ➖ not applicable
 | Meta robots | seo | Explicit `index, follow`. |
 | robots.txt | seo / agent-readiness | Generated with sitemap reference and explicit allow rules for named AI crawlers (GPTBot, ClaudeBot, PerplexityBot, …). |
 | `/llms.txt` | agent-readiness | Curated markdown index of pages + case studies. |
-| Content Security Policy | security | Delivered via `<meta http-equiv>`: strict `script-src 'self'` with **no** inline-script allowance (every bundled script is emitted as its own file — see `assetsInlineLimit` in `astro.config.mjs`); `default-src 'self'`, `object-src 'none'`, `base-uri 'self'`, `upgrade-insecure-requests`, scoped font/style allowances, and GoatCounter's `gc.zgo.at` script and `freenandes.goatcounter.com` count endpoint (`img-src`/`connect-src`), the only third-party script. |
+| Content Security Policy | security | Delivered via `<meta http-equiv>`: strict `script-src 'self'` with **no** inline-script allowance (every bundled script is emitted as its own file — see `assetsInlineLimit` in `astro.config.mjs`); `default-src 'self'`, `object-src 'none'`, `base-uri 'self'`, `upgrade-insecure-requests`, scoped font/style allowances, and GoatCounter's `gc.zgo.at` script and `freenandes.goatcounter.com` count endpoint (`connect-src`), the only third-party script. |
 | Referrer-Policy | security | `strict-origin-when-cross-origin` via `<meta name="referrer">`. |
 | Colour contrast | accessibility | Tertiary text token darkened `#aaa → #6f6f6f` (≈5:1 on paper, WCAG AA). Decorative-only ink kept faint via a separate `--ink-faint`. |
 | Custom error page (404) | resilience | `/404.html` with plain-language copy and routes back into the site. |

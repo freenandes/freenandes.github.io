@@ -22,9 +22,9 @@ export interface SiteConfig {
   locale: string;
   /** Open Graph locale (underscore form, e.g. en_US). */
   ogLocale: string;
-  /** The link preview (Open Graph and X cards): a file under /public. Keep it
-   *  a 1200×630 PNG or JPEG, small (some apps skip images over a few hundred
-   *  KB), with its text inside the centre square, which some apps crop to.
+  /** The link preview (Open Graph, which X reads too): a file under /public.
+   *  Keep it a 1200×630 PNG or JPEG, small (some apps skip images over a few
+   *  hundred KB), with its text inside the centre square, which some apps crop to.
    *  `width`, `height` and `type` must match the file: they let a platform draw
    *  the card the first time a link is shared, before it has fetched the image.
    *  `alt` reads out what the image says. `npm run og` draws the image from

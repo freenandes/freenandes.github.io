@@ -123,39 +123,43 @@ const fallbackLinks = [
             const panelId = `panel-${node.id}`;
             const circle = node.kind === 'floating' ? ring(node.label) : null;
             return (
-              <div
-                class:list={['node', variant(node)]}
-                data-id={node.id}
-                aria-hidden={circle ? 'true' : undefined}
-              >
+              <div class:list={['node', variant(node)]} data-id={node.id}>
                 {circle ? (
-                  <svg
-                    style={`--ring-start: ${node.ringStart ?? 0}deg`}
-                    viewBox={`0 0 ${circle.size} ${circle.size}`}
-                    width={circle.size}
-                    height={circle.size}
-                    role="img"
-                    aria-label={node.label}
-                    focusable="false"
-                  >
-                    <defs>
-                      <path id={`ring-${node.id}`} d={circle.d} fill="none" />
-                    </defs>
-                    <text>
-                      <textPath
-                        href={`#ring-${node.id}`}
-                        startOffset="0"
-                        textLength={circle.textLength}
-                        lengthAdjust="spacingAndGlyphs"
-                      >
-                        {node.label}
-                      </textPath>
-                    </text>
-                  </svg>
+                  <>
+                    {/* The spinning text is for the eye. Screen readers get
+                        the same words as a plain line, which reads more
+                        reliably than text set along a path. */}
+                    <svg
+                      style={`--ring-start: ${node.ringStart ?? 0}deg`}
+                      viewBox={`0 0 ${circle.size} ${circle.size}`}
+                      width={circle.size}
+                      height={circle.size}
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <defs>
+                        <path id={`ring-${node.id}`} d={circle.d} fill="none" />
+                      </defs>
+                      <text>
+                        <textPath
+                          href={`#ring-${node.id}`}
+                          startOffset="0"
+                          textLength={circle.textLength}
+                          lengthAdjust="spacingAndGlyphs"
+                        >
+                          {node.label}
+                        </textPath>
+                      </text>
+                    </svg>
+                    <p class="visually-hidden">{node.label}</p>
+                  </>
                 ) : (
                   <Heading>
+                    {/* The name at the centre opens no card: a click
+                        reshuffles the map, which its tooltip says. */}
                     <button
                       type="button"
+                      title={node.kind === 'identity' ? 'Reshuffle the map' : undefined}
                       aria-expanded={node.kind === 'identity' ? undefined : 'false'}
                       aria-controls={node.kind === 'identity' ? undefined : panelId}
                     >
@@ -206,7 +210,7 @@ const fallbackLinks = [
                             <a
                               href={s.href}
                               data-email={s.token}
-                              rel={s.href?.startsWith('http') ? 'me noopener' : undefined}
+                              rel={s.href?.startsWith('http') ? 'me' : undefined}
                             >
                               {s.label}
                             </a>
@@ -217,7 +221,7 @@ const fallbackLinks = [
                     {node.link && (
                       <a
                         href={node.link.external ? node.link.href : withBase(node.link.href)}
-                        {...(node.link.external ? { target: '_blank', rel: 'noopener' } : {})}
+                        target={node.link.external ? '_blank' : undefined}
                       >
                         {node.link.label}
                       </a>
@@ -306,64 +310,84 @@ const fallbackLinks = [
       ))
     }
   </nav>
+
+  {/* Inside the layout, not after it, so it lands in the <body> rather than
+      after the closing </html>. */}
+  <script>
+    import { initDiagram } from '../scripts/nav-diagram';
+
+    const root = document.querySelector<HTMLElement>('.diagram');
+    if (root) {
+      try {
+        initDiagram(root);
+      } catch (error) {
+        // Swap in the plain list of links now rather than after the delay
+        // (see "Fallback" in the styles), and still report the error.
+        root.dataset.failed = '';
+        throw error;
+      }
+    }
+  </script>
+
+  {/* Without scripting, the map is laid out as a plain list. Base puts this
+      in the <head>, the one place a <noscript> may hold styles. */}
+  <noscript slot="head">
+    <style>
+      /* No-JS fallback: collapse the simulation into a plain, readable list.
+         It still fills the screen, so the contour texture does too. */
+      .diagram {
+        display: flex;
+        flex-direction: column;
+        height: auto !important;
+        min-height: 100svh !important;
+        padding: var(--space-md) !important;
+      }
+
+      .links {
+        display: none !important;
+      }
+
+      .node {
+        position: static !important;
+        transform: none !important;
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 40rem;
+        margin-inline: auto;
+        margin-block-end: var(--space-lg);
+      }
+
+      .panel {
+        position: static !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        translate: none !important;
+        pointer-events: auto !important;
+        margin-block-start: var(--space-sm);
+      }
+
+      /* The entrance is held until the script has placed the map, so without
+         scripting there is nothing to wait for. */
+
+      .node,
+      .node button svg {
+        animation: none !important;
+      }
+
+      /* The list above already reads like the fallback, so it stays out. */
+
+      .run {
+        animation: none !important;
+      }
+
+      .fallback {
+        display: none !important;
+      }
+    </style>
+  </noscript>
 </Base>
-
-<noscript>
-  <style>
-    /* No-JS fallback: collapse the simulation into a plain, readable list.
-       It still fills the screen, so the contour texture does too. */
-    .diagram {
-      display: flex;
-      flex-direction: column;
-      height: auto !important;
-      min-height: 100svh !important;
-      padding: var(--space-md) !important;
-    }
-
-    .links {
-      display: none !important;
-    }
-
-    .node {
-      position: static !important;
-      transform: none !important;
-      display: flex !important;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      max-width: 40rem;
-      margin-inline: auto;
-      margin-block-end: var(--space-lg);
-    }
-
-    .panel {
-      position: static !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      translate: none !important;
-      pointer-events: auto !important;
-      margin-block-start: var(--space-sm);
-    }
-
-    /* The entrance is held until the script has placed the map, so without
-       scripting there is nothing to wait for. */
-
-    .node,
-    .node button svg {
-      animation: none !important;
-    }
-
-    /* The list above already reads like the fallback, so it stays out. */
-
-    .run {
-      animation: none !important;
-    }
-
-    .fallback {
-      display: none !important;
-    }
-  </style>
-</noscript>
 
 <style>
   /* --- Knobs and canvas ------------------------------------------------ */
@@ -1037,19 +1061,3 @@ const fallbackLinks = [
     display: inline-flex;
   }
 </style>
-
-<script>
-  import { initDiagram } from '../scripts/nav-diagram';
-
-  const root = document.querySelector<HTMLElement>('.diagram');
-  if (root) {
-    try {
-      initDiagram(root);
-    } catch (error) {
-      // Swap in the plain list of links now rather than after the delay
-      // (see "Fallback" in the styles), and still report the error.
-      root.dataset.failed = '';
-      throw error;
-    }
-  }
-</script>

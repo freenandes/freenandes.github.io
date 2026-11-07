@@ -1,13 +1,17 @@
 ---
 /** Page navigation. Sits at the top of the article in normal flow, then stays
     pinned to the viewport for the rest of the page, so the way back to the map
-    is always in reach. Children are the `<li>` items of the row. */
+    is always in reach. Children are the `<li>` items of the row. The <nav> is
+    what pins, not the list inside it: a sticky box only sticks within its
+    parent, so the list would have no room to move. */
 ---
 
 <div class="sentinel"></div>
-<ul class="page-nav" role="list">
-  <slot />
-</ul>
+<nav class="page-nav" aria-label="Main">
+  <ul role="list">
+    <slot />
+  </ul>
+</nav>
 
 <style>
   /* Marks the bar's resting place so the script can tell when it is pinned;

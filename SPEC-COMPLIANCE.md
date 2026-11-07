@@ -14,20 +14,23 @@ Legend: ✅ done · 🟙 platform-provided · ⏳ pending · ➖ not applicable
 | Spec | Category | Notes |
 | --- | --- | --- |
 | `<meta name="color-scheme">` | foundations | Declared `light` (the site is intentionally light-only) to stop dark-UA form/scrollbar mismatches. |
-| Open Graph protocol | foundations | Added `og:site_name`, `og:locale`, per-page `og:type` (`website`/`profile`/`article`), `og:image:alt`, and full `twitter:*` title/description/image/alt. |
-| Open Graph / Twitter image | foundations | `public/og.png`: 1200×630 (1.91:1), opaque, 70 KB, text inside the centre square for apps that crop. Absolute HTTPS URL with `og:image:type`, `og:image:width` and `og:image:height`, so platforms draw the card on the first share, and `summary_large_image` for X. Set in `src/site.config.ts`. |
+| Open Graph protocol | foundations | `og:site_name`, `og:locale`, per-page `og:type` (`website`/`profile`/`article`), title, description, URL and image with `og:image:alt`. No `twitter:*` tags: X falls back to Open Graph, though without `twitter:card` it may draw a small summary card rather than a large image. |
+| Open Graph image | foundations | `public/og.png`: 1200×630 (1.91:1), opaque, 85 KB, text inside the centre square for apps that crop. Absolute HTTPS URL with `og:image:type`, `og:image:width` and `og:image:height`, so platforms draw the card on the first share. Set in `src/site.config.ts`. |
 | Web app manifest | resilience | Generated at `/manifest.webmanifest` (base-aware) and linked from `<head>`. |
 | Favicons & app icons | foundations / resilience | `public/favicon.svg` (512×512) plus what `npm run icons` draws from it: `favicon.ico` (16, 32, 48), `apple-touch-icon.png` (180×180, opaque), and 192 and 512 PNGs and a 512 **maskable** PNG in the manifest. The `.ico` link claims `sizes="32x32"` so Chrome picks the SVG. One list in `src/lib/icons.mjs` feeds the script, `<head>` and the manifest. |
 | Structured data (JSON-LD) | seo / agent-readiness | `@graph` with `WebSite` + `Person` site-wide, `ProfilePage` on About, `CreativeWork` per project, and `BreadcrumbList` on sub-pages. |
-| Meta robots | seo | Explicit `index, follow`. |
-| robots.txt | seo / agent-readiness | Generated with sitemap reference and explicit allow rules for named AI crawlers (GPTBot, ClaudeBot, PerplexityBot, …). |
+| Meta robots | seo | None on indexable pages, since indexing is the default. The 404 says `noindex` and has no canonical link, because it's served at whatever address went missing. |
+| robots.txt | seo | Generated: allows every crawler and points to the sitemap, which is how crawlers find it (there's no `<link rel="sitemap">`, which isn't a standard link type). |
 | `/llms.txt` | agent-readiness | Curated markdown index of pages + case studies. |
 | Content Security Policy | security | Delivered via `<meta http-equiv>`: strict `script-src 'self'` with **no** inline-script allowance (every bundled script is emitted as its own file — see `assetsInlineLimit` in `astro.config.mjs`); `default-src 'self'`, `object-src 'none'`, `base-uri 'self'`, `upgrade-insecure-requests`, scoped font/style allowances. |
 | Referrer-Policy | security | `strict-origin-when-cross-origin` via `<meta name="referrer">`. |
 | Colour contrast | accessibility | Tertiary text token darkened `#aaa → #6f6f6f` (≈5:1 on paper, WCAG AA). Decorative-only ink kept faint via a separate `--ink-faint`. |
-| Custom error page (404) | resilience | `/404.html` with plain-language copy and routes back into the site. |
-| Graceful degradation | resilience | Reveal animations run off CSS alone and always play to completion, so content never depends on JS to appear; a `<noscript>` style block switches the motion off entirely when scripting is unavailable. On the home map, whose markers wait for its script, a plain list of the map's links replaces them if the script fails to load or throws. |
+| Custom error page (404) | resilience | `/404.html` with plain-language copy and routes back into the site, kept out of search results. |
+| Graceful degradation | resilience | Reveal animations run off CSS alone and always play to completion, so content never depends on JS to appear; a `<noscript>` style block in the `<head>` switches the motion off entirely when scripting is unavailable, and on the home page lays the map out as a list. On the home map, whose markers wait for its script, a plain list of the map's links replaces them if the script fails to load or throws. |
 | Scrollbar gutter | performance | `scrollbar-gutter: stable` to remove cross-page horizontal shift. |
+| Landmarks | accessibility | Every page has a `<main>`. About and the case studies label their two `<nav>`s: the pinned page nav ("Main") and the mini-map ("Pages"). The home map is itself a `<nav>`. |
+| Text alternatives on the map | accessibility | The floating rings' words are drawn along a path for the eye and given to screen readers as plain text. The name at the centre, which reshuffles the map instead of opening a card, says so in a tooltip (`title`), which screen readers read as its description. |
+| Video-only media | accessibility | The case-study videos are silent (encoded without sound), so they need no captions. Each sits in a `<figure>` whose caption says what it shows, with a poster frame. |
 
 ---
 
@@ -74,7 +77,7 @@ behind something that can set headers (Cloudflare, a reverse proxy, etc.).
 
 Re-evaluate if the site grows to include these:
 
-- **Captions/transcripts** (no audio/video), **accessible data tables** (no tables),
+- **Captions/transcripts** (the videos have no sound; see Video-only media above), **accessible data tables** (no tables),
   **feed discovery/hygiene** (no RSS/Atom feed), **breadcrumb UI** (single-level depth; JSON-LD
   breadcrumbs are present).
 - **Privacy policy / cookie consent / GPC**: the site sets no cookies and stores nothing in the
@@ -91,4 +94,4 @@ Re-evaluate if the site grows to include these:
 
 ---
 
-_Last reviewed: 2026-06 against the `required` and `recommended` tiers._
+_Last reviewed: 2026-11 against the `required` and `recommended` tiers._

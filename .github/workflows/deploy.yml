@@ -44,9 +44,12 @@ jobs:
       - name: Check types and templates
         run: npm run check
 
-      # The site URL and base path come from astro.config.mjs.
+      # The site URL and base path come from astro.config.mjs. COUNT_VISITS
+      # adds the GoatCounter image (see `visitCounter` in src/site.config.ts).
       - name: Build site
         run: npm run build
+        env:
+          COUNT_VISITS: 'true'
 
       - name: Upload artifact
         if: github.event_name != 'pull_request'

@@ -79,6 +79,14 @@ const structuredData = {
 // send every request to https, and while browsers exempt localhost from it,
 // a phone reaching `npm run dev -- --host` at the Mac's network address
 // would load no images, videos or scripts.
+//
+// The visit counter is an image, not a script: the path and title ride in its
+// query string, and nothing runs or is stored in the browser. Only the
+// deploy builds it (see `visitCounter` in site.config.ts).
+const countVisits = process.env.COUNT_VISITS === 'true';
+const counter = new URL(site.visitCounter);
+const counterSrc = `${counter}?${new URLSearchParams({ p: Astro.url.pathname, t: pageTitle })}`;
+
 const csp = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -86,7 +94,7 @@ const csp = [
   "script-src 'self'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
-  "img-src 'self' data:",
+  `img-src 'self' data:${countVisits ? ` ${counter.origin}` : ''}`,
   "connect-src 'self'",
   "form-action 'self'",
   "manifest-src 'self'",
@@ -168,6 +176,10 @@ const csp = [
         </Footer>
       )
     }
+
+    {/* `hidden` keeps it out of layout and the accessibility tree; browsers
+        still fetch a hidden image, and that fetch is the count. */}
+    {countVisits && <img hidden alt="" src={counterSrc} width="1" height="1" />}
 
     <script>
       import '../scripts/site';

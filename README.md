@@ -71,7 +71,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | --- | --- |
 | Colours, type scale, spacing, motion | `src/styles/tokens.css` |
 | How plain elements look everywhere (links, buttons, headings, lists, Markdown), shared print | `src/styles/global.css` |
-| Name, role, social links, OG image, theme colour, extra contact lines printed only on the PDF CV (`printContacts`) | `src/site.config.ts` |
+| Name, role, social links, OG image, theme colour, extra contact lines printed only on the PDF CV (`printContacts`), the GoatCounter visit counter (`visitCounter`, deploy builds only) | `src/site.config.ts` |
 | The favicon and app icons: the SVG they're drawn from, and the list of files made from it | `public/favicon.svg`, `src/lib/icons.mjs` |
 | Site URL, base path, redirects from the old `/portfolio/` addresses | `astro.config.mjs` |
 | `<head>`, metadata, CSP, JSON-LD, page shell | `src/layouts/Base.astro` |

@@ -22,9 +22,10 @@
   --accent-ink: #05f;
   --error: #d00;
 
-  /* Typography — variable webfonts + stable local fallbacks */
-  --font-sans: 'Atkinson Hyperlegible Next', roboto, arial, 'Helvetica Neue', helvetica, sans-serif;
-  --font-mono: 'Atkinson Hyperlegible Mono', menlo, 'Roboto Mono', monaco, monospace;
+  /* Typography — self-hosted variable webfonts. Their names and fallbacks are
+     in astro.config.mjs (`fonts`), and <Font> in Base.astro sets these two. */
+  --font-sans: var(--font-next);
+  --font-mono: var(--font-mono-face);
   --weight-regular: 380;
   --weight-medium: 480;
   --weight-semibold: 580;

@@ -639,6 +639,12 @@
     animation: lightbox-in var(--dur-fast) var(--ease);
   }
 
+  /* An enlarged inline SVG keeps the site's font in place of the one its file
+     names, as it does in its gallery. */
+  dialog > div:last-of-type > :global(svg) {
+    font-family: var(--font-sans);
+  }
+
   dialog[data-zoomed] > div:last-of-type > :global(img),
   dialog[data-zoomed] > div:last-of-type > :global(svg) {
     cursor: zoom-out;

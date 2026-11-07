@@ -3,6 +3,7 @@
     page's `footer` slot opens the footer, in place of its rule, and its `head`
     slot adds to the <head> (the home map's <noscript> styles). */
 
+import { Font } from 'astro:assets';
 import '../styles/global.css';
 import { site } from '../site.config';
 import { withBase } from '../lib/base';
@@ -78,7 +79,8 @@ const structuredData = {
 // report-uri are header-only and are intentionally omitted here (see
 // SPEC-COMPLIANCE.md). style-src needs 'unsafe-inline' for the inline
 // `style="--…"` custom-property attributes and for the small stylesheets Astro
-// inlines into the page; scripts are all bundled to files (see the
+// inlines into the page (the fonts' @font-face rules among them); the fonts
+// themselves are served from the site, so font-src is 'self' too; scripts are all bundled to files (see the
 // assetsInlineLimit note in astro.config.mjs), so script-src needs nothing but
 // 'self'. upgrade-insecure-requests is left out of the dev server: it would
 // send every request to https, and while browsers exempt localhost from it,
@@ -97,8 +99,8 @@ const csp = [
   "base-uri 'self'",
   "object-src 'none'",
   "script-src 'self'",
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src 'self' https://fonts.gstatic.com",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self'",
   `img-src 'self' data:${countVisits ? ` ${counter.origin}` : ''}`,
   "connect-src 'self'",
   "form-action 'self'",
@@ -137,12 +139,11 @@ const csp = [
     <meta property="og:image:height" content={String(site.ogImage.height)} />
     <meta property="og:image:alt" content={site.ogImage.alt} />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:ital,wght@0,200..800;1,200..800&family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800&display=swap"
-    />
+    {/* Self-hosted (astro.config.mjs → fonts). Every page sets text in the
+        upright styles of both, so those load first; the italics load only
+        where a page uses them. */}
+    <Font cssVariable="--font-next" preload={[{ style: 'normal' }]} />
+    <Font cssVariable="--font-mono-face" preload={[{ style: 'normal' }]} />
 
     {/* The .ico claims 32×32 so Chrome picks the SVG over it. */}
     <link rel="icon" href={withBase(icoIcon.path)} sizes="32x32" />

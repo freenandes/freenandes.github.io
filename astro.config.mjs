@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, fontProviders } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 
@@ -21,6 +21,38 @@ const MOVED_PROJECTS = {
 export default defineConfig({
   site: SITE,
   base: BASE_PATH,
+  // The fonts, self-hosted from src/assets/fonts/: one variable file per
+  // style, each holding the Latin set Google Fonts serves (every character the
+  // site uses). Astro serves them from the site, writes the @font-face rules
+  // and a fallback sized to match, so text barely moves when the font arrives.
+  // Base.astro puts each family on the page with <Font>, and tokens.css reads
+  // the CSS variable it sets.
+  fonts: [
+    {
+      provider: fontProviders.local(),
+      name: 'Atkinson Hyperlegible Next',
+      cssVariable: '--font-next',
+      fallbacks: ['roboto', 'arial', 'Helvetica Neue', 'helvetica', 'sans-serif'],
+      options: {
+        variants: [
+          { src: ['./src/assets/fonts/atkinson-hyperlegible-next.woff2'], weight: '200 800', style: 'normal' },
+          { src: ['./src/assets/fonts/atkinson-hyperlegible-next-italic.woff2'], weight: '200 800', style: 'italic' },
+        ],
+      },
+    },
+    {
+      provider: fontProviders.local(),
+      name: 'Atkinson Hyperlegible Mono',
+      cssVariable: '--font-mono-face',
+      fallbacks: ['menlo', 'Roboto Mono', 'monaco', 'monospace'],
+      options: {
+        variants: [
+          { src: ['./src/assets/fonts/atkinson-hyperlegible-mono.woff2'], weight: '200 800', style: 'normal' },
+          { src: ['./src/assets/fonts/atkinson-hyperlegible-mono-italic.woff2'], weight: '200 800', style: 'italic' },
+        ],
+      },
+    },
+  ],
   // The site was served from www.pmcf.xyz/portfolio/ before it moved to the
   // root, and links to those addresses were shared. GitHub Pages can't send
   // server redirects, so each old address gets a page that forwards to the new

@@ -2,8 +2,8 @@
 
 Audited against [The Website Specification](https://specification.website) (`required` +
 `recommended` tiers). This tracks what the site satisfies and what is still **pending**, grouped
-by *why* it can't be done yet so the blockers are explicit. The ones that wait on assets are also
-on the checklist in README → To do; tick them off there and move them up here when they land.
+by *why* it can't be done yet so the blockers are explicit. Anything that waits on work or assets
+also goes on the checklist in README → To do; tick it off there and move it up here when it lands.
 
 Legend: ✅ done · 🟙 platform-provided · ⏳ pending · ➖ not applicable
 
@@ -22,12 +22,13 @@ Legend: ✅ done · 🟙 platform-provided · ⏳ pending · ➖ not applicable
 | Meta robots | seo | None on indexable pages, since indexing is the default. The 404 says `noindex` and has no canonical link, because it's served at whatever address went missing. |
 | robots.txt | seo | Generated: allows every crawler and points to the sitemap, which is how crawlers find it (there's no `<link rel="sitemap">`, which isn't a standard link type). |
 | `/llms.txt` | agent-readiness | Curated markdown index of pages + case studies. |
-| Content Security Policy | security | Delivered via `<meta http-equiv>`: strict `script-src 'self'` with **no** inline-script allowance (every bundled script is emitted as its own file — see `assetsInlineLimit` in `astro.config.mjs`); `default-src 'self'`, `object-src 'none'`, `base-uri 'self'`, `upgrade-insecure-requests`, scoped font/style allowances. |
+| Content Security Policy | security | Delivered via `<meta http-equiv>`: strict `script-src 'self'` with **no** inline-script allowance (every bundled script is emitted as its own file — see `assetsInlineLimit` in `astro.config.mjs`); `default-src 'self'`, `object-src 'none'`, `base-uri 'self'`, `upgrade-insecure-requests`, and fonts and stylesheets from the site only. |
 | Referrer-Policy | security | `strict-origin-when-cross-origin` via `<meta name="referrer">`. |
 | Colour contrast | accessibility | Tertiary text token darkened `#aaa → #6f6f6f` (≈5:1 on paper, WCAG AA). Decorative-only ink kept faint via a separate `--ink-faint`. |
 | Custom error page (404) | resilience | `/404.html` with plain-language copy and routes back into the site, kept out of search results. |
 | Graceful degradation | resilience | Reveal animations run off CSS alone and always play to completion, so content never depends on JS to appear; a `<noscript>` style block in the `<head>` switches the motion off entirely when scripting is unavailable, and on the home page lays the map out as a list. On the home map, whose markers wait for its script, a plain list of the map's links replaces them if the script fails to load or throws. |
 | Scrollbar gutter | performance | `scrollbar-gutter: stable` to remove cross-page horizontal shift. |
+| Self-hosted web fonts | performance / security / privacy | Atkinson Hyperlegible Next and Mono, one variable WOFF2 per style holding the Latin set, served from the site (`src/assets/fonts/`, licences beside them). Astro writes the `@font-face` rules with `font-display: swap`, preloads the two upright files, and gives each family a fallback sized to its metrics. No request goes to Google, so visitors' addresses don't either, and the CSP allows fonts and styles from `'self'` only. |
 | Landmarks | accessibility | Every page has a `<main>`. About and the case studies label their two `<nav>`s: the pinned page nav ("Main") and the mini-map ("Pages"). The home map is itself a `<nav>`. |
 | Text alternatives on the map | accessibility | The floating rings' words are drawn along a path for the eye and given to screen readers as plain text. The name at the centre, which reshuffles the map instead of opening a card, says so in a tooltip (`title`), which screen readers read as its description. |
 | Video-only media | accessibility | The case-study videos are silent (encoded without sound), so they need no captions. Each sits in a `<figure>` whose caption says what it shows, with a poster frame. |
@@ -49,14 +50,6 @@ These are satisfied by hosting and need no code, but are **not configurable** fr
 
 > At launch on `www.pmcf.xyz/`, revisit HSTS (it needs a host or CDN that can send headers) and
 > DNS **CAA** records for `pmcf.xyz`.
-
----
-
-## ⏳ Pending — needs assets you have to provide/approve
-
-| Spec | Category | What's needed |
-| --- | --- | --- |
-| **Self-hosted web fonts** | performance / security / privacy | Fonts load from Google Fonts today. Self-hosting WOFF2 (subset, `font-display: swap`) removes a third-party request, unblocks **Subresource Integrity**, and lets the CSP drop the `fonts.googleapis.com`/`fonts.gstatic.com` allowances. Needs the font binaries committed. |
 
 ---
 

@@ -12,11 +12,21 @@
     <meta charset="utf-8" />
     <title>Link-preview card</title>
     <link rel="stylesheet" href="../../src/styles/tokens.css" />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@200..800&display=block"
-    />
     <style>
+      /* The site's own font file. On the site, Astro sets --font-next (see
+         `fonts` in astro.config.mjs); here the card sets it, and waits for the
+         font rather than drawing the fallback first. */
+      @font-face {
+        font-family: 'Atkinson Hyperlegible Next';
+        src: url('../../src/assets/fonts/atkinson-hyperlegible-next.woff2') format('woff2');
+        font-weight: 200 800;
+        font-display: block;
+      }
+
+      :root {
+        --font-next: 'Atkinson Hyperlegible Next', sans-serif;
+      }
+
       /* Knobs ------------------------------------------------------------ */
       :root {
         --og-width: 1200px; /* the script sets these from site.config.ts */

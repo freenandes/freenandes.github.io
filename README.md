@@ -48,7 +48,7 @@ The cloud image already has Node 22 and a Chromium that `npm run visual` finds w
   ```
 
 - Environment variables, which keep command output short: `ASTRO_TELEMETRY_DISABLED=1` and `NPM_CONFIG_UPDATE_NOTIFIER=false`.
-- Network access: the default level is enough (npm, GitHub, and Google Fonts, which the visual check loads). On a stricter level, allow `fonts.googleapis.com` and `fonts.gstatic.com`, plus `www.pmcf.xyz` if you want sessions to check the live site.
+- Network access: the default level is enough (npm and GitHub). The fonts are in the repo, so nothing else is needed; allow `www.pmcf.xyz` if you want sessions to check the live site.
 
 No secrets are needed: the locked project's ciphertext is committed, and the visual check uses the demo passphrase.
 
@@ -60,7 +60,8 @@ No secrets are needed: the locked project's ciphertext is committed, and the vis
 - The footer of About and every case study opens with a mini-map instead of a rule: the map's pages in the same order, pulled into one straight line, with no physics and no script. In a row, each label takes the room it needs and the gaps between labels are equal, from one edge of the text to the other. Each marker links to its page, and the page you're on is filled in. The name at the centre isn't on it, because the page nav stays pinned to the top and always links back to the map. Contact isn't either, because its links are in the footer just below.
 - The About page, which doubles as the printable CV, renders `src/content/cv.md`, a list of fields in the same order as the page: location and languages (one small line under your name), headline, summary (Markdown), jobs, earlier work, education, recommendations. You edit it by hand; the build rejects missing or misspelled fields.
 - To lock a project, you write its full text in a git-ignored file, and the build encrypts it into `public/locked/<slug>.json`. Visitors decrypt it in their browser with the passphrase (PBKDF2 + AES-GCM), and `marked` renders the Markdown. The plaintext is never published.
-- A strict Content Security Policy in `src/layouts/Base.astro` blocks inline and third-party scripts.
+- The fonts, Atkinson Hyperlegible Next and Mono, are served from the site itself, not from Google Fonts: the files are in `src/assets/fonts/`, and Astro's font support writes the `@font-face` rules, preloads the upright styles and sizes a fallback to match, so text barely moves when the font arrives.
+- A strict Content Security Policy in `src/layouts/Base.astro` blocks inline and third-party scripts, and allows fonts and stylesheets only from the site.
 - Deploy: `.github/workflows/deploy.yml` lints the CSS, checks types and builds on every pull request and every push to `main`. Only a push to `main` publishes to Pages.
 
 ## Where things live
@@ -70,6 +71,7 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | To change… | Open |
 | --- | --- |
 | Colours, type scale, spacing, motion | `src/styles/tokens.css` |
+| The fonts: the files and their licences, and which files make up each family | `src/assets/fonts/`; `fonts` in `astro.config.mjs` |
 | How plain elements look everywhere (links, buttons, headings, lists, Markdown), shared print | `src/styles/global.css` |
 | Name, role, social links, OG image, theme colour, extra contact lines printed only on the PDF CV (`printContacts`), the GoatCounter visit counter (`visitCounter`, deploy builds only) | `src/site.config.ts` |
 | The favicon and app icons: the SVG they're drawn from, and the list of files made from it | `public/favicon.svg`, `src/lib/icons.mjs` |
@@ -190,6 +192,16 @@ Every page shares one image when its link is posted (LinkedIn, Slack, X, WhatsAp
 2. Run `npm run og`. It photographs the card at the size `ogImage` gives into `public/og.png`, and writes nothing if the fonts didn't load or any text leaves the centre 630×630 square, which some apps crop to. It needs Chrome, found the same way as for `npm run visual`. Commit the new PNG. If you change what the image shows beyond the name and role, rewrite the rest of `alt` in `src/site.config.ts` to match.
 3. Platforms keep a copy for days. To see the new one sooner, re-scrape a page in [LinkedIn's Post Inspector](https://www.linkedin.com/post-inspector/) and [Facebook's Sharing Debugger](https://developers.facebook.com/tools/debug/).
 
+### Update or change the fonts
+
+The two families are self-hosted: one variable WOFF2 file per style in `src/assets/fonts/`, each holding the Latin set (every character the site uses), with their licences beside them. `fonts` in `astro.config.mjs` lists them, `Base.astro` puts them on every page with `<Font>`, and `tokens.css` reads the result as `--font-sans` and `--font-mono`.
+
+1. To update them, replace the four files in `src/assets/fonts/` under the same names. Google Fonts lists the current ones: open [Next's](https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800) and [Mono's](https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:ital,wght@0,200..800;1,200..800) stylesheets in a desktop browser and download the two `url(…)` files under `/* latin */` in each, upright (`font-style: normal`) and italic.
+2. To use a font with a different name, change `name` and the file names in `fonts`, and the `@font-face` in `scripts/og/card.html`, which loads its own copy.
+3. Run `npm run visual` to see what moved, and `npm run og` if the link-preview card should change too.
+
+A character outside the Latin set (such as ł or ș in a name) shows in the fallback font. To cover those, add Google's `/* latin-ext */` files as more variants in `fonts`, each with its `unicodeRange`.
+
 ### Change the favicon
 
 Every browser tab, bookmark, home screen and installed app shows an icon drawn from `public/favicon.svg`.
@@ -243,6 +255,3 @@ The site is audited against [The Website Specification](https://specification.we
 ## To do
 
 - [ ] Create the content based on [the list](notes/content-strategy.md) (local-only, `notes/` is git-ignored)
-- [ ] Self-host the fonts (currently Google Fonts).
-
-The last one is the Website Specification item that waits on assets; `SPEC-COMPLIANCE.md` → Pending has what it involves.

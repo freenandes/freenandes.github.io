@@ -43,13 +43,10 @@ if (type !== 'image/png' || !path.endsWith('.png')) {
   throw new Error(`og-image: ogImage in site.config.ts must be a PNG to be drawn here (got ${type}, ${path}).`);
 }
 
-// Behind a proxy (as in a cloud session), Chrome has to be told to use it to
-// reach Google Fonts.
-const proxy = process.env.HTTPS_PROXY ?? process.env.https_proxy;
 const browser = await puppeteer.launch({
   executablePath: findChrome(),
   headless: true,
-  args: ['--no-sandbox', '--disable-dev-shm-usage', ...(proxy ? [`--proxy-server=${proxy}`] : [])],
+  args: ['--no-sandbox', '--disable-dev-shm-usage'],
 });
 
 try {

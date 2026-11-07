@@ -22,8 +22,9 @@ Legend: ✅ done · 🟙 platform-provided · ⏳ pending · ➖ not applicable
 | Meta robots | seo | Explicit `index, follow`. |
 | robots.txt | seo / agent-readiness | Generated with sitemap reference and explicit allow rules for named AI crawlers (GPTBot, ClaudeBot, PerplexityBot, …). |
 | `/llms.txt` | agent-readiness | Curated markdown index of pages + case studies. |
-| Content Security Policy | security | Delivered via `<meta http-equiv>`: strict `script-src 'self'` with **no** inline-script allowance (every bundled script is emitted as its own file — see `assetsInlineLimit` in `astro.config.mjs`); `default-src 'self'`, `object-src 'none'`, `base-uri 'self'`, `upgrade-insecure-requests`, scoped font/style allowances, and GoatCounter's `gc.zgo.at` script and `freenandes.goatcounter.com` count endpoint (`connect-src`), the only third-party script. |
+| Content Security Policy | security | Delivered via `<meta http-equiv>`: strict `script-src 'self'` with **no** inline-script allowance (every bundled script is emitted as its own file — see `assetsInlineLimit` in `astro.config.mjs`); `default-src 'self'`, `object-src 'none'`, `base-uri 'self'`, `upgrade-insecure-requests`, scoped font/style allowances, and GoatCounter's endpoint in `connect-src` (the visit count is the site's own script, not GoatCounter's). |
 | Referrer-Policy | security | `strict-origin-when-cross-origin` via `<meta name="referrer">`. |
+| Global Privacy Control / Do Not Track | privacy | The visit count (`src/scripts/count.ts`) sends nothing when either is on. |
 | Colour contrast | accessibility | Tertiary text token darkened `#aaa → #6f6f6f` (≈5:1 on paper, WCAG AA). Decorative-only ink kept faint via a separate `--ink-faint`. |
 | Custom error page (404) | resilience | `/404.html` with plain-language copy and routes back into the site. |
 | Graceful degradation | resilience | Reveal animations run off CSS alone and always play to completion, so content never depends on JS to appear; a `<noscript>` style block switches the motion off entirely when scripting is unavailable. On the home map, whose markers wait for its script, a plain list of the map's links replaces them if the script fails to load or throws. |
@@ -77,10 +78,11 @@ Re-evaluate if the site grows to include these:
 - **Captions/transcripts** (no audio/video), **accessible data tables** (no tables),
   **feed discovery/hygiene** (no RSS/Atom feed), **breadcrumb UI** (single-level depth; JSON-LD
   breadcrumbs are present).
-- **Privacy policy / cookie consent / GPC**: the site sets no cookies and stores nothing on the
-  visitor's device. Page views are counted with GoatCounter, which doesn't store IP addresses or
-  track visitors across days, so there's no consent to ask for. Add a privacy policy if/when any of
-  that changes.
+- **Privacy policy / cookie consent**: the site sets no cookies and stores nothing on the
+  visitor's device. Visits are counted with GoatCounter through the site's own script, which sends
+  only the page's path and title and the referring site. GoatCounter keeps only hourly and daily
+  totals, never IP addresses or the full User-Agent, so there's no consent to ask for. Add a
+  privacy policy if/when any of that changes.
 - **Internationalisation** (hreflang, RTL, language switcher, locale formatting, plural rules):
   the site is single-language (`en`). `<html lang>` and `og:locale` are set.
 - **Form labels/errors, mobile input types**: the only form is the passphrase gate, which already

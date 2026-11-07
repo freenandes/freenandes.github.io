@@ -79,24 +79,17 @@ const structuredData = {
 // send every request to https, and while browsers exempt localhost from it,
 // a phone reaching `npm run dev -- --host` at the Mac's network address
 // would load no images, videos or scripts.
-//
-// GoatCounter is the one third-party script: cookieless page-view counts.
-// count.js loads from its CDN and sends each hit to the site's endpoint with
-// sendBeacon, which connect-src governs. It files each page under the path of
-// its canonical link, and skips localhost, so `npm run dev` and
-// `npm run visual` aren't counted.
-const countScript = 'https://gc.zgo.at/count.js';
-const countEndpoint = 'https://freenandes.goatcounter.com/count';
-
+// connect-src allows GoatCounter's endpoint, which `src/scripts/count.ts`
+// sends each visit to.
 const csp = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
-  `script-src 'self' ${new URL(countScript).origin}`,
+  "script-src 'self'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data:",
-  `connect-src 'self' ${new URL(countEndpoint).origin}`,
+  `connect-src 'self' ${new URL(site.goatcounter).origin}`,
   "form-action 'self'",
   "manifest-src 'self'",
   ...(import.meta.env.DEV ? [] : ['upgrade-insecure-requests']),
@@ -152,7 +145,6 @@ const csp = [
     <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
 
     <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)} />
-    <script is:inline data-goatcounter={countEndpoint} async src={countScript}></script>
 
     <noscript>
       <style>
@@ -164,7 +156,7 @@ const csp = [
       </style>
     </noscript>
   </head>
-  <body>
+  <body data-goatcounter={site.goatcounter}>
     <a class="skip-link" href="#main">Skip to content</a>
 
     <main id="main" class:list={[mainClass]}>
@@ -181,6 +173,7 @@ const csp = [
 
     <script>
       import '../scripts/site';
+      import '../scripts/count';
     </script>
   </body>
 </html>

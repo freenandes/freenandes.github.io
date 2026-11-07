@@ -60,8 +60,8 @@ No secrets are needed: the locked project's ciphertext is committed, and the vis
 - The footer of About and every case study opens with a mini-map instead of a rule: the map's pages in the same order, pulled into one straight line, with no physics and no script. In a row, each label takes the room it needs and the gaps between labels are equal, from one edge of the text to the other. Each marker links to its page, and the page you're on is filled in. The name at the centre isn't on it, because the page nav stays pinned to the top and always links back to the map. Contact isn't either, because its links are in the footer just below.
 - The About page, which doubles as the printable CV, renders `src/content/cv.md`, a list of fields in the same order as the page: location and languages (one small line under your name), headline, summary (Markdown), jobs, earlier work, education. You edit it by hand; the build rejects missing or misspelled fields.
 - To lock a project, you write its full text in a git-ignored file, and the build encrypts it into `public/locked/<slug>.json`. Visitors decrypt it in their browser with the passphrase (PBKDF2 + AES-GCM), and `marked` renders the Markdown. The plaintext is never published.
-- A strict Content Security Policy in `src/layouts/Base.astro` blocks inline and third-party scripts, except GoatCounter's.
-- [GoatCounter](https://freenandes.goatcounter.com) counts page views without cookies or anything else stored on the visitor's device. Its script and endpoint are set next to the CSP in `src/layouts/Base.astro`. It doesn't count visits from `localhost`.
+- A strict Content Security Policy in `src/layouts/Base.astro` blocks inline and third-party scripts.
+- [GoatCounter](https://freenandes.goatcounter.com) counts visits, through a small script of the site's own (`src/scripts/count.ts`) instead of GoatCounter's. It sends only the page's address, its title and the site the visitor came from, stores nothing on the visitor's device, and counts nothing when the browser asks not to be tracked. It only counts on the live site, so `npm run dev` and previews don't show up. Which of that GoatCounter keeps is set in its dashboard, under Settings.
 - Deploy: `.github/workflows/deploy.yml` lints the CSS, checks types and builds on every pull request and every push to `main`. Only a push to `main` publishes to Pages.
 
 ## Where things live
@@ -72,7 +72,8 @@ Each page owns its markup and its styling, so changing how a page looks means op
 | --- | --- |
 | Colours, type scale, spacing, motion | `src/styles/tokens.css` |
 | How plain elements look everywhere (links, buttons, headings, lists, Markdown), shared print | `src/styles/global.css` |
-| Name, role, social links, OG image, theme colour, extra contact lines printed only on the PDF CV (`printContacts`) | `src/site.config.ts` |
+| Name, role, social links, OG image, theme colour, GoatCounter endpoint, extra contact lines printed only on the PDF CV (`printContacts`) | `src/site.config.ts` |
+| What each visit sends to GoatCounter, and when it counts nothing | `src/scripts/count.ts` |
 | The favicon and app icons: the SVG they're drawn from, and the list of files made from it | `public/favicon.svg`, `src/lib/icons.mjs` |
 | Site URL, base path, redirects from the old `/portfolio/` addresses | `astro.config.mjs` |
 | `<head>`, metadata, CSP, JSON-LD, page shell | `src/layouts/Base.astro` |

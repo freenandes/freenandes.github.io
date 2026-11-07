@@ -34,6 +34,9 @@ export interface SiteConfig {
   /** Home-screen name, and the tint browsers paint their own UI with. */
   shortName: string;
   themeColor: string;
+  /** GoatCounter's endpoint for this site. `src/scripts/count.ts` sends each
+   *  visit there, and the CSP in `Base.astro` allows requests to its host. */
+  goatcounter: string;
 }
 
 const name = 'Pedro MC Fernandes';
@@ -62,6 +65,7 @@ export const site: SiteConfig = {
   },
   shortName: 'PMCF',
   themeColor: '#ffffff',
+  goatcounter: 'https://freenandes.goatcounter.com/count',
 };
 
 // This module only loads server-side (build/dev), so a token that no longer

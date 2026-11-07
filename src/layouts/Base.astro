@@ -79,15 +79,24 @@ const structuredData = {
 // send every request to https, and while browsers exempt localhost from it,
 // a phone reaching `npm run dev -- --host` at the Mac's network address
 // would load no images, videos or scripts.
+//
+// GoatCounter is the one third-party script: cookieless page-view counts.
+// count.js loads from its CDN and sends each hit to the site's endpoint, with
+// sendBeacon (connect-src) or, in old browsers, an image (img-src). It skips
+// localhost, so `npm run dev` and `npm run visual` aren't counted.
+const countScript = 'https://gc.zgo.at/count.js';
+const countEndpoint = 'https://freenandes.goatcounter.com/count';
+const countOrigin = new URL(countEndpoint).origin;
+
 const csp = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
-  "script-src 'self'",
+  `script-src 'self' ${new URL(countScript).origin}`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
-  "img-src 'self' data:",
-  "connect-src 'self'",
+  `img-src 'self' data: ${countOrigin}`,
+  `connect-src 'self' ${countOrigin}`,
   "form-action 'self'",
   "manifest-src 'self'",
   ...(import.meta.env.DEV ? [] : ['upgrade-insecure-requests']),
@@ -143,6 +152,7 @@ const csp = [
     <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
 
     <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)} />
+    <script is:inline data-goatcounter={countEndpoint} async src={countScript}></script>
 
     <noscript>
       <style>

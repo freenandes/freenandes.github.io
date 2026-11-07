@@ -1,17 +1,12 @@
 ---
-/** Screenshots in a case study, shown as thumbnails that open full size. Every
-    screenshot keeps the same scale, so their text reads at one size: side by
-    side past the text's edges when the window has room, stacked when it
-    doesn't, and as wide as the text on a phone. A filled gallery lays its
-    images out as one row instead, as wide as the row may grow and all at the
-    same height, so rows of mixed shapes line up. A thumbnail opens its
-    screenshot in the page's enlarged view (`Lightbox.astro`), which steps
-    through the rest from there; without the script, it's a plain link to
-    the image. The thumbnail itself comes in smaller sizes too, so a phone
-    doesn't download a full screenshot to show it a few hundred pixels wide;
-    the link, and so the enlarged view, keeps the full image. An SVG is drawn inline instead, so its text takes the site's font
-    and stays sharp at any size; its viewBox units count as on-screen pixels.
-    The caption is the default slot. */
+/** Screenshots in a case study, as thumbnails at one shared scale, so their
+    text reads at one size: side by side past the text's edges when there's
+    room, stacked when not, as wide as the text on a phone. `fill` lays them
+    out as one row of equal height instead. Thumbnails load smaller copies
+    (srcset); the link, and so the enlarged view (`Lightbox.astro`), keeps the
+    full image, and works as a plain link without the script. An SVG is drawn
+    inline, so its text takes the site's font and stays sharp; its viewBox
+    units count as on-screen pixels. The caption is the default slot. */
 
 import { getImage } from 'astro:assets';
 import type { SvgComponent } from 'astro/types';

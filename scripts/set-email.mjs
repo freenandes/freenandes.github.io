@@ -6,14 +6,9 @@
 
      npm run email -- you@example.com
 
-   The address is turned into the obfuscated token stored in
-   `src/site.config.ts` (`socials[].token`) and written there for you — so the
-   plaintext never lands in the repo and you never hand-translate a token.
-   `src/lib/email.ts` reverses the token in the browser to rebuild the link.
-
-   The codec is imported from `src/lib/email-codec.mjs` — the same file the
-   site ships — so the round-trip check below exercises the exact decoder the
-   browser will run, and the two sides cannot drift apart.
+   Encodes the address (`src/lib/email-codec.mjs`) and writes the token into
+   `src/site.config.ts` (`socials[].token`), after checking it decodes back.
+   The plaintext never lands in the repo.
    ========================================================================= */
 
 import { readFile, writeFile } from 'node:fs/promises';

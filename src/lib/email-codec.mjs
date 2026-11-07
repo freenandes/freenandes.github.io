@@ -1,15 +1,10 @@
-/** The email obfuscation codec — the only implementation.
+/** The email obfuscation codec, shared by the browser (through
+ * `src/lib/email.ts`) and `npm run email` (`scripts/set-email.mjs`), so the
+ * setter's round-trip check runs the decoder the site ships. Plain JavaScript,
+ * so the Node script can import it.
  *
- * Everything that encodes or decodes the address goes through this file: the
- * browser (via `src/lib/email.ts` → `src/scripts/site.ts`) and the
- * `npm run email` setter (`scripts/set-email.mjs`). It is plain JavaScript so
- * the Node script can import it without a TypeScript runtime — one shared
- * implementation means the setter's round-trip check exercises the exact
- * decoder the site ships, and the two sides cannot drift apart.
- *
- * XOR each byte with a key, Cloudflare-style: the first octet is the key, the
- * rest are the address xor'd with it, all hex. The key is derived from the
- * address so the token is reproducible rather than random.
+ * Cloudflare-style XOR: the first hex octet is the key, the rest is the address
+ * xor'd with it. The key comes from the address, so a token is reproducible.
  */
 
 /**

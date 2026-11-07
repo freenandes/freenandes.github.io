@@ -5,7 +5,7 @@ export default {
   rules: {
     // BEM-style modifiers (e.g. .node--floating) aren't kebab-case.
     'selector-class-pattern': null,
-    // Fluid type scale tokens (e.g. --step--1) from tokens.css.
+    // Type scale tokens (e.g. --step--1) from tokens.css.
     'custom-property-pattern': null,
     // Scoped Astro sheets often reorder states; specificity warnings are noisy here.
     'no-descending-specificity': null,
@@ -34,7 +34,7 @@ export default {
     'import-notation': null,
     // Token values use exact fractions; browsers round at computed-value time.
     'number-max-precision': null,
-    // Inline `style="--reveal-delay: …"` attributes are parsed as their own
+    // Inline `style="--reveal-step: …"` attributes are parsed as their own
     // stylesheet, so this rule would demand a blank line inside an HTML
     // attribute. Consecutive custom properties are exempt anyway, which is all
     // tokens.css has.

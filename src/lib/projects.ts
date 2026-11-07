@@ -2,7 +2,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 
 export type Project = CollectionEntry<'projects'>;
 
-/** All non-draft projects, sorted by `order` then newest date first. */
+/** Every project, minus drafts in production, sorted by `order`, then newest. */
 export async function getProjects(): Promise<Project[]> {
   const all = await getCollection('projects', ({ data }) =>
     import.meta.env.PROD ? !data.draft : true

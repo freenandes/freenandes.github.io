@@ -1,12 +1,13 @@
 ---
-/** The enlarged view of a case study's media, one dialog for the whole page.
-    A gallery thumbnail opens its screenshot here, as large as fits the window
-    but never past its own size, and zooms from there. The arrows at the
-    window's sides, the arrow keys, or a swipe step through every screenshot
-    and video on the page in reading order, and the counter at the top says
-    where you are; closing returns to the one last shown. A video plays here
-    at no more than its own size, and doesn't zoom. Without the script, a
-    thumbnail is a plain link to its image. */
+/** The enlarged view of a case study's media: one dialog for the page that
+    steps through every screenshot and video in reading order (side buttons,
+    arrow keys, swipe), with a counter at the top. A screenshot opens fitted to
+    the window, never past its own size; a click, a pinch, Ctrl or ⌘ with the
+    wheel, or the buttons zoom it, and zoomed it pans by scrolling or dragging.
+    A video plays at no more than its own size and doesn't zoom. The browser's
+    own pinch zoom is held off inside, since it would carry the buttons off
+    screen. Closing leaves the page on the last one shown. Without the script,
+    or with a modifier key, a thumbnail is a plain link to its file. */
 ---
 
 <dialog aria-label="Enlarged view">
@@ -31,16 +32,6 @@
 </dialog>
 
 <script>
-  // Shows the page's screenshots and videos in one dialog, in reading order.
-  // A screenshot opens fitted to the window, and zooms there: a click or tap
-  // zooms in where it lands and the next one zooms back out; a pinch, Ctrl or
-  // ⌘ with the wheel, or the zoom buttons zoom by degrees, and the fit button
-  // fits it to the window again. A zoomed screenshot pans by scrolling, or by
-  // dragging it with the mouse. Fitted, one finger swipes it aside to step
-  // to the next or previous one. The browser's own pinch zoom is held off
-  // inside the dialog, since it would carry the buttons off screen. A click
-  // with a modifier key still follows the link, to open the file in a new tab.
-
   /** A knob from the dialog's stylesheet. */
   const knob = (element: Element, name: string, fallback: number) =>
     Number.parseFloat(getComputedStyle(element).getPropertyValue(name)) || fallback;

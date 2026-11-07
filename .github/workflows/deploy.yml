@@ -41,6 +41,11 @@ jobs:
       - name: Lint CSS
         run: npm run lint:css
 
+      # Every file, command, knob and heading the docs and comments name
+      # must still exist.
+      - name: Check docs
+        run: npm run check:docs
+
       - name: Check types and templates
         run: npm run check
 

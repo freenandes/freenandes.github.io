@@ -3,7 +3,7 @@
 Audited against [The Website Specification](https://specification.website) (`required` +
 `recommended` tiers). This tracks what the site satisfies and what is still **pending**, grouped
 by *why* it can't be done yet so the blockers are explicit. Anything that waits on work or assets
-also goes on the checklist in README → To do; tick it off there and move it up here when it lands.
+also goes on the checklist in README → "To do"; tick it off there and move it up here when it lands.
 
 Legend: ✅ done · 🟙 platform-provided · ⏳ pending · ➖ not applicable
 
@@ -15,7 +15,7 @@ Legend: ✅ done · 🟙 platform-provided · ⏳ pending · ➖ not applicable
 | --- | --- | --- |
 | `<meta name="color-scheme">` | foundations | Declared `light` (the site is intentionally light-only) to stop dark-UA form/scrollbar mismatches. |
 | Open Graph protocol | foundations | `og:site_name`, `og:locale`, per-page `og:type` (`website`/`profile`/`article`), title, description, URL and image with `og:image:alt`. No `twitter:*` tags: X falls back to Open Graph, though without `twitter:card` it may draw a small summary card rather than a large image. |
-| Open Graph image | foundations | `public/og.png`: 1200×630 (1.91:1), opaque, 85 KB, text inside the centre square for apps that crop. Absolute HTTPS URL with `og:image:type`, `og:image:width` and `og:image:height`, so platforms draw the card on the first share. Set in `src/site.config.ts`. |
+| Open Graph image | foundations | `public/og.png`: 1200×630 (1.91:1), opaque, small, text inside the centre square for apps that crop. Absolute HTTPS URL with `og:image:type`, `og:image:width` and `og:image:height`, so platforms draw the card on the first share. Set in `src/site.config.ts`. |
 | Web app manifest | resilience | Generated at `/manifest.webmanifest` (base-aware) and linked from `<head>`. |
 | Favicons & app icons | foundations / resilience | `public/favicon.svg` (512×512) plus what `npm run icons` draws from it: `favicon.ico` (16, 32, 48), `apple-touch-icon.png` (180×180, opaque), and 192 and 512 PNGs and a 512 **maskable** PNG in the manifest. The `.ico` link claims `sizes="32x32"` so Chrome picks the SVG. One list in `src/lib/icons.mjs` feeds the script, `<head>` and the manifest. |
 | Structured data (JSON-LD) | seo / agent-readiness | `@graph` with `WebSite` + `Person` site-wide, `ProfilePage` on About, `CreativeWork` per project, and `BreadcrumbList` on sub-pages. |

@@ -17,15 +17,16 @@ There are no unit tests. Run these, using Node 22 (`.nvmrc`):
 
 - `npm run check`: types and templates. Expect 0 errors and 0 warnings.
 - `npm run lint:css`: lint errors fail CI.
+- `npm run check:docs`: every file, command, custom property, function, `KNOBS` key and heading the docs and comments name still exists.
 - `npm run build`: runs `encrypt`, then `astro build`.
 - `npm run visual`: run it for any change that shouldn't alter the look, and quote the result. It compares against `origin/main` (`--base <ref>` to change, `--only <name>` to filter) and exits `1` on any difference, with diffs in `.visual/`. A `drift` result on the home page is normal noise from the randomised layout. It finds a local Chrome, or the cloud image's Chromium (`CHROME_PATH` overrides). A full run takes about two minutes; use `--only` when the change is local to one page.
 
-CI runs lint, check and build on every pull request to `main`, and deploys only from `main`. To look at the site, use `npm run dev`, at http://localhost:4321/.
+CI runs lint, check:docs, check and build on every pull request to `main`, and deploys only from `main`. To look at the site, use `npm run dev`, at http://localhost:4321/.
 
 ## How it fits together
 
 - Every page renders into `src/layouts/Base.astro` (head, CSP, JSON-LD, footer). Its `footer` slot opens the footer in place of its rule. Its `head` slot adds to `<head>`: a `<noscript>` holding styles must go there, since HTML allows that nowhere else. A page's `<script>` or `<noscript>` written after `</Base>` lands after `</html>`, so keep them inside (its `<style>` is fine anywhere). `noindex` keeps a page out of search results and drops its canonical link (the 404 uses it). Link previews are Open Graph only. `src/scripts/site.ts` runs on every page: print buttons, email decoding, the reveal deferral.
-- Home (`src/pages/index.astro`) is a map. Its content is `src/diagram.config.ts`; its placement is a force simulation in `src/scripts/nav-diagram.ts` (over 1,800 lines: read the parts you touch). Tuning is `KNOBS` and `SIM` at the top of the script and the custom properties at the top of the page's `<style>`.
+- Home (`src/pages/index.astro`) is a map. Its content is `src/diagram.config.ts`; its placement is a force simulation in `src/scripts/nav-diagram.ts` (long: read the parts you touch). Tuning is `KNOBS` and `SIM` at the top of the script and the custom properties at the top of the page's `<style>`.
   - `getDiagramNodes()` (`src/lib/diagram.ts`) fills a project node's label, tags and link from its case study, and fails the build on a node whose page isn't published or a `diagramChain` id with no node. A case study is on the map only once it has a node (id = slug) listed in `diagramChain`.
   - `aria-expanded` on a marker's button is the one record of which card is open, and the CSS shows cards from it. The script sets `data-cards` (`flyout` or `popup`) on `.diagram`, and the CSS reads that, not a media query of its own.
   - The markers wait for the script. Without `is-mounted` by `--fallback-delay`, or with `data-failed`, the CSS swaps in `.fallback`, a plain list of the map's links.
@@ -60,12 +61,12 @@ CI runs lint, check and build on every pull request to `main`, and deploys only 
 
 ## Code style
 
-- Most files open with a short comment saying what they own. Keep it accurate when a file's job changes. Comments say why, or what isn't obvious from the code; don't restate the code or repeat what another file already explains.
+- Most files open with a short comment saying what they own. Comments say why, or what isn't obvious from the code; don't restate the code or repeat what another file already explains.
+- Docs and comments stay true. A change that makes a doc or comment wrong fixes it in the same commit, and renaming or removing something means searching the repo for the old name. `npm run check:docs` catches a name that no longer exists, not a sentence that's no longer true. Leave out facts that drift on their own, like line counts, file sizes or lists of the case studies: point at where they live instead.
 - TypeScript is strict (`astro/tsconfigs/strict`). Imports are relative; there's no path alias.
 
 ## Known state
 
-- The case studies are `peak-systems-at-percona`, `reading-the-terrain-at-percona` and `100000-pages-high-at-tui-group`, all on the map.
 - `notes/` and `sources/` are local-only and may be missing.
-- `package-lock.json`, `public/topo-low.svg` (one 537 KB line) and `public/locked/*.json` are generated. Don't read them; `.ignore` keeps them out of search results.
-- Pending work is tracked in README → To do and `SPEC-COMPLIANCE.md`.
+- `package-lock.json`, `public/topo-low.svg` (one huge line) and `public/locked/*.json` are generated. Don't read them; `.ignore` keeps them out of search results.
+- Pending work is tracked in README → "To do" and `SPEC-COMPLIANCE.md`.

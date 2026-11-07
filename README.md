@@ -14,13 +14,14 @@ Pedro MC Fernandes's portfolio. The home page is an interactive map that leads t
 | `npm run preview` | Serves the last build |
 | `npm run check` | Type and template errors |
 | `npm run lint:css` | CSS lint (`npm run lint:css:fix` fixes what it can) |
+| `npm run check:docs` | Fails if the docs or code comments name a file, command, knob or heading that no longer exists |
 | `npm run visual` | Compares how this working tree looks with `origin/main` ([more](#check-you-havent-changed-the-look)) |
 | `npm run encrypt` | Re-encrypts locked case studies (part of `build`) |
 | `npm run email -- you@example.com` | Changes the contact email |
 | `npm run icons` | Redraws the PNG and `.ico` icons from `public/favicon.svg` |
 | `npm run og` | Redraws the link-preview image, `public/og.png` |
 
-CI runs `lint:css`, `check` and `build` on every pull request, and a push to `main` only deploys if all three pass. Run them before you push.
+CI runs `lint:css`, `check:docs`, `check` and `build` on every pull request, and a push to `main` only deploys if all of them pass. Run them before you push.
 
 ## Setup
 
@@ -48,7 +49,7 @@ No secrets are needed.
 - **Locked case studies.** A case study can be locked: its text is encrypted at build time and decrypted in the reader's browser with a passphrase. None is locked right now.
 - **Fonts.** Atkinson Hyperlegible Next and Mono, served from the site itself, not from Google Fonts.
 - **Privacy and security.** A strict Content Security Policy allows no third-party scripts. The email address is obfuscated, so it never appears in the HTML or the repo. GoatCounter counts visits through a hidden image, with no script and no cookie, in deploy builds only.
-- **Metadata.** Open Graph link previews (one image for every page), JSON-LD, a sitemap, `robots.txt` and `/llms.txt`.
+- **Metadata.** Open Graph link previews (one image for every page), JSON-LD, a sitemap, `/robots.txt` and `/llms.txt`.
 - **Old addresses.** Pages that moved still answer at their old addresses ([Old links](#old-links)).
 - **Standards.** Audited against [The Website Specification](https://specification.website); `SPEC-COMPLIANCE.md` lists what's done and what's pending.
 

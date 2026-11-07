@@ -7,10 +7,10 @@
   --ink: #111;
   --ink-2: #555;
 
-  /* Tertiary text — darkened from #aaa to meet WCAG AA (≈5:1 on paper). */
+  /* Tertiary text: the lightest that meets WCAG AA on paper (≈5:1). */
   --ink-3: #6f6f6f;
 
-  /* Faint, decorative-only ink (rings, register mark); not used for text. */
+  /* Faint ink for decoration and disabled controls; never text. */
   --ink-faint: #aaa;
 
   /* The drawings on the map's texture; lighter still, and never text. */

@@ -3,12 +3,7 @@ import { site } from '../site.config';
 import { withBase } from '../lib/base';
 import { getProjects } from '../lib/projects';
 
-/**
- * /llms.txt — a curated, machine-readable index of the site's most important
- * content for LLMs. Emerging convention (https://llmstxt.org). Like robots.txt
- * it is conventionally read from the domain root; see SPEC-COMPLIANCE.md for the
- * sub-path caveat.
- */
+/** /llms.txt: a plain-text index of the site for LLMs (https://llmstxt.org). */
 export const GET: APIRoute = async ({ site: astroSite }) => {
   const abs = (path: string) => {
     const withBasePath = withBase(path);

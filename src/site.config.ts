@@ -8,12 +8,9 @@ export interface SiteConfig {
   description: string;
   /** What work is wanted. Opens the contact card and the footer. */
   availability: string;
-  /** Shown in link rows, the footer, the contact card and /llms.txt. A normal
-   *  link carries an `href`; the email carries an obfuscated `token` instead
-   *  (see `src/lib/email.ts`) so the address is never written as plaintext into
-   *  the served HTML *or* this public repo — the browser turns it back into a
-   *  `mailto:` link at runtime. To change the email run
-   *  `npm run email -- you@example.com`; never edit the token by hand. */
+  /** Shown in link rows, the footer, the contact card and /llms.txt. A link
+   *  has an `href`; the email has an obfuscated `token` instead
+   *  (`src/lib/email.ts`): change it with `npm run email -- you@example.com`. */
   socials: { label: string; href?: string; token?: string }[];
   /** Extra contacts printed before the socials on the PDF CV only, as
    *  written; the web page never shows them. */
@@ -22,22 +19,17 @@ export interface SiteConfig {
   locale: string;
   /** Open Graph locale (underscore form, e.g. en_US). */
   ogLocale: string;
-  /** The link preview (Open Graph, which X reads too): a file under /public.
-   *  Keep it a 1200×630 PNG or JPEG, small (some apps skip images over a few
-   *  hundred KB), with its text inside the centre square, which some apps crop to.
-   *  `width`, `height` and `type` must match the file: they let a platform draw
-   *  the card the first time a link is shared, before it has fetched the image.
-   *  `alt` reads out what the image says. `npm run og` draws the image from
-   *  `name` and `role` (see `scripts/og/card.html`), and `alt` is built from
-   *  the same two, so the three can't drift apart. */
+  /** The link preview (Open Graph): a 1200×630 PNG under /public, drawn by
+   *  `npm run og` from `name` and `role`. `width`, `height` and `type` must
+   *  match the file, so platforms can draw the card before fetching it. `alt`
+   *  says what the image shows. */
   ogImage: { path: string; width: number; height: number; type: string; alt: string };
   /** Home-screen name, and the tint browsers paint their own UI with. */
   shortName: string;
   themeColor: string;
-  /** GoatCounter's count endpoint. Every page loads it as a hidden image, with
-   *  no script and no cookie: GoatCounter reads the country and browser from
-   *  that one request. Only builds with COUNT_VISITS=true (the deploy) carry
-   *  it, so local builds and `npm run visual` never add to the numbers. */
+  /** GoatCounter's count endpoint, loaded by every page as a hidden image (no
+   *  script, no cookie). Only deploy builds (COUNT_VISITS=true) include it, so
+   *  local builds never count. */
   visitCounter: string;
 }
 

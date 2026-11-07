@@ -75,21 +75,16 @@ const structuredData = {
   ],
 };
 
-// Static-site CSP delivered via <meta>. Note: frame-ancestors, sandbox and
-// report-uri are header-only and are intentionally omitted here (see
-// SPEC-COMPLIANCE.md). style-src needs 'unsafe-inline' for the inline
-// `style="--…"` custom-property attributes and for the small stylesheets Astro
-// inlines into the page (the fonts' @font-face rules among them); the fonts
-// themselves are served from the site, so font-src is 'self' too; scripts are all bundled to files (see the
-// assetsInlineLimit note in astro.config.mjs), so script-src needs nothing but
-// 'self'. upgrade-insecure-requests is left out of the dev server: it would
-// send every request to https, and while browsers exempt localhost from it,
-// a phone reaching `npm run dev -- --host` at the Mac's network address
-// would load no images, videos or scripts.
-//
-// The visit counter is an image, not a script: the path and title ride in its
-// query string, and nothing runs or is stored in the browser. Only the
-// deploy builds it (see `visitCounter` in site.config.ts).
+// The Content Security Policy, as a <meta>: GitHub Pages can't send headers,
+// so header-only directives (frame-ancestors and the like) can't be used.
+// - style-src 'unsafe-inline': the `style="--…"` attributes, and the small
+//   stylesheets Astro inlines (the fonts' @font-face rules among them).
+// - script-src 'self': every script is bundled to a file (assetsInlineLimit in
+//   astro.config.mjs).
+// - No upgrade-insecure-requests in dev: a phone on `npm run dev -- --host`
+//   reaches the dev server over http and would load nothing.
+// - Deploy builds add the visit counter's origin to img-src; it's an image,
+//   with the path and title in its query string, so nothing runs.
 const countVisits = process.env.COUNT_VISITS === 'true';
 const counter = new URL(site.visitCounter);
 const counterSrc = `${counter}?${new URLSearchParams({ p: Astro.url.pathname, t: pageTitle })}`;

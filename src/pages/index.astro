@@ -311,8 +311,7 @@ const fallbackLinks = [
     }
   </nav>
 
-  {/* Inside the layout, not after it, so it lands in the <body> rather than
-      after the closing </html>. */}
+  {/* Inside the layout, so it lands in the <body>, not after </html>. */}
   <script>
     import { initDiagram } from '../scripts/nav-diagram';
 
@@ -329,12 +328,11 @@ const fallbackLinks = [
     }
   </script>
 
-  {/* Without scripting, the map is laid out as a plain list. Base puts this
-      in the <head>, the one place a <noscript> may hold styles. */}
+  {/* Without scripting, the map is laid out as a plain list that still fills
+      the screen, so the texture does too. It goes in the <head>, the one place
+      a <noscript> may hold styles. */}
   <noscript slot="head">
     <style>
-      /* No-JS fallback: collapse the simulation into a plain, readable list.
-         It still fills the screen, so the contour texture does too. */
       .diagram {
         display: flex;
         flex-direction: column;
@@ -563,7 +561,7 @@ const fallbackLinks = [
   }
 
   /* The portrait sticker keeps to its corner, on the drawings' layer and after
-     them in the tree, so it covers them and nothing else covers less. The
+     them in the tree, so it covers them and nothing else. The
      script keeps markers, rings and drawings off it, so it never moves with
      the map. It fades in with the markers. */
 

@@ -52,6 +52,14 @@ video {
   height: auto;
 }
 
+/* `hidden` hides, whatever `display` an element's own rule gives it. The
+   browser's version loses to any author rule, like the one above, which
+   left the visit counter's hidden image a pixel below the map. */
+
+[hidden] {
+  display: none !important;
+}
+
 input,
 button,
 textarea,

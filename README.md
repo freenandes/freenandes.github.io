@@ -213,7 +213,3 @@ The site used to live at `www.pmcf.xyz/portfolio/`, and the case studies at `/pr
 | `/projects/tui-case/`, `/portfolio/projects/tui-case/` | `/100000-pages-high-at-tui-group/` |
 
 Renaming a page adds its old address to `redirects` in `astro.config.mjs`; renaming a case study's file adds its old name to `MOVED_PROJECTS` there.
-
-## To do
-
-- [ ] Create the content based on [the list](notes/content-strategy.md) (local-only; `notes/` is git-ignored)

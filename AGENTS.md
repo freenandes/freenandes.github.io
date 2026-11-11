@@ -70,4 +70,4 @@ CI runs lint, check:docs, check and build on every pull request to `main`, and d
 
 - `notes/` and `sources/` are local-only and may be missing.
 - `package-lock.json`, `public/topo-low.svg` (one huge line) and `public/locked/*.json` are generated. Don't read them; `.ignore` keeps them out of search results.
-- Pending work is tracked in README → "To do" and `SPEC-COMPLIANCE.md`.
+- Pending work is tracked in `SPEC-COMPLIANCE.md`.

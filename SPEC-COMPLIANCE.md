@@ -2,8 +2,8 @@
 
 Audited against [The Website Specification](https://specification.website) (`required` +
 `recommended` tiers). This tracks what the site satisfies and what is still **pending**, grouped
-by *why* it can't be done yet so the blockers are explicit. Anything that waits on work or assets
-also goes on the checklist in README → "To do"; tick it off there and move it up here when it lands.
+by *why* it can't be done yet so the blockers are explicit. When a pending item lands, move it up to
+"Implemented".
 
 Legend: ✅ done · 🟙 platform-provided · ⏳ pending · ➖ not applicable
 

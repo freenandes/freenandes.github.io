@@ -4,6 +4,8 @@ dist/
 .astro/
 # visual-check builds, screenshots and diffs
 .visual/
+# browser-check build, certificate and screenshots
+.browsers/
 
 # dependencies
 node_modules/

@@ -19,6 +19,7 @@ There are no unit tests. Run these, using Node 22 (`.nvmrc`):
 - `npm run lint:css`: lint errors fail CI.
 - `npm run check:docs`: every file, command, custom property, function, `KNOBS` key and heading the docs and comments name still exists.
 - `npm run build`: runs `encrypt`, then `astro build`.
+- `npm run browsers`: run it for changes to the map script, the lightbox, `Base.astro` or `global.css`. It loads every page in Chrome, Firefox and WebKit at desktop and phone sizes and checks behaviour: errors, failed requests, sideways scroll, the map's cards, the lightbox. It exits `1` on a failure and `2` when a browser is missing; in a cloud session, install them first with `npx playwright install --with-deps firefox webkit`.
 - `npm run visual`: run it for any change that shouldn't alter the look, and quote the result. It compares against `origin/main` (`--base <ref>` to change, `--only <name>` to filter) and exits `1` on any difference, with diffs in `.visual/`. A `drift` result on the home page is normal noise from the randomised layout. It finds a local Chrome, or the cloud image's Chromium (`CHROME_PATH` overrides). A full run takes about two minutes; use `--only` when the change is local to one page.
 
 CI runs lint, check:docs, check and build on every pull request to `main`, and deploys only from `main`. To look at the site, use `npm run dev`, at http://localhost:4321/.
@@ -40,7 +41,7 @@ CI runs lint, check:docs, check and build on every pull request to `main`, and d
 - Locked case studies: `scripts/encrypt-projects.mjs` encrypts `src/protected/<slug>.md` into `public/locked/<slug>.json`, and `src/components/PasswordGate.astro` decrypts it in the browser. None is locked now, but the feature stays, so don't remove it as unused.
 - Fonts are self-hosted (`fonts` in `astro.config.mjs`, `<Font>` in `Base.astro`). Astro gives each family a hashed name, so CSS reaches them only through `--font-sans` and `--font-mono`. A file that names the font itself, like the case-study SVGs, needs a rule setting `font-family: var(--font-sans)`, as `Gallery.astro` and `Lightbox.astro` have. `scripts/og/card.html` has its own `@font-face`.
 - Generated, never edited by hand: `public/og.png` (`npm run og`), the PNG and `.ico` icons (`npm run icons`, from `public/favicon.svg` and the list in `src/lib/icons.mjs`) and the email token (`npm run email`).
-- The visit counter is in deploy builds only (`COUNT_VISITS=true` in `deploy.yml`), so local builds and `npm run visual` never count.
+- The visit counter is in deploy builds only (`COUNT_VISITS=true` in `deploy.yml`), so local builds, `npm run visual` and `npm run browsers` never count.
 
 ## Constraints that will bite
 

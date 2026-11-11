@@ -13,6 +13,7 @@
     "lint:css:fix": "stylelint \"src/**/*.{css,astro}\" --fix",
     "check:docs": "node scripts/check-docs.mjs",
     "visual": "node scripts/visual-check.mjs",
+    "browsers": "node scripts/browser-check.mjs",
     "prebuild": "node scripts/encrypt-projects.mjs",
     "build": "astro build",
     "preview": "astro preview",
@@ -29,6 +30,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
     "pixelmatch": "^7.2.0",
+    "playwright": "^1.65.0",
     "pngjs": "^7.0.0",
     "postcss-html": "^1.8.1",
     "puppeteer-core": "^25.4.0",

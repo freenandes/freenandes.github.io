@@ -16,6 +16,7 @@ Pedro MC Fernandes's portfolio. The home page is an interactive map that leads t
 | `npm run lint:css` | CSS lint (`npm run lint:css:fix` fixes what it can) |
 | `npm run check:docs` | Fails if the docs or code comments name a file, command, knob or heading that no longer exists |
 | `npm run visual` | Compares how this working tree looks with `origin/main` ([more](#check-you-havent-changed-the-look)) |
+| `npm run browsers` | Checks the site works in Chrome, Firefox and WebKit, at desktop and phone sizes ([more](#check-it-works-in-other-browsers)) |
 | `npm run encrypt` | Re-encrypts locked case studies (part of `build`) |
 | `npm run email -- you@example.com` | Changes the contact email |
 | `npm run icons` | Redraws the PNG and `.ico` icons from `public/favicon.svg` |
@@ -28,7 +29,7 @@ CI runs `lint:css`, `check:docs`, `check` and `build` on every pull request, and
 1. Install Node 22 (`.nvmrc` has the exact version CI uses). With Homebrew: `brew install node@22`, then add `/opt/homebrew/opt/node@22/bin` to your PATH.
 2. In the project folder, run `npm install`, then `npm run dev`.
 
-`npm run visual` and `npm run og` also need Google Chrome, or `CHROME_PATH` pointing at a Chrome binary.
+`npm run visual`, `npm run browsers` and `npm run og` also need Google Chrome, or `CHROME_PATH` pointing at a Chrome binary. `npm run browsers` also needs Playwright's Firefox and WebKit, installed once with `npx playwright install firefox webkit`, and `openssl`, which macOS and Linux already have.
 
 ### Claude Code cloud sessions
 
@@ -36,7 +37,7 @@ The cloud image has Node 22 and a Chromium the scripts find by themselves. In th
 
 - Setup script, which runs in the folder above the repo: `cd freenandes.github.io && npm ci --no-audit --no-fund`
 - Environment variables, for shorter output: `ASTRO_TELEMETRY_DISABLED=1` and `NPM_CONFIG_UPDATE_NOTIFIER=false`
-- Network: the default level is enough. Allow `www.pmcf.xyz` if sessions should check the live site.
+- Network: the default level is enough. Allow `www.pmcf.xyz` if sessions should check the live site, and `cdn.playwright.dev` and `playwright.download.prss.microsoft.com` for `npm run browsers`, which then needs `npx playwright install --with-deps firefox webkit` once per session.
 
 No secrets are needed.
 
@@ -200,6 +201,17 @@ npm run visual -- --keep          # keep both builds in .visual/
 ```
 
 It builds both versions, screenshots the same pages and states at desktop and phone sizes, and compares the pixels and the computed styles. Differences are saved as images in `.visual/` and the run exits `1`: something to review, not necessarily broken. The home map always varies a little; small differences there are reported as `drift`. The pages and states are in `scripts/visual/scenarios.mjs`.
+
+### Check it works in other browsers
+
+```bash
+npm run browsers                    # Chrome, Firefox and WebKit
+npm run browsers -- --only webkit   # one engine
+```
+
+It builds the working tree, serves it over HTTPS on this machine and loads every page in each engine, at desktop and phone sizes. It checks that nothing breaks: no script errors, failed requests or CSP violations, no sideways scrolling (on screen or printed), the map mounts and opens a card in view, and the lightbox opens and closes. It exits `1` if a check fails and `2` if a browser couldn't start. Screenshots of each engine go to `.browsers/` to compare by eye; they're never identical, because each engine renders fonts its own way.
+
+Run it after changing the map script, the lightbox, `Base.astro` (its CSP above all) or `global.css`. The phone sizes are emulated in desktop engines, so they don't stand in for Safari on an iPhone or Firefox on Android: check those on a real phone, or in Xcode's iOS Simulator, which runs the real Mobile Safari.
 
 ## Old links
 

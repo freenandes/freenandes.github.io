@@ -34,7 +34,7 @@ experience:
     period: August 2022 — October 2026
     summary: Percona builds open-source database software and services, including PMM (Percona Monitoring and Management), a monitoring and observability platform for MySQL, PostgreSQL, MongoDB, Redis, and more.
     points:
-      - Led the design of a native UI for PMM. Made the case for a features-first navigation instead of keeping Grafana as a single embedded app, brought the team along, and saw it ship in PMM 3.6, decoupling the interface from heavy third-party dependencies to reduce technical debt and unblock custom features.
+      - Led the design of a native UI for PMM. Made the case for a features-first navigation instead of keeping Grafana as a single embedded app, brought the team along, and saw it ship in PMM 3.6. The new UI freed PMM from heavy third-party dependencies, reducing technical debt and unblocking custom features.
       - Created high-fidelity vision prototypes grounded in user research with DBAs, SREs and developers to resolve core workflow issues, securing executive buy-in and driving product adoption.
       - Built and managed Peak UI, the front-end component and style foundation that streamlined development and enabled extensibility across Percona products.
       - Audited the user journey to PMM adoption, identified documentation as a key gap, and redesigned and coded modular templates across 10+ documentation sites, improving readability and simplifying content creation.

@@ -20,13 +20,13 @@ languages:
 headline: "Product Designer & Design Engineer"
 
 summary: |
-  I specialize in building interfaces for complex technical software: observability, databases, and developer tools. It’s a world I navigate with ease. I know its terminology, its workflows, and I understand the people who use these tools every day: DBAs, SREs and software developers.
+  I design interfaces for complex technical software: observability, databases, and developer tools. I know this world's terminology and workflows, and I understand the people who rely on these tools every day: DBAs, SREs, and software developers. That understanding is what lets me help teams decide what's worth building, not just how it should look.
 
   How I work:
   
   - Research first. Understanding real users and workflows is crucial. From diagrams to high-fidelity coded prototypes, I use whatever it takes to align teams and leadership on what to build.
-  - Design systems in code. I write production front-end code, so design and engineering work from the same source and share the same intent.
-  - Reviews that unblock teams. When teams ship fast, I turn UX findings into clear, actionable issue notes that anyone can pick up, so they can meet the deadline and still ship with quality.
+  - Reviews that unblock teams. When teams ship fast, I turn UX findings into clear, actionable notes that anyone can pick up, so UX improvements can meet the deadline with ease and still ship with the necessary quality.
+  - Design systems in code. I work directly in front-end codebases, so design and engineering share the same source and the same intent.
 
 experience:
   - role: Senior Product Designer
@@ -34,11 +34,11 @@ experience:
     period: August 2022 — October 2026
     summary: Percona builds open-source database software and services, including PMM (Percona Monitoring and Management), a monitoring and observability platform for MySQL, PostgreSQL, MongoDB, Redis, and more.
     points:
-      - Designed and coded a native UI for PMM, decoupling the interface from heavy third-party dependencies to reduce technical debt and unblock the development of custom features.
-      - Built and managed Peak UI, the front-end component and style foundation that streamlined development and enabled extensibility across Percona products.
+      - Led the design of a native UI for PMM. Made the case for a features-first navigation instead of keeping Grafana as a single embedded app, brought the team along, and saw it ship in PMM 3.6, decoupling the interface from heavy third-party dependencies to reduce technical debt and unblock custom features.
       - Created high-fidelity vision prototypes grounded in user research with DBAs, SREs and developers to resolve core workflow issues, securing executive buy-in and driving product adoption.
+      - Built and managed Peak UI, the front-end component and style foundation that streamlined development and enabled extensibility across Percona products.
       - Audited the user journey to PMM adoption, identified documentation as a key gap, and redesigned and coded modular templates across 10+ documentation sites, improving readability and simplifying content creation.
-      - Mentored designers and engineers on front-end code practices, design system patterns, and research methods.
+      - Mentored designers and engineers on design system patterns, design critique, and research methods.
 
   - role: Senior Product Designer
     org: FARFETCH

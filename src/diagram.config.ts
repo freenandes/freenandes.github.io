@@ -72,9 +72,9 @@ export const diagramNodes: DiagramEntry[] = [
     label: 'About/CV',
     kind: 'about',
     shape: 'hexagon',
-    tagline: 'I specialize in building interfaces for complex technical software.',
+    tagline: 'I design interfaces for complex technical software.',
     lines: [
-      'I cover the whole path, from user research and information architecture to interaction design, prototyping, design systems, and the production front-end code that ships them.',
+      'I help teams decide what’s worth building, then take it all the way: from user research and information architecture to prototypes, design systems, and the front-end code that ships them.',
     ],
     link: { label: 'Read the full story', href: '/about' },
     portrait: { x: 0.24, y: 0.08 },

@@ -74,7 +74,7 @@ const KNOBS = {
   /** How far a speech-balloon drawing (`data-balloon` in index.astro) may sit
    *  from the portrait sticker's box. One with no room that close lands
    *  anywhere, like the other drawings. */
-  balloonReach: 120,
+  balloonReach: 80,
   /** Space markers and rings keep from the portrait sticker's box. */
   stickerGap: 12,
   /** Pointer travel before a press on a marker becomes a drag. */

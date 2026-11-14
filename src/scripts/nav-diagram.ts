@@ -71,6 +71,10 @@ const KNOBS = {
    *  connectors and the other drawings, and from the canvas edge, and how many
    *  random spots it tries before staying hidden. Their size is in index.astro. */
   decor: { gap: 8, edge: 8, tries: 400 },
+  /** How far a speech-balloon drawing (`data-balloon` in index.astro) may sit
+   *  from the portrait sticker's box. One with no room that close lands
+   *  anywhere, like the other drawings. */
+  balloonReach: 80,
   /** Space markers and rings keep from the portrait sticker's box. */
   stickerGap: 12,
   /** Pointer travel before a press on a marker becomes a drag. */
@@ -1044,6 +1048,7 @@ export function initDiagram(root: HTMLElement) {
    * has run into moves, and one with no room left stays hidden.
    */
   function settleDecor() {
+    const isBalloon = (d: Decor) => d.el.hasAttribute('data-balloon');
     decorDue = false;
     if (!decor.length) return;
     const { gap, edge, tries } = KNOBS.decor;
@@ -1093,11 +1098,23 @@ export function initDiagram(root: HTMLElement) {
         blocks.push({ ...ink, ...d.spot });
         return false;
       })
-      .sort((a, b) => b.ink.halfX * b.ink.halfY - a.ink.halfX * a.ink.halfY);
+      .sort((a, b) => b.ink.halfX * b.ink.halfY - a.ink.halfX * a.ink.halfY)
+      // Balloons go first, so the room beside the sticker is still free.
+      .sort((a, b) => Number(isBalloon(b.d)) - Number(isBalloon(a.d)));
 
     for (const { d, ink } of moving) {
       d.spot = null;
       d.el.removeAttribute('data-placed');
+      if (portrait && isBalloon(d)) {
+        // Anywhere its box comes within reach of the sticker's.
+        const spanX = portrait.halfX + ink.halfX + KNOBS.balloonReach;
+        const spanY = portrait.halfY + ink.halfY + KNOBS.balloonReach;
+        for (let i = 0; i < tries && !d.spot; i++) {
+          const x = portrait.x + (Math.random() * 2 - 1) * spanX;
+          const y = portrait.y + (Math.random() * 2 - 1) * spanY;
+          if (fits(x, y, ink)) d.spot = { x, y };
+        }
+      }
       for (let i = 0; i < tries && !d.spot; i++) {
         const x = Math.random() * W;
         const y = Math.random() * H;

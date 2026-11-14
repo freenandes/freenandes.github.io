@@ -28,6 +28,10 @@ const decorations = Object.entries(
   }),
 ).map(([path, Drawing]) => ({ Drawing, name: basename(path, '.svg') }));
 
+// Drawings that read as the portrait's speech balloon: the map script lands
+// them beside the sticker, at a new spot on each load.
+const balloons = new Set(['proposta-de-valor']);
+
 // A marker's preview is the image in this folder named after its id, with its
 // alt text in diagram.config.ts. One without the other is a mistake, so the
 // build stops instead of shipping a preview with no alt, or none at all.
@@ -262,6 +266,7 @@ const fallbackLinks = [
           width="0"
           height="0"
           style={`--decor-frame: ${Drawing.width}; --decor-width: var(--decor-${name})`}
+          data-balloon={balloons.has(name) ? '' : undefined}
           aria-hidden="true"
           focusable="false"
         />
@@ -412,6 +417,8 @@ const fallbackLinks = [
     --decor-compass-wide: 20rem;
     --decor-kraken: 12rem;
     --decor-kraken-wide: 16rem;
+    --decor-proposta-de-valor: 14rem;
+    --decor-proposta-de-valor-wide: 20rem;
 
     /* The size of a drawing with no width above, per unit of its viewBox, and
        on a large screen. */
@@ -478,6 +485,7 @@ const fallbackLinks = [
       --decor-flag: var(--decor-flag-wide);
       --decor-compass: var(--decor-compass-wide);
       --decor-kraken: var(--decor-kraken-wide);
+      --decor-proposta-de-valor: var(--decor-proposta-de-valor-wide);
       --decor-scale: var(--decor-scale-wide);
     }
   }

@@ -70,8 +70,9 @@ Re-evaluate if the site grows to include these:
 - **Captions/transcripts** (the videos have no sound; see Video-only media above), **accessible
   data tables** (no tables), **feed discovery/hygiene** (no RSS/Atom feed), **breadcrumb UI**
   (single-level depth; JSON-LD breadcrumbs are present).
-- **Privacy policy / cookie consent / GPC**: the site sets no cookies and stores nothing in the
-  browser. Visits are counted by GoatCounter (`src/scripts/count.ts`): it gets the page, the
+- **Privacy policy / cookie consent / GPC**: the site sets no cookies and stores nothing in a
+  reader's browser; the one exception is the opt-out the owner sets in their own browsers
+  (`#dont-count-me`) so their visits aren't counted. Visits are counted by GoatCounter (`src/scripts/count.ts`): it gets the page, the
   referring site's origin (never the page on it), a campaign tag (`ref`, `utm_source`,
   `utm_campaign`; no other query parameter), the screen width, and clicks on the email address,
   outbound links, print and the map's cards. It sees the browser and the country from the

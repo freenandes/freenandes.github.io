@@ -49,7 +49,7 @@ No secrets are needed.
 - **Mini-map.** About and every case study end with the map's pages in one straight line, the current page filled in.
 - **Locked case studies.** A case study can be locked: its text is encrypted at build time and decrypted in the reader's browser with a passphrase. None is locked right now.
 - **Fonts.** Atkinson Hyperlegible Next and Mono, served from the site itself, not from Google Fonts.
-- **Privacy and security.** A strict Content Security Policy allows no third-party scripts. The email address is obfuscated, so it never appears in the HTML or the repo. GoatCounter counts visits, in deploy builds only, with no cookie and nothing stored in a reader's browser: the site's own script sends the page, the referring site (never the page on it), a campaign tag and the screen width, and counts clicks on contact and outbound links, CV prints and map cards opened ([Track where visits come from](#track-where-visits-come-from)). Without scripting, a hidden image counts the page alone.
+- **Privacy and security.** A strict Content Security Policy allows no third-party scripts. The email address is obfuscated, so it never appears in the HTML or the repo. GoatCounter counts visits, in deploy builds only, with no cookie and nothing stored in the browser: the site's own script sends the page, the referring site (never the page on it), a campaign tag and the screen width, and counts clicks on contact and outbound links, CV prints and map cards opened ([Track where visits come from](#track-where-visits-come-from)). Without scripting, a hidden image counts the page alone.
 - **Metadata.** Open Graph link previews (one image for every page), JSON-LD, a sitemap, `/robots.txt` and `/llms.txt`.
 - **Old addresses.** Pages that moved still answer at their old addresses ([Old links](#old-links)).
 - **Standards.** Audited against [The Website Specification](https://specification.website); `SPEC-COMPLIANCE.md` lists what's done and what's pending.
@@ -208,8 +208,6 @@ https://www.pmcf.xyz/peak-systems-at-percona/?ref=acme-application
 | `out/<site>` | follows a link to another site, such as `out/linkedin.com` |
 | `print/<page>` | prints a page, such as `print/about/` for the CV |
 | `map/<marker id>` | opens a card on the home map |
-
-To stop counting your own visits, open any page once in each browser you use, with `#dont-count-me` at the end of the address (`https://www.pmcf.xyz/#dont-count-me`). An alert confirms it. The setting stays in that browser; `#count-me` undoes it. It doesn't carry over to private windows, and Safari forgets it if you don't visit the site for a week.
 
 A page that doesn't exist is counted at the address that was asked for, with the title "Page not found", so broken links show up by name. All of this is in `src/scripts/count.ts`; the map's cards are counted from `src/scripts/nav-diagram.ts`.
 

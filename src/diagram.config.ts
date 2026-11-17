@@ -9,7 +9,7 @@ import { site } from './site.config';
  */
 
 export type NodeKind = 'identity' | 'about' | 'contact' | 'project' | 'floating';
-export type NodeShape = 'triangle' | 'square' | 'pentagon' | 'hexagon';
+export type NodeShape = 'triangle' | 'square' | 'pentagon' | 'star';
 
 /** A marker as the page renders it. */
 export interface DiagramNode {
@@ -63,7 +63,7 @@ export const diagramNodes: DiagramEntry[] = [
     // Two lines under the name, breaking before the "&".
     subLabel: site.role.replace(' & ', '\n& '),
     kind: 'identity',
-    shape: 'pentagon',
+    shape: 'star',
     portrait: { x: 0.5, y: 0.28 },
     landscape: { x: 0.26, y: 0.5 },
   },
@@ -71,7 +71,7 @@ export const diagramNodes: DiagramEntry[] = [
     id: 'about',
     label: 'About/CV',
     kind: 'about',
-    shape: 'hexagon',
+    shape: 'pentagon',
     tagline: 'I design interfaces for complex technical software.',
     lines: [
       'I help teams decide what’s worth building, then take it all the way: from user research and information architecture to prototypes, design systems, and the front-end code that ships them.',
@@ -124,7 +124,7 @@ export const diagramNodes: DiagramEntry[] = [
     tagline:
       'The scale case. One destination template, 100,000 generated pages.',
     lines: [
-      'I designed PageBuilder’s template and generation rules, supported by the Tagus design system. The first launch covered 175 destinations in Portugal and Spain, where our analytics team reported more than 4× organic traffic growth.',
+      'I designed the template and generation rules, supported by the design system. 1st launch covered 175 destinations in Portugal and Spain bringing 4× of organic traffic growth.',
     ],
     preview:
       'The All destinations homepage on stay.tui.com: a hero of four destinations, with Santorini opened wide beside Venice, Dubrovnik and Moscow, a search for destinations, dates and guests, and Featured destinations below.',

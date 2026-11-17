@@ -68,10 +68,18 @@ const KNOBS = {
    *  one along the chain. A connector starts `lineLag` after the later of its
    *  two markers; the floating rings land last, `ringStep` apart. */
   entrance: { first: 40, step: 50, lineLag: 40, ringStep: 90 },
-  /** The drawings on the texture: space each keeps from markers, rings,
-   *  connectors and the other drawings, and from the canvas edge, and how many
-   *  random spots it tries before staying hidden. Their size is in index.astro. */
-  decor: { gap: 8, edge: 8, tries: 400 },
+  /** The drawings on the texture and the post-it note: space each keeps from
+   *  markers, rings, connectors and the others, and from the canvas edge, how
+   *  many random spots it tries before staying hidden, and the most of the
+   *  canvas they and the portrait sticker may cover together, so a small
+   *  screen isn't crowded. Their size is in index.astro. */
+  decor: { gap: 8, edge: 8, tries: 400, coverage: 0.15 },
+  /** The order they claim room in, by file name (`post-it` is the note). Each
+   *  shows only while there's room and coverage left, and once one is left
+   *  out, so is everything after it, except the `decorAlways` ones, which
+   *  show whenever there's room. A drawing not listed comes last. */
+  decorOrder: ['flag', 'post-it', 'proposta-de-valor', 'compass', 'kraken'],
+  decorAlways: ['flag'],
   /** How far a speech-balloon drawing (`data-balloon` in index.astro) may sit
    *  from the portrait sticker's box. One with no room that close lands
    *  anywhere, like the other drawings. */
@@ -143,8 +151,9 @@ type Rect = { left: number; top: number; right: number; bottom: number };
  *  popup. */
 type Side = 'bottom' | 'top' | 'right' | 'left' | 'center';
 
-/** A drawing on the texture, and where its centre sits once it has landed. */
-type Decor = { el: SVGSVGElement; spot: { x: number; y: number } | null };
+/** A drawing on the texture, or the post-it note, and where its centre sits
+ *  once it has landed. */
+type Decor = { el: SVGSVGElement | HTMLImageElement; spot: { x: number; y: number } | null };
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -152,10 +161,9 @@ export function initDiagram(root: HTMLElement) {
   const links = root.querySelector<SVGSVGElement>('.links');
   if (!links) return;
   const svgEl: SVGSVGElement = links;
-  const decor: Decor[] = [...root.querySelectorAll<SVGSVGElement>('.decor')].map((el) => ({
-    el,
-    spot: null,
-  }));
+  const decor: Decor[] = [
+    ...root.querySelectorAll<SVGSVGElement | HTMLImageElement>('.decor, .post-it'),
+  ].map((el) => ({ el, spot: null }));
   const ruler = root.querySelector<SVGSVGElement>('.ruler');
   const sticker = root.querySelector<HTMLElement>('.sticker');
   // The sticker's spot and tilt within the ranges index.astro gives them, picked
@@ -1024,9 +1032,15 @@ export function initDiagram(root: HTMLElement) {
   }
 
   /** Where a decoration's drawing sits inside its frame. The drawing is what has
-   *  to stay clear, not the empty margins around it. */
-  function measureDecor(el: SVGSVGElement): Box {
+   *  to stay clear, not the empty margins around it. A picture (the post-it)
+   *  fills its frame. */
+  function measureDecor(el: SVGSVGElement | HTMLImageElement): Box {
     const frame = el.getBoundingClientRect();
+    if (el instanceof HTMLImageElement) {
+      const halfX = frame.width / 2;
+      const halfY = frame.height / 2;
+      return { x: halfX, y: halfY, halfX, halfY };
+    }
     const parts = [...el.children]
       .map((part) => part.getBoundingClientRect())
       .filter((r) => r.width > 0 || r.height > 0);
@@ -1044,15 +1058,24 @@ export function initDiagram(root: HTMLElement) {
 
   /**
    * Runs on a map at rest, after a new layout. The decorations belong to the
-   * texture, so the simulation doesn't know about them and one stays exactly
-   * where it is for as long as the map leaves it clear. Only one the new layout
-   * has run into moves, and one with no room left stays hidden.
+   * texture, so the simulation doesn't know about them. They claim room in
+   * `KNOBS.decorOrder` while there's room and `KNOBS.decor.coverage` lasts, and
+   * once one is left out, so is everything after it, except the `decorAlways`
+   * ones. One stays exactly where it is for as long as the map and those
+   * before it leave it clear, and one moving looks for a spot that moves none
+   * after it before taking one that does.
    */
   function settleDecor() {
     const isBalloon = (d: Decor) => d.el.hasAttribute('data-balloon');
+    const nameOf = (d: Decor) => d.el.dataset.decor ?? '';
+    const rank = (d: Decor) => {
+      const i = (KNOBS.decorOrder as readonly string[]).indexOf(nameOf(d));
+      return i < 0 ? Infinity : i;
+    };
+    const area = (b: Box) => 4 * b.halfX * b.halfY;
     decorDue = false;
     if (!decor.length) return;
-    const { gap, edge, tries } = KNOBS.decor;
+    const { gap, edge, tries, coverage } = KNOBS.decor;
     const blocks: Box[] = nodes.map((n) => {
       const half = nodeHalf(n);
       return { x: n.x, y: n.y, halfX: half.x, halfY: half.y };
@@ -1076,59 +1099,91 @@ export function initDiagram(root: HTMLElement) {
         line.getPointAtLength(i * step),
       ),
     );
-    const fits = (x: number, y: number, ink: Box) =>
+    const apart = (x: number, y: number, ink: Box, b: Box) =>
+      Math.abs(x - b.x) >= ink.halfX + b.halfX + gap ||
+      Math.abs(y - b.y) >= ink.halfY + b.halfY + gap;
+    const fits = (x: number, y: number, ink: Box, avoid: Box[] = []) =>
       x - ink.halfX >= edge &&
       x + ink.halfX <= W - edge &&
       y - ink.halfY >= edge &&
       y + ink.halfY <= H - edge &&
-      blocks.every(
-        (b) =>
-          Math.abs(x - b.x) >= ink.halfX + b.halfX + gap ||
-          Math.abs(y - b.y) >= ink.halfY + b.halfY + gap,
-      ) &&
+      blocks.every((b) => apart(x, y, ink, b)) &&
+      avoid.every((b) => apart(x, y, ink, b)) &&
       points.every(
         (p) => Math.abs(x - p.x) >= ink.halfX + gap || Math.abs(y - p.y) >= ink.halfY + gap,
       );
 
-    // The ones that can stay claim their spots first, for the rest to work
-    // around, and of the rest the biggest go first, while there's most room.
-    const moving = decor
+    // In order; unlisted ones last, the biggest of them first.
+    const items = decor
       .map((d) => ({ d, ink: measureDecor(d.el) }))
-      .filter(({ d, ink }) => {
-        if (!d.spot || !fits(d.spot.x, d.spot.y, ink)) return true;
-        blocks.push({ ...ink, ...d.spot });
-        return false;
-      })
-      .sort((a, b) => b.ink.halfX * b.ink.halfY - a.ink.halfX * a.ink.halfY)
-      // Balloons go first, so the room beside the sticker is still free.
-      .sort((a, b) => Number(isBalloon(b.d)) - Number(isBalloon(a.d)));
+      .sort((a, b) => rank(a.d) - rank(b.d) || area(b.ink) - area(a.ink));
 
-    for (const { d, ink } of moving) {
-      d.spot = null;
-      d.el.removeAttribute('data-placed');
+    /** Where the drawing at `items[at]` can go: first clear of the spots held
+     *  by those after it, and of the room a balloon after it wants beside the
+     *  sticker; failing that, anywhere clear. A balloon tries beside the
+     *  sticker before anywhere else. */
+    function findSpot(at: number) {
+      const { d, ink } = items[at];
+      const later = items.slice(at + 1);
+      const soft: Box[] = later.flatMap((o) => (o.d.spot ? [{ ...o.ink, ...o.d.spot }] : []));
+      const balloon = later.find((o) => isBalloon(o.d) && !o.d.spot);
+      if (portrait && balloon) {
+        soft.push({
+          ...portrait,
+          halfX: portrait.halfX + KNOBS.balloonReach + 2 * balloon.ink.halfX,
+          halfY: portrait.halfY + KNOBS.balloonReach + 2 * balloon.ink.halfY,
+        });
+      }
+      const search = (pick: () => { x: number; y: number }, avoid: Box[]) => {
+        for (let i = 0; i < tries; i++) {
+          const p = pick();
+          if (fits(p.x, p.y, ink, avoid)) return p;
+        }
+        return null;
+      };
+      const anywhere = () => ({ x: Math.random() * W, y: Math.random() * H });
+      const picks = [anywhere];
       if (portrait && isBalloon(d)) {
         // Anywhere its box comes within reach of the sticker's.
         const spanX = portrait.halfX + ink.halfX + KNOBS.balloonReach;
         const spanY = portrait.halfY + ink.halfY + KNOBS.balloonReach;
-        for (let i = 0; i < tries && !d.spot; i++) {
-          const x = portrait.x + (Math.random() * 2 - 1) * spanX;
-          const y = portrait.y + (Math.random() * 2 - 1) * spanY;
-          if (fits(x, y, ink)) d.spot = { x, y };
-        }
+        picks.unshift(() => ({
+          x: portrait.x + (Math.random() * 2 - 1) * spanX,
+          y: portrait.y + (Math.random() * 2 - 1) * spanY,
+        }));
       }
-      for (let i = 0; i < tries && !d.spot; i++) {
-        const x = Math.random() * W;
-        const y = Math.random() * H;
-        if (fits(x, y, ink)) d.spot = { x, y };
+      for (const pick of picks) {
+        const spot = search(pick, soft) ?? search(pick, []);
+        if (spot) return spot;
       }
-      if (!d.spot) continue;
-      blocks.push({ ...ink, ...d.spot });
-      d.el.style.setProperty('--decor-x', `${d.spot.x - ink.x}px`);
-      d.el.style.setProperty('--decor-y', `${d.spot.y - ink.y}px`);
+      return null;
+    }
+
+    // The sticker counts against the coverage too.
+    let room = coverage * W * H - (portrait ? area(portrait) : 0);
+    let open = true;
+    items.forEach(({ d, ink }, at) => {
+      const always = (KNOBS.decorAlways as readonly string[]).includes(nameOf(d));
+      const stays = d.spot && fits(d.spot.x, d.spot.y, ink) ? d.spot : null;
+      const spot =
+        always || (open && area(ink) <= room) ? (stays ?? findSpot(at)) : null;
+      if (!spot) {
+        if (!always) open = false;
+        d.spot = null;
+        d.el.removeAttribute('data-placed');
+        return;
+      }
+      room -= area(ink);
+      blocks.push({ ...ink, ...spot });
+      if (spot === stays) return;
+      d.spot = spot;
+      d.el.removeAttribute('data-placed');
+      d.el.style.setProperty('--decor-x', `${spot.x - ink.x}px`);
+      d.el.style.setProperty('--decor-y', `${spot.y - ink.y}px`);
       // Reading layout ends the last fade, so this one starts from nothing.
       void d.el.getBoundingClientRect();
       d.el.setAttribute('data-placed', '');
-    }
+    });
   }
 
   function relayout() {

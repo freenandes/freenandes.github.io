@@ -52,14 +52,20 @@ export async function getDiagramNodes(): Promise<DiagramNode[]> {
   return nodes;
 }
 
-/** Marker outline: a regular polygon in a 20×20 box, point up (square: flat). */
-const SIDES: Record<NodeShape, number> = { triangle: 3, square: 4, pentagon: 5, hexagon: 6 };
+/** Marker outline in a 20×20 box, point up (square: flat): a regular polygon
+ *  with this many corners, or for the star, this many points. */
+const CORNERS: Record<NodeShape, number> = { triangle: 3, square: 4, pentagon: 5, star: 5 };
+/** How far in a star's inner corners sit, as a share of its points' reach.
+ *  Lower is spikier. */
+const STAR_INNER = 0.52;
 
-export function polygon(shape: NodeShape = 'hexagon'): string {
-  const sides = SIDES[shape];
+export function polygon(shape: NodeShape = 'pentagon'): string {
+  const star = shape === 'star';
+  const count = star ? 2 * CORNERS[shape] : CORNERS[shape];
   const start = shape === 'square' ? -45 : -90;
-  return Array.from({ length: sides }, (_, i) => {
-    const angle = ((start + (i * 360) / sides) * Math.PI) / 180;
-    return `${(10 + 8.4 * Math.cos(angle)).toFixed(2)},${(10 + 8.4 * Math.sin(angle)).toFixed(2)}`;
+  return Array.from({ length: count }, (_, i) => {
+    const angle = ((start + (i * 360) / count) * Math.PI) / 180;
+    const r = star && i % 2 ? 8.4 * STAR_INNER : 8.4;
+    return `${(10 + r * Math.cos(angle)).toFixed(2)},${(10 + r * Math.sin(angle)).toFixed(2)}`;
   }).join(' ');
 }

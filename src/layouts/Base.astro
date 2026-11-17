@@ -83,8 +83,10 @@ const structuredData = {
 //   astro.config.mjs).
 // - No upgrade-insecure-requests in dev: a phone on `npm run dev -- --host`
 //   reaches the dev server over http and would load nothing.
-// - Deploy builds add the visit counter's origin to img-src; it's an image,
-//   with the path and title in its query string, so nothing runs.
+// - Deploy builds add the visit counter's origin to img-src and connect-src:
+//   `src/scripts/count.ts` sends each hit as a beacon, or an image where
+//   beacons fail, and the <noscript> image counts readers without scripting.
+//   Nothing from that origin runs.
 const countVisits = process.env.COUNT_VISITS === 'true';
 const counter = new URL(site.visitCounter);
 const counterSrc = `${counter}?${new URLSearchParams({ p: Astro.url.pathname, t: pageTitle })}`;
@@ -97,7 +99,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self'",
   `img-src 'self' data:${countVisits ? ` ${counter.origin}` : ''}`,
-  "connect-src 'self'",
+  `connect-src 'self'${countVisits ? ` ${counter.origin}` : ''}`,
   "form-action 'self'",
   "manifest-src 'self'",
   ...(import.meta.env.DEV ? [] : ['upgrade-insecure-requests']),
@@ -105,7 +107,7 @@ const csp = [
 ---
 
 <!doctype html>
-<html lang={site.locale}>
+<html lang={site.locale} data-counter={countVisits ? site.visitCounter : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="Content-Security-Policy" content={csp} />
@@ -175,12 +177,20 @@ const csp = [
       )
     }
 
-    {/* `hidden` keeps it out of layout and the accessibility tree; browsers
+    {/* Counts a reader without scripting; with it, `count.ts` counts instead.
+        `hidden` keeps it out of layout and the accessibility tree; browsers
         still fetch a hidden image, and that fetch is the count. */}
-    {countVisits && <img hidden alt="" src={counterSrc} width="1" height="1" />}
+    {
+      countVisits && (
+        <noscript>
+          <img hidden alt="" src={counterSrc} width="1" height="1" />
+        </noscript>
+      )
+    }
 
     <script>
       import '../scripts/site';
+      import '../scripts/count';
     </script>
   </body>
 </html>

@@ -49,7 +49,7 @@ No secrets are needed.
 - **Mini-map.** About and every case study end with the map's pages in one straight line, the current page filled in.
 - **Locked case studies.** A case study can be locked: its text is encrypted at build time and decrypted in the reader's browser with a passphrase. None is locked right now.
 - **Fonts.** Atkinson Hyperlegible Next and Mono, served from the site itself, not from Google Fonts.
-- **Privacy and security.** A strict Content Security Policy allows no third-party scripts. The email address is obfuscated, so it never appears in the HTML or the repo. GoatCounter counts visits through a hidden image, with no script and no cookie, in deploy builds only.
+- **Privacy and security.** A strict Content Security Policy allows no third-party scripts. The email address is obfuscated, so it never appears in the HTML or the repo. GoatCounter counts visits, in deploy builds only, with no cookie and nothing stored in the browser: the site's own script sends the page, the referring site (never the page on it), a campaign tag and the screen width, and counts clicks on contact and outbound links, CV prints and map cards opened ([Track where visits come from](#track-where-visits-come-from)). Without scripting, a hidden image counts the page alone.
 - **Metadata.** Open Graph link previews (one image for every page), JSON-LD, a sitemap, `/robots.txt` and `/llms.txt`.
 - **Old addresses.** Pages that moved still answer at their old addresses ([Old links](#old-links)).
 - **Standards.** Audited against [The Website Specification](https://specification.website); `SPEC-COMPLIANCE.md` lists what's done and what's pending.
@@ -190,6 +190,26 @@ The files are in `src/assets/fonts/`, one variable WOFF2 per style holding the L
 3. Run `npm run visual` to see what moved, and `npm run og` if the preview image should follow.
 
 A character outside the Latin set (such as ł or ș) shows in the fallback font. To cover those, add Google's `/* latin-ext */` files as more variants under `fonts`, each with its `unicodeRange`.
+
+### Track where visits come from
+
+Visits show up on the [GoatCounter dashboard](https://freenandes.goatcounter.com). A visit from another site lists that site under Top referrers. For a link with no referrer, such as one in the PDF of the CV, an email or a job application, add a `ref` tag, which the Campaigns panel lists:
+
+```
+https://www.pmcf.xyz/?ref=cv-pdf
+https://www.pmcf.xyz/peak-systems-at-percona/?ref=acme-application
+```
+
+`utm_source` and `utm_campaign` work too. Every other parameter in the address stays on the reader's side. Events are listed with the pages, under these names:
+
+| Event | Counted when a reader |
+| --- | --- |
+| `email` | clicks the email address |
+| `out/<site>` | follows a link to another site, such as `out/linkedin.com` |
+| `print/<page>` | prints a page, such as `print/about/` for the CV |
+| `map/<marker id>` | opens a card on the home map |
+
+A page that doesn't exist is counted at the address that was asked for, with the title "Page not found", so broken links show up by name. All of this is in `src/scripts/count.ts`; the map's cards are counted from `src/scripts/nav-diagram.ts`.
 
 ### Check you haven't changed the look
 

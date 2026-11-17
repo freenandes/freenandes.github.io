@@ -137,6 +137,7 @@ A lower `-crf` is sharper and bigger: 22 suits a short video, and a long, busy o
 
 1. Drop the SVG in `src/assets/decor/`; nothing else needs wiring. In the file, replace its colour with `fill="currentColor"` and turn `style` attributes into plain ones.
 2. Give it a width at the top of the `<style>` in `src/pages/index.astro`, named after the file: `kraken.svg` takes `--decor-kraken`, and `--decor-kraken-wide` from 64rem (add that one to the wide media query below the knobs too). Without one, it takes its viewBox width times `--decor-scale`.
+3. Optionally give it a colour in the same place: `--decor-kraken-color`. Without one, it takes `--ink-decor`.
 
 Each drawing gets a random free spot once the map settles. One with no room stays hidden, which for a big drawing can mean never on a phone.
 

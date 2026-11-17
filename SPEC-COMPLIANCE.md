@@ -24,7 +24,7 @@ Legend: ✅ done · 🟙 platform-provided · ⏳ pending · ➖ not applicable
 | `/llms.txt` | agent-readiness | Curated markdown index of pages + case studies. |
 | Content Security Policy | security | Delivered via `<meta http-equiv>`: strict `script-src 'self'` with **no** inline-script allowance (every bundled script is emitted as its own file — see `assetsInlineLimit` in `astro.config.mjs`); `default-src 'self'`, `object-src 'none'`, `base-uri 'self'`, `upgrade-insecure-requests`, and fonts and stylesheets from the site only. |
 | Referrer-Policy | security | `strict-origin-when-cross-origin` via `<meta name="referrer">`. |
-| Colour contrast | accessibility | The lightest text, `--ink-3` (`#6f6f6f`), is ≈5:1 on paper (WCAG AA). The fainter `--ink-faint` is only for decoration and disabled controls. |
+| Colour contrast | accessibility | The lightest text, `--ink-3`, meets WCAG AA (4.5:1) on `--paper` and `--paper-2`. The fainter `--ink-faint` is only for decoration and disabled controls. |
 | Custom error page (404) | resilience | `/404.html` with plain-language copy and routes back into the site, kept out of search results. |
 | Graceful degradation | resilience | Reveal animations run off CSS alone and always play to completion, so content never depends on JS to appear; a `<noscript>` style block in the `<head>` switches the motion off entirely when scripting is unavailable, and on the home page lays the map out as a list. On the home map, whose markers wait for its script, a plain list of the map's links replaces them if the script fails to load or throws. |
 | Scrollbar gutter | performance | `scrollbar-gutter: stable` to remove cross-page horizontal shift. |

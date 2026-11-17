@@ -19,8 +19,8 @@ import portrait from '../assets/sticker.png';
 const nodes = await getDiagramNodes();
 
 // Every drawing in this folder lands on the map's texture, with nothing else to
-// wire up. Each is drawn in `currentColor`, so `.decor` below colours them all,
-// and each has its own width knob below, named after its file.
+// wire up. Each is drawn in `currentColor`, so `.decor` below colours it, and
+// each has its own width and colour knobs below, named after its file.
 const decorations = Object.entries(
   import.meta.glob<SvgComponent & ImageMetadata>('../assets/decor/*.svg', {
     eager: true,
@@ -265,7 +265,7 @@ const fallbackLinks = [
           class="decor"
           width="0"
           height="0"
-          style={`--decor-frame: ${Drawing.width}; --decor-width: var(--decor-${name})`}
+          style={`--decor-frame: ${Drawing.width}; --decor-width: var(--decor-${name}); --decor-color: var(--decor-${name}-color)`}
           data-balloon={balloons.has(name) ? '' : undefined}
           aria-hidden="true"
           focusable="false"
@@ -420,6 +420,13 @@ const fallbackLinks = [
     --decor-proposta-de-valor: 14rem;
     --decor-proposta-de-valor-wide: 20rem;
 
+    /* Each drawing's colour, named after its file. One with none takes
+       --ink-decor. */
+    --decor-flag-color: var(--ink-decor);
+    --decor-compass-color: var(--ink-decor);
+    --decor-kraken-color: var(--ink-decor);
+    --decor-proposta-de-valor-color: var(--ink-decor);
+
     /* The size of a drawing with no width above, per unit of its viewBox, and
        on a large screen. */
     --decor-scale: calc(4rem / 400);
@@ -536,7 +543,7 @@ const fallbackLinks = [
     z-index: -1;
     width: var(--decor-width, calc(var(--decor-frame) * var(--decor-scale)));
     height: auto;
-    color: var(--ink-decor);
+    color: var(--decor-color, var(--ink-decor));
     pointer-events: none;
     translate: var(--decor-x, 0) var(--decor-y, 0);
     opacity: 0;
@@ -860,7 +867,6 @@ const fallbackLinks = [
     font-weight: var(--weight-bold);
     letter-spacing: var(--tracking-tight);
     text-transform: none;
-    color: var(--ink-2);
   }
 
   /* --- Floating rings --------------------------------------------------- */

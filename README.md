@@ -49,7 +49,7 @@ No secrets are needed.
 - **Mini-map.** About and every case study end with the map's pages in one straight line, the current page filled in.
 - **Locked case studies.** A case study can be locked: its text is encrypted at build time and decrypted in the reader's browser with a passphrase. None is locked right now.
 - **Fonts.** Atkinson Hyperlegible Next and Mono, served from the site itself, not from Google Fonts.
-- **Privacy and security.** A strict Content Security Policy allows no third-party scripts. The email address is obfuscated, so it never appears in the HTML or the repo. GoatCounter counts visits, in deploy builds only, with no cookie and nothing stored in the browser: the site's own script sends the page, the referring site (never the page on it), a campaign tag and the screen width, and counts clicks on contact and outbound links, CV prints and map cards opened ([Track where visits come from](#track-where-visits-come-from)). Without scripting, a hidden image counts the page alone.
+- **Privacy and security.** A strict Content Security Policy allows no third-party scripts. The email address is obfuscated, so it never appears in the HTML or the repo. GoatCounter counts visits, in deploy builds only, with no cookie and nothing stored in the browser: the site's own script sends the page, the referring site (never the page on it), a source or campaign tag and the screen width, and counts clicks on contact and outbound links, CV prints and map cards opened ([Track where visits come from](#track-where-visits-come-from)). Without scripting, a hidden image counts the page alone.
 - **Metadata.** Open Graph link previews (one image for every page), JSON-LD, a sitemap, `/robots.txt` and `/llms.txt`.
 - **Old addresses.** Pages that moved still answer at their old addresses ([Old links](#old-links)).
 - **Standards.** Audited against [The Website Specification](https://specification.website); `SPEC-COMPLIANCE.md` lists what's done and what's pending.
@@ -193,14 +193,14 @@ A character outside the Latin set (such as ł or ș) shows in the fallback font.
 
 ### Track where visits come from
 
-Visits show up on the [GoatCounter dashboard](https://freenandes.goatcounter.com). A visit from another site lists that site under Top referrers. For a link with no referrer, such as one in the PDF of the CV, an email or a job application, add a `ref` tag, which the Campaigns panel lists:
+Visits show up on the [GoatCounter dashboard](https://freenandes.goatcounter.com). A visit from another site lists that site under Top referrers. A link with no referrer, such as one in the PDF of the CV, an email or a job application, can name its own source with `ref` (or `utm_source`), which Top referrers lists in place of the site. To group links under a name in the Campaigns panel, add `utm_campaign` too:
 
 ```
 https://www.pmcf.xyz/?ref=cv-pdf
-https://www.pmcf.xyz/peak-systems-at-percona/?ref=acme-application
+https://www.pmcf.xyz/peak-systems-at-percona/?ref=acme&utm_campaign=job-applications
 ```
 
-`utm_source` and `utm_campaign` work too. Every other parameter in the address stays on the reader's side. Events are listed with the pages, under these names:
+Every other parameter in the address stays on the reader's side. Screen widths show in the dashboard's Size stats widget. Events are listed with the pages, under these names:
 
 | Event | Counted when a reader |
 | --- | --- |

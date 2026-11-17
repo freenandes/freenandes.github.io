@@ -42,9 +42,10 @@ function optedOut() {
   }
 }
 
-/** Query keys GoatCounter reads as a campaign (`?ref=cv-pdf`). Nothing else in
- *  the address is sent. */
-const CAMPAIGN_KEYS = ['ref', 'utm_source', 'utm_campaign'];
+/** Query keys GoatCounter reads: `ref` and `utm_source` name the source in
+ *  place of the referrer (`?ref=cv-pdf`), and `utm_campaign` files the visit
+ *  under a campaign. Nothing else in the address is sent. */
+const TAG_KEYS = ['ref', 'utm_source', 'utm_campaign'];
 
 /** The page's address as GoatCounter files it: the canonical path, as the
  *  noscript image sends it, or, on a page without one (the 404), the address
@@ -85,7 +86,7 @@ function countVisit() {
   }
   const query = new URLSearchParams();
   for (const [key, value] of new URLSearchParams(location.search)) {
-    if (CAMPAIGN_KEYS.includes(key)) query.set(key, value);
+    if (TAG_KEYS.includes(key)) query.set(key, value);
   }
   send({
     p: pagePath(),

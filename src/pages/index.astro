@@ -15,6 +15,7 @@ import { withBase } from '../lib/base';
 import { getDiagramNodes, polygon } from '../lib/diagram';
 import { site } from '../site.config';
 import portrait from '../assets/sticker.png';
+import postIt from '../assets/post-it.webp';
 
 const nodes = await getDiagramNodes();
 
@@ -169,6 +170,7 @@ const fallbackLinks = [
                     >
                       {/* Sized for a page whose stylesheet hasn't loaded. */}
                       <svg
+                        style={`--marker-shape-size: var(--marker-size-${node.shape ?? 'pentagon'})`}
                         viewBox="0 0 20 20"
                         width="16"
                         height="16"
@@ -266,6 +268,7 @@ const fallbackLinks = [
           width="0"
           height="0"
           style={`--decor-frame: ${Drawing.width}; --decor-width: var(--decor-${name}); --decor-color: var(--decor-${name}-color)`}
+          data-decor={name}
           data-balloon={balloons.has(name) ? '' : undefined}
           aria-hidden="true"
           focusable="false"
@@ -288,6 +291,21 @@ const fallbackLinks = [
       src={portrait}
       alt={`Sticker of ${site.name} in a training suit and a cap that says "Run"`}
       width={160}
+      densities={[1, 2, 3]}
+      format="webp"
+      loading="eager"
+      decoding="async"
+      draggable="false"
+    />
+    {/* The post-it lands like a drawing: anywhere clear of the map, at a new
+        spot on each load, and hidden when there's no room. Which of them
+        show first on a small screen is `decorOrder` in the map script. */}
+    <Image
+      class="post-it"
+      data-decor="post-it"
+      src={postIt}
+      alt="Post-it note: “We listen: users, customers, events”"
+      width={144}
       densities={[1, 2, 3]}
       format="webp"
       loading="eager"
@@ -403,9 +421,17 @@ const fallbackLinks = [
   .diagram {
     --topo-size: 150rem; /* width of one tile of the contour texture */
     --topo-opacity: 0.1;
-    --marker-size: 1rem;
-    --marker-size-identity: 1.25rem; /* the name at the centre */
-    --link-width: 1.375; /* connector stroke */
+
+    /* Each marker shape's size, so a light one like the triangle can be drawn
+       bigger to look as big as the rest. Its outline stays as thick. */
+    --marker-size-star: 1.28125rem; /* the main one */
+    --marker-size-triangle: 1.1875rem;
+    --marker-size-square: 1.15625rem;
+    --marker-size-pentagon: 1.09375rem;
+    --marker-stroke: 2; /* a marker's outline, in px */
+    --marker-stroke-identity: 2;
+
+    --link-width: 1.75; /* connector stroke */
     --card-width: 20rem; /* widest a card gets (never more than 90vw) */
     --ring-turn: 30s; /* one full turn of a floating ring */
 
@@ -414,9 +440,9 @@ const fallbackLinks = [
     --decor-flag: 4rem;
     --decor-flag-wide: 5rem;
     --decor-compass: 14rem;
-    --decor-compass-wide: 20rem;
+    --decor-compass-wide: 18rem;
     --decor-kraken: 12rem;
-    --decor-kraken-wide: 16rem;
+    --decor-kraken-wide: 14rem;
     --decor-proposta-de-valor: 14rem;
     --decor-proposta-de-valor-wide: 20rem;
 
@@ -475,6 +501,10 @@ const fallbackLinks = [
     --sticker-shadow-y: 0.125rem;
     --sticker-shadow-blur: 0.25rem;
     --sticker-shadow-color: rgb(0 0 0 / 33%);
+
+    /* The post-it note's width. It lands anywhere clear of the map, like the
+       drawings (KNOBS.decor in the script sets its clearances). */
+    --post-it-width: clamp(7rem, 20vw, 9rem);
 
     position: relative;
     width: 100%;
@@ -620,6 +650,34 @@ const fallbackLinks = [
 
     .diagram.is-mounted .sticker {
       animation-play-state: running;
+    }
+  }
+
+  /* The post-it shares the drawings' layer and placement: the script writes
+     its spot once the map is at rest. Until then, or with no room, it's
+     hidden, from screen readers too. */
+
+  .post-it {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: var(--post-it-width);
+    height: auto;
+    translate: var(--decor-x, 0) var(--decor-y, 0);
+    visibility: hidden;
+    pointer-events: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .post-it[data-placed] {
+    visibility: visible;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .post-it[data-placed] {
+      animation: node-in var(--dur) var(--ease);
     }
   }
 
@@ -790,9 +848,11 @@ const fallbackLinks = [
     cursor: grabbing;
   }
 
+  /* The markup gives each its shape's size knob. */
+
   .node button svg {
-    width: var(--marker-size);
-    height: var(--marker-size);
+    width: var(--marker-shape-size);
+    height: var(--marker-shape-size);
     overflow: visible;
     flex: none;
     transition: transform var(--dur-fast) var(--ease);
@@ -801,18 +861,13 @@ const fallbackLinks = [
   .node button polygon {
     fill: var(--paper);
     stroke: var(--ink);
-    stroke-width: 1.75;
+    stroke-width: var(--marker-stroke);
     vector-effect: non-scaling-stroke;
     transition: fill var(--dur-fast) var(--ease), stroke var(--dur-fast) var(--ease);
   }
 
-  .node--identity button svg {
-    width: var(--marker-size-identity);
-    height: var(--marker-size-identity);
-  }
-
   .node--identity button polygon {
-    stroke-width: 2;
+    stroke-width: var(--marker-stroke-identity);
   }
 
   /* Hover and keyboard focus only light a marker up; a card opens on a click,

@@ -10,6 +10,7 @@
    ============================================================================= */
 
 import { diagramNodes, diagramChain, type DiagramEntry } from '../diagram.config';
+import { countEvent } from './count';
 
 /* --- Knobs -------------------------------------------------------------------
    The values worth turning, in one place; everything below them is machinery.
@@ -1756,6 +1757,8 @@ export function initDiagram(root: HTMLElement) {
       const wasOpen = isOpen(n);
       closeAll(n);
       setOpen(n, !wasOpen);
+      // Which cards readers open says what draws them, clicked through or not.
+      if (!wasOpen) countEvent(`map/${n.cfg.id}`, n.panel?.getAttribute('aria-label') ?? n.cfg.id);
     });
   }
 

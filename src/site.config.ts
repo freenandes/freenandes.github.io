@@ -27,9 +27,9 @@ export interface SiteConfig {
   /** Home-screen name, and the tint browsers paint their own UI with. */
   shortName: string;
   themeColor: string;
-  /** GoatCounter's count endpoint, loaded by every page as a hidden image (no
-   *  script, no cookie). Only deploy builds (COUNT_VISITS=true) include it, so
-   *  local builds never count. */
+  /** GoatCounter's count endpoint, which `src/scripts/count.ts` sends every
+   *  visit and event to (no cookie). Only deploy builds (COUNT_VISITS=true)
+   *  include it, so local builds never count. */
   visitCounter: string;
 }
 

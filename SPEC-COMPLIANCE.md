@@ -71,9 +71,13 @@ Re-evaluate if the site grows to include these:
   data tables** (no tables), **feed discovery/hygiene** (no RSS/Atom feed), **breadcrumb UI**
   (single-level depth; JSON-LD breadcrumbs are present).
 - **Privacy policy / cookie consent / GPC**: the site sets no cookies and stores nothing in the
-  browser. Visits are counted by GoatCounter through a hidden image with no script: it sees the
-  page, the browser and the country from that one request, and keeps no IP address. Add a
-  privacy policy if the site ever collects more.
+  browser. Visits are counted by GoatCounter (`src/scripts/count.ts`): it gets the page, the
+  referring site's origin (never the page on it), a campaign tag (`ref`, `utm_source`,
+  `utm_campaign`; no other query parameter), the screen width, and clicks on the email address,
+  outbound links, print and the map's cards. It sees the browser and the country from the
+  request and keeps no IP address. Without scripting, a hidden image sends the page alone. None
+  of this identifies a person, so no consent banner is needed; a short privacy note would still
+  be good practice.
 - **Internationalisation** (hreflang, RTL, language switcher, locale formatting, plural rules):
   the site is single-language (`en`). `<html lang>` and `og:locale` are set.
 - **Form labels/errors, mobile input types**: the only form is the passphrase gate, which already

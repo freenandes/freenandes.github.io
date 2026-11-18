@@ -17,6 +17,7 @@ import { site } from '../site.config';
 import portrait from '../assets/sticker.png';
 import postIt from '../assets/post-it.webp';
 import postItYellow from '../assets/post-it-yellow.webp';
+import notebook from '../assets/notebook.webp';
 
 const nodes = await getDiagramNodes();
 
@@ -331,6 +332,24 @@ const fallbackLinks = [
       decoding="async"
       draggable="false"
     />
+    {/* The sketchbook lands like the post-its, after them in `decorOrder`,
+        and keeps its distance from them and the portrait where it can
+        (`decorBerth` in the map script). `data-tilt` has the script pick its
+        tilt once per page load. Its `width` is the top of `--notebook-width`
+        in pixels, as the post-its' are. */}
+    <Image
+      class="notebook"
+      data-decor="notebook"
+      data-tilt
+      src={notebook}
+      alt="Sketchbook open on a sitemap and a wireframe of a travel site's home page"
+      width={136}
+      densities={[1, 2, 3]}
+      format="webp"
+      loading="eager"
+      decoding="async"
+      draggable="false"
+    />
     {/* Each marker's preview floats over everything while the pointer is on
         the marker, so it's the last thing in the map. It only entices: the
         card says the same in words, so it's hidden from assistive tech. */}
@@ -531,6 +550,13 @@ const fallbackLinks = [
     /* Raising either top size means raising that image's `width` in the
        markup, or a 1x screen draws it blurry. */
 
+    /* The sketchbook: smaller than the portrait, so it doesn't compete with
+       it, and tilted within this range, picked once per page load. It wears
+       the portrait's shadow. The same rule about its top width applies. */
+    --notebook-width: clamp(6.5rem, 18vw, 8.5rem);
+    --notebook-tilt: 0deg;
+    --notebook-tilt-range: 7deg;
+
     position: relative;
     width: 100%;
     height: 100svh;
@@ -678,11 +704,12 @@ const fallbackLinks = [
     }
   }
 
-  /* The post-its share the drawings' layer and placement: the script writes
-     each one's spot once the map is at rest. Until then, or with no room, it's
-     hidden, from screen readers too. */
+  /* The post-its and the sketchbook share the drawings' layer and placement:
+     the script writes each one's spot once the map is at rest. Until then, or
+     with no room, it's hidden, from screen readers too. */
 
-  .post-it {
+  .post-it,
+  .notebook {
     position: absolute;
     top: 0;
     left: 0;
@@ -696,12 +723,25 @@ const fallbackLinks = [
     user-select: none;
   }
 
-  .post-it[data-placed] {
+  /* The script sets `--decor-rt` (-1 to 1) once per page load. */
+
+  .notebook {
+    width: var(--notebook-width);
+    rotate: calc(var(--notebook-tilt) + var(--decor-rt, 0) * var(--notebook-tilt-range));
+    filter: drop-shadow(
+      var(--sticker-shadow-x) var(--sticker-shadow-y) var(--sticker-shadow-blur)
+        var(--sticker-shadow-color)
+    );
+  }
+
+  .post-it[data-placed],
+  .notebook[data-placed] {
     visibility: visible;
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .post-it[data-placed] {
+    .post-it[data-placed],
+    .notebook[data-placed] {
       animation: node-in var(--dur) var(--ease);
     }
   }

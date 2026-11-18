@@ -302,14 +302,16 @@ const fallbackLinks = [
         new spot on each load, and hidden when there's no room. Which of them
         show first on a small screen is `decorOrder` in the map script. The
         yellow one is glued under the blue one (`glued` there), so it comes
-        first, to be covered. */}
+        first, to be covered. Each one's `width` is the top of its width knob
+        (`--post-it-width`, `--post-it-yellow-width`) in pixels, so a 1x
+        screen gets a file it never has to enlarge. */}
     <Image
       class="post-it"
       data-decor="post-it-yellow"
       style="--post-it-size: var(--post-it-yellow-width)"
       src={postItYellow}
       alt="Post-it note: “We build quality software”"
-      width={144}
+      width={156}
       densities={[1, 2, 3]}
       format="webp"
       loading="eager"
@@ -322,7 +324,7 @@ const fallbackLinks = [
       style="--post-it-size: var(--post-it-width)"
       src={postIt}
       alt="Post-it note: “We listen: users, customers, events”"
-      width={144}
+      width={168}
       densities={[1, 2, 3]}
       format="webp"
       loading="eager"
@@ -468,7 +470,7 @@ const fallbackLinks = [
     --decor-flag-color: var(--ink-decor);
     --decor-compass-color: var(--ink-decor);
     --decor-kraken-color: var(--ink-decor);
-    --decor-proposta-de-valor-color: var(--ink-decor);
+    --decor-proposta-de-valor-color: var(--ink-faint);
 
     /* The size of a drawing with no width above, per unit of its viewBox, and
        on a large screen. */
@@ -525,6 +527,9 @@ const fallbackLinks = [
        they overlap). */
     --post-it-width: clamp(8rem, 23vw, 10.5rem);
     --post-it-yellow-width: clamp(7.5rem, 21.5vw, 9.75rem);
+
+    /* Raising either top size means raising that image's `width` in the
+       markup, or a 1x screen draws it blurry. */
 
     position: relative;
     width: 100%;

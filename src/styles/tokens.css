@@ -6,15 +6,9 @@
   --paper-2: #f4f4f4;
   --ink: #111;
   --ink-2: #525252;
-
-  /* Tertiary text, the lightest text colour: keep it at WCAG AA (4.5:1) or
-     above on both papers. */
   --ink-3: #686868;
-
-  /* Faint ink for decoration and disabled controls; never text. */
   --ink-faint: #a8a8a8;
 
-  /* The drawings on the map's texture; lighter still, and never text. */
   --ink-decor: #d4d4d4;
   --line-soft: rgb(0 0 0 / 4%);
   --line: rgb(0 0 0 / 8%);

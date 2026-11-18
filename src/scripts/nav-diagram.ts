@@ -1228,8 +1228,10 @@ export function initDiagram(root: HTMLElement) {
       if (spot === d.spot) return;
       d.spot = spot;
       d.el.removeAttribute('data-placed');
-      d.el.style.setProperty('--decor-x', `${spot.x - ink.x}px`);
-      d.el.style.setProperty('--decor-y', `${spot.y - ink.y}px`);
+      // Whole pixels: a picture moved by a fraction of one is resampled, and
+      // a post-it goes soft on a 1x screen.
+      d.el.style.setProperty('--decor-x', `${Math.round(spot.x - ink.x)}px`);
+      d.el.style.setProperty('--decor-y', `${Math.round(spot.y - ink.y)}px`);
       // Reading layout ends the last fade, so this one starts from nothing.
       void d.el.getBoundingClientRect();
       d.el.setAttribute('data-placed', '');

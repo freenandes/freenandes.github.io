@@ -66,9 +66,9 @@ Each page owns its markup and styles. Values worth tuning are named knobs at the
 | `<head>`, metadata, CSP, page shell | `src/layouts/Base.astro` |
 | Site URL, base path, fonts, redirects from old addresses | `astro.config.mjs` |
 | Home: markers, card copy, preview alt text, the chain they connect in | `src/diagram.config.ts` |
-| Home: look, and knobs for the texture, markers, cards, rings, previews, popups, drawings, sticker, post-it and ruler | the top of the `<style>` in `src/pages/index.astro` |
+| Home: look, and knobs for the texture, markers, cards, rings, previews, popups, drawings, sticker, post-its and ruler | the top of the `<style>` in `src/pages/index.astro` |
 | Home: marker spacing, connector shapes, where cards open, entrance timing, physics, which drawings show first and how crowded the map may get | `KNOBS` and `SIM` at the top of `src/scripts/nav-diagram.ts` |
-| Home: the drawings, the ruler, the portrait sticker, the post-it, the case-study previews | `src/assets/decor/`, `src/assets/ruler.svg`, `src/assets/sticker.png`, `src/assets/post-it.webp`, `src/assets/previews/<marker id>.png` |
+| Home: the drawings, the ruler, the portrait sticker, the post-its, the case-study previews | `src/assets/decor/`, `src/assets/ruler.svg`, `src/assets/sticker.png`, `src/assets/post-it.webp`, `src/assets/post-it-yellow.webp`, `src/assets/previews/<marker id>.png` |
 | About: look, print rules, and the `--cv-*` spacing knobs | `src/pages/about.astro` |
 | About: content, and which fields it takes | `src/content/cv.md`, `src/content.config.ts` |
 | Case study: text, images and videos | `src/content/projects/<slug>.mdx`, `src/assets/projects/<slug>/` |
@@ -141,7 +141,7 @@ A lower `-crf` is sharper and bigger: 22 suits a short video, and a long, busy o
 
 4. Give it a place in `decorOrder` at the top of `src/scripts/nav-diagram.ts`, which says which drawings show first when room is short. Without one, it comes last.
 
-Each drawing, and the post-it, gets a random free spot once the map settles. They claim room in `decorOrder` until the canvas is covered as far as `KNOBS.decor.coverage` allows; once one is left out, so is everything after it, except those in `decorAlways`. One with no room stays hidden, which for a big drawing can mean never on a phone.
+Each drawing, and each post-it, gets a random free spot once the map settles; the yellow post-it is glued under the blue one, which covers one of its top corners (`glued` in `KNOBS`). They claim room in `decorOrder` until the canvas is covered as far as `KNOBS.decor.coverage` allows; once one is left out, so is everything after it, except those in `decorAlways`. One with no room stays hidden, which for a big drawing can mean never on a phone.
 
 ### Lock a case study
 

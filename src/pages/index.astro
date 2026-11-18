@@ -16,6 +16,7 @@ import { getDiagramNodes, polygon } from '../lib/diagram';
 import { site } from '../site.config';
 import portrait from '../assets/sticker.png';
 import postIt from '../assets/post-it.webp';
+import postItYellow from '../assets/post-it-yellow.webp';
 
 const nodes = await getDiagramNodes();
 
@@ -297,12 +298,28 @@ const fallbackLinks = [
       decoding="async"
       draggable="false"
     />
-    {/* The post-it lands like a drawing: anywhere clear of the map, at a new
-        spot on each load, and hidden when there's no room. Which of them
-        show first on a small screen is `decorOrder` in the map script. */}
+    {/* The post-its land like the drawings: anywhere clear of the map, at a
+        new spot on each load, and hidden when there's no room. Which of them
+        show first on a small screen is `decorOrder` in the map script. The
+        yellow one is glued under the blue one (`glued` there), so it comes
+        first, to be covered. */}
+    <Image
+      class="post-it"
+      data-decor="post-it-yellow"
+      style="--post-it-size: var(--post-it-yellow-width)"
+      src={postItYellow}
+      alt="Post-it note: “We build quality software”"
+      width={144}
+      densities={[1, 2, 3]}
+      format="webp"
+      loading="eager"
+      decoding="async"
+      draggable="false"
+    />
     <Image
       class="post-it"
       data-decor="post-it"
+      style="--post-it-size: var(--post-it-width)"
       src={postIt}
       alt="Post-it note: “We listen: users, customers, events”"
       width={144}
@@ -502,9 +519,12 @@ const fallbackLinks = [
     --sticker-shadow-blur: 0.25rem;
     --sticker-shadow-color: rgb(0 0 0 / 33%);
 
-    /* The post-it note's width. It lands anywhere clear of the map, like the
-       drawings (KNOBS.decor in the script sets its clearances). */
-    --post-it-width: clamp(7rem, 20vw, 9rem);
+    /* The post-it notes' widths: the blue one, and the yellow one glued under
+       it. They land anywhere clear of the map, like the drawings (KNOBS.decor
+       and KNOBS.glueOverlap in the script set their clearances and how far
+       they overlap). */
+    --post-it-width: clamp(8rem, 23vw, 10.5rem);
+    --post-it-yellow-width: clamp(7.5rem, 21.5vw, 9.75rem);
 
     position: relative;
     width: 100%;
@@ -653,8 +673,8 @@ const fallbackLinks = [
     }
   }
 
-  /* The post-it shares the drawings' layer and placement: the script writes
-     its spot once the map is at rest. Until then, or with no room, it's
+  /* The post-its share the drawings' layer and placement: the script writes
+     each one's spot once the map is at rest. Until then, or with no room, it's
      hidden, from screen readers too. */
 
   .post-it {
@@ -662,7 +682,7 @@ const fallbackLinks = [
     top: 0;
     left: 0;
     z-index: -1;
-    width: var(--post-it-width);
+    width: var(--post-it-size);
     height: auto;
     translate: var(--decor-x, 0) var(--decor-y, 0);
     visibility: hidden;

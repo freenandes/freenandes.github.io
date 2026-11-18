@@ -72,7 +72,7 @@ export const diagramNodes: DiagramEntry[] = [
     label: 'About/CV',
     kind: 'about',
     shape: 'pentagon',
-    tagline: 'I design interfaces for complex technical software.',
+    tagline: 'I design interfaces for technical software.',
     lines: [
       'I help teams decide what’s worth building, then take it all the way: from user research and information architecture to prototypes, design systems, and the front-end code that ships them.',
     ],
@@ -97,7 +97,7 @@ export const diagramNodes: DiagramEntry[] = [
     tagline:
       "The systems case. Giving PMM its own interface and a foundation for new apps.",
     lines: [
-      "I designed a native interface for Percona’s database monitoring platform and helped build Peak UI design system. Grafana upgrade work fell from weeks to days, and two more teams shipped six preview apps.",
+      "I designed a native interface for Percona’s database monitoring platform and helped build Peak UI design system. Grafana upgrade work fell from weeks to days, and two more teams felt empowered to ship six extensions due to it.",
     ],
     preview:
       'PMM’s Updates page while an update runs: step 1 of 2, updating PMM Server to 3.0.2, with its progress bar and a Cancel Update link.',

@@ -27,7 +27,15 @@ const KNOBS = {
   inset: {
     x: { base: 0.12, narrow: 0.1, max: 160 },
     y: { base: 0.08, narrow: 0, min: 56, max: 150 },
+    /** On a landscape screen the side margin is at most `min` on a canvas
+     *  `from` wide or less, growing to `max` at `to` wide, so a small laptop
+     *  or a tablet held sideways spreads the map across more of its width.
+     *  From `to` up, `x` alone decides. */
+    landscapeX: { from: 1000, min: 36, to: 1440, max: 160 },
   },
+  /** Space a marker's box (marker plus label, or a ring) keeps from the
+   *  canvas's sides, whatever the margin above. */
+  markerEdge: 16,
   /** Space kept between two markers' boxes (marker plus label). */
   markerGap: {
     x: { base: 34, narrow: -12 },
@@ -78,8 +86,13 @@ const KNOBS = {
    *  shows only while there's room and coverage left, and once one is left
    *  out, so is everything after it, except the `decorAlways` ones, which
    *  show whenever there's room. A drawing not listed comes last. */
-  decorOrder: ['flag', 'post-it', 'proposta-de-valor', 'compass', 'kraken'],
+  decorOrder: ['flag', 'post-it', 'post-it-yellow', 'proposta-de-valor', 'compass', 'kraken'],
   decorAlways: ['flag'],
+  /** Notes glued under another, by name. Each lands only with the note it's
+   *  under, which covers one of its top corners, picked at random on each
+   *  landing, by `glueOverlap` of the top note's own width and height. */
+  glued: { 'post-it-yellow': 'post-it' },
+  glueOverlap: { x: 0.3, y: 0.35 },
   /** How far a speech-balloon drawing (`data-balloon` in index.astro) may sit
    *  from the portrait sticker's box. One with no room that close lands
    *  anywhere, like the other drawings. */
@@ -309,8 +322,12 @@ export function initDiagram(root: HTMLElement) {
     const narrow = narrowness();
     // Labels are centered under the dot and extend to each side, so the
     // horizontal margin grows a little on narrow viewports.
-    const { x, y } = KNOBS.inset;
-    const mx = Math.min((x.base + x.narrow * narrow) * W, x.max);
+    const { x, y, landscapeX: lx } = KNOBS.inset;
+    let mx = Math.min((x.base + x.narrow * narrow) * W, x.max);
+    if (viewportLandscape()) {
+      const t = Math.max(0, Math.min(1, (W - lx.from) / (lx.to - lx.from)));
+      mx = Math.min(mx, lx.min + t * (lx.max - lx.min));
+    }
     const my = Math.max(y.min, Math.min((y.base + y.narrow * narrow) * H, y.max));
     // The bottom margin holds even the tallest marker's box clear of the ruler.
     const tallest = Math.max(...nodes.filter((n) => !n.floating).map((n) => nodeHalf(n).y));
@@ -499,6 +516,15 @@ export function initDiagram(root: HTMLElement) {
     return { x: Math.max(r.width, 48) / 2, y: Math.max(r.height, 40) / 2 };
   }
 
+  /** A marker's x held inside the side margins, and its whole box, label or
+   *  ring included, `KNOBS.markerEdge` clear of the canvas's sides. */
+  function clampX(n: Node, x: number, mx: number, iw: number) {
+    const reach = nodeHalf(n).x + KNOBS.markerEdge;
+    const lo = Math.max(mx + 6, reach);
+    const hi = Math.min(mx + iw - 6, W - reach);
+    return lo <= hi ? Math.max(lo, Math.min(hi, x)) : W / 2;
+  }
+
   function sepPad() {
     const narrow = narrowness();
     const { x, y } = KNOBS.markerGap;
@@ -557,7 +583,7 @@ export function initDiagram(root: HTMLElement) {
           py[i] += off.y;
           moved = Math.max(moved, Math.hypot(off.x, off.y));
         }
-        px[i] = Math.max(mx + 6, Math.min(mx + iw - 6, px[i]));
+        px[i] = clampX(nodes[i], px[i], mx, iw);
         py[i] = Math.max(my + 6, Math.min(my + ih - 6, py[i]));
       }
       if (moved < 0.3) break;
@@ -590,7 +616,7 @@ export function initDiagram(root: HTMLElement) {
         const midY = (p.ay + nx.ay) / 2;
         const urgency = Math.min(1, (cos - cosLimit) / (1 - cosLimit));
         const k = 0.12 + 0.18 * urgency;
-        const newX = Math.max(mx + 6, Math.min(mx + iw - 6, c.ax + (midX - c.ax) * k));
+        const newX = clampX(c, c.ax + (midX - c.ax) * k, mx, iw);
         const newY = Math.max(my + 6, Math.min(my + ih - 6, c.ay + (midY - c.ay) * k));
         const adj = Math.hypot(newX - c.ax, newY - c.ay);
         c.ax = newX;
@@ -764,7 +790,7 @@ export function initDiagram(root: HTMLElement) {
           hit = true;
         }
         if (!hit) continue;
-        n.ax = Math.max(mx + 6, Math.min(mx + iw - 6, n.ax + pushX * 0.5));
+        n.ax = clampX(n, n.ax + pushX * 0.5, mx, iw);
         n.ay = Math.max(
           my + 6,
           Math.min(my + ih - 6, floor - nodeHalf(n).y, n.ay + pushY * 0.5),
@@ -960,7 +986,7 @@ export function initDiagram(root: HTMLElement) {
         }
       }
       for (const n of nodes) {
-        n.ax = Math.max(mx + 6, Math.min(mx + iw - 6, n.ax));
+        n.ax = clampX(n, n.ax, mx, iw);
         n.ay = Math.max(my + 6, Math.min(my + ih - 6, n.ay));
       }
       if (maxPush < 0.4) break;
@@ -1061,9 +1087,10 @@ export function initDiagram(root: HTMLElement) {
    * texture, so the simulation doesn't know about them. They claim room in
    * `KNOBS.decorOrder` while there's room and `KNOBS.decor.coverage` lasts, and
    * once one is left out, so is everything after it, except the `decorAlways`
-   * ones. One stays exactly where it is for as long as the map and those
-   * before it leave it clear, and one moving looks for a spot that moves none
-   * after it before taking one that does.
+   * ones. A note in `KNOBS.glued` lands only with the one over it. One stays
+   * exactly where it is for as long as the map and those before it leave it
+   * clear, and one moving looks for a spot that moves none after it before
+   * taking one that does.
    */
   function settleDecor() {
     const isBalloon = (d: Decor) => d.el.hasAttribute('data-balloon');
@@ -1118,13 +1145,32 @@ export function initDiagram(root: HTMLElement) {
       .map((d) => ({ d, ink: measureDecor(d.el) }))
       .sort((a, b) => rank(a.d) - rank(b.d) || area(b.ink) - area(a.ink));
 
-    /** Where the drawing at `items[at]` can go: first clear of the spots held
-     *  by those after it, and of the room a balloon after it wants beside the
-     *  sticker; failing that, anywhere clear. A balloon tries beside the
-     *  sticker before anywhere else. */
-    function findSpot(at: number) {
+    type Spot = { x: number; y: number };
+    type Item = (typeof items)[number];
+    const glued = KNOBS.glued as Record<string, string>;
+
+    /** The note glued under `items[at]`, if any. */
+    const stuckUnder = (at: number) => items.find((o) => glued[nameOf(o.d)] === nameOf(items[at].d));
+
+    /** Where a note glued under one at `base` sits, so that one covers its top
+     *  corner on `side` (-1 left, 1 right) by `KNOBS.glueOverlap` of its own
+     *  box. */
+    function glueSpot(base: Spot, baseInk: Box, stuckInk: Box, side: -1 | 1): Spot {
+      const { x, y } = KNOBS.glueOverlap;
+      return {
+        x: base.x - side * (baseInk.halfX * (1 - 2 * x) + stuckInk.halfX),
+        y: base.y + baseInk.halfY * (1 - 2 * y) + stuckInk.halfY,
+      };
+    }
+
+    /** Where the drawing at `items[at]` can go, with the note glued under it
+     *  when `stuck` is given: first clear of the spots held by those after
+     *  it, and of the room a balloon after it wants beside the sticker;
+     *  failing that, anywhere clear. A balloon tries beside the sticker before
+     *  anywhere else. */
+    function findSpot(at: number, stuck?: Item) {
       const { d, ink } = items[at];
-      const later = items.slice(at + 1);
+      const later = items.slice(at + 1).filter((o) => o !== stuck);
       const soft: Box[] = later.flatMap((o) => (o.d.spot ? [{ ...o.ink, ...o.d.spot }] : []));
       const balloon = later.find((o) => isBalloon(o.d) && !o.d.spot);
       if (portrait && balloon) {
@@ -1134,10 +1180,13 @@ export function initDiagram(root: HTMLElement) {
           halfY: portrait.halfY + KNOBS.balloonReach + 2 * balloon.ink.halfY,
         });
       }
-      const search = (pick: () => { x: number; y: number }, avoid: Box[]) => {
+      const search = (pick: () => Spot, avoid: Box[]) => {
         for (let i = 0; i < tries; i++) {
-          const p = pick();
-          if (fits(p.x, p.y, ink, avoid)) return p;
+          const spot = pick();
+          if (!fits(spot.x, spot.y, ink, avoid)) continue;
+          if (!stuck) return { spot, glued: null };
+          const g = glueSpot(spot, ink, stuck.ink, Math.random() < 0.5 ? -1 : 1);
+          if (fits(g.x, g.y, stuck.ink, avoid)) return { spot, glued: g };
         }
         return null;
       };
@@ -1153,8 +1202,8 @@ export function initDiagram(root: HTMLElement) {
         }));
       }
       for (const pick of picks) {
-        const spot = search(pick, soft) ?? search(pick, []);
-        if (spot) return spot;
+        const found = search(pick, soft) ?? search(pick, []);
+        if (found) return found;
       }
       return null;
     }
@@ -1162,20 +1211,21 @@ export function initDiagram(root: HTMLElement) {
     // The sticker counts against the coverage too.
     let room = coverage * W * H - (portrait ? area(portrait) : 0);
     let open = true;
-    items.forEach(({ d, ink }, at) => {
-      const always = (KNOBS.decorAlways as readonly string[]).includes(nameOf(d));
-      const stays = d.spot && fits(d.spot.x, d.spot.y, ink) ? d.spot : null;
-      const spot =
-        always || (open && area(ink) <= room) ? (stays ?? findSpot(at)) : null;
+    /** Glued notes already landed with the note over them. */
+    const landed = new Set<Decor>();
+    const held = ({ d, ink }: Item) => (d.spot && fits(d.spot.x, d.spot.y, ink) ? d.spot : null);
+
+    /** Shows `d` at `spot`, or hides it for `null`. One whose spot hasn't
+     *  changed is left as it is. */
+    function land(d: Decor, ink: Box, spot: Spot | null) {
       if (!spot) {
-        if (!always) open = false;
         d.spot = null;
         d.el.removeAttribute('data-placed');
         return;
       }
       room -= area(ink);
       blocks.push({ ...ink, ...spot });
-      if (spot === stays) return;
+      if (spot === d.spot) return;
       d.spot = spot;
       d.el.removeAttribute('data-placed');
       d.el.style.setProperty('--decor-x', `${spot.x - ink.x}px`);
@@ -1183,6 +1233,34 @@ export function initDiagram(root: HTMLElement) {
       // Reading layout ends the last fade, so this one starts from nothing.
       void d.el.getBoundingClientRect();
       d.el.setAttribute('data-placed', '');
+    }
+
+    items.forEach((item, at) => {
+      const { d, ink } = item;
+      if (landed.has(d)) return;
+      const always = (KNOBS.decorAlways as readonly string[]).includes(nameOf(d));
+      // A glued note that didn't land with its note doesn't land at all.
+      if (!always && (!open || area(ink) > room || nameOf(d) in glued)) {
+        open = false;
+        land(d, ink, null);
+        return;
+      }
+      const stays = held(item);
+      const stuck = stuckUnder(at);
+      if (stuck && area(ink) + area(stuck.ink) <= room) {
+        const stuckStays = stays && held(stuck);
+        const pair =
+          stays && stuckStays ? { spot: stays, glued: stuckStays } : findSpot(at, stuck);
+        if (pair?.glued) {
+          land(d, ink, pair.spot);
+          land(stuck.d, stuck.ink, pair.glued);
+          landed.add(stuck.d);
+          return;
+        }
+      }
+      const spot = stays ?? findSpot(at)?.spot ?? null;
+      if (!spot && !always) open = false;
+      land(d, ink, spot);
     });
   }
 

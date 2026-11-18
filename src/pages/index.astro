@@ -17,6 +17,7 @@ import { site } from '../site.config';
 import portrait from '../assets/sticker.png';
 import postIt from '../assets/post-it.webp';
 import postItYellow from '../assets/post-it-yellow.webp';
+import notebook from '../assets/notebook.webp';
 
 const nodes = await getDiagramNodes();
 
@@ -302,14 +303,16 @@ const fallbackLinks = [
         new spot on each load, and hidden when there's no room. Which of them
         show first on a small screen is `decorOrder` in the map script. The
         yellow one is glued under the blue one (`glued` there), so it comes
-        first, to be covered. */}
+        first, to be covered. Each one's `width` is the top of its width knob
+        (`--post-it-width`, `--post-it-yellow-width`) in pixels, so a 1x
+        screen gets a file it never has to enlarge. */}
     <Image
       class="post-it"
       data-decor="post-it-yellow"
       style="--post-it-size: var(--post-it-yellow-width)"
       src={postItYellow}
       alt="Post-it note: “We build quality software”"
-      width={144}
+      width={156}
       densities={[1, 2, 3]}
       format="webp"
       loading="eager"
@@ -322,7 +325,25 @@ const fallbackLinks = [
       style="--post-it-size: var(--post-it-width)"
       src={postIt}
       alt="Post-it note: “We listen: users, customers, events”"
-      width={144}
+      width={168}
+      densities={[1, 2, 3]}
+      format="webp"
+      loading="eager"
+      decoding="async"
+      draggable="false"
+    />
+    {/* The sketchbook lands like the post-its, after them in `decorOrder`,
+        and keeps its distance from them and the portrait where it can
+        (`decorBerth` in the map script). `data-tilt` has the script pick its
+        tilt once per page load. Its `width` is the top of `--notebook-width`
+        in pixels, as the post-its' are. */}
+    <Image
+      class="notebook"
+      data-decor="notebook"
+      data-tilt
+      src={notebook}
+      alt="Sketchbook open on a sitemap and a wireframe of a travel site's home page"
+      width={180}
       densities={[1, 2, 3]}
       format="webp"
       loading="eager"
@@ -468,7 +489,7 @@ const fallbackLinks = [
     --decor-flag-color: var(--ink-decor);
     --decor-compass-color: var(--ink-decor);
     --decor-kraken-color: var(--ink-decor);
-    --decor-proposta-de-valor-color: var(--ink-decor);
+    --decor-proposta-de-valor-color: var(--ink-faint);
 
     /* The size of a drawing with no width above, per unit of its viewBox, and
        on a large screen. */
@@ -525,6 +546,16 @@ const fallbackLinks = [
        they overlap). */
     --post-it-width: clamp(8rem, 23vw, 10.5rem);
     --post-it-yellow-width: clamp(7.5rem, 21.5vw, 9.75rem);
+
+    /* Raising either top size means raising that image's `width` in the
+       markup, or a 1x screen draws it blurry. */
+
+    /* The sketchbook: smaller than the portrait, so it doesn't compete with
+       it, and tilted within this range, picked once per page load. It wears
+       the portrait's shadow. The same rule about its top width applies. */
+    --notebook-width: clamp(9rem, 23.5vw, 11.25rem);
+    --notebook-tilt: 0deg;
+    --notebook-tilt-range: 7deg;
 
     position: relative;
     width: 100%;
@@ -673,11 +704,12 @@ const fallbackLinks = [
     }
   }
 
-  /* The post-its share the drawings' layer and placement: the script writes
-     each one's spot once the map is at rest. Until then, or with no room, it's
-     hidden, from screen readers too. */
+  /* The post-its and the sketchbook share the drawings' layer and placement:
+     the script writes each one's spot once the map is at rest. Until then, or
+     with no room, it's hidden, from screen readers too. */
 
-  .post-it {
+  .post-it,
+  .notebook {
     position: absolute;
     top: 0;
     left: 0;
@@ -691,12 +723,25 @@ const fallbackLinks = [
     user-select: none;
   }
 
-  .post-it[data-placed] {
+  /* The script sets `--decor-rt` (-1 to 1) once per page load. */
+
+  .notebook {
+    width: var(--notebook-width);
+    rotate: calc(var(--notebook-tilt) + var(--decor-rt, 0) * var(--notebook-tilt-range));
+    filter: drop-shadow(
+      var(--sticker-shadow-x) var(--sticker-shadow-y) var(--sticker-shadow-blur)
+        var(--sticker-shadow-color)
+    );
+  }
+
+  .post-it[data-placed],
+  .notebook[data-placed] {
     visibility: visible;
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .post-it[data-placed] {
+    .post-it[data-placed],
+    .notebook[data-placed] {
       animation: node-in var(--dur) var(--ease);
     }
   }

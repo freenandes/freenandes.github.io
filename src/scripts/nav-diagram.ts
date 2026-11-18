@@ -76,18 +76,30 @@ const KNOBS = {
    *  one along the chain. A connector starts `lineLag` after the later of its
    *  two markers; the floating rings land last, `ringStep` apart. */
   entrance: { first: 40, step: 50, lineLag: 40, ringStep: 90 },
-  /** The drawings on the texture and the post-it note: space each keeps from
-   *  markers, rings, connectors and the others, and from the canvas edge, how
-   *  many random spots it tries before staying hidden, and the most of the
-   *  canvas they and the portrait sticker may cover together, so a small
-   *  screen isn't crowded. Their size is in index.astro. */
+  /** The drawings on the texture, the post-its and the sketchbook: space
+   *  each keeps from markers, rings, connectors and the others, and from the
+   *  canvas edge, how many random spots it tries before staying hidden, and
+   *  the most of the canvas they and the portrait sticker may cover together,
+   *  so a small screen isn't crowded. Their size is in index.astro. */
   decor: { gap: 8, edge: 8, tries: 400, coverage: 0.15 },
   /** The order they claim room in, by file name (`post-it` is the note). Each
    *  shows only while there's room and coverage left, and once one is left
    *  out, so is everything after it, except the `decorAlways` ones, which
    *  show whenever there's room. A drawing not listed comes last. */
-  decorOrder: ['flag', 'post-it', 'post-it-yellow', 'proposta-de-valor', 'compass', 'kraken'],
+  decorOrder: [
+    'flag',
+    'post-it',
+    'post-it-yellow',
+    'notebook',
+    'proposta-de-valor',
+    'compass',
+    'kraken',
+  ],
   decorAlways: ['flag'],
+  /** Extra space, by name, a decoration would rather keep from the portrait
+   *  sticker and the decorations already down. It lands closer only when
+   *  nothing that far fits. */
+  decorBerth: { notebook: 48 },
   /** Notes glued under another, by name. Each lands only with the note it's
    *  under, which covers one of its top corners, picked at random on each
    *  landing, by `glueOverlap` of the top note's own width and height. */
@@ -164,8 +176,8 @@ type Rect = { left: number; top: number; right: number; bottom: number };
  *  popup. */
 type Side = 'bottom' | 'top' | 'right' | 'left' | 'center';
 
-/** A drawing on the texture, or the post-it note, and where its centre sits
- *  once it has landed. */
+/** A drawing on the texture, a post-it or the sketchbook, and where its
+ *  centre sits once it has landed. */
 type Decor = { el: SVGSVGElement | HTMLImageElement; spot: { x: number; y: number } | null };
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -175,8 +187,15 @@ export function initDiagram(root: HTMLElement) {
   if (!links) return;
   const svgEl: SVGSVGElement = links;
   const decor: Decor[] = [
-    ...root.querySelectorAll<SVGSVGElement | HTMLImageElement>('.decor, .post-it'),
+    ...root.querySelectorAll<SVGSVGElement | HTMLImageElement>('.decor, .post-it, .notebook'),
   ].map((el) => ({ el, spot: null }));
+  // A tilted one's tilt, within the range index.astro gives it, picked once
+  // per page load, before anything measures it.
+  for (const { el } of decor) {
+    if (el.hasAttribute('data-tilt')) {
+      el.style.setProperty('--decor-rt', (Math.random() * 2 - 1).toFixed(3));
+    }
+  }
   const ruler = root.querySelector<SVGSVGElement>('.ruler');
   const sticker = root.querySelector<HTMLElement>('.sticker');
   // The sticker's spot and tilt within the ranges index.astro gives them, picked
@@ -1058,14 +1077,18 @@ export function initDiagram(root: HTMLElement) {
   }
 
   /** Where a decoration's drawing sits inside its frame. The drawing is what has
-   *  to stay clear, not the empty margins around it. A picture (the post-it)
-   *  fills its frame. */
+   *  to stay clear, not the empty margins around it. A picture (a post-it, the
+   *  sketchbook) fills its frame; a tilted one's box is the one around it as
+   *  tilted, about the middle of its untilted frame. */
   function measureDecor(el: SVGSVGElement | HTMLImageElement): Box {
     const frame = el.getBoundingClientRect();
     if (el instanceof HTMLImageElement) {
-      const halfX = frame.width / 2;
-      const halfY = frame.height / 2;
-      return { x: halfX, y: halfY, halfX, halfY };
+      return {
+        x: el.offsetWidth / 2,
+        y: el.offsetHeight / 2,
+        halfX: frame.width / 2,
+        halfY: frame.height / 2,
+      };
     }
     const parts = [...el.children]
       .map((part) => part.getBoundingClientRect())
@@ -1165,13 +1188,19 @@ export function initDiagram(root: HTMLElement) {
 
     /** Where the drawing at `items[at]` can go, with the note glued under it
      *  when `stuck` is given: first clear of the spots held by those after
-     *  it, and of the room a balloon after it wants beside the sticker;
-     *  failing that, anywhere clear. A balloon tries beside the sticker before
+     *  it, of the room a balloon after it wants beside the sticker, and of
+     *  its `KNOBS.decorBerth`; failing that, anywhere clear. A balloon tries beside the sticker before
      *  anywhere else. */
     function findSpot(at: number, stuck?: Item) {
       const { d, ink } = items[at];
       const later = items.slice(at + 1).filter((o) => o !== stuck);
       const soft: Box[] = later.flatMap((o) => (o.d.spot ? [{ ...o.ink, ...o.d.spot }] : []));
+      const berth = (KNOBS.decorBerth as Record<string, number>)[nameOf(d)] ?? 0;
+      if (berth) {
+        for (const b of portrait ? [portrait, ...down] : down) {
+          soft.push({ ...b, halfX: b.halfX + berth, halfY: b.halfY + berth });
+        }
+      }
       const balloon = later.find((o) => isBalloon(o.d) && !o.d.spot);
       if (portrait && balloon) {
         soft.push({
@@ -1213,6 +1242,8 @@ export function initDiagram(root: HTMLElement) {
     let open = true;
     /** Glued notes already landed with the note over them. */
     const landed = new Set<Decor>();
+    /** The boxes of the decorations down so far. */
+    const down: Box[] = [];
     const held = ({ d, ink }: Item) => (d.spot && fits(d.spot.x, d.spot.y, ink) ? d.spot : null);
 
     /** Shows `d` at `spot`, or hides it for `null`. One whose spot hasn't
@@ -1225,11 +1256,14 @@ export function initDiagram(root: HTMLElement) {
       }
       room -= area(ink);
       blocks.push({ ...ink, ...spot });
+      down.push({ ...ink, ...spot });
       if (spot === d.spot) return;
       d.spot = spot;
       d.el.removeAttribute('data-placed');
-      d.el.style.setProperty('--decor-x', `${spot.x - ink.x}px`);
-      d.el.style.setProperty('--decor-y', `${spot.y - ink.y}px`);
+      // Whole pixels: a picture moved by a fraction of one is resampled, and
+      // a post-it goes soft on a 1x screen.
+      d.el.style.setProperty('--decor-x', `${Math.round(spot.x - ink.x)}px`);
+      d.el.style.setProperty('--decor-y', `${Math.round(spot.y - ink.y)}px`);
       // Reading layout ends the last fade, so this one starts from nothing.
       void d.el.getBoundingClientRect();
       d.el.setAttribute('data-placed', '');

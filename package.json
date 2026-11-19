@@ -12,6 +12,7 @@
     "lint:css": "stylelint \"src/**/*.{css,astro}\"",
     "lint:css:fix": "stylelint \"src/**/*.{css,astro}\" --fix",
     "check:docs": "node scripts/check-docs.mjs",
+    "check:site": "node scripts/check-site.mjs",
     "visual": "node scripts/visual-check.mjs",
     "browsers": "node scripts/browser-check.mjs",
     "prebuild": "node scripts/encrypt-projects.mjs",

@@ -329,6 +329,28 @@ main > section {
   color: var(--ink-3);
 }
 
+/* Numbers hang in the margin like the bullets, in the same smaller type, with
+   a quarter-em space instead of a full one to sit close to the text (a
+   browser that ignores `content` on a marker keeps its own space). Unlike a
+   bullet, a number grows: two digits need more room than a phone's gutter,
+   so below the width where the margin beside the column holds them with a
+   gutter to spare, even next to a scrollbar, the list indents and they sit
+   inside the column.
+   Outside markers end where the text starts either way, so "9." and "10."
+   line up on the dot. */
+.prose ol li::marker {
+  content: counter(list-item) '.\2005';
+  font-size: var(--step--1);
+  font-weight: var(--weight-semibold);
+  color: var(--ink-3);
+}
+
+@media (width < 46rem) {
+  .prose ol {
+    padding-inline-start: 1.5em;
+  }
+}
+
 .prose hr {
   margin-block-start: var(--step-2);
 }

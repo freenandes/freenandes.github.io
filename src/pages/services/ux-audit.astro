@@ -124,13 +124,9 @@ const jsonLd = [
         (src/scripts/site.ts), so the address is never in the HTML; without
         scripting it stays hidden (global.css) and LinkedIn is the way in. */}
     <section id="contact" aria-labelledby="contact-title" data-reveal>
-      <h2 id="contact-title" class="visually-hidden">Contact</h2>
+      <h2 id="contact-title" class="visually-hidden">Email me</h2>
       <p>{data.contact.text}</p>
       <a class="button" data-email={email.token}>{data.contact.button}</a>
-      <p>
-        {data.contact.linkedin}{' '}
-        <a href={linkedin.href}>{linkedin.href.replace(/^https?:\/\/(www\.)?/, '')}</a>
-      </p>
     </section>
   </article>
 </Base>
@@ -139,9 +135,9 @@ const jsonLd = [
   /* --- Knobs ---------------------------------------------------------------- */
   article {
     --audit-section-gap: var(--space-xl); /* above each section's title */
-    --audit-contact-border: 1px solid var(--ink); /* the contact box's frame */
+    --audit-contact-border: 1px solid var(--line-strong); /* the contact box's frame */
     --audit-contact-pad: var(--space-lg);
-    --audit-button-pad: 0.875rem 1.5rem;
+    --audit-button-pad: 0.625rem 0.875rem;
     --audit-placeholder-ratio: 16 / 9;
   }
 
@@ -193,14 +189,6 @@ const jsonLd = [
     margin-block: var(--audit-section-gap) var(--space-lg);
     padding: var(--audit-contact-pad);
     border: var(--audit-contact-border);
-    border-radius: var(--radius-md);
-  }
-
-  #contact p:first-of-type {
-    font-size: var(--step-1);
-    font-weight: var(--weight-bold);
-    line-height: var(--leading-snug);
-    letter-spacing: var(--tracking-tight);
   }
 
   #contact p:last-child {

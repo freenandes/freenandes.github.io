@@ -57,6 +57,11 @@ jobs:
         env:
           COUNT_VISITS: 'true'
 
+      # Links inside the site, the CSP's rules and the UX audit's separation,
+      # checked in the pages just built.
+      - name: Check built site
+        run: npm run check:site
+
       - name: Upload artifact
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3

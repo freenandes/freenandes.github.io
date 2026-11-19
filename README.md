@@ -17,6 +17,7 @@ The repo also serves a page the portfolio keeps apart: the UX audit service, for
 | `npm run check` | Type and template errors |
 | `npm run lint:css` | CSS lint (`npm run lint:css:fix` fixes what it can) |
 | `npm run check:docs` | Fails if the docs or code comments name a file, command, knob or heading that no longer exists |
+| `npm run check:site` | After `build`: fails on a broken link inside the site, anything the CSP would block, or a portfolio page pointing to the UX audit |
 | `npm run visual` | Compares how this working tree looks with `origin/main` ([more](#check-you-havent-changed-the-look)) |
 | `npm run browsers` | Checks the site works in Chrome, Firefox and WebKit, at desktop and phone sizes ([more](#check-it-works-in-other-browsers)) |
 | `npm run encrypt` | Re-encrypts locked case studies (part of `build`) |
@@ -24,7 +25,7 @@ The repo also serves a page the portfolio keeps apart: the UX audit service, for
 | `npm run icons` | Redraws the PNG and `.ico` icons from `public/favicon.svg` |
 | `npm run og` | Redraws the link-preview images, `public/og.png` and `public/og-ux-audit.png` |
 
-CI runs `lint:css`, `check:docs`, `check` and `build` on every pull request, and a push to `main` only deploys if all of them pass. Run them before you push.
+CI runs `lint:css`, `check:docs`, `check`, `build` and `check:site` on every pull request, and a push to `main` only deploys if all of them pass. Run them before you push.
 
 ## Setup
 

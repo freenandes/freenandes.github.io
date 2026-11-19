@@ -18,6 +18,7 @@
 
 import { getEntry, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import Lightbox from '../../components/Lightbox.astro';
 import PageNav from '../../components/PageNav.astro';
 import { site } from '../../site.config';
 import { withBase } from '../../lib/base';
@@ -130,6 +131,8 @@ const jsonLd = [
     </section>
   </article>
 
+  <Lightbox />
+
   <li slot="footer-links"><a href={withBase('/about/')}>About Pedro</a></li>
 </Base>
 
@@ -140,7 +143,6 @@ const jsonLd = [
     --audit-contact-border: 1px solid var(--line-strong); /* the contact box's frame */
     --audit-contact-pad: var(--space-lg);
     --audit-button-pad: 0.625rem 0.875rem;
-    --audit-placeholder-ratio: 16 / 9;
   }
 
   @media (width < 40rem) {
@@ -180,16 +182,6 @@ const jsonLd = [
     color: var(--ink-3);
   }
 
-  /* The example finding, until there is one. */
-  .prose :global(.placeholder > div) {
-    display: grid;
-    place-items: center;
-    aspect-ratio: var(--audit-placeholder-ratio);
-    border: 1px dashed var(--line-strong);
-    border-radius: var(--radius-sm);
-    background: var(--paper-2);
-  }
-
   /* --- Contact: a framed box with a filled button, shapes the site shows
      nowhere else. --- */
 
@@ -204,7 +196,7 @@ const jsonLd = [
 
   a.button {
     padding: var(--audit-button-pad);
-    border-radius: none;
+    border-radius: 0;
     background: var(--accent-ink);
     color: var(--paper);
     text-decoration: none;

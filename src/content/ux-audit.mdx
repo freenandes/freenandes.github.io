@@ -33,8 +33,10 @@ contact:
   button: Email me
 ---
 
+import Gallery from '../components/Gallery.astro';
 import Packages from '../components/AuditPackages.astro';
 import { withBase } from '../lib/base';
+import sampleReport from '../assets/ux-audit/sample-report.webp';
 
 Hi! My name is Pedro and I'm a product designer and design engineer. 
 
@@ -74,16 +76,19 @@ You get one written report, as long as your product needs and no longer. Its fin
 
 Where it helps, each finding includes a screenshot or screen recording that shows the issue. The report is plain, structured text with clear sections, easy for people to read and for AI tools to turn into tickets in Jira, GitHub, Linear, or any other connector you may have in your AI stack. It comes as a zip folder of markdown files with the screenshots and recordings linked alongside, ready to open in Obsidian, VS Code or any AI tool.
 
-{/* PLACEHOLDER: the example finding. Replace this figure with one real,
-    legible finding from an open-source tool, with Keep and Change: put the
-    image in src/assets/, import it above and show it in a Gallery, as the
-    case studies do (README → "Add screenshots or a video"), with
-    `<Lightbox />` added to the page. Then delete `.placeholder` from the
-    page's styles. */}
-<figure class="placeholder">
-  <div aria-hidden="true"><span class="meta">Placeholder: example finding</span></div>
-  <figcaption>One real finding from an open-source tool, with Keep and Change. Image to come.</figcaption>
-</figure>
+<Gallery
+  narrow
+  density={2}
+  scale={1}
+  images={[
+    {
+      src: sampleReport,
+      alt: 'A sample UX audit report for Flowline v2, a self-hosted workflow tool, laid out as overlapping pages. The first opens with a summary, a table of priorities from P1 to P3 and a table of findings at a glance. Over it, finding C2, “The large-output warning reads like a download prompt”, gives its priority, who it affects and the effort, then where it happens, what happens, why it matters and suggestions, above a screenshot of the warning. Beside it, the scope and method: the setup, the user profile, the scenario of collecting design roles from 25 job boards into a CSV, the seven-step workflow built for it and the outcome, above a screenshot of that workflow. In front, the delivered folder, flowline-ux-audit.zip, holds report.md and a captures folder of screenshots and a recording.',
+    },
+  ]}
+>
+  Illustrative only: the look of the report may change. What counts is the audit and what it finds, not the visuals.
+</Gallery>
 
 ## Packages and pricing
 

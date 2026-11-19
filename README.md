@@ -244,14 +244,14 @@ Run it after changing the map script, the lightbox, `Base.astro` (its CSP above 
 
 `/services/ux-audit/` sells UX audits to software teams. It's kept apart from the portfolio in one direction only:
 
-- It links to the portfolio: the name in its header and a line in its intro.
-- The portfolio never links to it, except "UX audits" in About's footer, beside the contact links, which the printed CV leaves out. No nav, map marker, case study or `/llms.txt` entry points to it. People arrive from a link sent to them, from search (it's in the sitemap, with its own description, preview image and `Service` structured data) or from About.
+- It links to the portfolio: a line in its intro and "About Pedro" in its footer, both to About.
+- The portfolio never links to it, except "Hands-on UX audit" in About's footer, beside the contact links, which the printed CV leaves out. No nav, map marker, case study or `/llms.txt` entry points to it. People arrive from a link sent to them, from search (it's in the sitemap, with its own description, preview image and `Service` structured data) or from About.
 - `/services/`, `/service/`, `/servicos/` and `/ux-audit/` forward to it (`redirects` in `astro.config.mjs`). `/services/` may become a list of services one day; until then it forwards too.
 - A missing address that looks like it (lowercased, it starts with `/service` or `/servicos`, or contains `ux-audit`, `uxaudit` or `ux_audit`) is forwarded by the 404 page's script, since GitHub Pages paths are case-sensitive and `/Services/` would otherwise miss. Any other miss gets the portfolio's 404, which leads back to the map.
 
 Its words are in `src/content/ux-audit.mdx`: the body is the page's text, in Markdown like a case study, and the frontmatter holds the title, the service's name in the top bar, the heading, the packages (which draw the pricing table, placed in the text by `<Packages />`, and the prices search engines see) and the contact box. `src/pages/services/ux-audit.astro` is only the frame and the look.
 
-It reads like the rest of the site until it asks for something: the packages table is its first new shape, and the closing contact box, framed, with the site's only filled button, is where it breaks the pattern on purpose. The top bar's "Email me" and the button use the same obfuscated address as every email link. Its footer drops the rule and the availability line, and adds a link to About. The example finding is still a marked placeholder in the MDX; the comment above it says how to swap in the real image.
+It reads like the rest of the site until it asks for something: the packages table is its first new shape, and the closing contact box, framed, with the site's only filled button, is where it breaks the pattern on purpose. The top bar's "Email me" and the button use the same obfuscated address as every email link. Its footer drops the rule and the availability line, and adds a link to About. The sample report under "What you get" is a Gallery, as in the case studies, with the page's own enlarged view; its image is in `src/assets/ux-audit/`.
 
 ## Old links
 

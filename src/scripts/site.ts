@@ -48,14 +48,23 @@ for (const el of document.querySelectorAll<HTMLElement>('[data-email]')) {
 /** Release a held block once its top has come this far inside the viewport. */
 const TRIGGER = '-12%';
 
+/** The end of the page counts as in view from this far below the window's
+    bottom edge, so a scroll that reached the end can't be missed by rounding. */
+const END_SLACK = '8px';
+
 /**
  * Defers the load reveal of any `[data-reveal]` block that starts below the
  * fold so it plays when the reader actually gets there. Blocks already on
  * screen keep the staggered entrance CSS gives them.
  *
- * Nothing here hides content: it only pauses an animation that is already
- * running off-screen, so a failure (or no JavaScript at all) degrades to every
- * block revealing on load, as before.
+ * A held block stays invisible until it's released, so each one has two ways
+ * out: its top passes the trigger line, or the end of the page comes into view
+ * while it's on screen. The second is for the page's last stretch, which can't
+ * scroll that far up: the page stops once its end meets the bottom of the
+ * window, so a footer shorter than the trigger's share of the window never
+ * reaches the line, and would stay hidden on a tall window. If this script
+ * fails before holding anything, or there's no JavaScript, every block reveals
+ * on load, as before.
  */
 function deferOffscreenReveals() {
   if (!('IntersectionObserver' in window)) return;
@@ -67,15 +76,32 @@ function deferOffscreenReveals() {
   );
   if (!held.length) return;
 
-  const observer = new IntersectionObserver(
+  function release(el: Element) {
+    el.removeAttribute('data-reveal-wait');
+    atTrigger.unobserve(el);
+  }
+
+  const atTrigger = new IntersectionObserver(
     (entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        entry.target.removeAttribute('data-reveal-wait');
-        observer.unobserve(entry.target);
-      }
+      for (const entry of entries) if (entry.isIntersecting) release(entry.target);
     },
     { rootMargin: `0px 0px ${TRIGGER} 0px` }
+  );
+
+  // The end of the page is an empty element after everything else in <body>.
+  // Once it's in view, whatever is still held below the top of the window is
+  // released; a block above it, skipped by a jump, still waits for the reader
+  // to scroll back up to it.
+  const end = document.createElement('div');
+  document.body.append(end);
+  const atEnd = new IntersectionObserver(
+    ([entry]) => {
+      if (!entry?.isIntersecting) return;
+      for (const el of held) {
+        if (el.hasAttribute('data-reveal-wait') && el.getBoundingClientRect().bottom > 0) release(el);
+      }
+    },
+    { rootMargin: `0px 0px ${END_SLACK} 0px` }
   );
 
   for (const el of held) {
@@ -83,8 +109,9 @@ function deferOffscreenReveals() {
     // The entrance started with the page, a few frames before this script
     // ran; rewind it so the block waits on its first frame, not partway in.
     for (const animation of el.getAnimations()) animation.currentTime = 0;
-    observer.observe(el);
+    atTrigger.observe(el);
   }
+  atEnd.observe(end);
 }
 
 deferOffscreenReveals();

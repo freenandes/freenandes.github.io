@@ -365,9 +365,8 @@ a[data-email]:not([href]),
 
 /* --- Motion -------------------------------------------------------------- */
 
-/* Reveal runs off CSS alone, so it can never leave content stuck invisible:
-   the animation always plays to its end whether or not any script loads.
-   Stagger a block by giving it its place in the queue:
+/* Reveal runs off CSS alone: without a script, the animation always plays to
+   its end. Stagger a block by giving it its place in the queue:
    `data-reveal style="--reveal-step: 2"`. */
 
 [data-reveal] {
@@ -377,8 +376,10 @@ a[data-email]:not([href]),
 
 /* Blocks that start below the fold are held at the first frame instead of
    playing to an empty room; `src/scripts/site.ts` releases them as the reader
-   arrives. Holding (rather than re-triggering) keeps this a pause, so nothing
-   can flash or double-animate. */
+   arrives. A held block is invisible, so every one needs a way out: the script
+   gives each two (`deferOffscreenReveals()`), and `npm run browsers` fails a
+   page that leaves one held. Holding (rather than re-triggering) keeps this a
+   pause, so nothing can flash or double-animate. */
 
 [data-reveal][data-reveal-wait] {
   animation-play-state: paused;

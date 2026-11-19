@@ -236,9 +236,9 @@ npm run browsers                    # Chrome, Firefox and WebKit
 npm run browsers -- --only webkit   # one engine
 ```
 
-It builds the working tree, serves it over HTTPS on this machine and loads every page in each engine, at desktop and phone sizes. It checks that nothing breaks: no script errors, failed requests or CSP violations, no sideways scrolling (on screen or printed), the map mounts and opens a card in view, and the lightbox opens and closes. It exits `1` if a check fails and `2` if a browser couldn't start. Screenshots of each engine go to `.browsers/` to compare by eye; they're never identical, because each engine renders fonts its own way.
+It builds the working tree, serves it over HTTPS on this machine and loads every page in each engine, at desktop and phone sizes. It checks that nothing breaks: no script errors, failed requests or CSP violations, no sideways scrolling (on screen or printed), the map mounts and opens a card in view, the lightbox opens and closes, and once scrolled to the end, no block is left invisible waiting for its entrance, also in a window as tall as a portrait 1440p screen. It exits `1` if a check fails and `2` if a browser couldn't start. Screenshots of each engine go to `.browsers/` to compare by eye; they're never identical, because each engine renders fonts its own way.
 
-Run it after changing the map script, the lightbox, `Base.astro` (its CSP above all) or `global.css`. The phone sizes are emulated in desktop engines, so they don't stand in for Safari on an iPhone or Firefox on Android: check those on a real phone, or in Xcode's iOS Simulator, which runs the real Mobile Safari.
+Run it after changing the map script, the lightbox, `src/scripts/site.ts`, `Base.astro` (its CSP above all) or `global.css`. The phone sizes are emulated in desktop engines, so they don't stand in for Safari on an iPhone or Firefox on Android: check those on a real phone, or in Xcode's iOS Simulator, which runs the real Mobile Safari.
 
 ## The UX audit page
 

@@ -39,6 +39,14 @@
   --tracking-mono: 0.03125em;
   --tracking-wide: 0.0625em;
 
+  /* Link underlines, in em of the link's own type. Links in running text are
+     set larger than the chrome links (--step-0 against --step--1), so theirs
+     are the chrome's times 0.8125, to draw the same line. */
+  --underline-offset: 0.25em;
+  --underline-thickness: 0.125em;
+  --underline-offset-text: 0.203125em;
+  --underline-thickness-text: 0.1015625em;
+
   /* Space */
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;

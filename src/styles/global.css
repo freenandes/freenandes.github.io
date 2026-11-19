@@ -139,8 +139,8 @@ button.link {
   letter-spacing: var(--tracking-mono);
   text-transform: uppercase;
   text-decoration: underline;
-  text-underline-offset: 0.25em;
-  text-decoration-thickness: 0.125em;
+  text-underline-offset: var(--underline-offset);
+  text-decoration-thickness: var(--underline-thickness);
   transition: color var(--dur-fast) var(--ease);
 }
 
@@ -238,8 +238,8 @@ main > section {
   text-transform: none;
   color: var(--accent-ink);
   text-decoration: underline;
-  text-underline-offset: 0.125em;
-  text-decoration-thickness: 0.125em;
+  text-underline-offset: var(--underline-offset-text);
+  text-decoration-thickness: var(--underline-thickness-text);
   text-decoration-color: var(--accent-ink);
   transition: color var(--dur-fast) var(--ease),
     text-decoration-color var(--dur-fast) var(--ease);

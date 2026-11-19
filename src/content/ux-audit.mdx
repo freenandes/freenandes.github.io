@@ -3,9 +3,8 @@
 # src/pages/services/ux-audit.astro frames it with the fields here.
 title: UX audits for software teams # browser tab and search result, before " — <name>"
 description: "Hands-on UX audits for software teams, from developer tools to consumer apps: what gets in your users' way, what to keep, and how to fix it. From €900."
-kicker: Hands-on UX audit
+service: Hands-on UX audit # the top bar, beside the email link
 heading: A product designer who knows your users and your code
-availability: Taking on UX audits and interface fixes for software teams. # opens the footer
 
 # The packages table and the page's structured data. Prices in euros, excluding VAT.
 audits:
@@ -27,12 +26,11 @@ fixes:
   delivery: Agreed per project
   price: On request
 
-# The framed box that ends the page. The button opens an email to the address
-# in site.config.ts; the LinkedIn link comes from there too.
+# The framed box that ends the page. `button` is also the top bar's link; both
+# open an email to the address in site.config.ts.
 contact:
-  text: Email me about your product and what's worrying you, and we'll set up the free 30-minute call.
+  text: Email me about your product and what’s worrying you, and we’ll set up the free 30-minute call. # typographic apostrophes: frontmatter isn't converted like the body
   button: Email me
-  linkedin: "Prefer LinkedIn? Message me there:"
 ---
 
 import Packages from '../components/AuditPackages.astro';

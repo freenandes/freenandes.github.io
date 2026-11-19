@@ -1,9 +1,9 @@
 ---
 /** The shell every page renders into: <head>, skip link, <main>, footer. A
     page's `footer` slot opens the footer, in place of its rule, its
-    `footer-end` slot adds a row above the copyright (About's link to the UX
-    audit), and its `head` slot adds to the <head> (the home map's <noscript>
-    styles). */
+    `footer-links` slot adds links after the footer's contact links (About's
+    to the UX audit), and its `head` slot adds to the <head> (the home map's
+    <noscript> styles). */
 
 import { Font } from 'astro:assets';
 import '../styles/global.css';
@@ -28,8 +28,8 @@ interface Props {
   noindex?: boolean;
   /** This page's link preview, in place of the site's (`site.ogImage`). */
   ogImage?: OgImage;
-  /** The footer's opening line, in place of `site.availability`. */
-  availability?: string;
+  /** Off drops the rule and the availability line that open the footer. */
+  footerIntro?: boolean;
 }
 
 const {
@@ -41,7 +41,7 @@ const {
   jsonLd = [],
   noindex = false,
   ogImage: preview = site.ogImage,
-  availability,
+  footerIntro = true,
 } = Astro.props;
 
 const pageTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site.role}`;
@@ -180,9 +180,9 @@ const csp = [
 
     {
       footer && (
-        <Footer availability={availability}>
+        <Footer intro={footerIntro}>
           <slot name="footer" />
-          <slot name="footer-end" slot="end" />
+          <slot name="footer-links" slot="links" />
         </Footer>
       )
     }

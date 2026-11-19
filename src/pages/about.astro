@@ -221,6 +221,12 @@ const jsonLd = [
   </article>
 
   <MiniMap slot="footer" />
+
+  {/* The one page of the portfolio that points to the UX audit, from the
+      footer, so the printed CV never shows it. */}
+  <ul role="list" slot="footer-end">
+    <li><a href={withBase('/services/ux-audit/')}>Services: UX audit</a></li>
+  </ul>
 </Base>
 
 <style>

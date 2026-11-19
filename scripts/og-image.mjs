@@ -2,15 +2,17 @@
 /* =========================================================================
    og-image.mjs
 
-   Redraw the link-preview image in one step:
+   Redraw the link-preview images in one step:
 
      npm run og
 
-   Opens `scripts/og/card.html` in headless Chrome, fills in the name and role
-   from `src/site.config.ts`, and photographs it at the size `ogImage` gives
-   into the file it names (`public/og.png`). Run it whenever the name, the role
-   or the card changes, and commit what it writes. It stops instead of writing
-   if the webfonts didn't load or any text spills out of the centre square.
+   Opens `scripts/og/card.html` in headless Chrome once per card, fills in its
+   words from `src/site.config.ts` and photographs it at the size the card's
+   image gives, into the file it names: `ogImage` (every page's, from the name
+   and role) into `public/og.png`, and `uxAuditOgImage` (the UX audit page's)
+   into `public/og-ux-audit.png`. Run it whenever those words or the card
+   change, and commit what it writes. It stops instead of writing if the
+   webfonts didn't load or any text spills out of the centre square.
 
    Needs Chrome: it finds a local one, or the cloud image's Chromium
    (`CHROME_PATH` overrides), the same way `npm run visual` does.
@@ -38,9 +40,18 @@ const CARD = pathToFileURL(fileURLToPath(new URL('og/card.html', import.meta.url
 const {
   module: { site },
 } = await runnerImport('/src/site.config.ts', { root: ROOT, configFile: false, logLevel: 'silent' });
-const { width, height, path, type } = site.ogImage;
-if (type !== 'image/png' || !path.endsWith('.png')) {
-  throw new Error(`og-image: ogImage in site.config.ts must be a PNG to be drawn here (got ${type}, ${path}).`);
+
+/** Each card: the image it becomes, and its words. "X & Y" in the role sets
+    each part on its own line, the ampersand leading. */
+const audit = site.uxAuditOgImage;
+const cards = [
+  { image: site.ogImage, title: site.name, lines: site.role.split(/\s+(?=&\s)/), domain: 'pmcf.xyz' },
+  { image: audit, title: audit.title, lines: audit.lines, domain: audit.domain },
+];
+for (const { image } of cards) {
+  if (image.type !== 'image/png' || !image.path.endsWith('.png')) {
+    throw new Error(`og-image: ${image.path} in site.config.ts must be a PNG to be drawn here (got ${image.type}).`);
+  }
 }
 
 const browser = await puppeteer.launch({
@@ -50,20 +61,28 @@ const browser = await puppeteer.launch({
 });
 
 try {
+  for (const { image, title, lines, domain } of cards) {
+    await draw(image, { title, lines, domain });
+  }
+} finally {
+  await browser.close();
+}
+
+/** Photographs the card with these words into `image.path`, under /public. */
+async function draw({ width, height, path }, words) {
   const page = await browser.newPage();
   await page.setViewport({ width, height, deviceScaleFactor: 1 });
   await page.goto(CARD, { waitUntil: 'networkidle0' });
 
   const problems = await page.evaluate(
-    async ({ name, role, width, height, fonts }) => {
+    async ({ title, lines, domain, width, height, fonts }) => {
       document.documentElement.style.setProperty('--og-width', `${width}px`);
       document.documentElement.style.setProperty('--og-height', `${height}px`);
-      document.querySelector('[data-og="name"]').textContent = name;
-      // "X & Y" sets each part on its own line, the ampersand leading.
-      const parts = role.split(/\s+(?=&\s)/);
+      document.querySelector('[data-og="name"]').textContent = title;
       document.querySelector('[data-og="role"]').replaceChildren(
-        ...parts.map((text) => Object.assign(document.createElement('span'), { textContent: text }))
+        ...lines.map((text) => Object.assign(document.createElement('span'), { textContent: text }))
       );
+      document.querySelector('[data-og="domain"]').textContent = domain;
 
       await document.fonts.ready;
       const found = [];
@@ -86,7 +105,7 @@ try {
       }
       return found;
     },
-    { name: site.name, role: site.role, width, height, fonts: FONTS }
+    { ...words, width, height, fonts: FONTS }
   );
   if (problems.length) throw new Error(`og-image: nothing written.\n  ${problems.join('\n  ')}`);
 
@@ -98,6 +117,5 @@ try {
   if (png.length > MAX_BYTES) {
     console.warn(`og-image: over ${MAX_BYTES / 1000} KB; some apps may skip it. Try a lighter texture.`);
   }
-} finally {
-  await browser.close();
+  await page.close();
 }

@@ -1,11 +1,13 @@
 ---
 /** The shell every page renders into: <head>, skip link, <main>, footer. A
-    page's `footer` slot opens the footer, in place of its rule, and its `head`
-    slot adds to the <head> (the home map's <noscript> styles). */
+    page's `footer` slot opens the footer, in place of its rule, its
+    `footer-end` slot adds a row above the copyright (About's link to the UX
+    audit), and its `head` slot adds to the <head> (the home map's <noscript>
+    styles). */
 
 import { Font } from 'astro:assets';
 import '../styles/global.css';
-import { site } from '../site.config';
+import { site, type OgImage } from '../site.config';
 import { withBase } from '../lib/base';
 import { svgIcon, icoIcon, appleTouchIcon } from '../lib/icons.mjs';
 import Footer from '../components/Footer.astro';
@@ -24,6 +26,10 @@ interface Props {
   /** Keeps the page out of search results, with no canonical address. The
       404 uses it: it's served at whatever address went missing. */
   noindex?: boolean;
+  /** This page's link preview, in place of the site's (`site.ogImage`). */
+  ogImage?: OgImage;
+  /** The footer's opening line, in place of `site.availability`. */
+  availability?: string;
 }
 
 const {
@@ -34,13 +40,16 @@ const {
   ogType = 'website',
   jsonLd = [],
   noindex = false,
+  ogImage: preview = site.ogImage,
+  availability,
 } = Astro.props;
 
 const pageTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site.role}`;
 const origin = Astro.site ?? Astro.url;
 const canonical = new URL(Astro.url.pathname, origin).toString();
 const siteBase = new URL(withBase('/'), origin).toString();
-const ogImage = new URL(withBase(site.ogImage.path), origin).toString();
+const absolute = (path: string) => new URL(withBase(path), origin).toString();
+const ogImage = absolute(preview.path);
 
 // Profiles the site owner can be cross-referenced by (schema.org sameAs).
 const sameAs = site.socials
@@ -68,7 +77,7 @@ const structuredData = {
       jobTitle: site.role,
       description: site.description,
       url: siteBase,
-      image: ogImage,
+      image: absolute(site.ogImage.path),
       ...(sameAs.length ? { sameAs } : {}),
     },
     ...jsonLd,
@@ -131,10 +140,10 @@ const csp = [
     <meta property="og:description" content={description} />
     {!noindex && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={ogImage} />
-    <meta property="og:image:type" content={site.ogImage.type} />
-    <meta property="og:image:width" content={String(site.ogImage.width)} />
-    <meta property="og:image:height" content={String(site.ogImage.height)} />
-    <meta property="og:image:alt" content={site.ogImage.alt} />
+    <meta property="og:image:type" content={preview.type} />
+    <meta property="og:image:width" content={String(preview.width)} />
+    <meta property="og:image:height" content={String(preview.height)} />
+    <meta property="og:image:alt" content={preview.alt} />
 
     {/* Self-hosted (astro.config.mjs → fonts). Every page sets text in the
         upright styles of both, so those load first; the italics load only
@@ -171,8 +180,9 @@ const csp = [
 
     {
       footer && (
-        <Footer>
+        <Footer availability={availability}>
           <slot name="footer" />
+          <slot name="footer-end" slot="end" />
         </Footer>
       )
     }

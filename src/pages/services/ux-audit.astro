@@ -1,0 +1,468 @@
+---
+/** The UX audit service page, for freelance clients. It stands apart from the
+    portfolio in one direction: it links to the portfolio, and the portfolio
+    never links here, except About's footer, which is never printed. People
+    arrive by a link sent to them, from search, or from About. `/services/`,
+    `/service/`, `/servicos/` and `/ux-audit/` forward here (`redirects` in
+    astro.config.mjs), and so does a 404 at any address that looks like this
+    one (src/pages/404.astro).
+
+    The page reads like the rest of the site until it asks for something: the
+    packages table is its first new shape, and the closing contact box, with
+    the site's only filled button, is where it breaks the pattern on purpose. */
+
+import Base from '../../layouts/Base.astro';
+import PageNav from '../../components/PageNav.astro';
+import { site } from '../../site.config';
+import { withBase } from '../../lib/base';
+
+const title = 'UX audits for software teams';
+const description =
+  "Hands-on UX audits for software teams, from developer tools to consumer apps: what gets in your users' way, what to keep, and how to fix it. From €900.";
+
+const email = site.socials.find((s) => s.token);
+const linkedin = site.socials.find((s) => s.href?.includes('linkedin.com'));
+if (!email?.token || !linkedin?.href) {
+  throw new Error('services/ux-audit.astro: site.config.ts needs the Email and LinkedIn socials for the contact box.');
+}
+
+/** The packages, in the table and in the page's structured data. `price` is
+    in euros, excluding VAT; the last one has no fixed price. */
+const audits = [
+  { name: 'Flow audit', scope: 'One key flow, e.g. onboarding or first setup', delivery: '2–3 working days', price: 900 },
+  { name: 'Core audit', scope: '2 to 4 main flows', delivery: '1 week', price: 1900 },
+  {
+    name: 'Product audit',
+    scope: '5 to 7 key flows across your product, including their states and edge cases',
+    delivery: '2 weeks',
+    price: 3900,
+  },
+];
+const fixes = {
+  name: 'Fixes',
+  scope: 'I make the interface changes the audit recommends, directly in your codebase',
+  delivery: 'Agreed per project',
+  price: 'On request',
+};
+const euros = (price: number) => `€${price.toLocaleString('en')}`;
+
+const origin = Astro.site ?? Astro.url;
+const abs = (path: string) => new URL(withBase(path), origin).toString();
+const pageUrl = new URL(Astro.url.pathname, origin).toString();
+const personId = `${abs('/')}#person`;
+const serviceId = `${pageUrl}#service`;
+
+const jsonLd = [
+  {
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#webpage`,
+    url: pageUrl,
+    name: `${title} — ${site.name}`,
+    description,
+    inLanguage: site.locale,
+    isPartOf: { '@id': `${abs('/')}#website` },
+    about: { '@id': serviceId },
+    author: { '@id': personId },
+  },
+  {
+    '@type': 'Service',
+    '@id': serviceId,
+    name: 'Hands-on UX audit',
+    serviceType: 'UX audit',
+    description,
+    url: pageUrl,
+    provider: { '@id': personId },
+    areaServed: 'Worldwide',
+    audience: { '@type': 'BusinessAudience', name: 'Software teams' },
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'UX audit packages',
+      itemListElement: [
+        ...audits.map((audit) => ({
+          '@type': 'Offer',
+          name: audit.name,
+          description: `${audit.scope}. Delivery: ${audit.delivery}.`,
+          price: audit.price,
+          priceCurrency: 'EUR',
+          priceSpecification: {
+            '@type': 'PriceSpecification',
+            price: audit.price,
+            priceCurrency: 'EUR',
+            valueAddedTaxIncluded: false,
+          },
+          url: pageUrl,
+        })),
+        { '@type': 'Offer', name: fixes.name, description: `${fixes.scope}. Quoted per project.`, url: pageUrl },
+      ],
+    },
+  },
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: site.name, item: abs('/') },
+      { '@type': 'ListItem', position: 2, name: 'UX audit', item: pageUrl },
+    ],
+  },
+];
+---
+
+<Base
+  title={title}
+  description={description}
+  jsonLd={jsonLd}
+  ogImage={site.uxAuditOgImage}
+  availability="Taking on UX audits and interface fixes for software teams."
+>
+  <article>
+    <PageNav>
+      <li><a href={withBase('/')}>{site.name}</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </PageNav>
+
+    <header data-reveal>
+      <p class="meta">Hands-on UX audit</p>
+      <h1>A product designer who knows your users and your code</h1>
+    </header>
+
+    <div class="prose" data-reveal style="--reveal-step: 1">
+      <p>
+        I run hands-on UX audits that show software teams what's getting in their users' way, what to keep, and how
+        to fix it, from developer tools and infrastructure software to consumer apps.
+      </p>
+      <p>
+        I understand both sides. On yours: maybe your product is already out there but doesn't quite work for the
+        people using it, or you're under pressure to ship a feature and have doubts about it. I've worked inside teams
+        facing exactly that. On your users' side, I can speak for the people I've designed for, from online shoppers
+        and travelers to database administrators, site reliability engineers and platform engineers, and the terms and
+        workflows they expect.
+      </p>
+      <p>
+        I've spent my career designing interfaces and design systems, from consumer e-commerce and travel products to
+        database observability tools, where I also worked directly in the front-end code with engineering teams. Some
+        of that work is in <a href={withBase('/')}>my portfolio</a>.
+      </p>
+    </div>
+
+    <section class="prose" aria-labelledby="service" data-reveal>
+      <h2 id="service">The service: hands-on UX audit</h2>
+      <p>
+        A UX audit is a hands-on expert review of your product, seen through your users' eyes. You get a report of
+        what works and should be kept, and what gets in the way and should change, written so your team can turn it
+        into tickets right away.
+      </p>
+
+      <h3>When is it a good time for a UX audit?</h3>
+      <ul>
+        <li>When support requests or user complaints keep pointing at the interface</li>
+        <li>When a feature isn't being adopted and you're not sure why</li>
+        <li>When your product grew feature by feature and no longer feels coherent</li>
+        <li>When your design team is stretched or wants a fresh, outside view</li>
+      </ul>
+
+      <h3>Why not just ask an AI?</h3>
+      <p>
+        You can, and you'll get a long list of plausible issues. I use AI too, to work faster. What you pay for is what
+        AI cannot do:
+      </p>
+      <ul>
+        <li>
+          <strong>I actually use your product.</strong> I install it, set it up and run real workflows with real data,
+          not just review screenshots.
+        </li>
+        <li><strong>I know your users.</strong> I can tell what they find normal from what really slows them down.</li>
+        <li>
+          <strong>I choose what matters.</strong> You get fewer findings, ordered by urgency and impact, so your team
+          doesn't waste time on the wrong ones.
+        </li>
+        <li><strong>I tell you what to keep.</strong> That way it isn't "fixed" by accident.</li>
+        <li>
+          <strong>I stand behind it.</strong> We go through it together, I answer your team's questions, and I can make
+          the fixes myself as an option.
+        </li>
+      </ul>
+    </section>
+
+    <section class="prose" aria-labelledby="deliverable" data-reveal>
+      <h2 id="deliverable">What you get</h2>
+      <p>
+        You get one written report, as long as your product needs and no longer. Its findings are split into two
+        groups:
+      </p>
+      <ul>
+        <li><strong>Keep:</strong> what works well and why, so it survives future changes.</li>
+        <li><strong>Change:</strong> what gets in your users' way, why it matters, and what to do about it.</li>
+      </ul>
+      <p>
+        Where it helps, each finding includes a screenshot or screen recording that shows the issue. The report is
+        plain, structured text with clear sections, easy for people to read and for AI tools to turn into tickets in
+        Jira, GitHub or Linear. It comes as a zip folder of markdown files with the screenshots and recordings linked
+        alongside, ready to open in Obsidian, VS Code or any AI tool.
+      </p>
+
+      {/* PLACEHOLDER: the example finding. Replace this figure with one real,
+          legible finding from an open-source tool, with Keep and Change: put
+          the image in src/assets/, import it above, and show it in a
+          `Gallery` (src/components/Gallery.astro, with `Lightbox` on the
+          page), its caption saying what the finding is. Then delete
+          `.placeholder` from the styles below. */}
+      <figure class="placeholder">
+        <div aria-hidden="true"><span class="meta">Placeholder: example finding</span></div>
+        <figcaption>One real finding from an open-source tool, with Keep and Change. Image to come.</figcaption>
+      </figure>
+    </section>
+
+    <section class="prose" aria-labelledby="pricing" data-reveal>
+      <h2 id="pricing">Packages and pricing</h2>
+      <p>
+        Every audit has a fixed price, so you know the cost before we start. Fixes are quoted per project. Even the
+        largest audit costs less than a week of an engineering team's time spent building the wrong thing.
+      </p>
+
+      <table>
+        <caption>Prices in euros, excluding VAT.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Package</th>
+            <th scope="col">Delivery</th>
+            <th scope="col">Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            audits.map((audit) => (
+              <tr>
+                <th scope="row">
+                  <span>{audit.name}</span>
+                  <span>{audit.scope}</span>
+                </th>
+                <td>{audit.delivery}</td>
+                <td>{euros(audit.price)}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+        <tbody>
+          <tr>
+            <th scope="row">
+              <span>{fixes.name}</span>
+              <span>{fixes.scope}</span>
+            </th>
+            <td>{fixes.delivery}</td>
+            <td>{fixes.price}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        Every audit includes a kickoff call, the report, and a call to walk your team through the findings. Questions
+        about the report are answered for two weeks after delivery.
+      </p>
+    </section>
+
+    <section class="prose" aria-labelledby="process" data-reveal>
+      <h2 id="process">How it works</h2>
+      <ol>
+        <li>
+          <strong>Intro call (free, 30 min).</strong> You tell me about your product, your users and what worries you.
+          We pick the package.
+        </li>
+        <li>
+          <strong>Access.</strong> You give me access to the product, a test account or a self-hosted setup, and any
+          docs your users rely on. The environment should be working by the kickoff; setting up complex self-hosted
+          installs is quoted separately.
+        </li>
+        <li><strong>Kickoff.</strong> We agree on the flows to audit and who your main users are.</li>
+        <li><strong>Audit.</strong> I use the product as your users would and write the report.</li>
+        <li>
+          <strong>Walkthrough.</strong> We go through the report together on a short call, and I answer your team's
+          questions.
+        </li>
+      </ol>
+    </section>
+
+    {/* The page's one loud moment. The email link is assembled in the browser
+        (src/scripts/site.ts), so the address is never in the HTML; without
+        scripting it stays hidden (global.css) and LinkedIn is the way in. */}
+    <section id="contact" class="contact" aria-labelledby="contact-title" data-reveal>
+      <h2 id="contact-title" class="visually-hidden">Contact</h2>
+      <p>Email me about your product and what's worrying you, and we'll set up the free 30-minute call.</p>
+      <a class="button" data-email={email.token}>Email me</a>
+      <p>
+        Prefer LinkedIn? Message me there:{' '}
+        <a href={linkedin.href}>{linkedin.href.replace(/^https?:\/\/(www\.)?/, '')}</a>
+      </p>
+    </section>
+  </article>
+</Base>
+
+<style>
+  /* --- Knobs ---------------------------------------------------------------- */
+  article {
+    --audit-section-gap: var(--space-xl); /* above each section's title */
+    --audit-row-pad: var(--space-md); /* above and below each package row */
+    --audit-price-width: 6.5rem; /* the price column */
+    --audit-contact-border: 1px solid var(--ink); /* the contact box's frame */
+    --audit-contact-pad: var(--space-lg);
+    --audit-button-pad: 0.875rem 1.5rem;
+    --audit-placeholder-ratio: 16 / 9;
+  }
+
+  h1 {
+    margin-block-start: var(--space-sm);
+  }
+
+  header {
+    margin-block-end: var(--space-lg);
+  }
+
+  section {
+    margin-block-start: var(--audit-section-gap);
+  }
+
+  /* The steps' numbers hang outside the text like the bullets do, in their
+     soft ink. */
+  ol li::marker {
+    font-weight: var(--weight-semibold);
+    color: var(--ink-3);
+  }
+
+  /* --- Packages: rows ruled like the CV's sections, the price in bold. The
+     scope sits under each package's name, so three columns fit a phone. --- */
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+
+  caption {
+    caption-side: bottom;
+    padding-block-start: var(--space-sm);
+    text-align: start;
+    font-size: var(--step--1);
+    color: var(--ink-3);
+  }
+
+  th,
+  td {
+    padding-block: var(--audit-row-pad);
+    padding-inline-end: var(--space-md);
+    text-align: start;
+    vertical-align: top;
+    font-weight: inherit;
+  }
+
+  thead th {
+    padding-block: 0 var(--space-sm);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--ink-3);
+    border-block-end: 1px solid var(--line-strong);
+  }
+
+  tbody tr + tr,
+  tbody + tbody tr {
+    border-block-start: 1px solid var(--line);
+  }
+
+  th[scope='row'] span {
+    display: block;
+  }
+
+  th[scope='row'] span:first-child {
+    font-weight: var(--weight-bold);
+  }
+
+  th[scope='row'] span + span {
+    margin-block-start: var(--space-xs);
+    color: var(--ink-2);
+  }
+
+  td {
+    color: var(--ink-2);
+  }
+
+  th:last-child,
+  td:last-child {
+    width: var(--audit-price-width);
+    padding-inline-end: 0;
+    text-align: end;
+  }
+
+  td:last-child {
+    font-weight: var(--weight-bold);
+    color: var(--ink);
+  }
+
+  tbody:last-of-type {
+    border-block-end: 1px solid var(--line-strong);
+  }
+
+  /* --- The example finding, until there is one. --- */
+
+  .placeholder > div {
+    display: grid;
+    place-items: center;
+    aspect-ratio: var(--audit-placeholder-ratio);
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-sm);
+    background: var(--paper-2);
+  }
+
+  /* --- Contact: a framed box with bold words and a filled button, shapes the
+     site shows nowhere else. --- */
+
+  .contact {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-lg);
+    margin-block: var(--audit-section-gap) var(--space-lg);
+    padding: var(--audit-contact-pad);
+    border: var(--audit-contact-border);
+    border-radius: var(--radius-md);
+  }
+
+  .contact p:first-of-type {
+    font-size: var(--step-1);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .contact p:last-child {
+    color: var(--ink-2);
+  }
+
+  .contact p:last-child a {
+    overflow-wrap: anywhere;
+  }
+
+  a.button {
+    padding: var(--audit-button-pad);
+    border-radius: var(--radius-sm);
+    background: var(--accent-ink);
+    color: var(--paper);
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease);
+  }
+
+  a.button:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  @media (width < 40rem) {
+    article {
+      --audit-contact-pad: var(--space-md);
+      --audit-price-width: 5rem;
+    }
+
+    a.button {
+      justify-self: stretch;
+      text-align: center;
+    }
+  }
+</style>

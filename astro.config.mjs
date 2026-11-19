@@ -67,6 +67,13 @@ export default defineConfig({
         [`/portfolio/projects/${old}`, `/${slug}/`],
       ])
     ),
+    // The UX audit is the only service so far, so /services/ forwards to it
+    // until it lists more than one; the others are addresses people guess.
+    // A miss that only looks like these (/Services/, /services/ux-audt) is
+    // caught by the 404 page's script instead.
+    ...Object.fromEntries(
+      ['/services', '/service', '/servicos', '/ux-audit'].map((path) => [path, '/services/ux-audit/'])
+    ),
   },
   integrations: [mdx(), sitemap()],
   markdown: {

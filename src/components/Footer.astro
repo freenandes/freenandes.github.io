@@ -1,20 +1,30 @@
 ---
 /** The footer: availability, contact links and copyright. A page can open it
     with something of its own, through Base's `footer` slot (the mini-map on
-    About and the case studies), which then stands in for the rule. */
+    About and the case studies), which then stands in for the rule, and add a
+    row above the copyright through its `footer-end` slot (the `end` slot
+    here). It's never printed (global.css). */
 
 import { site } from '../site.config';
+
+interface Props {
+  /** The opening line, in place of `site.availability`. */
+  availability?: string;
+}
+
+const { availability = site.availability } = Astro.props;
 ---
 
 <footer data-reveal>
   <slot />
   <div>
-    <p>{site.availability}</p>
+    <p>{availability}</p>
     <ul role="list">
       {site.socials.map((s) => (
         <li><a href={s.href} data-email={s.token}>{s.label}</a></li>
       ))}
     </ul>
+    <slot name="end" />
     <p>© {new Date().getFullYear()} {site.name}</p>
   </div>
 </footer>

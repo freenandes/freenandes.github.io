@@ -1,0 +1,106 @@
+---
+# The UX audit page, /services/ux-audit/. The body below is the page's text;
+# src/pages/services/ux-audit.astro frames it with the fields here.
+title: UX audits for software teams # browser tab and search result, before " — <name>"
+description: "Hands-on UX audits for software teams, from developer tools to consumer apps: what gets in your users' way, what to keep, and how to fix it. From €900."
+service: Hands-on UX audit # the top bar, beside the email link
+heading: A product designer who knows your users and your code
+
+# The packages table and the page's structured data. Prices in euros, excluding VAT.
+audits:
+  - name: Flow audit
+    scope: One key flow, e.g. onboarding or first setup
+    delivery: 2–3 working days
+    price: 900
+  - name: Core audit
+    scope: 2 to 4 main flows
+    delivery: 1 week
+    price: 1900
+  - name: Product audit
+    scope: 5 to 7 key flows across your product, including their states and edge cases
+    delivery: 2 weeks
+    price: 3900
+fixes:
+  name: Fixes
+  scope: I make the interface changes the audit recommends, directly in your codebase
+  delivery: Agreed per project
+  price: On request
+
+# The framed box that ends the page. `button` is also the top bar's link; both
+# open an email to the address in site.config.ts.
+contact:
+  text: Email me about your product and what’s worrying you, and we’ll set up the free 30-minute call. # typographic apostrophes: frontmatter isn't converted like the body
+  button: Email me
+---
+
+import Packages from '../components/AuditPackages.astro';
+import { withBase } from '../lib/base';
+import sampleReport from '../assets/ux-audit/sample-report.webp';
+
+Hi! My name is Pedro and I'm a product designer and design engineer. 
+
+**I run hands-on UX audits** that show software teams what's getting in their users' way, what to keep, and how to fix it, from developer tools and infrastructure software to consumer apps.
+
+**I understand both sides.** On yours: maybe your product is already out there but doesn't quite work for the people using it, or you're under pressure to ship a feature and have doubts about it. I've worked inside teams facing exactly that. On your users' side, I can speak for the people I've designed for, from online shoppers and travelers to database administrators, site reliability engineers and platform engineers, and the terms and workflows they expect.
+
+**I've spent my career designing interfaces and design systems**, from consumer e-commerce and travel products to database observability tools, where I also worked directly in the front-end code with engineering teams. <a href={withBase('/about/')}>Learn more about my career</a>
+
+## The service: hands-on UX audit
+
+A UX audit is a hands-on expert review of your product, seen through your users' eyes. You get a report of what works and should be kept, and what gets in the way and should change, written so your team can turn it into tickets right away.
+
+### When is it a good time for a UX audit?
+
+- When support requests or user complaints keep pointing at the interface
+- When a feature isn't being adopted and you're not sure why
+- When your product grew feature by feature and no longer feels coherent
+- When your design team is stretched or wants a fresh, outside view
+
+### Why not just ask an AI?
+
+You can, and you'll get a long list of plausible issues. I use AI too, to work faster. What you pay for is what AI cannot do:
+
+- **I actually use your product.** I install it, set it up and run real workflows with real data, not just review screenshots.
+- **I understand how people use products.** Years of watching people use very different products let me tell what users find normal from what really slows them down. And every audit starts with a short study of your own users.
+- **I choose what matters.** You get fewer findings, ordered by urgency and impact, so your team doesn't waste time on the wrong ones.
+- **I tell you what to keep.** That way it isn't "fixed" by accident.
+- **I stand behind it.** We go through it together, I answer your team's questions, and I can make the fixes myself as an option.
+
+## What you get
+
+You get one written report, as long as your product needs and no longer. Its findings are split into two groups:
+
+- **Keep:** what works well and why, so it survives future changes.
+- **Change:** what gets in your users' way, why it matters, and what to do about it.
+
+Where it helps, each finding includes a screenshot or screen recording that shows the issue. The report is plain, structured text with clear sections, easy for people to read and for AI tools to turn into tickets in Jira, GitHub, Linear, or any other connector you may have in your AI stack. It comes as a zip folder of markdown files with the screenshots and recordings linked alongside, ready to open in Obsidian, VS Code or any AI tool.
+
+{/* A plain figure, not a Gallery: a sample to glance at, not to enlarge. The
+    file is drawn at 2×, so it stays sharp on high-density screens. */}
+<figure>
+  <img
+    src={sampleReport.src}
+    width={Math.round(sampleReport.width / 2)}
+    height={Math.round(sampleReport.height / 2)}
+    alt="A sample UX audit report for Flowline v2, a self-hosted workflow tool, laid out as overlapping pages. The first opens with a summary, a table of priorities from P1 to P3 and a table of findings at a glance. Over it, finding C2, “The large-output warning reads like a download prompt”, gives its priority, who it affects and the effort, then where it happens, what happens, why it matters and suggestions, above a screenshot of the warning. Beside it, the scope and method: the setup, the user profile, the scenario of collecting design roles from 25 job boards into a CSV, the seven-step workflow built for it and the outcome, above a screenshot of that workflow. In front, the delivered folder, flowline-ux-audit.zip, holds report.md and a captures folder of screenshots and a recording."
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption>Illustrative only: the look of the report may change.</figcaption>
+</figure>
+
+## Packages and pricing
+
+Every audit has a fixed price, so you know the cost before we start. Fixes are quoted per project. Even the largest audit costs less than a week of an engineering team's time spent building the wrong thing.
+
+<Packages audits={frontmatter.audits} fixes={frontmatter.fixes} />
+
+Every audit includes a kickoff call, the report, and a call to walk your team through the findings. Questions about the report are answered for two weeks after delivery.
+
+## How it works
+
+1. **Intro call (free, 30 min).** You tell me about your product, your users and what worries you. We pick the package.
+2. **Access.** You give me access to the product, a test account or a self-hosted setup, and any docs your users rely on. The environment should be working by the kickoff; setting up complex self-hosted installs is quoted separately.
+3. **Kickoff.** We agree on the flows to audit and who your main users are.
+4. **Audit.** I use the product as your users would and write the report.
+5. **Walkthrough.** We go through the report together on a short call, and I answer your team's questions.

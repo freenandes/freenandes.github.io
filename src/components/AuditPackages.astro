@@ -1,0 +1,134 @@
+---
+/** The UX audit page's packages table, placed by `<Packages />` in
+    `src/content/ux-audit.mdx` from its frontmatter. Rows ruled like the CV's
+    sections, the price in bold; each package's scope sits under its name, so
+    three columns fit a phone. */
+
+interface Package {
+  name: string;
+  scope: string;
+  delivery: string;
+}
+
+interface Props {
+  /** Fixed-price audits, `price` in euros excluding VAT. */
+  audits: (Package & { price: number })[];
+  /** The add-on with no fixed price, its `price` shown as written. */
+  fixes: Package & { price: string };
+}
+
+const { audits, fixes } = Astro.props;
+const euros = (price: number) => `€${price.toLocaleString('en')}`;
+const rows = [audits.map((a) => ({ ...a, price: euros(a.price) })), [fixes]];
+---
+
+<table>
+  <caption>Prices in euros, excluding VAT.</caption>
+  <thead>
+    <tr>
+      <th scope="col">Package</th>
+      <th scope="col">Delivery</th>
+      <th scope="col">Price</th>
+    </tr>
+  </thead>
+  {
+    rows.map((group) => (
+      <tbody>
+        {group.map((row) => (
+          <tr>
+            <th scope="row">
+              <span>{row.name}</span>
+              <span>{row.scope}</span>
+            </th>
+            <td>{row.delivery}</td>
+            <td>{row.price}</td>
+          </tr>
+        ))}
+      </tbody>
+    ))
+  }
+</table>
+
+<style>
+  table {
+    /* Knobs */
+    --packages-row-pad: var(--space-md); /* above and below each row */
+    --packages-price-width: 6.5rem; /* the price column; narrower on a phone, below */
+
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+
+  caption {
+    caption-side: bottom;
+    padding-block-start: var(--space-sm);
+    text-align: start;
+    font-size: var(--step--1);
+    color: var(--ink-3);
+  }
+
+  th,
+  td {
+    padding-block: var(--packages-row-pad);
+    padding-inline-end: var(--space-md);
+    text-align: start;
+    vertical-align: top;
+    font-weight: inherit;
+  }
+
+  thead th {
+    padding-block: 0 var(--space-sm);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--ink-3);
+    border-block-end: 1px solid var(--line-strong);
+  }
+
+  tbody tr + tr,
+  tbody + tbody tr {
+    border-block-start: 1px solid var(--line);
+  }
+
+  th[scope='row'] span {
+    display: block;
+  }
+
+  th[scope='row'] span:first-child {
+    font-weight: var(--weight-bold);
+  }
+
+  th[scope='row'] span + span {
+    margin-block-start: var(--space-xs);
+    color: var(--ink-2);
+  }
+
+  td {
+    color: var(--ink-2);
+  }
+
+  th:last-child,
+  td:last-child {
+    width: var(--packages-price-width);
+    padding-inline-end: 0;
+    text-align: end;
+  }
+
+  td:last-child {
+    font-weight: var(--weight-bold);
+    color: var(--ink);
+  }
+
+  tbody:last-of-type {
+    border-block-end: 1px solid var(--line-strong);
+  }
+
+  @media (width < 40rem) {
+    table {
+      --packages-price-width: 5rem;
+    }
+  }
+</style>

@@ -2,6 +2,17 @@
 
 import { decodeEmail } from './lib/email';
 
+/** A link preview (Open Graph): a 1200×630 PNG under /public, drawn by
+ *  `npm run og`. `width`, `height` and `type` must match the file, so
+ *  platforms can draw the card before fetching it. `alt` says what it shows. */
+export interface OgImage {
+  path: string;
+  width: number;
+  height: number;
+  type: string;
+  alt: string;
+}
+
 export interface SiteConfig {
   name: string;
   role: string;
@@ -19,11 +30,11 @@ export interface SiteConfig {
   locale: string;
   /** Open Graph locale (underscore form, e.g. en_US). */
   ogLocale: string;
-  /** The link preview (Open Graph): a 1200×630 PNG under /public, drawn by
-   *  `npm run og` from `name` and `role`. `width`, `height` and `type` must
-   *  match the file, so platforms can draw the card before fetching it. `alt`
-   *  says what the image shows. */
-  ogImage: { path: string; width: number; height: number; type: string; alt: string };
+  /** Every page's link preview, drawn from `name` and `role`. */
+  ogImage: OgImage;
+  /** The UX audit page's link preview: the same card, drawn with `title` in
+   *  place of the name, `lines` in place of the role and `domain` below. */
+  uxAuditOgImage: OgImage & { title: string; lines: string[]; domain: string };
   /** Home-screen name, and the tint browsers paint their own UI with. */
   shortName: string;
   themeColor: string;
@@ -56,6 +67,16 @@ export const site: SiteConfig = {
     height: 630,
     type: 'image/png',
     alt: `${name}, ${role}, pmcf.xyz. Set over a topographic map crossed by a route of map markers.`,
+  },
+  uxAuditOgImage: {
+    path: '/og-ux-audit.png',
+    width: 1200,
+    height: 630,
+    type: 'image/png',
+    title: 'Hands-on UX audits',
+    lines: ['What to keep', '& what to fix'],
+    domain: 'pmcf.xyz',
+    alt: 'Hands-on UX audits: what to keep and what to fix, pmcf.xyz. Set over a topographic map crossed by a route of map markers.',
   },
   shortName: 'PMCF',
   themeColor: '#ffffff',

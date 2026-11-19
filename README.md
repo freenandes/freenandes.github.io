@@ -2,6 +2,8 @@
 
 Pedro MC Fernandes's portfolio. The home page is an interactive map that leads to an About page, which doubles as the printable CV, and to the case studies.
 
+The repo also serves a page the portfolio keeps apart: the UX audit service, for freelance clients ([The UX audit page](#the-ux-audit-page)).
+
 - Live at https://www.pmcf.xyz/, built from `main` of this repo. Every push to `main` deploys.
 - A static site: Astro 7, MDX, TypeScript and plain CSS, on GitHub Pages.
 
@@ -20,7 +22,7 @@ Pedro MC Fernandes's portfolio. The home page is an interactive map that leads t
 | `npm run encrypt` | Re-encrypts locked case studies (part of `build`) |
 | `npm run email -- you@example.com` | Changes the contact email |
 | `npm run icons` | Redraws the PNG and `.ico` icons from `public/favicon.svg` |
-| `npm run og` | Redraws the link-preview image, `public/og.png` |
+| `npm run og` | Redraws the link-preview images, `public/og.png` and `public/og-ux-audit.png` |
 
 CI runs `lint:css`, `check:docs`, `check` and `build` on every pull request, and a push to `main` only deploys if all of them pass. Run them before you push.
 
@@ -50,7 +52,7 @@ No secrets are needed.
 - **Locked case studies.** A case study can be locked: its text is encrypted at build time and decrypted in the reader's browser with a passphrase. None is locked right now.
 - **Fonts.** Atkinson Hyperlegible Next and Mono, served from the site itself, not from Google Fonts.
 - **Privacy and security.** A strict Content Security Policy allows no third-party scripts. The email address is obfuscated, so it never appears in the HTML or the repo. GoatCounter counts visits, in deploy builds only, with no cookie and nothing stored in the browser: the site's own script sends the page, the referring site (never the page on it), a source or campaign tag and the screen width, and counts clicks on contact and outbound links, CV prints and map cards opened ([Track where visits come from](#track-where-visits-come-from)). Without scripting, a hidden image counts the page alone.
-- **Metadata.** Open Graph link previews (one image for every page), JSON-LD, a sitemap, `/robots.txt` and `/llms.txt`.
+- **Metadata.** Open Graph link previews (one image for every page but the UX audit's, which has its own), JSON-LD, a sitemap, `/robots.txt` and `/llms.txt`.
 - **Old addresses.** Pages that moved still answer at their old addresses ([Old links](#old-links)).
 - **Standards.** Audited against [The Website Specification](https://specification.website); `SPEC-COMPLIANCE.md` lists what's done and what's pending.
 
@@ -77,7 +79,9 @@ Each page owns its markup and styles. Values worth tuning are named knobs at the
 | Mini-map, page nav, footer | `src/components/MiniMap.astro`, `PageNav.astro`, `Footer.astro` |
 | Fonts | `src/assets/fonts/`, and `fonts` in `astro.config.mjs` |
 | Favicon and app icons | `public/favicon.svg`, then `npm run icons` |
-| Link-preview image | `scripts/og/card.html`, then `npm run og` |
+| Link-preview images | `scripts/og/card.html`, then `npm run og` |
+| The UX audit page: text, packages and prices, contact box and footer wording | `src/content/ux-audit.mdx` |
+| The UX audit page: look, and its packages table | `src/pages/services/ux-audit.astro`, `src/components/AuditPackages.astro` |
 | 404, `/llms.txt`, `/robots.txt`, manifest | `src/pages/` |
 | CI and deploy | `.github/workflows/deploy.yml` |
 
@@ -171,10 +175,10 @@ Run `npm run email -- you@example.com`. It stores the address as an obfuscated t
 
 ### Change the link-preview image
 
-Every page shares one image when its link is posted: `public/og.png`, drawn from `scripts/og/card.html` with the name and role from `src/site.config.ts`.
+Every page shares one image when its link is posted: `public/og.png`, drawn from `scripts/og/card.html` with the name and role from `src/site.config.ts`. The UX audit page has its own, `public/og-ux-audit.png`, drawn from the same card with the words in `uxAuditOgImage`.
 
 1. Change the words in `src/site.config.ts`, or the look in `scripts/og/card.html` (open it in a browser to see it; its knobs are at the top of its `<style>`).
-2. Run `npm run og` and commit the PNG. It refuses to write if the font didn't load or text leaves the centre square, which some apps crop to. If the picture changes beyond the name and role, update `alt` in `ogImage` too.
+2. Run `npm run og` and commit the PNGs it changed (Chrome versions draw text a little differently, so a card whose words didn't change may come out a few pixels off: leave that one as it was). It refuses to write if the font didn't load or text leaves the centre square, which some apps crop to. If the picture changes beyond its words, update `alt` in `ogImage` and `uxAuditOgImage` too.
 3. Platforms cache previews for days. To refresh one sooner, re-scrape the page in [LinkedIn's Post Inspector](https://www.linkedin.com/post-inspector/) or [Facebook's Sharing Debugger](https://developers.facebook.com/tools/debug/).
 
 ### Change the favicon
@@ -232,9 +236,22 @@ npm run browsers                    # Chrome, Firefox and WebKit
 npm run browsers -- --only webkit   # one engine
 ```
 
-It builds the working tree, serves it over HTTPS on this machine and loads every page in each engine, at desktop and phone sizes. It checks that nothing breaks: no script errors, failed requests or CSP violations, no sideways scrolling (on screen or printed), the map mounts and opens a card in view, and the lightbox opens and closes. It exits `1` if a check fails and `2` if a browser couldn't start. Screenshots of each engine go to `.browsers/` to compare by eye; they're never identical, because each engine renders fonts its own way.
+It builds the working tree, serves it over HTTPS on this machine and loads every page in each engine, at desktop and phone sizes. It checks that nothing breaks: no script errors, failed requests or CSP violations, no sideways scrolling (on screen or printed), the map mounts and opens a card in view, the lightbox opens and closes, and once scrolled to the end, no block is left invisible waiting for its entrance, also in a window as tall as a portrait 1440p screen. It exits `1` if a check fails and `2` if a browser couldn't start. Screenshots of each engine go to `.browsers/` to compare by eye; they're never identical, because each engine renders fonts its own way.
 
-Run it after changing the map script, the lightbox, `Base.astro` (its CSP above all) or `global.css`. The phone sizes are emulated in desktop engines, so they don't stand in for Safari on an iPhone or Firefox on Android: check those on a real phone, or in Xcode's iOS Simulator, which runs the real Mobile Safari.
+Run it after changing the map script, the lightbox, `src/scripts/site.ts`, `Base.astro` (its CSP above all) or `global.css`. The phone sizes are emulated in desktop engines, so they don't stand in for Safari on an iPhone or Firefox on Android: check those on a real phone, or in Xcode's iOS Simulator, which runs the real Mobile Safari.
+
+## The UX audit page
+
+`/services/ux-audit/` sells UX audits to software teams. It's kept apart from the portfolio in one direction only:
+
+- It links to the portfolio: a line in its intro and "About Pedro" in its footer, both to About.
+- The portfolio never links to it, except "Hands-on UX audit" in About's footer, beside the contact links, which the printed CV leaves out. No nav, map marker, case study or `/llms.txt` entry points to it. People arrive from a link sent to them, from search (it's in the sitemap, with its own description, preview image and `Service` structured data) or from About.
+- `/services/`, `/service/`, `/servicos/` and `/ux-audit/` forward to it (`redirects` in `astro.config.mjs`). `/services/` may become a list of services one day; until then it forwards too.
+- A missing address that looks like it (lowercased, it starts with `/service` or `/servicos`, or contains `ux-audit`, `uxaudit` or `ux_audit`) is forwarded by the 404 page's script, since GitHub Pages paths are case-sensitive and `/Services/` would otherwise miss. Any other miss gets the portfolio's 404, which leads back to the map.
+
+Its words are in `src/content/ux-audit.mdx`: the body is the page's text, in Markdown like a case study, and the frontmatter holds the title, the service's name in the top bar, the heading, the packages (which draw the pricing table, placed in the text by `<Packages />`, and the prices search engines see) and the contact box. `src/pages/services/ux-audit.astro` is only the frame and the look.
+
+It reads like the rest of the site until it asks for something: the packages table is its first new shape, and the closing contact box, framed, with the site's only filled button, is where it breaks the pattern on purpose. The top bar's "Email me" and the button use the same obfuscated address as every email link. Its footer drops the rule and the availability line, and adds a link to About. The sample report under "What you get" is a plain figure, not a Gallery, so it doesn't invite enlarging; its image, drawn at 2×, is in `src/assets/ux-audit/`.
 
 ## Old links
 

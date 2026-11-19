@@ -8,8 +8,10 @@
    Chrome, Firefox and WebKit (Safari's engine), at a desktop and a phone size.
    It checks behaviour, not pixels, because fonts render differently in each
    engine: no script errors, failed requests or CSP violations, no sideways
-   scroll, the map mounts and opens a card in view, and the lightbox opens and
-   closes. Screenshots of each engine land in .browsers/ to compare by eye.
+   scroll, the map mounts and opens a card in view, the lightbox opens and
+   closes, and scrolled to the end, no block is left invisible waiting for its
+   entrance, at each size and in a tall desktop window. Screenshots of each
+   engine land in .browsers/ to compare by eye.
 
    Phone sizes are emulated in desktop engines: a small viewport with touch,
    plus Chrome's mobile mode. They aren't iOS Safari or Android Firefox.
@@ -46,6 +48,13 @@ const BASE_PATH = astroConfig.base ?? '/';
 const SETTLE_MS = 2500;
 /** A card or the lightbox fades in; wait this long before measuring it. */
 const OPEN_MS = 800;
+/** A block's entrance (`--dur-slow`) has played by then. */
+const REVEAL_MS = 1200;
+/** A desktop window as tall as a portrait 1440p screen. A short footer can't
+    scroll up to the reveal's trigger line in one this tall, which is how
+    footers used to stay invisible (`deferOffscreenReveals()` in
+    src/scripts/site.ts). */
+const TALL = { width: 1440, height: 2560 };
 
 /** Chrome is your installed one (see `findChrome()`); Firefox and WebKit are
     Playwright's builds, installed with `npx playwright install firefox webkit`. */
@@ -187,6 +196,41 @@ async function checkLightbox(page, touch, problems, shot) {
   }
 }
 
+/** Scrolled to the end the way a reader goes, a page leaves no block waiting
+    for its entrance: each one was released on the way down, or never held.
+    One left waiting stays invisible, which nothing else here would notice.
+    Its own page, so the scroll starts at the top, from a fresh load. */
+async function checkReveals(context, site, pagePath, problems, viewport) {
+  const page = await context.newPage();
+  try {
+    if (viewport) await page.setViewportSize(viewport);
+    await page.goto(site.origin + site.base + pagePath, { waitUntil: 'load', timeout: 30000 });
+    // Half a window at a time, two frames apart, so the page's observers see
+    // every stretch go by.
+    await page.evaluate(async () => {
+      const frames = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      for (let step = 0; step < 400; step++) {
+        scrollTo({ top: (step * innerHeight) / 2, behavior: 'instant' });
+        await frames();
+        if (scrollY + innerHeight >= document.documentElement.scrollHeight - 1) break;
+      }
+    });
+    await page.waitForTimeout(REVEAL_MS);
+    const hidden = await page.evaluate(() =>
+      [...document.querySelectorAll('[data-reveal]')]
+        .filter((el) => el.getClientRects().length)
+        .filter((el) => el.hasAttribute('data-reveal-wait') || Number(getComputedStyle(el).opacity) < 0.99)
+        .map((el) => el.tagName.toLowerCase() + (el.id ? `#${el.id}` : ''))
+    );
+    const where = viewport ? ` of a ${viewport.width}×${viewport.height} window` : '';
+    if (hidden.length) problems.push(`still invisible after scrolling to the end${where}: ${hidden.join(', ')}`);
+  } catch (err) {
+    problems.push(`stopped checking reveals: ${firstLine(err)}`);
+  } finally {
+    await page.close();
+  }
+}
+
 /** Loads one page and runs every check that applies to it. */
 async function checkPage(context, touch, site, pagePath, tag) {
   const page = await context.newPage();
@@ -235,6 +279,8 @@ async function checkPage(context, touch, site, pagePath, tag) {
   } finally {
     await page.close();
   }
+  await checkReveals(context, site, pagePath, problems);
+  if (!touch) await checkReveals(context, site, pagePath, problems, TALL);
   return [...new Set(problems)];
 }
 

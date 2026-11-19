@@ -89,4 +89,26 @@ const cv = defineCollection({
   }).strict(),
 });
 
-export const collections = { projects, cv };
+// One entry: src/content/ux-audit.mdx, the UX audit page's words. Its body is
+// the page's text; the frontmatter holds what the page frames it with (title,
+// top bar, heading, contact box) and the packages, which draw both the
+// table in the body and the page's structured data. `.strict()` turns a
+// misspelled field into a build error.
+const uxAudit = defineCollection({
+  loader: glob({ pattern: 'ux-audit.mdx', base: './src/content' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    service: z.string(),
+    heading: z.string(),
+    // Fixed-price audits, `price` in euros excluding VAT.
+    audits: z.array(
+      z.object({ name: z.string(), scope: z.string(), delivery: z.string(), price: z.number() }).strict()
+    ),
+    // The add-on with no fixed price: `price` is shown as written.
+    fixes: z.object({ name: z.string(), scope: z.string(), delivery: z.string(), price: z.string() }).strict(),
+    contact: z.object({ text: z.string(), button: z.string() }).strict(),
+  }).strict(),
+});
+
+export const collections = { projects, cv, uxAudit };

@@ -1,0 +1,214 @@
+---
+/** The UX audit service page, for freelance clients. Its words are in
+    `src/content/ux-audit.mdx`: the body is the page's text, and the
+    frontmatter holds the top bar, the heading, the packages and the contact
+    box. This file is the frame around them and their look.
+
+    It stands apart from the portfolio in one direction: it links to the
+    portfolio, and the portfolio never links here, except About's footer,
+    which is never printed. People arrive by a link sent to them, from search,
+    or from About. `/services/`, `/service/`, `/servicos/` and `/ux-audit/`
+    forward here (`redirects` in astro.config.mjs), and so does a 404 at any
+    address that looks like this one (src/pages/404.astro).
+
+    The page reads like the rest of the site until it asks for something: the
+    packages table (src/components/AuditPackages.astro) is its first new
+    shape, and the closing contact box, with the site's only filled button, is
+    where it breaks the pattern on purpose. */
+
+import { getEntry, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageNav from '../../components/PageNav.astro';
+import { site } from '../../site.config';
+import { withBase } from '../../lib/base';
+
+const entry = await getEntry('uxAudit', 'ux-audit');
+if (!entry) throw new Error('src/content/ux-audit.mdx is missing — the UX audit page renders from it.');
+const { data } = entry;
+const { Content } = await render(entry);
+
+const email = site.socials.find((s) => s.token);
+if (!email?.token) {
+  throw new Error('services/ux-audit.astro: site.config.ts needs the Email social for the email links.');
+}
+
+const origin = Astro.site ?? Astro.url;
+const abs = (path: string) => new URL(withBase(path), origin).toString();
+const pageUrl = new URL(Astro.url.pathname, origin).toString();
+const personId = `${abs('/')}#person`;
+const serviceId = `${pageUrl}#service`;
+
+const jsonLd = [
+  {
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#webpage`,
+    url: pageUrl,
+    name: `${data.title} — ${site.name}`,
+    description: data.description,
+    inLanguage: site.locale,
+    isPartOf: { '@id': `${abs('/')}#website` },
+    about: { '@id': serviceId },
+    author: { '@id': personId },
+  },
+  {
+    '@type': 'Service',
+    '@id': serviceId,
+    name: data.service,
+    serviceType: 'UX audit',
+    description: data.description,
+    url: pageUrl,
+    provider: { '@id': personId },
+    areaServed: 'Worldwide',
+    audience: { '@type': 'BusinessAudience', name: 'Software teams' },
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'UX audit packages',
+      itemListElement: [
+        ...data.audits.map((audit) => ({
+          '@type': 'Offer',
+          name: audit.name,
+          description: `${audit.scope}. Delivery: ${audit.delivery}.`,
+          price: audit.price,
+          priceCurrency: 'EUR',
+          priceSpecification: {
+            '@type': 'PriceSpecification',
+            price: audit.price,
+            priceCurrency: 'EUR',
+            valueAddedTaxIncluded: false,
+          },
+          url: pageUrl,
+        })),
+        {
+          '@type': 'Offer',
+          name: data.fixes.name,
+          description: `${data.fixes.scope}. ${data.fixes.delivery}.`,
+          url: pageUrl,
+        },
+      ],
+    },
+  },
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: site.name, item: abs('/') },
+      { '@type': 'ListItem', position: 2, name: 'UX audit', item: pageUrl },
+    ],
+  },
+];
+---
+
+<Base
+  title={data.title}
+  description={data.description}
+  jsonLd={jsonLd}
+  ogImage={site.uxAuditOgImage}
+  footerIntro={false}
+>
+  <article>
+    {/* The service's name in the links' type, painted in ink: a title, not a
+        link. The email links are assembled in the browser (src/scripts/site.ts),
+        so the address is never in the HTML; without scripting they stay hidden
+        (global.css) and the footer's LinkedIn is the way in. */}
+    <PageNav>
+      <li><span>{data.service}</span></li>
+      <li><a data-email={email.token}>{data.contact.button}</a></li>
+    </PageNav>
+
+    <header data-reveal>
+      <h1>{data.heading}</h1>
+    </header>
+
+    <div class="prose" data-reveal style="--reveal-step: 1">
+      <Content />
+    </div>
+
+    {/* The page's one loud moment. */}
+    <section id="contact" aria-labelledby="contact-title" data-reveal>
+      <h2 id="contact-title" class="visually-hidden">Email me</h2>
+      <p>{data.contact.text}</p>
+      <a class="button" data-email={email.token}>{data.contact.button}</a>
+    </section>
+  </article>
+
+  <li slot="footer-links"><a href={withBase('/about/')}>About Pedro</a></li>
+</Base>
+
+<style>
+  /* --- Knobs ---------------------------------------------------------------- */
+  article {
+    --audit-section-gap: var(--space-xl); /* above each section's title */
+    --audit-contact-border: 1px solid var(--line-strong); /* the contact box's frame */
+    --audit-contact-pad: var(--space-lg);
+    --audit-button-pad: 0.625rem 0.875rem;
+  }
+
+  @media (width < 40rem) {
+    article {
+      --audit-contact-pad: var(--space-md);
+    }
+  }
+
+  /* The service's name in the top bar: the links' type, without their colour
+     or underline. The bar is PageNav's, hence :global(). */
+  :global(.page-nav) span {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  header {
+    margin-block-end: var(--space-lg);
+  }
+
+  /* The body is rendered MDX, so its elements aren't scoped to this file and
+     need :global(). */
+
+  .prose :global(h2) {
+    margin-block-start: var(--audit-section-gap);
+  }
+
+  /* The steps' numbers hang outside the text like the bullets do, in their
+     soft ink. */
+  .prose :global(ol li::marker) {
+    font-weight: var(--weight-semibold);
+    color: var(--ink-3);
+  }
+
+  /* --- Contact: a framed box with a filled button, shapes the site shows
+     nowhere else. --- */
+
+  #contact {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-lg);
+    margin-block: var(--audit-section-gap) 0;
+    padding: var(--audit-contact-pad);
+    border: var(--audit-contact-border);
+  }
+
+  a.button {
+    padding: var(--audit-button-pad);
+    border-radius: var(--radius-sm);
+    background: var(--accent-ink);
+    color: var(--paper);
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease);
+  }
+
+  a.button:hover {
+    background: var(--accent);
+    color: var(--paper);
+  }
+
+  @media (width < 40rem) {
+    a.button {
+      justify-self: stretch;
+      text-align: center;
+    }
+  }
+</style>

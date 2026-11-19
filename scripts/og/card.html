@@ -1,11 +1,13 @@
 <!doctype html>
 <!--
-  The link-preview card: what `npm run og` photographs into public/og.png.
+  The link-preview card: what `npm run og` photographs into public/og.png,
+  and again, with other words, into public/og-ux-audit.png.
 
-  Lay it out here like any page. The script fills the name and role from
-  src/site.config.ts (the text below is only a stand-in for opening this file
-  in a browser) and fails if anything lands outside the centre square, which
-  some apps crop to. Colours and fonts come from the site's tokens.
+  Lay it out here like any page. The script fills the title, the lines under
+  it and the domain from src/site.config.ts (the text below is only a stand-in
+  for opening this file in a browser) and fails if anything lands outside the
+  centre square, which some apps crop to. Colours and fonts come from the
+  site's tokens.
 -->
 <html lang="en">
   <head>
@@ -131,7 +133,7 @@
         color: var(--ink-faint);
       }
 
-      /* Each part of "X & Y" on its own line, the ampersand leading. */
+      /* Each line on its own: the parts of "X & Y", the ampersand leading. */
       p[data-og='role'] span {
         display: block;
       }

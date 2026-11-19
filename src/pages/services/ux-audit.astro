@@ -18,7 +18,6 @@
 
 import { getEntry, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import Lightbox from '../../components/Lightbox.astro';
 import PageNav from '../../components/PageNav.astro';
 import { site } from '../../site.config';
 import { withBase } from '../../lib/base';
@@ -130,8 +129,6 @@ const jsonLd = [
       <a class="button" data-email={email.token}>{data.contact.button}</a>
     </section>
   </article>
-
-  <Lightbox />
 
   <li slot="footer-links"><a href={withBase('/about/')}>About Pedro</a></li>
 </Base>

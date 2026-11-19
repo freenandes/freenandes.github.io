@@ -251,7 +251,7 @@ Run it after changing the map script, the lightbox, `Base.astro` (its CSP above 
 
 Its words are in `src/content/ux-audit.mdx`: the body is the page's text, in Markdown like a case study, and the frontmatter holds the title, the service's name in the top bar, the heading, the packages (which draw the pricing table, placed in the text by `<Packages />`, and the prices search engines see) and the contact box. `src/pages/services/ux-audit.astro` is only the frame and the look.
 
-It reads like the rest of the site until it asks for something: the packages table is its first new shape, and the closing contact box, framed, with the site's only filled button, is where it breaks the pattern on purpose. The top bar's "Email me" and the button use the same obfuscated address as every email link. Its footer drops the rule and the availability line, and adds a link to About. The sample report under "What you get" is a Gallery, as in the case studies, with the page's own enlarged view; its image is in `src/assets/ux-audit/`.
+It reads like the rest of the site until it asks for something: the packages table is its first new shape, and the closing contact box, framed, with the site's only filled button, is where it breaks the pattern on purpose. The top bar's "Email me" and the button use the same obfuscated address as every email link. Its footer drops the rule and the availability line, and adds a link to About. The sample report under "What you get" is a plain figure, not a Gallery, so it doesn't invite enlarging; its image, drawn at 2×, is in `src/assets/ux-audit/`.
 
 ## Old links
 

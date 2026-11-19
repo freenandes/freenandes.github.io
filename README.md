@@ -80,7 +80,8 @@ Each page owns its markup and styles. Values worth tuning are named knobs at the
 | Fonts | `src/assets/fonts/`, and `fonts` in `astro.config.mjs` |
 | Favicon and app icons | `public/favicon.svg`, then `npm run icons` |
 | Link-preview images | `scripts/og/card.html`, then `npm run og` |
-| The UX audit page: copy, packages and prices, look | `src/pages/services/ux-audit.astro` |
+| The UX audit page: text, packages and prices, contact box and footer wording | `src/content/ux-audit.mdx` |
+| The UX audit page: look, and its packages table | `src/pages/services/ux-audit.astro`, `src/components/AuditPackages.astro` |
 | 404, `/llms.txt`, `/robots.txt`, manifest | `src/pages/` |
 | CI and deploy | `.github/workflows/deploy.yml` |
 
@@ -248,7 +249,9 @@ Run it after changing the map script, the lightbox, `Base.astro` (its CSP above 
 - `/services/`, `/service/`, `/servicos/` and `/ux-audit/` forward to it (`redirects` in `astro.config.mjs`). `/services/` may become a list of services one day; until then it forwards too.
 - A missing address that looks like it (lowercased, it starts with `/service` or `/servicos`, or contains `ux-audit`, `uxaudit` or `ux_audit`) is forwarded by the 404 page's script, since GitHub Pages paths are case-sensitive and `/Services/` would otherwise miss. Any other miss gets the portfolio's 404, which leads back to the map.
 
-It reads like the rest of the site until it asks for something: the packages table is its first new shape, and the closing contact box, framed, with bold words and the site's only filled button, is where it breaks the pattern on purpose. The "Email me" button uses the same obfuscated address as every email link. The example finding is still a marked placeholder; the comment above it says how to swap in the real image.
+Its words are in `src/content/ux-audit.mdx`: the body is the page's text, in Markdown like a case study, and the frontmatter holds the title, the header, the packages (which draw the pricing table, placed in the text by `<Packages />`, and the prices search engines see), the footer line and the contact box. `src/pages/services/ux-audit.astro` is only the frame and the look.
+
+It reads like the rest of the site until it asks for something: the packages table is its first new shape, and the closing contact box, framed, with bold words and the site's only filled button, is where it breaks the pattern on purpose. The "Email me" button uses the same obfuscated address as every email link. The example finding is still a marked placeholder in the MDX; the comment above it says how to swap in the real image.
 
 ## Old links
 

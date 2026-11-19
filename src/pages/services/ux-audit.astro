@@ -172,18 +172,6 @@ const jsonLd = [
     margin-block-start: var(--audit-section-gap);
   }
 
-  /* The steps' numbers hang outside the text like the bullets do, in their
-     soft ink and smaller type, so on a phone they fit in the gutter instead
-     of running off the screen. A quarter-em space in place of the default
-     one keeps them close to the text; a browser that ignores `content` on a
-     marker keeps its own space, which the smaller type still fits. */
-  .prose :global(ol li::marker) {
-    content: counter(list-item) '.\2005';
-    font-size: var(--step--1);
-    font-weight: var(--weight-semibold);
-    color: var(--ink-3);
-  }
-
   /* --- Contact: a framed box with a filled button, shapes the site shows
      nowhere else. --- */
 

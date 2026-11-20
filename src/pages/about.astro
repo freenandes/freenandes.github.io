@@ -3,16 +3,77 @@
     everything about how it looks is in this file. */
 
 import { getEntry } from 'astro:content';
+import { getImage } from 'astro:assets';
 import { marked } from 'marked';
 import Base from '../layouts/Base.astro';
 import PageNav from '../components/PageNav.astro';
 import MiniMap from '../components/MiniMap.astro';
+import Lightbox from '../components/Lightbox.astro';
 import { site } from '../site.config';
 import { withBase } from '../lib/base';
+import { getProjects } from '../lib/projects';
 
 const entry = await getEntry('cv', 'cv');
 if (!entry) throw new Error('src/content/cv.md is missing — the About page renders from it.');
 const cv = entry.data;
+
+/** A thumbnail's height in CSS pixels, mirroring `--cv-thumb-height`, for the
+    browser's guess at its width before layout. One that supports
+    `sizes="auto"` measures the real width instead. */
+const THUMB_HEIGHT_HINT = 72;
+/** As in Gallery.astro: a WebP, JPEG or AVIF links to its file as it is, a
+    PNG to a WebP of it; thumbnails are WebPs at this quality. */
+const COMPRESSED = ['webp', 'jpg', 'jpeg', 'avif'];
+const QUALITY = 90;
+
+// A job with what sits under it on screen: its case studies, by title, and
+// its thumbnails, each linking to its full image for the enlarged view. One
+// that names a case study that isn't published fails the build, as the map does.
+const projects = await getProjects();
+type Extras = { org: string; caseStudies: string[]; images: { src: ImageMetadata; alt: string }[] };
+const withExtras = async <Job extends Extras>({ caseStudies, images, ...job }: Job) => ({
+  ...job,
+  caseStudies: caseStudies.map((id) => {
+    const project = projects.find((p) => p.id === id);
+    if (!project) throw new Error(`cv.md: ${job.org} links to the case study "${id}", which isn't published.`);
+    return { title: project.data.title, href: withBase(`/${id}/`) };
+  }),
+  images: await Promise.all(
+    images.map(async ({ src, alt }) => {
+      const url = COMPRESSED.includes(src.format)
+        ? src.src
+        : (await getImage({ src, format: 'webp', quality: QUALITY })).src;
+      // Copies for 1×, 2× and 3× screens, none wider than the original.
+      const shown = Math.ceil((THUMB_HEIGHT_HINT * src.width) / src.height);
+      const widths = [1, 2, 3].map((n) => n * shown).filter((width) => width < src.width);
+      const thumbs = widths.length
+        ? await getImage({ src, width: widths[0], widths, format: 'webp', quality: QUALITY })
+        : undefined;
+      return {
+        url,
+        thumb: thumbs?.src ?? url,
+        srcset: thumbs?.srcSet.attribute,
+        sizes: `auto, ${shown}px`,
+        alt,
+        width: src.width,
+        height: src.height,
+      };
+    })
+  ),
+});
+
+// The jobs, then the earlier work, drawn alike: an earlier job is a job
+// without bullets.
+const jobSections = [
+  { id: 'experience', title: 'Experience', step: 2, jobs: await Promise.all(cv.experience.map(withExtras)) },
+  {
+    id: 'earlier-work',
+    title: 'Earlier work',
+    step: undefined,
+    jobs: await Promise.all(cv.earlierWork.map((job) => withExtras({ ...job, points: [] as string[] }))),
+  },
+];
+const hasImages = jobSections.some((section) => section.jobs.some((job) => job.images.length > 0));
 // The summary is a Markdown field (not the file body) so cv.md reads in page order.
 const summary = await marked.parse(cv.summary);
 const name = site.name;
@@ -126,49 +187,78 @@ const jsonLd = [
 
     {/* Each section's <h2> lives inside its first entry's .entry-keep, so a
         printed page can never end on a section title (see the print styles). */}
-    <section id="experience" data-reveal style="--reveal-step: 2">
-      {
-        cv.experience.map((job, i) => (
-          <div class="entry">
-            <div class="entry-keep">
-              {i === 0 && <h2>Experience</h2>}
-              <p class="period">{job.period}</p>
-              <div>
-                <h3>{job.role}, {job.org}</h3>
-                {job.summary && <p>{job.summary}</p>}
-                {job.points.length > 0 && (
-                  <ul>
-                    {job.points.slice(0, 1).map((point) => <li>{point}</li>)}
-                  </ul>
-                )}
-              </div>
-            </div>
-            {job.points.length > 1 && (
-              <ul>
-                {job.points.slice(1).map((point) => <li>{point}</li>)}
-              </ul>
-            )}
-          </div>
-        ))
-      }
-    </section>
-
     {
-      cv.earlierWork.length > 0 && (
-        <section id="earlier-work" data-reveal>
-          {cv.earlierWork.map((job, i) => (
-            <div class="entry">
-              <div class="entry-keep">
-                {i === 0 && <h2>Earlier work</h2>}
-                <p class="period">{job.period}</p>
-                <div>
-                  <h3>{job.role}, {job.org}</h3>
-                  {job.summary && <p>{job.summary}</p>}
+      jobSections.map(
+        (section) =>
+          section.jobs.length > 0 && (
+            <section
+              id={section.id}
+              data-reveal
+              style={section.step ? `--reveal-step: ${section.step}` : undefined}
+            >
+              {section.jobs.map((job, i) => (
+                <div class="entry">
+                  <div class="entry-keep">
+                    {i === 0 && <h2>{section.title}</h2>}
+                    <p class="period">{job.period}</p>
+                    <div>
+                      <h3>{job.role}, {job.org}</h3>
+                      {job.summary && <p>{job.summary}</p>}
+                      {job.points.length > 0 && (
+                        <ul>
+                          {job.points.slice(0, 1).map((point) => <li>{point}</li>)}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+                  {job.points.length > 1 && (
+                    <ul>
+                      {job.points.slice(1).map((point) => <li>{point}</li>)}
+                    </ul>
+                  )}
+                  {(job.caseStudies.length > 0 || job.images.length > 0) && (
+                    <div class="entry-extras no-print">
+                      {job.caseStudies.length > 0 && (
+                        <div>
+                          <p class="meta">Case studies:</p>
+                          <ul role="list">
+                            {job.caseStudies.map((study) => (
+                              <li><a href={study.href}>{study.title}</a></li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {job.images.length > 0 && (
+                        <ul role="list">
+                          {job.images.map((image) => (
+                            <li>
+                              <a
+                                href={image.url}
+                                data-enlarge
+                                style={`--w: ${image.width}; --ratio: ${image.width / image.height}`}
+                              >
+                                <span class="visually-hidden">Enlarge image:</span>
+                                <img
+                                  src={image.thumb}
+                                  srcset={image.srcset}
+                                  sizes={image.srcset && image.sizes}
+                                  alt={image.alt}
+                                  width={image.width}
+                                  height={image.height}
+                                  loading="lazy"
+                                  decoding="async"
+                                />
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </div>
-            </div>
-          ))}
-        </section>
+              ))}
+            </section>
+          )
       )
     }
 
@@ -220,6 +310,8 @@ const jsonLd = [
     }
   </article>
 
+  {hasImages && <Lightbox />}
+
   <MiniMap slot="footer" />
 
   {/* The one page of the portfolio that points to the UX audit, from the
@@ -234,6 +326,9 @@ const jsonLd = [
     --cv-section-gap: calc(var(--space-lg) + var(--space-md)); /* above a section title */
     --cv-title-gap: calc(var(--space-md) + var(--space-sm)); /* below the title's rule */
     --cv-entry-gap: calc(var(--space-md) + var(--space-sm)); /* between entries */
+    --cv-extras-gap: var(--space-md); /* above a job's case-study links and thumbnails */
+    --cv-extras-after: calc(var(--space-lg) + var(--space-md)); /* below them, before the next job */
+    --cv-thumb-height: 4.5rem; /* a thumbnail's height (THUMB_HEIGHT_HINT follows it) */
     --cv-map-gap: var(--space-xl); /* extra room between the last section and the mini-map */
     --cv-quote-paragraph-gap: var(--space-sm); /* between a recommendation's paragraphs */
     --cv-quote-sign-gap: var(--space-md); /* between a recommendation and who wrote it */
@@ -351,7 +446,10 @@ const jsonLd = [
     margin-block-start: var(--space-sm);
   }
 
-  .entry ul {
+  /* The bullets: the first beside the title, the rest below. Not the rows of
+     links and thumbnails under them, which are lists too. */
+  .entry-keep ul,
+  .entry > ul {
     margin-block-start: var(--space-sm);
     display: grid;
     gap: var(--space-sm);
@@ -366,6 +464,51 @@ const jsonLd = [
   .entry li::marker {
     font-size: var(--step--1);
     color: var(--ink-3);
+  }
+
+  /* A job's case studies, then its thumbnails, in the body column. They sit
+     close under its bullets and the next job further off, so they read as
+     this job's. Screen only: the PDF leaves them, and that room, out. */
+  .entry-extras {
+    grid-column: 2;
+    display: grid;
+    gap: var(--space-md);
+    margin-block-start: var(--cv-extras-gap);
+  }
+
+  @media screen {
+    .entry:has(> .entry-extras) + .entry {
+      margin-block-start: var(--cv-extras-after);
+    }
+  }
+
+  /* "Case studies:", with the links just under it. */
+  .entry-extras .meta + ul {
+    margin-block-start: var(--space-sm);
+  }
+
+  /* Thumbnails at one height, each in its own shape, framed like a case
+     study's screenshots. A click opens the enlarged view (Lightbox.astro). */
+  .entry-extras ul:has(img) {
+    gap: var(--space-sm);
+  }
+
+  .entry-extras a:has(img) {
+    display: block;
+    cursor: zoom-in;
+  }
+
+  .entry-extras img {
+    width: auto;
+    height: var(--cv-thumb-height);
+    object-fit: cover;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    transition: border-color var(--dur-fast) var(--ease);
+  }
+
+  .entry-extras a:hover img {
+    border-color: var(--line-strong);
   }
 
   /* Recommendations: the date where a job's dates go, the quote in the body
@@ -416,6 +559,11 @@ const jsonLd = [
     .entry > ul {
       grid-column: 1;
       margin-block-start: 0;
+    }
+
+    .entry-extras {
+      grid-column: 1;
+      margin-block-start: calc(var(--cv-extras-gap) - var(--space-sm));
     }
 
     /* The one-column grid adds its gap under the title too. */

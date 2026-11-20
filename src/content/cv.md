@@ -28,6 +28,9 @@ summary: |
   - Reviews that unblock teams. When teams ship fast, I turn UX findings into clear, actionable notes that anyone can pick up, so UX improvements can meet the deadline with ease and still ship with the necessary quality.
   - Design systems in code. I work directly in front-end codebases, so design and engineering share the same source and the same intent.
 
+# A job, here or in earlierWork, can end with `caseStudies` (file names from
+# src/content/projects/, without .mdx) and `images` (`src`, a path from this
+# file, and `alt`). Both show under the job on the page only, never on the PDF.
 experience:
   - role: Senior Product Designer
     org: Percona
@@ -39,6 +42,9 @@ experience:
       - Built and managed Peak UI, the front-end component and style foundation that streamlined development and enabled extensibility across Percona products.
       - Audited the user journey to PMM adoption, identified documentation as a key gap, and redesigned and coded modular templates across 10+ documentation sites, improving readability and simplifying content creation.
       - Mentored designers and engineers on design system patterns, design critique, and research methods.
+    caseStudies:
+      - peak-systems-at-percona
+      - reading-the-terrain-at-percona
 
   - role: Senior Product Designer
     org: FARFETCH
@@ -49,6 +55,9 @@ experience:
       - Created a taxonomy framework for sustainable items, resolving catalog inconsistencies, making complex product attributes clearer, and documenting standards shared across departments.
       - Redesigned product listing cards to enable direct purchasing from catalog pages, removing friction in the checkout funnel and improving product discovery.
       - Built modular component patterns that balanced high-end luxury aesthetics with strict functional e-commerce requirements.
+    images:
+      - src: ../assets/cv/farfetch-menu.webp
+        alt: "A minimal, icon-less navigation proposed for FARFETCH, in seven phone screens: the home page, the main menu, the Women menu, scrolling down and back up, and a search for Balenciaga."
 
   - role: Senior Product Designer
     org: TUI Group
@@ -60,6 +69,8 @@ experience:
       - Managed front-end QA with external development teams to keep implementation true to the design.
       - Validated interface patterns using A/B testing and Baymard UX benchmarking before scaling features across distributed European teams.
       - Built vision prototypes to align international product strategy, helping grow the Lisbon hub’s influence within the group.
+    caseStudies:
+      - 100000-pages-high-at-tui-group
 
   - role: User Experience Designer
     org: SMARTIDIOM
@@ -69,6 +80,11 @@ experience:
       - Designed and coded 4 interconnected web applications, turning a traditional service business into a digital platform that connects clients with certified professionals.
       - Built Slayout, a UI component system created from scratch to standardize interface patterns across complex workflows, including calendar scheduling, financial tracking, bidding systems, and onboarding flows.
       - Created high-fidelity product demonstrations and front-end builds showcased at CES 2017 to validate market demand and platform capabilities.
+    images:
+      - src: ../assets/cv/smartidiom-suppliers.webp
+        alt: "The SMARTIDIOM Suppliers dashboard: the time and date, a timecard, tasks, invoices, notifications, today’s schedule and a to-do list."
+      - src: ../assets/cv/smartidiom-icons.webp
+        alt: "The icon map of Slayout, the SMARTIDIOM design system: about fifty line icons, each with its name, from paper plane to clock."
 
 # Older or side jobs, one short line each: no bullet points.
 earlierWork:
@@ -86,6 +102,13 @@ earlierWork:
     org: Freelance
     period: 2009 — 2011
     summary: "Editorial illustration for Visão, DIFF and Lux Woman, brand identities with systematic guidelines, and my first web layouts in code."
+    images:
+      - src: ../assets/cv/illustration-demi-moore.webp
+        alt: "A fashion illustration of Demi Moore, hands on hips, with long black hair, a green dress, a moss-green shrug and a black sash bearing the Scorpio sign, her name lettered beside her."
+      - src: ../assets/cv/illustration-fiction.webp
+        alt: "An illustration on grey: an upside-down figure with dark red hair, in a harlequin top, spills white dots between arms reaching out of black holes, above the word Fiction in white splashes."
+      - src: ../assets/cv/illustration-mask.webp
+        alt: "A collage on a black harlequin pattern: a pale mask of a face looped in strings of rhinestones, among floating pencil sharpeners and orange pencil shavings."
 
   - role: Industrial Designer
     org: COMOPI

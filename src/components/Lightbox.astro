@@ -1,7 +1,10 @@
 ---
-/** The enlarged view of a case study's media: one dialog for the page that
-    steps through every screenshot and video in reading order (side buttons,
-    arrow keys, swipe), with a counter at the top. A screenshot opens fitted to
+/** The enlarged view of a page's media: one dialog for the page that steps
+    through every screenshot and video in reading order (side buttons, arrow
+    keys, swipe), with a counter at the top. A case study's galleries and
+    videos are in it, and so is any link marked `data-enlarge` (About's
+    thumbnails), which holds an <img> and links to its full file, with its
+    own width (`--w`) and shape (`--ratio`) set. A screenshot opens fitted to
     the window, never past its own size; a click, a pinch, Ctrl or ⌘ with the
     wheel, or the buttons zoom it, and zoomed it pans by scrolling or dragging.
     A video plays at no more than its own size and doesn't zoom. The browser's
@@ -63,8 +66,11 @@
   const previous = dialog?.querySelector<HTMLButtonElement>('[data-step="-1"]');
   const next = dialog?.querySelector<HTMLButtonElement>('[data-step="1"]');
 
-  /** Every gallery thumbnail and every video in the text, in reading order. */
-  const items = [...document.querySelectorAll<HTMLElement>('[data-gallery] > div > a, .prose figure > video')];
+  /** Every gallery thumbnail, other thumbnail and video in the text, in
+      reading order. */
+  const items = [
+    ...document.querySelectorAll<HTMLElement>('[data-gallery] > div > a, a[data-enlarge], .prose figure > video'),
+  ];
 
   if (dialog && stage && count && zoomIn && zoomOut && zoomFit && close && previous && next && items.length) {
     const step = knob(dialog, '--lightbox-zoom-step', 1.5);

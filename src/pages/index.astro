@@ -10,6 +10,8 @@ import type { SvgComponent } from 'astro/types';
 import { Image } from 'astro:assets';
 import Ruler from '../assets/ruler.svg';
 import Base from '../layouts/Base.astro';
+import VideoWindow from '../components/VideoWindow.astro';
+import PlayMark from '../components/PlayMark.astro';
 import type { DiagramNode, NodeKind } from '../diagram.config';
 import { withBase } from '../lib/base';
 import { getDiagramNodes, polygon } from '../lib/diagram';
@@ -18,6 +20,12 @@ import portrait from '../assets/sticker.png';
 import postIt from '../assets/post-it.webp';
 import postItYellow from '../assets/post-it-yellow.webp';
 import notebook from '../assets/notebook.webp';
+import introVideo from '../assets/intro-video.mp4';
+import introPoster from '../assets/intro-video.jpg';
+import introCaptions from '../assets/intro-video.vtt?url&no-inline';
+import sketchbookVideo from '../assets/sketchbook-video.mp4';
+import sketchbookPoster from '../assets/sketchbook-video.jpg';
+import sketchbookCaptions from '../assets/sketchbook-video.vtt?url&no-inline';
 
 const nodes = await getDiagramNodes();
 
@@ -32,8 +40,33 @@ const decorations = Object.entries(
 ).map(([path, Drawing]) => ({ Drawing, name: basename(path, '.svg') }));
 
 // Drawings that read as the portrait's speech balloon: the map script lands
-// them beside the sticker, at a new spot on each load.
+// them beside the sticker, at a new spot on each load, and they light up with
+// it under the pointer.
 const balloons = new Set(['proposta-de-valor']);
+
+// The videos the map opens, each in a window of its own (VideoWindow.astro):
+// the introduction, from the name at the centre and the portrait sticker, and
+// the sketchbook's, from the sketchbook. Each trigger names its window's `id`
+// in `aria-controls`. `count` is the name the window's events are counted
+// under, and `label` what it is to a screen reader.
+const videos = {
+  intro: {
+    id: 'intro-video',
+    label: 'Video introduction',
+    count: 'intro',
+    video: introVideo,
+    poster: introPoster,
+    captions: introCaptions,
+  },
+  sketchbook: {
+    id: 'sketchbook-video',
+    label: 'Video on knowing what to build',
+    count: 'sketchbook',
+    video: sketchbookVideo,
+    poster: sketchbookPoster,
+    captions: sketchbookCaptions,
+  },
+};
 
 // A marker's preview is the image in this folder named after its id, with its
 // alt text in diagram.config.ts. One without the other is a mistake, so the
@@ -162,13 +195,16 @@ const fallbackLinks = [
                   </>
                 ) : (
                   <Heading>
-                    {/* The name at the centre opens no card: a click
-                        reshuffles the map, which its tooltip says. */}
+                    {/* The name at the centre opens no card: it opens the
+                        video introduction, as the portrait sticker does.
+                        Its name is the heading's, so the description below
+                        says what it opens. */}
                     <button
                       type="button"
-                      title={node.kind === 'identity' ? 'Reshuffle the map' : undefined}
-                      aria-expanded={node.kind === 'identity' ? undefined : 'false'}
-                      aria-controls={node.kind === 'identity' ? undefined : panelId}
+                      aria-expanded="false"
+                      aria-controls={node.kind === 'identity' ? videos.intro.id : panelId}
+                      aria-haspopup={node.kind === 'identity' ? 'dialog' : undefined}
+                      aria-describedby={node.kind === 'identity' ? `${videos.intro.id}-what` : undefined}
                     >
                       {/* Sized for a page whose stylesheet hasn't loaded. */}
                       <svg
@@ -185,6 +221,13 @@ const fallbackLinks = [
                       {node.subLabel && <span>{node.subLabel}</span>}
                     </button>
                   </Heading>
+                )}
+                {/* Hidden, so it's read only as the name's description, not
+                    again on its own. */}
+                {node.kind === 'identity' && (
+                  <p id={`${videos.intro.id}-what`} hidden>
+                    Opens the video introduction
+                  </p>
                 )}
 
                 {node.kind !== 'identity' && !circle && (
@@ -286,19 +329,33 @@ const fallbackLinks = [
       focusable="false"
     />
     {/* The portrait sticker sits on the drawings, under the map, so it comes
-        last among them. Its width and height give a page with no stylesheet
-        a small picture, not a full-size one. */}
-    <Image
+        last among them. It's a button: it opens the video introduction, as
+        the name at the centre does. It's disabled until the video's script
+        (VideoWindow.astro) enables it, so without that script it's only a
+        picture, not a button that does nothing. Its picture's width and
+        height give a page with no stylesheet a small one, not a full-size
+        one. */}
+    <button
       class="sticker"
-      src={portrait}
-      alt={`Sticker of ${site.name} in a training suit and a cap that says "Run"`}
-      width={160}
-      densities={[1, 2, 3]}
-      format="webp"
-      loading="eager"
-      decoding="async"
-      draggable="false"
-    />
+      type="button"
+      aria-label="Watch the video introduction"
+      aria-expanded="false"
+      aria-controls={videos.intro.id}
+      aria-haspopup="dialog"
+      disabled
+    >
+      <Image
+        src={portrait}
+        alt={`Sticker of ${site.name} in a training suit and a cap that says "Run"`}
+        width={160}
+        densities={[1, 2, 3]}
+        format="webp"
+        loading="eager"
+        decoding="async"
+        draggable="false"
+      />
+      <PlayMark />
+    </button>
     {/* The post-its land like the drawings: anywhere clear of the map, at a
         new spot on each load, and hidden when there's no room. Which of them
         show first on a small screen is `decorOrder` in the map script. The
@@ -335,21 +392,34 @@ const fallbackLinks = [
     {/* The sketchbook lands like the post-its, after them in `decorOrder`,
         and keeps its distance from them and the portrait where it can
         (`decorBerth` in the map script). `data-tilt` has the script pick its
-        tilt once per page load. Its `width` is the top of `--notebook-width`
-        in pixels, as the post-its' are. */}
-    <Image
+        tilt once per page load. It's a button: it opens the sketchbook's
+        video, so with no room for it on the map, that video can't be
+        opened either. Like the portrait, it's disabled until the video's
+        script enables it. Its picture's `width` is the top of
+        `--notebook-width` in pixels, as the post-its' are. */}
+    <button
       class="notebook"
+      type="button"
       data-decor="notebook"
       data-tilt
-      src={notebook}
-      alt="Sketchbook open on a sitemap and a wireframe of a travel site's home page"
-      width={180}
-      densities={[1, 2, 3]}
-      format="webp"
-      loading="eager"
-      decoding="async"
-      draggable="false"
-    />
+      aria-label="Watch the video on knowing what to build"
+      aria-expanded="false"
+      aria-controls={videos.sketchbook.id}
+      aria-haspopup="dialog"
+      disabled
+    >
+      <Image
+        src={notebook}
+        alt="Sketchbook open on a sitemap and a wireframe of a travel site's home page"
+        width={180}
+        densities={[1, 2, 3]}
+        format="webp"
+        loading="eager"
+        decoding="async"
+        draggable="false"
+      />
+      <PlayMark />
+    </button>
     {/* Each marker's preview floats over everything while the pointer is on
         the marker, so it's the last thing in the map. It only entices: the
         card says the same in words, so it's hidden from assistive tech. */}
@@ -371,6 +441,8 @@ const fallbackLinks = [
       ))
     }
   </nav>
+
+  {Object.values(videos).map((props) => <VideoWindow {...props} />)}
 
   {/* Inside the layout, so it lands in the <body>, not after </html>. */}
   <script>
@@ -540,6 +612,19 @@ const fallbackLinks = [
     --sticker-shadow-blur: 0.25rem;
     --sticker-shadow-color: rgb(0 0 0 / 33%);
 
+    /* Under the pointer it opens the video introduction: it turns this much
+       further, a play mark this wide shows where its centre sits (from the
+       picture's left and top), and its speech balloon turns this colour.
+       The mark grows in from the scale below and casts the shadow below;
+       the sketchbook's mark is the same. */
+    --sticker-hover-turn: -5deg;
+    --sticker-play-size: 2.75rem;
+    --sticker-play-x: 50%;
+    --sticker-play-y: 70%;
+    --sticker-play-from: 0.85;
+    --sticker-play-shadow: 0 0.125rem 0.5rem rgb(0 0 0 / 25%);
+    --balloon-hover-color: var(--accent-ink);
+
     /* The post-it notes' widths: the blue one, and the yellow one glued under
        it. They land anywhere clear of the map, like the drawings (KNOBS.decor
        and KNOBS.glueOverlap in the script set their clearances and how far
@@ -557,7 +642,19 @@ const fallbackLinks = [
     --notebook-tilt: 0deg;
     --notebook-tilt-range: 7deg;
 
+    /* Under the pointer it opens its video, as the portrait does: it turns
+       this much further, and a play mark as wide as the portrait's shows
+       where its centre sits (from the picture's left and top). */
+    --notebook-hover-turn: -5deg;
+    --notebook-play-x: 50%;
+    --notebook-play-y: 42%;
+
     position: relative;
+
+    /* Its own stacking context, so the sticker, on the drawings' layer under
+       the map, still takes the pointer: in its parent's, the map's own box
+       would lie over that layer and catch it. */
+    isolation: isolate;
     width: 100%;
     height: 100svh;
     min-height: 34rem;
@@ -628,6 +725,7 @@ const fallbackLinks = [
     pointer-events: none;
     translate: var(--decor-x, 0) var(--decor-y, 0);
     opacity: 0;
+    transition: color var(--dur-fast) var(--ease);
   }
 
   .decor[data-placed] {
@@ -659,7 +757,9 @@ const fallbackLinks = [
   /* The portrait sticker keeps to its corner, on the drawings' layer and after
      them in the tree, so it covers them and nothing else. The
      script keeps markers, rings and drawings off it, so it never moves with
-     the map. It fades in with the markers. */
+     the map. It fades in with the markers. It's a button wrapped tight
+     round its picture, so the script measures the picture when it measures
+     the button. */
 
   .sticker {
     position: absolute;
@@ -669,16 +769,110 @@ const fallbackLinks = [
     top: calc(var(--sticker-top) + var(--sticker-ry, 0) * var(--sticker-roam-y));
     left: calc(var(--sticker-left) + var(--sticker-rx, 0) * var(--sticker-roam-x));
     z-index: -1;
+    display: block;
     width: var(--sticker-width);
     height: auto;
+    padding: 0;
+    background: none;
+    border: 0;
     rotate: calc(var(--sticker-tilt) + var(--sticker-rt, 0) * var(--sticker-tilt-range));
     filter: drop-shadow(
       var(--sticker-shadow-x) var(--sticker-shadow-y) var(--sticker-shadow-blur)
         var(--sticker-shadow-color)
     );
-    pointer-events: none;
     -webkit-user-select: none;
     user-select: none;
+
+    /* Its turn and play mark under the pointer (below). */
+    --hover-turn: var(--sticker-hover-turn);
+    --play-x: var(--sticker-play-x);
+    --play-y: var(--sticker-play-y);
+  }
+
+  /* The portrait and the sketchbook each open a video (VideoWindow.astro):
+     each is a button wrapped tight round its picture, with a play mark
+     (PlayMark.astro, so its parts are reached with :global()) where its
+     knobs put it. Until the video's script enables it, it's disabled, and
+     only a picture: it takes no pointer, so it never lights up. */
+
+  .sticker:disabled,
+  .notebook:disabled {
+    pointer-events: none;
+  }
+
+  .sticker img,
+  .notebook img {
+    width: 100%;
+  }
+
+  .sticker > :global(svg),
+  .notebook > :global(svg) {
+    position: absolute;
+    top: var(--play-y);
+    left: var(--play-x);
+    width: var(--sticker-play-size);
+    height: var(--sticker-play-size);
+    translate: -50% -50%;
+    opacity: 0;
+    scale: var(--sticker-play-from);
+    filter: drop-shadow(var(--sticker-play-shadow));
+    transition: opacity var(--dur-fast) var(--ease), scale var(--dur-fast) var(--ease);
+  }
+
+  .sticker :global(circle),
+  .notebook :global(circle) {
+    fill: var(--accent);
+  }
+
+  .sticker :global(path),
+  .notebook :global(path) {
+    fill: var(--paper);
+  }
+
+  /* Pointing at either, or tabbing to it, turns it a little further and
+     shows its play mark; the portrait also lights its speech balloon
+     (`data-balloon`). While its video is open, it rests. The picture turns
+     inside the button, which stays put, so the pointer can't slip off an
+     edge that moved away from it. A touch screen goes without the hover,
+     which would stick after the tap. */
+
+  @media (prefers-reduced-motion: no-preference) {
+    .sticker img,
+    .notebook img {
+      transition: rotate var(--dur) var(--ease);
+    }
+  }
+
+  .sticker:focus-visible:not([aria-expanded='true']) img,
+  .notebook:focus-visible:not([aria-expanded='true']) img {
+    rotate: var(--hover-turn);
+  }
+
+  .sticker:focus-visible:not([aria-expanded='true']) > :global(svg),
+  .notebook:focus-visible:not([aria-expanded='true']) > :global(svg) {
+    opacity: 1;
+    scale: 1;
+  }
+
+  .diagram:has(.sticker:focus-visible:not([aria-expanded='true'])) .decor[data-balloon] {
+    color: var(--balloon-hover-color);
+  }
+
+  @media (hover: hover) {
+    .sticker:hover:not([aria-expanded='true']) img,
+    .notebook:hover:not([aria-expanded='true']) img {
+      rotate: var(--hover-turn);
+    }
+
+    .sticker:hover:not([aria-expanded='true']) > :global(svg),
+    .notebook:hover:not([aria-expanded='true']) > :global(svg) {
+      opacity: 1;
+      scale: 1;
+    }
+
+    .diagram:has(.sticker:hover:not([aria-expanded='true'])) .decor[data-balloon] {
+      color: var(--balloon-hover-color);
+    }
   }
 
   /* On a phone the corner is tight, so the sticker slips past the canvas's
@@ -723,15 +917,26 @@ const fallbackLinks = [
     user-select: none;
   }
 
-  /* The script sets `--decor-rt` (-1 to 1) once per page load. */
+  /* The script sets `--decor-rt` (-1 to 1) once per page load. The
+     sketchbook is a button (above), so it takes the pointer once placed. */
 
   .notebook {
+    display: block;
     width: var(--notebook-width);
+    padding: 0;
+    background: none;
+    border: 0;
     rotate: calc(var(--notebook-tilt) + var(--decor-rt, 0) * var(--notebook-tilt-range));
     filter: drop-shadow(
       var(--sticker-shadow-x) var(--sticker-shadow-y) var(--sticker-shadow-blur)
         var(--sticker-shadow-color)
     );
+    pointer-events: auto;
+
+    /* Its turn and play mark under the pointer (above). */
+    --hover-turn: var(--notebook-hover-turn);
+    --play-x: var(--notebook-play-x);
+    --play-y: var(--notebook-play-y);
   }
 
   .post-it[data-placed],

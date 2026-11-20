@@ -1,0 +1,14 @@
+---
+/** The play mark: a disc with a triangle on it, on the map's video triggers
+    and on each video window's play button. It has no look of its own: whoever
+    places it sizes it and fills its `circle` and `path`, styling them with
+    `:global()`, since a page's scoped styles don't reach into another
+    component. It's hidden from assistive tech, as the button round it says
+    what it does. Its width and height give a page with no stylesheet a small
+    mark, not a full-size one. */
+---
+
+<svg viewBox="0 0 40 40" width="16" height="16" aria-hidden="true" focusable="false">
+  <circle cx="20" cy="20" r="20"></circle>
+  <path d="M16 12.5v15l12-7.5z"></path>
+</svg>

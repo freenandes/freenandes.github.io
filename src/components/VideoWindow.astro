@@ -1,0 +1,564 @@
+---
+/** A video on the home map, in a window over it. The page renders one per
+    video (`videos` in index.astro), and each video's triggers name its window
+    in `aria-controls`; the script takes their clicks. Where the map opens
+    cards beside their markers (`data-cards="flyout"` on `.diagram`), it opens
+    as a small window the reader can drag aside while using the map behind, by
+    the video until it plays and by the grip on its top left corner whatever
+    it's doing; where cards open as popups (touch screens), it's a modal in
+    the middle of the screen, and a tap outside it closes it. One opens at a
+    time. It never plays by itself: the play button, which covers the video,
+    starts it, and closing the window (the close button, Escape, or opening
+    another), or leaving the page, stops it and puts it back to the start.
+    README.md has the encode (Add or replace a video on the map). */
+
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import PlayMark from './PlayMark.astro';
+
+interface Props {
+  /** The id its triggers name in `aria-controls`. */
+  id: string;
+  /** What it is, for screen readers, and the title its events are counted
+      under. */
+  label: string;
+  /** The name its events are counted under: `<count>/open`, `<count>/play`. */
+  count: string;
+  /** The video's address, and a frame of it, which lies over it until it
+      plays. */
+  video: string;
+  poster: ImageMetadata;
+  /** The captions' address. Import them with `?url&no-inline`: Vite would
+      inline a file this small as a data: address, which the CSP in
+      Base.astro doesn't let media load. */
+  captions: string;
+}
+
+const { id, label, count, video, poster, captions } = Astro.props;
+---
+
+<dialog id={id} aria-label={label} data-video-window={count} style={`--ratio: ${poster.width / poster.height}`}>
+  {/* The poster is a frame of the video, so it gives the video's shape. */}
+  <video src={video} width={poster.width} height={poster.height} preload="none" playsinline disablepictureinpicture>
+    <track kind="captions" src={captions} srclang="en" label="English" />
+  </video>
+  {/* The poster lies over the video until it plays, as an image rather than
+      the video's `poster`, which takes one file for every screen. `sizes`
+      follows `--video-width` and `--video-popup` below. */}
+  <Image
+    src={poster}
+    alt=""
+    widths={[360, 540, 720, 1080]}
+    sizes="min(80vw, 22.5rem)"
+    format="webp"
+    loading="lazy"
+    decoding="async"
+    draggable="false"
+  />
+  <button type="button" aria-label="Play the video" data-play>
+    <PlayMark />
+  </button>
+  {/* The grip drags the window with the pointer, so it's no control for the
+      keyboard or a screen reader. */}
+  <div aria-hidden="true" data-grip>
+    <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" focusable="false">
+      <circle cx="6" cy="3.5" r="1.25"></circle>
+      <circle cx="10" cy="3.5" r="1.25"></circle>
+      <circle cx="6" cy="8" r="1.25"></circle>
+      <circle cx="10" cy="8" r="1.25"></circle>
+      <circle cx="6" cy="12.5" r="1.25"></circle>
+      <circle cx="10" cy="12.5" r="1.25"></circle>
+    </svg>
+  </div>
+  <button type="button" aria-label="Close" data-close>
+    <svg
+      viewBox="0 0 16 16"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="m4 4 8 8m0-8-8 8"></path>
+    </svg>
+  </button>
+</dialog>
+
+<script>
+  import { countEvent } from '../scripts/count';
+
+  /** How far, in CSS pixels, a press moves before it drags the window
+      rather than clicking. */
+  const DRAG_SLOP = 4;
+
+  const windows = [...document.querySelectorAll<HTMLDialogElement>('dialog[data-video-window]')];
+
+  for (const dialog of windows) {
+    const video = dialog.querySelector('video');
+    const poster = dialog.querySelector('img');
+    const play = dialog.querySelector<HTMLButtonElement>('[data-play]');
+    const grip = dialog.querySelector<HTMLElement>('[data-grip]');
+    const close = dialog.querySelector<HTMLButtonElement>('[data-close]');
+    if (!video || !poster || !play || !grip || !close) continue;
+    const count = dialog.dataset.videoWindow ?? dialog.id;
+    const title = dialog.getAttribute('aria-label') ?? count;
+    const selector = `[aria-controls="${dialog.id}"]`;
+    const triggers = [...document.querySelectorAll<HTMLElement>(selector)];
+    const map = document.querySelector<HTMLElement>('.diagram');
+    /** The trigger that opened the window, which gets focus back. */
+    let opener: HTMLElement | null = null;
+    /** How far the window has been dragged from the middle of the screen. */
+    let offset = { x: 0, y: 0 };
+    let counted = false;
+
+    const setExpanded = (open: boolean) => {
+      for (const trigger of triggers) trigger.setAttribute('aria-expanded', String(open));
+    };
+
+    /** Puts the window (x, y) whole pixels from the middle of the screen, or
+        as near as it gets while staying wholly in view. Its size comes from
+        layout, so the opening animation's scale doesn't skew it. */
+    const place = (x: number, y: number) => {
+      const view = document.documentElement;
+      const size = getComputedStyle(dialog);
+      const roomX = Math.max(0, Math.floor((view.clientWidth - Number.parseFloat(size.width)) / 2));
+      const roomY = Math.max(0, Math.floor((view.clientHeight - Number.parseFloat(size.height)) / 2));
+      offset = {
+        x: Math.min(Math.max(Math.round(x), -roomX), roomX),
+        y: Math.min(Math.max(Math.round(y), -roomY), roomY),
+      };
+      dialog.style.setProperty('--video-x', `${offset.x}px`);
+      dialog.style.setProperty('--video-y', `${offset.y}px`);
+    };
+
+    /** Back to the start: stopped, the poster and the play button on top. */
+    const reset = () => {
+      video.pause();
+      video.controls = false;
+      if (video.currentTime > 0) video.currentTime = 0;
+      dialog.removeAttribute('data-started');
+      dialog.removeAttribute('data-playing');
+    };
+
+    /** The poster waits for the window, or for a pointer on a trigger. */
+    const warm = () => {
+      poster.loading = 'eager';
+    };
+
+    const open = (trigger: HTMLElement) => {
+      const modal = map?.dataset.cards === 'popup';
+      opener = trigger;
+      warm();
+      // The video starts loading as the window opens, so a click plays it at
+      // once. A touch screen, likely on a phone's data, fetches only its
+      // length and first frame until then.
+      if (video.preload === 'none') video.preload = modal ? 'metadata' : 'auto';
+      // One window at a time, so two videos never play over each other.
+      for (const other of windows) if (other !== dialog && other.open) other.close();
+      offset = { x: 0, y: 0 };
+      dialog.style.removeProperty('--video-x');
+      dialog.style.removeProperty('--video-y');
+      if (modal) dialog.showModal();
+      else dialog.show();
+      play.focus({ preventScroll: true });
+      setExpanded(true);
+      countEvent(`${count}/open`, title);
+    };
+
+    // A trigger that's only a picture without this script (the portrait,
+    // the sketchbook) waits disabled; from here on it works.
+    for (const trigger of triggers) {
+      trigger.removeAttribute('disabled');
+      trigger.addEventListener('pointerenter', warm, { once: true });
+    }
+
+    // A trigger opens the window, and closes it again. The click is taken
+    // here, after the trigger's own handlers, so a click the map kept for
+    // itself (the end of a drag on the name) is left alone.
+    document.addEventListener('click', (event) => {
+      const trigger = event.target instanceof Element ? event.target.closest<HTMLElement>(selector) : null;
+      if (!trigger || event.defaultPrevented) return;
+      if (dialog.open) dialog.close();
+      else open(trigger);
+    });
+
+    close.addEventListener('click', () => dialog.close());
+
+    // Escape closes the window wherever focus is. It's caught on its way
+    // down and goes no further, so the map, which would close an open card
+    // with it too, doesn't see it: the window lies over the cards, so it
+    // goes first, and the next Escape closes the card. Focus inside the
+    // video's own controls is the exception: Chrome keeps every key to
+    // them, so the page never hears it; Tab on from there reaches the close
+    // button.
+    addEventListener(
+      'keydown',
+      (event) => {
+        if (event.key !== 'Escape' || !dialog.open) return;
+        event.preventDefault();
+        event.stopPropagation();
+        dialog.close();
+      },
+      true,
+    );
+
+    // Closing stops the video, and hands focus back to the trigger, unless
+    // the reader has already moved on somewhere else.
+    dialog.addEventListener('close', () => {
+      reset();
+      setExpanded(false);
+      const focused = document.activeElement;
+      if (opener && (!focused || focused === document.body || dialog.contains(focused))) {
+        opener.focus({ preventScroll: true });
+      }
+      opener = null;
+    });
+
+    // Leaving the page stops it too, so going back finds the map as it was.
+    addEventListener('pagehide', () => {
+      video.pause();
+      if (dialog.open) dialog.close();
+    });
+
+    // Switching between a hovering pointer and touch changes how the window
+    // opens (the map's `data-cards`), so an open one closes.
+    if (map) {
+      new MutationObserver(() => dialog.open && dialog.close()).observe(map, {
+        attributes: true,
+        attributeFilter: ['data-cards'],
+      });
+    }
+
+    // A press on the window is one of two gestures. On a touch screen's
+    // modal, a tap outside it closes it, and does nothing else: the page
+    // behind can't be reached while it's open. Only a press that starts and
+    // ends outside counts, so letting go of the seek bar off the video
+    // doesn't close it.
+    //
+    // On a desktop it drags the window, kept wholly in view: by the grip
+    // whatever the video is doing, and by the video itself until it starts.
+    // Once it has, the video is left to its own controls, which in some
+    // engines keep the pointer to themselves. A press becomes a drag once
+    // it has moved; until then it's a click, which plays the video. The drag
+    // takes the pointer, so the click that ends it lands on the window, not
+    // on the play button, and starts nothing. The press is followed from
+    // the page, since a quick flick can leave the window before the drag
+    // has taken the pointer.
+    const outside = (event: MouseEvent) => {
+      const box = dialog.getBoundingClientRect();
+      return event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom;
+    };
+    let pressedOutside = false;
+    let press: { id: number; x: number; y: number; from: { x: number; y: number }; moving: boolean } | null = null;
+    let dragged = false;
+    dialog.addEventListener('pointerdown', (event) => {
+      // A drag that ended without a click mustn't swallow this press's.
+      dragged = false;
+      pressedOutside = dialog.matches(':modal') && outside(event);
+      if (dialog.matches(':modal') || !event.isPrimary || event.button !== 0) return;
+      if (!(event.target instanceof Element)) return;
+      if (!grip.contains(event.target) && (video.controls || close.contains(event.target))) return;
+      // No text selection, and no focus change, from a press on the grip.
+      if (grip.contains(event.target)) event.preventDefault();
+      press = { id: event.pointerId, x: event.clientX, y: event.clientY, from: offset, moving: false };
+    });
+    addEventListener('pointermove', (event) => {
+      if (press?.id !== event.pointerId) return;
+      const dx = event.clientX - press.x;
+      const dy = event.clientY - press.y;
+      if (!press.moving) {
+        if (Math.hypot(dx, dy) < DRAG_SLOP) return;
+        press.moving = true;
+        try {
+          dialog.setPointerCapture(event.pointerId);
+        } catch {}
+        dialog.toggleAttribute('data-dragging', true);
+      }
+      place(press.from.x + dx, press.from.y + dy);
+    });
+    const drop = (event: PointerEvent) => {
+      if (press?.id !== event.pointerId) return;
+      dragged = press.moving;
+      press = null;
+      dialog.removeAttribute('data-dragging');
+    };
+    addEventListener('pointerup', drop);
+    addEventListener('pointercancel', drop);
+    // The click that ends either gesture: a drag's goes no further, in case
+    // an engine still sends it to the video; a tap outside the modal closes
+    // it.
+    dialog.addEventListener(
+      'click',
+      (event) => {
+        if (dragged) {
+          dragged = false;
+          event.preventDefault();
+          event.stopPropagation();
+        } else if (pressedOutside && outside(event)) {
+          dialog.close();
+        }
+        pressedOutside = false;
+      },
+      true,
+    );
+    addEventListener('resize', () => {
+      if (dialog.open && !dialog.matches(':modal')) place(offset.x, offset.y);
+    });
+
+    // The play button starts it and steps aside; the poster stays until the
+    // first frame is up, so nothing flashes between them.
+    play.addEventListener('click', () => {
+      dialog.toggleAttribute('data-started', true);
+      video.play().catch(() => {
+        if (video.paused) dialog.removeAttribute('data-started');
+      });
+    });
+    // Once it has started, its own controls pause and seek it, and take
+    // the focus the play button had.
+    video.addEventListener('play', () => {
+      const focused = dialog.contains(document.activeElement) || document.activeElement === document.body;
+      dialog.toggleAttribute('data-started', true);
+      video.controls = true;
+      if (focused) video.focus({ preventScroll: true });
+      if (!counted) countEvent(`${count}/play`, title);
+      counted = true;
+    });
+    video.addEventListener('playing', () => dialog.toggleAttribute('data-playing', true));
+    // At the end it goes back to the poster, ready to play again.
+    video.addEventListener('ended', () => {
+      const focused = dialog.contains(document.activeElement) || document.activeElement === document.body;
+      reset();
+      if (focused) play.focus({ preventScroll: true });
+    });
+  }
+</script>
+
+<style>
+  dialog {
+    /* The video's width on a desktop, and on a touch screen, where the window
+       opens as a modal, the share of the screen's width and height it may
+       take. Either way it shrinks to fit a short screen, keeping at least
+       the gap around it. The poster's `sizes` follows the first two. */
+    --video-width: 22.5rem;
+    --video-popup: 0.8;
+    --video-gap: var(--space-lg);
+
+    /* The window's corners and its shadow, deep and soft, and what dims the
+       page behind the modal on a touch screen. */
+    --video-radius: var(--radius-sm);
+    --video-shadow: 0 3rem 3rem -1rem rgb(0 0 0 / 33%), 0 0.5rem 1rem 0 rgb(0 0 0 / 10%);
+    --video-backdrop: rgb(0 0 0 / 33%);
+
+    /* The play button's disc and the shadow it casts on the video; and the
+       discs in the video's top corners, the grip and the close button, their
+       size on a touch screen, for a finger, and their distance from the
+       corners. */
+    --video-play: 3.75rem;
+    --video-play-shadow: 0 0.25rem 0.75rem rgb(0 0 0 / 25%);
+    --video-corner: 2.25rem;
+    --video-corner-touch: 2.75rem;
+    --video-corner-inset: 0.625rem;
+
+    /* The captions' size: the browser's own would fill a video this narrow. */
+    --video-caption-size: 0.875rem;
+
+    /* The room the window may take, and the video's width in it. */
+    --video-room-x: calc(100vw - 2 * var(--video-gap));
+    --video-room-y: calc(100dvh - 2 * var(--video-gap));
+    --video-shown: min(var(--video-width), var(--video-room-x), var(--video-room-y) * var(--ratio));
+
+    /* In the middle of the screen until dragged: the script writes the
+       drag as `--video-x` and `--video-y`. */
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-overlay);
+    width: fit-content;
+    height: fit-content;
+    max-width: none;
+    max-height: none;
+    margin: auto;
+    padding: 0;
+    color: var(--ink);
+    background: var(--ink);
+    border: 0;
+    border-radius: var(--video-radius);
+    outline: 1px solid var(--line-soft);
+    box-shadow: var(--video-shadow);
+    overflow: hidden;
+    translate: var(--video-x, 0) var(--video-y, 0);
+  }
+
+  /* On a desktop the window drags: by the video until it starts, and by the
+     grip whatever it's doing. */
+  dialog:not(:modal) {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  dialog:not(:modal, [data-started]),
+  dialog:not(:modal) > div {
+    cursor: grab;
+    touch-action: none;
+  }
+
+  dialog[data-dragging],
+  dialog[data-dragging] > div {
+    cursor: grabbing;
+  }
+
+  dialog:modal {
+    --video-width: 100vw;
+    --video-corner: var(--video-corner-touch);
+    --video-room-x: calc(100vw * var(--video-popup));
+    --video-room-y: calc(100dvh * var(--video-popup));
+  }
+
+  dialog[open] {
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    dialog[open] {
+      animation: video-in var(--dur) var(--ease);
+    }
+  }
+
+  @keyframes video-in {
+    from {
+      opacity: 0;
+      scale: 0.96;
+    }
+  }
+
+  dialog::backdrop {
+    background: var(--video-backdrop);
+  }
+
+  /* The video, the poster over it until it plays, and the play button, the
+     grip and the close button over both. */
+  dialog video {
+    width: var(--video-shown);
+    max-width: none;
+    height: auto;
+    aspect-ratio: var(--ratio);
+  }
+
+  dialog video::cue {
+    font-family: var(--font-sans);
+    font-size: var(--video-caption-size);
+    line-height: var(--leading-snug);
+  }
+
+  dialog img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  dialog[data-playing] img {
+    display: none;
+  }
+
+  /* The play button covers the whole video, so a click anywhere on it plays
+     it; the disc in the middle is its mark, lit in the accent like a marker
+     under the pointer. Off the disc the pointer says the window drags. */
+  dialog > button:first-of-type {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: inherit;
+  }
+
+  dialog[data-started] > button:first-of-type {
+    display: none;
+  }
+
+  /* It clips nothing round it, so its focus ring goes inside. */
+  dialog > button:first-of-type:focus-visible {
+    outline-offset: -0.375rem;
+  }
+
+  /* The mark is PlayMark.astro's, so its parts are reached with :global(). */
+  dialog > button:first-of-type > :global(svg) {
+    width: var(--video-play);
+    height: var(--video-play);
+    filter: drop-shadow(var(--video-play-shadow));
+    cursor: pointer;
+  }
+
+  dialog > button:first-of-type :global(circle) {
+    fill: var(--paper);
+    transition: fill var(--dur-fast) var(--ease);
+  }
+
+  dialog > button:first-of-type :global(path) {
+    fill: var(--ink);
+    transition: fill var(--dur-fast) var(--ease);
+  }
+
+  dialog > button:first-of-type:is(:hover, :focus-visible) :global(circle) {
+    fill: var(--accent);
+  }
+
+  dialog > button:first-of-type:is(:hover, :focus-visible) :global(path) {
+    fill: var(--paper);
+  }
+
+  /* The corner discs, over the poster, the play button and the video: the
+     grip on the top left and the close button on the top right, lit like
+     the play button. A modal on a touch screen doesn't move, so it has no
+     grip. */
+  dialog > div,
+  dialog > button:last-of-type {
+    position: absolute;
+    top: var(--video-corner-inset);
+    display: grid;
+    place-items: center;
+    width: var(--video-corner);
+    height: var(--video-corner);
+    padding: 0;
+    color: var(--ink);
+    background: var(--paper);
+    border: 0;
+    border-radius: var(--radius-pill);
+    transition:
+      color var(--dur-fast) var(--ease),
+      background-color var(--dur-fast) var(--ease);
+  }
+
+  dialog > div {
+    left: var(--video-corner-inset);
+  }
+
+  dialog > button:last-of-type {
+    right: var(--video-corner-inset);
+  }
+
+  dialog:modal > div {
+    display: none;
+  }
+
+  dialog > div:hover,
+  dialog[data-dragging] > div,
+  dialog > button:last-of-type:is(:hover, :focus-visible) {
+    color: var(--paper);
+    background: var(--accent);
+  }
+
+  dialog > div > svg,
+  dialog > button:last-of-type > svg {
+    width: calc(var(--video-corner) / 2);
+    height: calc(var(--video-corner) / 2);
+  }
+</style>

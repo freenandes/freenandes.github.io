@@ -1,22 +1,23 @@
 ---
-/** The footer: availability, contact links and copyright. A page can open it
-    with something of its own, through Base's `footer` slot (the mini-map on
-    About and the case studies), which then stands in for the rule, and add
-    links of its own after the contact links through its `footer-links` slot
-    (the `links` slot here). It's never printed (global.css). */
+/** The footer: availability, contact links and copyright. Base puts whatever
+    a page gives its `footer` slot (the mini-map on About and the case
+    studies) right before it, standing in for the rule, and a page adds links
+    of its own after the contact links through its `footer-links` slot (the
+    `links` slot here). It's never printed (global.css). */
 
 import { site } from '../site.config';
 
 interface Props {
   /** Off drops the rule and the availability line that open the footer. */
   intro?: boolean;
+  /** Off drops the rule alone, for a page whose mini-map's line takes its place. */
+  rule?: boolean;
 }
 
-const { intro = true } = Astro.props;
+const { intro = true, rule = true } = Astro.props;
 ---
 
-<footer class:list={{ plain: !intro }} data-reveal>
-  <slot />
+<footer class:list={{ ruled: intro && rule }} data-reveal>
   <div>
     {intro && <p>{site.availability}</p>}
     <ul role="list">
@@ -38,11 +39,9 @@ const { intro = true } = Astro.props;
   }
 
   /* The rule sits on the inner box so it lines up with the text column rather
-     than running out into the gutters. It only opens a footer that nothing
-     else opens: the mini-map's line takes its place, and a page that drops
-     the footer's intro (`plain`) has none. */
+     than running out into the gutters. */
 
-  footer:not(.plain) div:first-child {
+  footer.ruled div {
     border-block-start: 1px solid var(--line-strong);
   }
 

@@ -3,7 +3,9 @@
     map's pages pulled into one straight, static line, which also stands in for
     the footer's rule. Each marker links to its page, and the page it's on is
     marked. The markers and their order are the map's own
-    (`src/diagram.config.ts`, through `src/lib/diagram.ts`). */
+    (`src/diagram.config.ts`, through `src/lib/diagram.ts`). Where the line
+    runs across, it stays pinned to the foot of the window, on paper under a
+    rule, until the reader reaches its own place above the footer. */
 
 import { diagramChain, type DiagramNode } from '../diagram.config';
 import { bare, withBase } from '../lib/base';
@@ -42,7 +44,7 @@ const stops = (await getDiagramNodes())
     footer keeps its rule. */}
 {
   stops.length > 1 && (
-    <nav aria-label="Pages">
+    <nav aria-label="Pages" data-reveal>
       <ol role="list" style={`--stops: ${stops.length}`}>
         {stops.map(({ label, shape, href, current }) => (
           <li>
@@ -59,6 +61,29 @@ const stops = (await getDiagramNodes())
     </nav>
   )
 }
+{/* Marks where the line rests, just under it, so the script can tell when it
+    is pinned above that place. It has no size, so it takes no room. */}
+{stops.length > 1 && <div data-mini-map-end></div>}
+
+<script>
+  const end = document.querySelector('[data-mini-map-end]');
+  const nav = end?.previousElementSibling;
+
+  // Its resting place is below the window while the line is pinned. The
+  // pinned gap (`--pinned-gap`, the bar's bottom padding) still hangs below
+  // that place, so the line comes to rest only once the place has risen
+  // that far above the window's foot.
+  if (nav && end) {
+    const gap = Number.parseFloat(getComputedStyle(nav).paddingBlockEnd) || 0;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        nav.classList.toggle('is-pinned', !entry.isIntersecting && entry.boundingClientRect.top > 0);
+      },
+      { rootMargin: `0px 0px ${-gap}px 0px` },
+    );
+    observer.observe(end);
+  }
+</script>
 
 <style>
   /* The custom properties are this component's own values, in one place. The
@@ -70,13 +95,14 @@ const stops = (await getDiagramNodes())
   nav {
     --marker-size: 1rem;
     --link-width: 1px; /* connector stroke, as thick as a divider */
-    --link-color: var(--line-strong); /* and the same colour */
+    --link-color: var(--ink-3); /* connector colour */
     --stop-pad: 0.75rem; /* air around a stop, inside its hit area */
     --stack-pad: 1.5rem; /* air above and below a stop in the column */
     --label-gap: var(--space-md); /* least room between two labels in the row */
+    --pinned-gap: var(--space-md); /* while pinned, extra room under the labels, down to the window's foot */
 
     container-type: inline-size;
-    padding-block-start: var(--space-md);
+    padding-block-start: var(--space-sm);
   }
 
   /* An <ol> because the stops have an order, and so the site's row styling
@@ -234,6 +260,54 @@ const stops = (await getDiagramNodes())
 
     li:last-child::after {
       right: 0;
+    }
+  }
+
+  /* Pinned. Once the line runs across, it sticks to the foot of the window
+     and settles into its place above the footer at the end of the page. It's
+     a child of <body> (Base.astro), so it can travel the whole page. A media
+     query, since the container can't query itself: the 30rem above, plus
+     the two gutters and room for a scrollbar that takes up width. */
+
+  @media (width >= 33rem) {
+    /* The pinned gap is padding the margin takes back, so the line rests
+       where it always has: at rest, the gap lies over the footer's own top
+       padding, and nothing shows in it. */
+
+    nav {
+      position: sticky;
+      bottom: 0;
+      z-index: var(--z-sticky);
+      padding-block-end: var(--pinned-gap);
+      margin-block-end: calc(-1 * var(--pinned-gap));
+    }
+
+    /* While pinned, the page scrolls under a paper plate topped with a
+       divider, as it does under the page nav: the shadow carries the paper
+       out to the window's edges, and the rule stays on the column. At rest
+       the plate fades away, and the line reads as the footer's rule again. */
+
+    nav::before {
+      content: '';
+      position: absolute;
+      inset: 0 var(--gutter);
+      z-index: -1;
+      background: var(--paper);
+      border-block-start: 1px solid var(--line);
+      box-shadow: 0 0 0 100vmax var(--paper);
+      clip-path: inset(0 -100vmax);
+      opacity: 0;
+      transition: opacity var(--dur) var(--ease);
+    }
+
+    nav.is-pinned::before {
+      opacity: 1;
+    }
+
+    /* Whatever the keyboard moves to lands clear of the pinned line. */
+
+    :global(html) {
+      scroll-padding-block-end: 6rem;
     }
   }
 

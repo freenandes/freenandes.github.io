@@ -134,8 +134,8 @@ type Node = {
   el: HTMLElement;
   cfg: DiagramEntry;
   id: string;
-  /** The marker's button, and the card it opens. The name has no card, and a
-   *  ring has neither. */
+  /** The marker's button, and the card it opens. The name's button opens the
+   *  video introduction instead (VideoWindow.astro), and a ring has neither. */
   button: HTMLButtonElement | null;
   panel: HTMLElement | null;
   /** The screen that floats beside the marker on hover, if it has one. */
@@ -178,7 +178,7 @@ type Side = 'bottom' | 'top' | 'right' | 'left' | 'center';
 
 /** A drawing on the texture, a post-it or the sketchbook, and where its
  *  centre sits once it has landed. */
-type Decor = { el: SVGSVGElement | HTMLImageElement; spot: { x: number; y: number } | null };
+type Decor = { el: SVGSVGElement | HTMLElement; spot: { x: number; y: number } | null };
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -187,7 +187,7 @@ export function initDiagram(root: HTMLElement) {
   if (!links) return;
   const svgEl: SVGSVGElement = links;
   const decor: Decor[] = [
-    ...root.querySelectorAll<SVGSVGElement | HTMLImageElement>('.decor, .post-it, .notebook'),
+    ...root.querySelectorAll<SVGSVGElement | HTMLElement>('.decor, .post-it, .notebook'),
   ].map((el) => ({ el, spot: null }));
   // A tilted one's tilt, within the range index.astro gives it, picked once
   // per page load, before anything measures it.
@@ -1077,12 +1077,13 @@ export function initDiagram(root: HTMLElement) {
   }
 
   /** Where a decoration's drawing sits inside its frame. The drawing is what has
-   *  to stay clear, not the empty margins around it. A picture (a post-it, the
-   *  sketchbook) fills its frame; a tilted one's box is the one around it as
-   *  tilted, about the middle of its untilted frame. */
-  function measureDecor(el: SVGSVGElement | HTMLImageElement): Box {
+   *  to stay clear, not the empty margins around it. A picture (a post-it, or
+   *  the sketchbook, a button wrapped round its picture) fills its frame; a
+   *  tilted one's box is the one around it as tilted, about the middle of its
+   *  untilted frame. */
+  function measureDecor(el: SVGSVGElement | HTMLElement): Box {
     const frame = el.getBoundingClientRect();
-    if (el instanceof HTMLImageElement) {
+    if (el instanceof HTMLElement) {
       return {
         x: el.offsetWidth / 2,
         y: el.offsetHeight / 2,
@@ -1307,14 +1308,6 @@ export function initDiagram(root: HTMLElement) {
     computeAnchors();
     routeEdges();
     decorDue = true;
-  }
-
-  function resetLayout() {
-    generateLayout();
-    generateEdgeShapes();
-    relayout();
-    seedFromAnchors();
-    wake();
   }
 
   /**
@@ -1654,9 +1647,10 @@ export function initDiagram(root: HTMLElement) {
   }
 
   /** `aria-expanded` is the one record of which card is open; the page's CSS
-   *  shows a card from it, and nothing else does. */
+   *  shows a card from it, and nothing else does. The name's records the
+   *  video introduction, which isn't a card, so it never counts here. */
   function isOpen(n: Node) {
-    return n.button?.getAttribute('aria-expanded') === 'true';
+    return !!n.panel && n.button?.getAttribute('aria-expanded') === 'true';
   }
 
   function openNode() {
@@ -1909,18 +1903,16 @@ export function initDiagram(root: HTMLElement) {
 
     hit.addEventListener('click', (ev) => {
       // Swallow only the click that ends a drag, so Enter and Space, which
-      // click without a pointer press, still open the card afterwards.
+      // click without a pointer press, still open the card afterwards. On the
+      // name, VideoWindow.astro sees it swallowed and leaves it too.
       if (moved) {
         moved = false;
         ev.preventDefault();
         return;
       }
-      // The name at the centre reshuffles the map instead of opening a card.
-      if (n.cfg.kind === 'identity') {
-        resetLayout();
-        closeAll();
-        return;
-      }
+      // The name at the centre opens the video introduction, not a card:
+      // VideoWindow.astro takes that click.
+      if (n.cfg.kind === 'identity') return;
       const wasOpen = isOpen(n);
       closeAll(n);
       setOpen(n, !wasOpen);

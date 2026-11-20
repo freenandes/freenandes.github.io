@@ -8,7 +8,8 @@
    Chrome, Firefox and WebKit (Safari's engine), at a desktop and a phone size.
    It checks behaviour, not pixels, because fonts render differently in each
    engine: no script errors, failed requests or CSP violations, no sideways
-   scroll, the map mounts and opens a card in view, the lightbox opens and
+   scroll, the map mounts and opens a card in view, each of its video windows
+   opens in view, drags, plays and closes, the lightbox opens and
    closes, and scrolled to the end, no block is left invisible waiting for its
    entrance, at each size and in a tall desktop window. Screenshots of each
    engine land in .browsers/ to compare by eye.
@@ -144,7 +145,8 @@ async function checkMap(page, touch, problems, shot) {
   const fallback = await page.$eval('.diagram .fallback', (el) => getComputedStyle(el).visibility !== 'hidden');
   if (fallback) problems.push('the fallback list shows after mounting');
 
-  const button = await page.$('.node button[aria-expanded]');
+  // A marker with a card: the name's button opens the video introduction.
+  const button = await page.$('.node button[aria-controls^="panel-"]');
   if (!button) return problems.push('no marker buttons on the map');
   await page.waitForTimeout(SETTLE_MS);
   await press(page, button, touch).catch((err) => problems.push(`couldn't press a marker: ${firstLine(err)}`));
@@ -170,6 +172,154 @@ async function checkMap(page, touch, problems, shot) {
   await page.keyboard.press('Escape');
   await page.waitForTimeout(OPEN_MS / 2);
   if ((await button.getAttribute('aria-expanded')) !== 'false') problems.push('Escape left the card open');
+}
+
+/** Each video window on the map (`dialog[data-video-window]`) opens in view
+    from the first of its triggers on show, as a modal where cards open as
+    popups, with its poster up. On a desktop the video drags it, without
+    playing; pressed, the video plays, then drags by the grip and keeps
+    playing; the cross stops and closes it. Its last trigger opens it too, and
+    Escape, with focus anywhere, or on a touch screen a tap outside, closes it.
+    A trigger the map had no room for (the sketchbook can be one) is skipped.
+    On a desktop, opening one window closes another. */
+async function checkVideoWindows(page, touch, problems, shot) {
+  // The sketchbook is a trigger, and it lands only once the map is at rest.
+  await page.waitForFunction(() => document.querySelector('[data-decor][data-placed]'), null, { timeout: 5000 }).catch(() => {});
+  const ids = await page.$$eval('dialog[data-video-window]', (dialogs) => dialogs.map((dialog) => dialog.id));
+  if (!ids.length) return problems.push('no video windows on the map');
+  const shown = [];
+  for (const id of ids) {
+    const triggers = await visibleTriggers(page, id);
+    if (!triggers.length) continue;
+    shown.push(id);
+    await checkVideoWindow(page, touch, problems, shot, id, triggers);
+  }
+  if (!shown.includes('intro-video')) problems.push('nothing on the map opens the video introduction');
+
+  // One window at a time.
+  if (!touch && shown.length > 1) {
+    const [first, second] = shown;
+    await press(page, (await visibleTriggers(page, first))[0], touch).catch(() => {});
+    await page.waitForTimeout(OPEN_MS);
+    // A click in script: the first window may lie over the second's trigger.
+    await (await visibleTriggers(page, second))[0].evaluate((el) => el.click());
+    await page.waitForTimeout(OPEN_MS);
+    const open = await page.$$eval('dialog[data-video-window]', (dialogs) => dialogs.filter((d) => d.open).map((d) => d.id));
+    if (open.join() !== second) problems.push(`opening #${second} over #${first} left open: ${open.join(', ') || 'none'}`);
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(OPEN_MS / 2);
+  }
+}
+
+/** A window's triggers the reader can see and press. */
+async function visibleTriggers(page, id) {
+  const visible = [];
+  for (const handle of await page.$$(`[aria-controls="${id}"]`)) {
+    const seen = await handle.evaluate((el) => {
+      const box = el.getBoundingClientRect();
+      return getComputedStyle(el).visibility === 'visible' && box.width > 0 && box.height > 0;
+    });
+    if (seen) visible.push(handle);
+  }
+  return visible;
+}
+
+async function checkVideoWindow(page, touch, problems, shot, id, triggers) {
+  const at = `dialog#${id}`;
+  const isOpen = (sel) => document.querySelector(sel)?.open;
+  const isClosed = (sel) => {
+    const dialog = document.querySelector(sel);
+    return dialog && !dialog.open && dialog.querySelector('video').paused;
+  };
+  const opens = (what) =>
+    page.waitForFunction(isOpen, at, { timeout: 4000 }).catch(() => problems.push(`${what} didn't open #${id}`) && false);
+  const closes = (what) =>
+    page.waitForFunction(isClosed, at, { timeout: 3000 }).catch(() => problems.push(`${what} didn't close and stop #${id}`));
+
+  await press(page, triggers[0], touch).catch((err) => problems.push(`couldn't press a trigger of #${id}: ${firstLine(err)}`));
+  if (!(await opens('pressing its first trigger'))) return;
+  await page.waitForTimeout(OPEN_MS);
+  const state = await page.$eval(at, (dialog) => {
+    const box = dialog.getBoundingClientRect();
+    const poster = dialog.querySelector('img');
+    const video = dialog.querySelector('video');
+    return {
+      modal: dialog.matches(':modal'),
+      mode: document.querySelector('.diagram')?.getAttribute('data-cards'),
+      inView: box.width > 100 && box.left >= -1 && box.top >= -1
+        && box.right <= innerWidth + 1 && box.bottom <= innerHeight + 1,
+      poster: !!poster && poster.complete && poster.naturalWidth > 0,
+      expanded: [...document.querySelectorAll(`[aria-controls="${dialog.id}"]`)].map((t) => t.getAttribute('aria-expanded')),
+      // An engine without the codecs can't be asked to play it.
+      playable: video.canPlayType('video/mp4; codecs="avc1.640029, mp4a.40.2"') !== '',
+    };
+  });
+  if (!state.inView) problems.push(`#${id} runs off screen`);
+  if (state.modal !== (state.mode === 'popup')) {
+    problems.push(`#${id} opened as ${state.modal ? 'a modal' : 'a window'} where data-cards="${state.mode}"`);
+  }
+  if (!state.poster) problems.push(`#${id}'s poster didn't load`);
+  if (state.expanded.some((value) => value !== 'true')) problems.push(`open, #${id} left its triggers' aria-expanded at ${state.expanded.join(', ')}`);
+  await shot(`home-${id}`);
+
+  // On a desktop the video drags the window, and letting go doesn't play it.
+  if (!touch) {
+    const box = await page.$eval(at, (dialog) => dialog.getBoundingClientRect().toJSON());
+    const grab = { x: box.x + box.width / 2, y: box.y + box.height / 4 };
+    await page.mouse.move(grab.x, grab.y);
+    await page.mouse.down();
+    await page.mouse.move(grab.x - 120, grab.y + 10, { steps: 8 });
+    await page.mouse.up();
+    await page.waitForTimeout(OPEN_MS / 4);
+    const moved = await page.$eval(at, (dialog) => ({
+      x: dialog.getBoundingClientRect().x,
+      started: dialog.hasAttribute('data-started'),
+    }));
+    if (Math.abs(moved.x - (box.x - 120)) > 2) problems.push(`dragging #${id} moved it to x=${Math.round(moved.x)}, not ${Math.round(box.x - 120)}`);
+    if (moved.started) problems.push(`dragging #${id} started it`);
+  }
+
+  if (state.playable) {
+    // Muted, so no engine's rules on sound without a gesture come into it.
+    await page.$eval(`${at} video`, (video) => (video.muted = true));
+    await press(page, await page.$(`${at} [data-play]`), touch).catch((err) => problems.push(`couldn't press play on #${id}: ${firstLine(err)}`));
+    const playing = (sel) => {
+      const video = document.querySelector(`${sel} video`);
+      return video && !video.paused && video.currentTime > 0;
+    };
+    await page.waitForFunction(playing, at, { timeout: 8000 }).catch(() => problems.push(`#${id} didn't play`));
+
+    // Playing, it drags by its grip on a desktop, and keeps playing.
+    if (!touch) {
+      const grip = await page.$eval(`${at} [data-grip]`, (el) => el.getBoundingClientRect().toJSON());
+      const before = await page.$eval(at, (dialog) => dialog.getBoundingClientRect().x);
+      await page.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(grip.x + grip.width / 2 + 100, grip.y + grip.height / 2, { steps: 8 });
+      await page.mouse.up();
+      await page.waitForTimeout(OPEN_MS / 4);
+      const after = await page.$eval(at, (dialog) => ({
+        x: dialog.getBoundingClientRect().x,
+        paused: dialog.querySelector('video').paused,
+      }));
+      if (Math.abs(after.x - (before + 100)) > 2) problems.push(`#${id}'s grip didn't drag it while playing`);
+      if (after.paused) problems.push(`dragging #${id}'s grip paused it`);
+    }
+  }
+  await press(page, await page.$(`${at} [data-close]`), touch).catch(() => {});
+  await closes('the cross');
+
+  await press(page, triggers.at(-1), touch).catch((err) => problems.push(`couldn't press a trigger of #${id}: ${firstLine(err)}`));
+  if (!(await opens('pressing its last trigger'))) return;
+  await page.waitForTimeout(OPEN_MS);
+  if (touch) {
+    await page.touchscreen.tap(8, 8);
+  } else {
+    // Escape closes it wherever focus is, not only inside it.
+    await page.evaluate(() => document.activeElement instanceof HTMLElement && document.activeElement.blur());
+    await page.keyboard.press('Escape');
+  }
+  await closes(touch ? 'a tap outside' : 'Escape');
 }
 
 /** The first gallery link opens the lightbox with something in it, and Close
@@ -267,7 +417,10 @@ async function checkPage(context, touch, site, pagePath, tag) {
     if (width[0] > width[1] + 1) problems.push(`scrolls sideways: ${width[0]}px wide in a ${width[1]}px window`);
     if (name !== 'home') await shot(name);
 
-    if (await page.$('.diagram')) await checkMap(page, touch, problems, shot);
+    if (await page.$('.diagram')) {
+      await checkMap(page, touch, problems, shot);
+      await checkVideoWindows(page, touch, problems, shot);
+    }
     await checkLightbox(page, touch, problems, pageShot);
 
     // Printed (the About page is the CV), it must still fit the width.

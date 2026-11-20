@@ -30,8 +30,9 @@ Legend: ✅ done · 🟙 platform-provided · ⏳ pending · ➖ not applicable
 | Scrollbar gutter | performance | `scrollbar-gutter: stable` to remove cross-page horizontal shift. |
 | Self-hosted web fonts | performance / security / privacy | Atkinson Hyperlegible Next and Mono, one variable WOFF2 per style holding the Latin set, served from the site (`src/assets/fonts/`, licences beside them). Astro writes the `@font-face` rules with `font-display: swap`, preloads the two upright files, and gives each family a fallback sized to its metrics. No request goes to Google, so visitors' addresses don't either, and the CSP allows fonts and styles from `'self'` only. |
 | Landmarks | accessibility | Every page has a `<main>`. About and the case studies label their two `<nav>`s: the pinned page nav ("Main") and the mini-map ("Pages"). The home map is itself a `<nav>`. |
-| Text alternatives on the map | accessibility | The floating rings' words reach screen readers as plain text. The name at the centre, which reshuffles the map, says so in a tooltip (`title`) that screen readers read as its description. |
-| Video-only media | accessibility | The case-study videos are silent (encoded without sound), so they need no captions. Each sits in a `<figure>` whose caption says what it shows, with a poster frame. |
+| Text alternatives on the map | accessibility | The floating rings' words reach screen readers as plain text. The name at the centre, the portrait sticker and the sketchbook, which open the map's videos, are buttons announced as opening a dialog (`aria-haspopup`, `aria-expanded`); the sticker's and the sketchbook's labels say what they open, and the name's description does. Without scripting, the sticker and the sketchbook are disabled, so no button sits there doing nothing. A video's window closes on Escape wherever focus is, except inside the video's own controls in Chrome, which keep every key (Tab on from there reaches its close button), and before an open card on the map, which the next Escape closes. |
+| Video-only media | accessibility | The case-study videos are silent (encoded without sound), so they need no captions. Each sits in a `<figure>` whose caption says what it shows, with a poster frame. The two videos on the home map have sound: see Pending. |
+| Media that never plays by itself | accessibility | The videos on the home map wait for a click on their play button, which covers the video, and stop when their window closes or the page is left. One window opens at a time, so two never play together. |
 
 ---
 
@@ -63,18 +64,27 @@ behind something that can set them (Cloudflare, a reverse proxy, etc.).
 
 ---
 
+## ⏳ Pending — needs the owner's words
+
+- **Captions for the videos on the home map** (`src/assets/intro-video.mp4`,
+  `src/assets/sketchbook-video.mp4`): they're speech, so WCAG 1.2.2 (level A) asks for
+  captions. They're in place, `src/assets/intro-video.vtt` and `src/assets/sketchbook-video.vtt`
+  in a `<track kind="captions">` in `src/components/VideoWindow.astro`, but drafted by a machine
+  (whisper.cpp), which can misquote a video: each counts once the owner has checked it.
+
+---
+
 ## ➖ Not applicable (no qualifying content today)
 
 Re-evaluate if the site grows to include these:
 
-- **Captions/transcripts** (the videos have no sound; see Video-only media above), **accessible
-  data tables** (no tables), **feed discovery/hygiene** (no RSS/Atom feed), **breadcrumb UI**
+- **Accessible data tables** (no tables), **feed discovery/hygiene** (no RSS/Atom feed), **breadcrumb UI**
   (single-level depth; JSON-LD breadcrumbs are present).
 - **Privacy policy / cookie consent / GPC**: the site sets no cookies and stores nothing in the
   browser. Visits are counted by GoatCounter (`src/scripts/count.ts`): it gets the page, the
   referring site's origin (never the page on it), a source or campaign tag (`ref`,
   `utm_source`, `utm_campaign`; no other query parameter), the screen width, and clicks on the
-  email address, outbound links, print and the map's cards. It sees the browser and the country
+  email address, outbound links, print, the map's cards and its videos. It sees the browser and the country
   from the request and keeps no IP address. Without scripting, a hidden image sends the page
   alone. None of this identifies a person, so no consent banner is needed.
 - **Internationalisation** (hreflang, RTL, language switcher, locale formatting, plural rules):

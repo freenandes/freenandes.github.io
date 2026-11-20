@@ -46,7 +46,8 @@ No secrets are needed.
 
 ## How it works
 
-- **Home map.** Markers for About, Contact and each case study, joined in one chain, among spinning rings and drawings on a contour texture. A physics simulation places them, so the layout changes on every load, and clicking the name at the centre reshuffles it. A click opens a marker's card; on a desktop, pointing at a case study also shows a preview of it. Touch screens open cards as popups. If the script fails, a plain list of the links takes the map's place.
+- **Home map.** Markers for About, Contact and each case study, joined in one chain, among spinning rings and drawings on a contour texture. A physics simulation places them, so the layout changes on every load. A click opens a marker's card; on a desktop, pointing at a case study also shows a preview of it. Touch screens open cards as popups. If the script fails, a plain list of the links takes the map's place.
+- **Videos on the map.** The name at the centre of the map, and the portrait sticker, open a short video introduction of Pedro in a window; the sketchbook opens a second video, on knowing what to build. On a desktop each is a small window that drags aside, so the map stays usable: by the video until it plays, and by the grip on its top left corner whether it's playing or paused; on a touch screen it's a popup, closed by a tap outside it. One opens at a time. A video never plays by itself, closing its window (or pressing Escape) stops it, and each has captions. Pointing at the portrait or the sketchbook turns it a little and shows a play mark on it; the portrait also lights up the drawing beside it.
 - **About and CV.** Rendered from `src/content/cv.md`. "Download PDF" prints it with its own print styles.
 - **Case studies.** One MDX file each, served at `/<file name>/`. Screenshots sit in galleries and open in an enlarged view that zooms and steps through every screenshot and video on the page.
 - **Mini-map.** About and every case study end with the map's pages in one straight line, the current page filled in.
@@ -69,7 +70,10 @@ Each page owns its markup and styles. Values worth tuning are named knobs at the
 | `<head>`, metadata, CSP, page shell | `src/layouts/Base.astro` |
 | Site URL, base path, fonts, redirects from old addresses | `astro.config.mjs` |
 | Home: markers, card copy, preview alt text, the chain they connect in | `src/diagram.config.ts` |
-| Home: look, and knobs for the texture, markers, cards, rings, previews, popups, drawings, sticker, post-its, sketchbook and ruler | the top of the `<style>` in `src/pages/index.astro` |
+| Home: look, and knobs for the texture, markers, cards, rings, previews, popups, drawings, sticker (and how it turns under the pointer), post-its, sketchbook and ruler | the top of the `<style>` in `src/pages/index.astro` |
+| Home: the videos' window, its size, shadow, play button, grip and close button, and the captions' size | `src/components/VideoWindow.astro` |
+| Home: which videos the map opens, their labels, and the names their visits are counted under | `videos` at the top of `src/pages/index.astro` |
+| Home: each video, its poster frame and its captions | `src/assets/intro-video.mp4`, `.jpg` and `.vtt`; `src/assets/sketchbook-video.mp4`, `.jpg` and `.vtt` |
 | Home: marker spacing, connector shapes, where cards open, entrance timing, physics, which drawings show first and how crowded the map may get | `KNOBS` and `SIM` at the top of `src/scripts/nav-diagram.ts` |
 | Home: the drawings, the ruler, the portrait sticker, the post-its, the sketchbook, the case-study previews | `src/assets/decor/`, `src/assets/ruler.svg`, `src/assets/sticker.png`, `src/assets/post-it.webp`, `src/assets/post-it-yellow.webp`, `src/assets/notebook.webp`, `src/assets/previews/<marker id>.png` |
 | About: look, print rules, and the `--cv-*` spacing knobs | `src/pages/about.astro` |
@@ -137,6 +141,37 @@ ffmpeg -i master.mp4 -vf "scale=out_range=tv:flags=lanczos,format=yuv420p" -c:v 
 ```
 
 A lower `-crf` is sharper and bigger: 22 suits a short video, and a long, busy one can go to about 29 before text softens.
+
+### Add or replace a video on the map
+
+The map opens two videos, each in a window of its own (`src/components/VideoWindow.astro`): the introduction, from the name at the centre and the portrait sticker, and the sketchbook's, from the sketchbook. A video is three files in `src/assets/` named after it: the `.mp4`, a `.jpg` frame of it that sits over it until it plays, and its `.vtt` captions, such as `src/assets/intro-video.vtt`. Keep portrait 9:16 masters, since the window is drawn in that shape; another shape needs the knobs in `src/components/VideoWindow.astro` looked at. Below, `<name>` is the video's file name without its extension, such as `intro-video`.
+
+1. Encode the master. This keeps every frame at its own time, strips the phone's metadata (it records where the video was shot), halves a 4K frame to 1080×1920, and makes the sound mono, 3 dB quieter so it doesn't clip:
+
+   ```bash
+   ffmpeg -i master.mp4 -map 0:v:0 -map 0:a:0 -map_metadata -1 -map_chapters -1 -fps_mode passthrough -vf "scale=1080:1920:flags=lanczos+accurate_rnd+full_chroma_int,format=yuv420p" -c:v libx264 -preset veryslow -tune film -crf 26 -profile:v high -level:v 4.1 -g 120 -x264-params aq-mode=3 -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -af "pan=mono|c0=0.5*c0+0.5*c1,volume=-3dB" -c:a aac -b:a 128k -movflags +faststart src/assets/<name>.mp4
+   ```
+
+   Camera footage costs far more than a screen recording: at `-crf 26` these come out at about 2.5 Mbit/s, and look like their masters at the size the window shows them. Drop `pan=…,` if the two channels of the master differ, and `volume=-3dB` if it isn't loud.
+2. Take the poster from a frame where the face is at rest and the hands are down (frame 28 of the introduction, 3036 of the sketchbook's); it sits over the video until it plays:
+
+   ```bash
+   ffmpeg -i master.mp4 -vf "select='eq(n\,28)',scale=1080:1920:flags=lanczos:in_color_matrix=bt709:in_range=tv,format=rgb24" -fps_mode passthrough -frames:v 1 -q:v 2 src/assets/<name>.jpg
+   ```
+
+3. Check `ffprobe -show_entries format_tags src/assets/<name>.mp4` lists no `location`.
+4. A new video goes in `videos` at the top of `src/pages/index.astro`: its window's id, its label for screen readers, the name its visits are counted under, and its three files (the captions imported with `?url&no-inline`). Its trigger is a `<button>` with `aria-controls` set to that id, `aria-expanded="false"` and `aria-haspopup="dialog"`, like the sketchbook. Open it from the map with `npm run dev`.
+5. Redo the captions, `src/assets/<name>.vtt`, if the words changed. A machine draft comes from [whisper.cpp](https://github.com/ggml-org/whisper.cpp) (`brew install whisper.cpp`) and its `ggml-large-v3-turbo.bin` model from [Hugging Face](https://huggingface.co/ggerganov/whisper.cpp), about 1.6 GB:
+
+   ```bash
+   ffmpeg -i master.mp4 -map 0:a:0 -ac 1 -ar 16000 audio.wav
+   ```
+
+   ```bash
+   whisper-cli -m ggml-large-v3-turbo.bin -f audio.wav -l en -ml 36 -sow -ovtt -of draft
+   ```
+
+   Then go through the draft by hand before it becomes `src/assets/<name>.vtt`: fix the words it misheard, and the cues it cut mid-phrase, keeping each to two lines of about 36 characters. Each captions file's opening note says the same.
 
 ### Add a drawing to the map
 
@@ -216,6 +251,8 @@ Every other parameter in the address stays on the reader's side. Screen widths s
 | `out/<site>` | follows a link to another site, such as `out/linkedin.com` |
 | `print/<page>` | prints a page, such as `print/about/` for the CV |
 | `map/<marker id>` | opens a card on the home map |
+| `<video>/open` | opens a video on the map: `intro/open` the introduction, from the name or the portrait, and `sketchbook/open` the sketchbook's |
+| `<video>/play` | plays it, once per visit to the page |
 
 A page that doesn't exist is counted at the address that was asked for, with the title "Page not found", so broken links show up by name. All of this is in `src/scripts/count.ts`; the map's cards are counted from `src/scripts/nav-diagram.ts`.
 
@@ -237,9 +274,9 @@ npm run browsers                    # Chrome, Firefox and WebKit
 npm run browsers -- --only webkit   # one engine
 ```
 
-It builds the working tree, serves it over HTTPS on this machine and loads every page in each engine, at desktop and phone sizes. It checks that nothing breaks: no script errors, failed requests or CSP violations, no sideways scrolling (on screen or printed), the map mounts and opens a card in view, the lightbox opens and closes, and once scrolled to the end, no block is left invisible waiting for its entrance, also in a window as tall as a portrait 1440p screen. It exits `1` if a check fails and `2` if a browser couldn't start. Screenshots of each engine go to `.browsers/` to compare by eye; they're never identical, because each engine renders fonts its own way.
+It builds the working tree, serves it over HTTPS on this machine and loads every page in each engine, at desktop and phone sizes. It checks that nothing breaks: no script errors, failed requests or CSP violations, no sideways scrolling (on screen or printed), the map mounts and opens a card in view, each video window opens in view from its triggers, drags, plays and closes, one at a time, the lightbox opens and closes, and once scrolled to the end, no block is left invisible waiting for its entrance, also in a window as tall as a portrait 1440p screen. It exits `1` if a check fails and `2` if a browser couldn't start. Screenshots of each engine go to `.browsers/` to compare by eye; they're never identical, because each engine renders fonts its own way.
 
-Run it after changing the map script, the lightbox, `src/scripts/site.ts`, `Base.astro` (its CSP above all) or `global.css`. The phone sizes are emulated in desktop engines, so they don't stand in for Safari on an iPhone or Firefox on Android: check those on a real phone, or in Xcode's iOS Simulator, which runs the real Mobile Safari.
+Run it after changing the map script, the video windows (`src/components/VideoWindow.astro`), the lightbox, `src/scripts/site.ts`, `Base.astro` (its CSP above all) or `global.css`. The phone sizes are emulated in desktop engines, so they don't stand in for Safari on an iPhone or Firefox on Android: check those on a real phone, or in Xcode's iOS Simulator, which runs the real Mobile Safari.
 
 ## The UX audit page
 

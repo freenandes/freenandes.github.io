@@ -1,0 +1,108 @@
+WEBVTT
+
+NOTE
+Captions for the sketchbook video (sketchbook-video.mp4), from a machine
+transcript: whisper.cpp with the large-v3-turbo model. Correct the words
+and keep the times; a cue holds up to two lines of about 36 characters.
+
+00:00:00.681 --> 00:00:05.320
+Hi, it's Pedro.
+So I was thinking here.
+
+00:00:05.320 --> 00:00:10.120
+Anyone can build software
+now in an afternoon or so.
+
+00:00:10.120 --> 00:00:14.940
+So why would you still need
+a designer like me for that?
+
+00:00:14.940 --> 00:00:17.340
+A little bit of a provocation.
+
+00:00:17.340 --> 00:00:21.490
+Can't Claude actually come up
+with a design straight away?
+
+00:00:21.490 --> 00:00:28.660
+Well, yes, it can. Perfectly.
+But building is cheap.
+
+00:00:28.660 --> 00:00:32.060
+But that was never
+the hard part, was it?
+
+00:00:32.060 --> 00:00:36.920
+Knowing what to build and why
+and even how is the hard part.
+
+00:00:36.920 --> 00:00:37.870
+Because in the end,
+
+00:00:37.870 --> 00:00:41.870
+if you're creating something
+that needs to work for people,
+
+00:00:41.870 --> 00:00:46.920
+for even machines
+or pets or whatever,
+
+00:00:46.920 --> 00:00:52.100
+the real test is not
+if it works on first look.
+
+00:00:52.100 --> 00:00:53.660
+It always works on first look.
+
+00:00:54.544 --> 00:00:56.970
+But if it makes sense
+to whoever uses it,
+
+00:00:56.970 --> 00:01:00.623
+and AI will happily build
+the wrong thing for you.
+
+00:01:02.648 --> 00:01:07.370
+That's for sure. Out of the mega
+normalization of what already exists
+
+00:01:07.370 --> 00:01:09.320
+and what it consumed.
+
+00:01:09.320 --> 00:01:15.955
+So I start here with questions
+about the product, not the code.
+
+00:01:15.955 --> 00:01:19.160
+Who is it for?
+What are users trying to do?
+
+00:01:19.160 --> 00:01:21.980
+How will we know it
+works in the end?
+
+00:01:21.980 --> 00:01:24.100
+How will we measure that?
+
+00:01:24.100 --> 00:01:28.060
+So AI and generative coding can
+come after that. And it's fast.
+
+00:01:28.060 --> 00:01:29.810
+But thinking about what to make
+
+00:01:29.810 --> 00:01:35.940
+and why and how is what makes
+that speed worth it in the long run.
+
+00:01:37.080 --> 00:01:42.300
+So to make users happy to spend
+their time with confidence,
+
+00:01:42.300 --> 00:01:45.120
+with confidence in your application.
+
+00:01:46.822 --> 00:01:48.620
+Thanks for listening.
+Have a nice one.
+

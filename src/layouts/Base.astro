@@ -1,6 +1,6 @@
 ---
 /** The shell every page renders into: <head>, skip link, <main>, footer. A
-    page's `footer` slot opens the footer, in place of its rule, its
+    page's `footer` slot goes right before the footer, in place of its rule, its
     `footer-links` slot adds links after the footer's contact links (About's
     to the UX audit), and its `head` slot adds to the <head> (the home map's
     <noscript> styles). */
@@ -178,10 +178,13 @@ const csp = [
       <slot />
     </main>
 
+    {/* The footer slot sits just before the footer, not in it, as a child of
+        <body>: the mini-map pins itself to the window's foot with
+        `position: sticky`, which only moves within its parent. */}
+    {footer && <slot name="footer" />}
     {
       footer && (
-        <Footer intro={footerIntro}>
-          <slot name="footer" />
+        <Footer intro={footerIntro} rule={!Astro.slots.has('footer')}>
           <slot name="footer-links" slot="links" />
         </Footer>
       )

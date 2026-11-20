@@ -190,10 +190,12 @@ ul.meta-row {
 
 /* --- Layout -------------------------------------------------------------- */
 
-/* Every page is one column of `--measure`, and the footer lines up with it.
-   The home page opts out in index.astro: its map is full-bleed. */
+/* Every page is one column of `--measure`, and the footer, with the mini-map
+   just before it, lines up with it. The home page opts out in index.astro:
+   its map is full-bleed. */
 
 main,
+body > nav,
 body > footer {
   width: 100%;
   max-width: var(--measure);

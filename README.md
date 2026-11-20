@@ -153,10 +153,10 @@ The map opens two videos, each in a window of its own (`src/components/VideoWind
    ```
 
    Camera footage costs far more than a screen recording: at `-crf 26` these come out at about 2.5 Mbit/s, and look like their masters at the size the window shows them. Drop `pan=…,` if the two channels of the master differ, and `volume=-3dB` if it isn't loud.
-2. Take the poster from a frame where the face is at rest and the hands are down (frame 28 of the introduction, 3036 of the sketchbook's); it sits over the video until it plays:
+2. Take the poster from a frame where the face is at rest and the hands are down (frame 975 of the introduction, 3036 of the sketchbook's); it sits over the video until it plays:
 
    ```bash
-   ffmpeg -i master.mp4 -vf "select='eq(n\,28)',scale=1080:1920:flags=lanczos:in_color_matrix=bt709:in_range=tv,format=rgb24" -fps_mode passthrough -frames:v 1 -q:v 2 src/assets/<name>.jpg
+   ffmpeg -i master.mp4 -vf "select='eq(n\,975)',scale=1080:1920:flags=lanczos:in_color_matrix=bt709:in_range=tv,format=rgb24" -fps_mode passthrough -frames:v 1 -q:v 2 src/assets/<name>.jpg
    ```
 
 3. Check `ffprobe -show_entries format_tags src/assets/<name>.mp4` lists no `location`.

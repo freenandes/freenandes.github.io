@@ -198,6 +198,7 @@ The build fails if a published locked case study has no encrypted file, so a for
 Edit `src/content/cv.md`, then check `/about/` with `npm run dev` and its Download PDF button.
 
 - Jobs and recommendations go newest first. A job is `role`, `org`, `period`, an optional one-line `summary` and a list of `points`; `earlierWork` takes the same fields minus `points`.
+- A job, in `experience` or `earlierWork`, can also take `caseStudies`, a list of case-study file names without `.mdx`, shown as links titled like the case study, and `images`, each a `src` (the file's path from `cv.md`; they live in `src/assets/cv/`) and its `alt` text, shown as small thumbnails that open in the enlarged view. Both appear on the page only, never on the PDF. A case study that isn't published fails the build.
 - A recommendation is `name`, `role`, an optional `org`, a `date` shown as written, and the quote under `text: |`, without quotation marks. `print: false` keeps it off the PDF.
 - `summary` is Markdown under `summary: |`, every line indented two spaces.
 - Elsewhere, wrap a value that contains `: ` in double quotes, or the build fails.

@@ -38,55 +38,66 @@ const projects = defineCollection({
 // misspelled field into a build error instead of silently dropping it.
 const cv = defineCollection({
   loader: glob({ pattern: 'cv.md', base: './src/content' }),
-  schema: z.object({
-    headline: z.string(),
-    location: z.string().optional(),
-    summary: z.string(),
-    experience: z.array(
-      z.object({
-        role: z.string(),
-        org: z.string(),
-        period: z.string(),
-        summary: z.string().optional(),
-        points: z.array(z.string()).default([]),
-      }).strict()
-    ),
-    earlierWork: z
-      .array(
+  schema: ({ image }) => {
+    // Under a job on the page, never on the PDF: links to its case studies,
+    // by file name (the page checks each is published), and thumbnails that
+    // open in the enlarged view, by path from cv.md.
+    const extras = {
+      caseStudies: z.array(z.string()).default([]),
+      images: z.array(z.object({ src: image(), alt: z.string() }).strict()).default([]),
+    };
+    return z.object({
+      headline: z.string(),
+      location: z.string().optional(),
+      summary: z.string(),
+      experience: z.array(
         z.object({
           role: z.string(),
           org: z.string(),
           period: z.string(),
           summary: z.string().optional(),
+          points: z.array(z.string()).default([]),
+          ...extras,
         }).strict()
-      )
-      .default([]),
-    education: z.array(
-      z.object({
-        title: z.string(),
-        org: z.string().optional(),
-        period: z.string().optional(),
-        note: z.string().optional(),
-      }).strict()
-    ),
-    // Quoted as written; the page adds the quotation marks. `text` is plain
-    // text, with blank lines between paragraphs. `print: false` keeps one on
-    // the page but off the PDF.
-    recommendations: z
-      .array(
+      ),
+      earlierWork: z
+        .array(
+          z.object({
+            role: z.string(),
+            org: z.string(),
+            period: z.string(),
+            summary: z.string().optional(),
+            ...extras,
+          }).strict()
+        )
+        .default([]),
+      education: z.array(
         z.object({
-          name: z.string(),
-          role: z.string(),
+          title: z.string(),
           org: z.string().optional(),
-          date: z.string(),
-          text: z.string(),
-          print: z.boolean().default(true),
+          period: z.string().optional(),
+          note: z.string().optional(),
         }).strict()
-      )
-      .default([]),
-    skills: z.array(z.string()).default([]),
-    languages: z.array(z.string()).default([]),
-  }).strict(),
+      ),
+      // Quoted as written; the page adds the quotation marks. `text` is plain
+      // text, with blank lines between paragraphs. `print: false` keeps one on
+      // the page but off the PDF.
+      recommendations: z
+        .array(
+          z.object({
+            name: z.string(),
+            role: z.string(),
+            org: z.string().optional(),
+            date: z.string(),
+            text: z.string(),
+            print: z.boolean().default(true),
+          }).strict()
+        )
+        .default([]),
+      skills: z.array(z.string()).default([]),
+      languages: z.array(z.string()).default([]),
+    }).strict();
+  },
 });
 
 // One entry: src/content/ux-audit.mdx, the UX audit page's words. Its body is

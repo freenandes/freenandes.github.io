@@ -322,10 +322,10 @@ async function checkVideoWindow(page, touch, problems, shot, id, triggers) {
   await closes(touch ? 'a tap outside' : 'Escape');
 }
 
-/** The first gallery link opens the lightbox with something in it, and Close
-    closes it. */
+/** The first gallery link, or About's first thumbnail, opens the lightbox
+    with something in it, and Close closes it. */
 async function checkLightbox(page, touch, problems, shot) {
-  const item = await page.$('[data-gallery] > div > a');
+  const item = await page.$('[data-gallery] > div > a, a[data-enlarge]');
   if (!item) return;
   await item.scrollIntoViewIfNeeded();
   await press(page, item, touch).catch((err) => problems.push(`couldn't press a gallery item: ${firstLine(err)}`));

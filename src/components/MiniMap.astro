@@ -13,10 +13,11 @@ import { getDiagramNodes, polygon } from '../lib/diagram';
 
 /** The page a marker stands for. The name at the centre is the map itself, which
     the pinned page nav always links to. The contact card has no page (the
-    footer carries its links), and the floating rings are decoration. */
+    footer carries its links), the side project's links lead off the site,
+    and the floating rings are decoration. */
 function pageOf(node: DiagramNode): string | undefined {
   if (node.kind !== 'about' && node.kind !== 'project') return undefined;
-  return node.link && !node.link.external ? node.link.href : undefined;
+  return node.links?.find((link) => !link.external)?.href;
 }
 
 // Stops follow the chain, closing up over the markers it skips. A page the

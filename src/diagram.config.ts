@@ -8,8 +8,16 @@ import { site } from './site.config';
  * pulled straight.
  */
 
-export type NodeKind = 'identity' | 'about' | 'contact' | 'project' | 'floating';
-export type NodeShape = 'triangle' | 'square' | 'pentagon' | 'star';
+/** `side` is a side project: off the chain, its card links out. */
+export type NodeKind = 'identity' | 'about' | 'contact' | 'project' | 'side' | 'floating';
+export type NodeShape = 'triangle' | 'square' | 'pentagon' | 'hexagon' | 'star';
+
+/** A link on a marker's card. `external` opens it in a new tab. */
+export interface NodeLink {
+  label: string;
+  href: string;
+  external?: boolean;
+}
 
 /** A marker as the page renders it. */
 export interface DiagramNode {
@@ -24,7 +32,9 @@ export interface DiagramNode {
   tagline?: string;
   lines?: string[];
   tags?: string[];
-  link?: { label: string; href: string; external?: boolean };
+  /** Links at the foot of the card, in a row. The first is where the map's
+   *  fallback list sends the marker. */
+  links?: NodeLink[];
   /**
    * Alt text for the marker's preview: a screen from the project, in
    * `src/assets/previews/` and named after the marker's id. On a desktop it
@@ -51,7 +61,7 @@ export interface DiagramNode {
  */
 export type DiagramEntry =
   | (DiagramNode & { kind: Exclude<NodeKind, 'project'> })
-  | (Omit<DiagramNode, 'label' | 'tags' | 'link'> & { kind: 'project' });
+  | (Omit<DiagramNode, 'label' | 'tags' | 'links'> & { kind: 'project' });
 
 /** The link at the bottom of every case study's card. */
 export const projectLinkLabel = 'Open case study';
@@ -76,7 +86,7 @@ export const diagramNodes: DiagramEntry[] = [
     lines: [
       'I help teams decide what’s worth building, then take it all the way: from user research and information architecture to prototypes, design systems, and the front-end code that ships them.',
     ],
-    link: { label: 'Read the full story', href: '/about' },
+    links: [{ label: 'Read the full story', href: '/about' }],
     portrait: { x: 0.24, y: 0.08 },
     landscape: { x: 0.12, y: 0.26 },
   },
@@ -132,6 +142,26 @@ export const diagramNodes: DiagramEntry[] = [
     landscape: { x: 0.88, y: 0.46 },
   },
   {
+    // Left out of diagramChain, so it lands on its own wherever the chain
+    // and the portrait leave room, and hides where they leave none.
+    id: 'actuallyexplain',
+    label: 'AE',
+    kind: 'side',
+    shape: 'hexagon',
+    tagline: 'actuallyEXPLAIN',
+    lines: [
+      'Open-source side project: paste a PostgreSQL query and it shows you what it does, step by step, as a diagram with plain-language explanations.',
+    ],
+    links: [
+      { label: 'Try it', href: 'https://actuallyexplain.vercel.app/', external: true },
+      { label: 'GitHub', href: 'https://github.com/freenandes/actuallyexplain/', external: true },
+    ],
+    preview:
+      'actuallyEXPLAIN explaining a recursive query: the SQL on the left with its WITH RECURSIVE block highlighted, its steps drawn as a diagram of boxes, and a side panel defining WITH / CTE, with a link to the PostgreSQL docs.',
+    portrait: { x: 0.8, y: 0.38 },
+    landscape: { x: 0.84, y: 0.8 },
+  },
+  {
     id: 'float-1',
     label: 'Fix problems, not screens',
     kind: 'floating',
@@ -159,8 +189,10 @@ export const diagramNodes: DiagramEntry[] = [
 
 /**
  * The line the connectors draw, marker to marker. One open chain: reorder the
- * ids to reroute it, drop one to leave that marker unconnected. The mini-map
- * follows the same order, skipping the markers that have no page.
+ * ids to reroute it. A marker left out is a stray, like the side project: it
+ * lands unconnected in the room the chain and the portrait sticker leave, and
+ * stays hidden where they leave none. The mini-map follows the same order,
+ * skipping the markers that have no page.
  */
 export const diagramChain = [
   'contact',

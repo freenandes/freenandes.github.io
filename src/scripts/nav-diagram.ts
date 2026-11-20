@@ -1,8 +1,9 @@
 /* =============================================================================
    The home page's map: a small force layout that scatters the markers, keeps
    them from colliding, and routes the connectors between them without crossings.
-   Outside the simulation, it finds free spots for the map's decorations and
-   for each card as it opens, and keeps all of it off the portrait sticker.
+   Outside the simulation, it finds free spots for the markers left out of the
+   chain (the side project), for the map's decorations and for each card as it
+   opens, and keeps all of it off the portrait sticker.
 
    The markers, their copy and the chain they connect in are authored in
    `src/diagram.config.ts` — the same file the page renders from, so the layout
@@ -89,7 +90,8 @@ const KNOBS = {
   /** The order they claim room in, by file name (`post-it` is the note). Each
    *  shows only while there's room and coverage left, and once one is left
    *  out, so is everything after it, except the `decorAlways` ones, which
-   *  show whenever there's room. A drawing not listed comes last. */
+   *  show whenever there's room. A drawing not listed comes last. The strays
+   *  come before them all: while one is hidden, only `decorAlways` show. */
   decorOrder: [
     'flag',
     'post-it',
@@ -115,6 +117,25 @@ const KNOBS = {
   balloonReach: 80,
   /** Space markers and rings keep from the portrait sticker's box. */
   stickerGap: 12,
+  /** A marker left out of the chain (a stray: the side project) comes after
+   *  the chain and the portrait sticker, and before the decorations. It
+   *  lands anywhere on the canvas they leave room, at the free spot on a grid
+   *  `step` apart nearest a random one, which leans `lean` of the way toward
+   *  the spot it was authored to prefer. Free means its box is `roomy.line`
+   *  clear of every connector, `roomy.edge` of the canvas's sides, and as
+   *  clear of the markers as they keep of each other; failing that, only as
+   *  clear as `tight` asks, about what the post-its keep. With no spot even
+   *  then, it stays hidden, and so do the decorations, except `decorAlways`,
+   *  so none shows in its place. It gives way to the chain's markers, keeping
+   *  `tight.marker` from them, and after a drag it glides to the nearest free
+   *  spot if it's left on a connector or a marker. The rings give way to it
+   *  outright, to the nearest spot `tight.marker` clear of it. */
+  stray: {
+    roomy: { line: 32, edge: 16 },
+    tight: { line: 8, edge: 8, marker: 8 },
+    step: 8,
+    lean: 0.25,
+  },
   /** Pointer travel before a press on a marker becomes a drag. */
   dragThreshold: 6,
   /** Quiet time after a resize before the full re-layout runs. */
@@ -158,6 +179,10 @@ type Node = {
   dotDy: number;
 
   floating: boolean;
+  /** Left out of the chain: placed apart (placeStrays), and hidden while
+   *  there's no room for it (`unplaced`). */
+  stray: boolean;
+  unplaced: boolean;
   calm: boolean;
   dragging: boolean;
   hover: boolean;
@@ -241,6 +266,8 @@ export function initDiagram(root: HTMLElement) {
       ay: 0,
       dotDy: 0,
       floating: cfg.kind === 'floating',
+      stray: cfg.kind !== 'floating' && !diagramChain.includes(cfg.id),
+      unplaced: false,
       calm: false,
       dragging: false,
       hover: false,
@@ -265,12 +292,13 @@ export function initDiagram(root: HTMLElement) {
   });
 
   // The chain doubles as the layout order, so the random walk lays the markers
-  // out sequentially and the connectors read as one line. Anything left out of
-  // the chain still needs a place; floating rings are laid out separately.
-  const chainOrder: Node[] = [
-    ...chain,
-    ...nodes.filter((n) => !n.floating && !chain.includes(n)),
-  ];
+  // out sequentially and the connectors read as one line. The markers left
+  // out of it (strays) and the floating rings are laid out separately.
+  const strays = nodes.filter((n) => n.stray);
+
+  /** Who gives way when two boxes meet: a ring to any marker, a stray to the
+   *  chain's markers. */
+  const rank = (n: Node) => (n.floating ? 0 : n.stray ? 1 : 2);
 
   let W = 0;
   let H = 0;
@@ -379,7 +407,7 @@ export function initDiagram(root: HTMLElement) {
   }
 
   function layoutSpine(landscape: boolean, configMix: number) {
-    const n = chainOrder.length;
+    const n = chain.length;
     const narrow = narrowness();
     const { iw, ih } = inset();
     const alongPx = landscape ? iw : ih;
@@ -408,7 +436,7 @@ export function initDiagram(root: HTMLElement) {
       const along = endPad + t * (1 - 2 * endPad);
       const perp = 0.5 + bias + Math.sin(t * Math.PI * lobes + phase) * perpAmp;
       const spine = landscape ? { x: along, y: perp } : { x: perp, y: along };
-      chainOrder[i].frac = blendWithConfig(chainOrder[i], landscape, spine, mix);
+      chain[i].frac = blendWithConfig(chain[i], landscape, spine, mix);
     }
   }
 
@@ -548,7 +576,14 @@ export function initDiagram(root: HTMLElement) {
     return lo <= hi ? Math.max(lo, Math.min(hi, x)) : W / 2;
   }
 
-  function sepPad() {
+  /** Space kept between two markers' boxes: `KNOBS.markerGap`, or for a
+   *  stray, `KNOBS.stray.tight.marker`, so the simulation never pushes one
+   *  out of the tight spot it may have been given. */
+  function sepPad(a?: Node, b?: Node) {
+    if (a?.stray || b?.stray) {
+      const gap = KNOBS.stray.tight.marker;
+      return { x: gap, y: gap };
+    }
     const narrow = narrowness();
     const { x, y } = KNOBS.markerGap;
     return {
@@ -563,7 +598,7 @@ export function initDiagram(root: HTMLElement) {
   ): { x: number; y: number; hit: boolean } {
     const ha = nodeHalf(a);
     const hb = nodeHalf(b);
-    const pad = sepPad();
+    const pad = sepPad(a, b);
     const needX = ha.x + hb.x + pad.x;
     const needY = ha.y + hb.y + pad.y;
     const dx = bx - ax;
@@ -583,10 +618,11 @@ export function initDiagram(root: HTMLElement) {
     const portrait = stickerBox();
     for (let it = 0; it < iterations; it++) {
       let moved = 0;
+      // Strays have no spot yet: they're placed once the chain has its own.
       for (let i = 0; i < nodes.length; i++) {
-        if (nodes[i].floating) continue;
+        if (nodes[i].floating || nodes[i].stray) continue;
         for (let j = i + 1; j < nodes.length; j++) {
-          if (nodes[j].floating) continue;
+          if (nodes[j].floating || nodes[j].stray) continue;
           const s = separationPush(nodes[i], nodes[j], px[i], py[i], px[j], py[j]);
           if (!s.hit) continue;
           const hx = s.x * 0.5;
@@ -599,7 +635,7 @@ export function initDiagram(root: HTMLElement) {
         }
       }
       for (let i = 0; i < nodes.length; i++) {
-        if (nodes[i].floating) continue;
+        if (nodes[i].floating || nodes[i].stray) continue;
         const off = stickerPush(portrait, px[i], py[i], nodeHalf(nodes[i]));
         if (off) {
           px[i] += off.x;
@@ -619,7 +655,7 @@ export function initDiagram(root: HTMLElement) {
   function straightenAngles(iterations = 20, cosLimit = -0.15) {
     const { mx, my, iw, ih } = inset();
     if (iw < 2 || ih < 2) return;
-    const order = chainOrder;
+    const order = chain;
     if (order.length < 3) return;
     for (let it = 0; it < iterations; it++) {
       let maxAdj = 0;
@@ -660,7 +696,7 @@ export function initDiagram(root: HTMLElement) {
       for (let j = i + 1; j < nodes.length; j++) {
         const a = nodes[i];
         const b = nodes[j];
-        if (a.floating || b.floating) continue;
+        if (!chain.includes(a) || !chain.includes(b)) continue;
         const s = separationPush(a, b, a.ax, a.ay, b.ax, b.ay);
         if (s.hit && Math.hypot(s.x, s.y) > 10) return true;
       }
@@ -670,8 +706,7 @@ export function initDiagram(root: HTMLElement) {
 
   function orientationMismatched() {
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    for (const n of nodes) {
-      if (n.floating) continue;
+    for (const n of chain) {
       minX = Math.min(minX, n.ax); maxX = Math.max(maxX, n.ax);
       minY = Math.min(minY, n.ay); maxY = Math.max(maxY, n.ay);
     }
@@ -799,7 +834,7 @@ export function initDiagram(root: HTMLElement) {
           }
         }
         for (const o of nodes) {
-          if (o === n) continue;
+          if (o === n || o.unplaced) continue;
           const s = separationPush(n, o, o.ax, o.ay, n.ax, n.ay);
           if (!s.hit) continue;
           pushX += s.x * 0.5;
@@ -922,7 +957,7 @@ export function initDiagram(root: HTMLElement) {
   }
 
   function decrossEdges() {
-    const order = chainOrder;
+    const order = chain;
     const safety = 12;
     for (let pass = 0; pass < safety; pass++) {
       let improved = false;
@@ -1028,7 +1063,234 @@ export function initDiagram(root: HTMLElement) {
     computeAnchors();
     decrossEdges();
     refineCurveCrossings();
-    relaxFloatingFromEdges();
+  }
+
+  /** Whether a box of half-size `half` at (x, y) comes within `gap` of a
+   *  connector in `polys`. Each segment is measured along the way from its
+   *  nearest point to the box's centre, against how far the box reaches that
+   *  way, so a box whose corner a line only passes counts too. */
+  function nearLine(
+    half: { x: number; y: number },
+    x: number,
+    y: number,
+    polys: { x: number; y: number }[][],
+    gap: number,
+  ) {
+    for (const poly of polys) {
+      for (let i = 0; i < poly.length - 1; i++) {
+        const c = closestPointOnSeg(x, y, poly[i], poly[i + 1]);
+        if (c.d < 0.01) return true;
+        const reach = (half.x * Math.abs(x - c.x) + half.y * Math.abs(y - c.y)) / c.d;
+        if (c.d < reach + gap) return true;
+      }
+    }
+    return false;
+  }
+
+  /** How clear a stray keeps of everything: `roomy` where it can,
+   *  `tight` where it has to (KNOBS.stray). */
+  type StrayRoom = { line: number; edge: number; marker: { x: number; y: number } };
+  function strayRoom(tight: boolean): StrayRoom {
+    const { roomy, tight: least } = KNOBS.stray;
+    return tight
+      ? { ...least, marker: { x: least.marker, y: least.marker } }
+      : { ...roomy, marker: sepPad() };
+  }
+
+  /** The ruler's drawing as a box on the canvas. */
+  function rulerBox(): Box | null {
+    if (!ruler) return null;
+    const canvas = root.getBoundingClientRect();
+    const frame = ruler.getBoundingClientRect();
+    const ink = measureDecor(ruler);
+    return { ...ink, x: frame.left - canvas.left + ink.x, y: frame.top - canvas.top + ink.y };
+  }
+
+  /** What a stray's spot is checked against: the connectors, and the
+   *  sticker and the ruler, which never move. */
+  function strayObstacles() {
+    return { polys: edges.map(edgePolyline), fixed: [stickerBox(), rulerBox()] };
+  }
+
+  /** Whether stray `n` at (x, y) is clear, by `room`, of the connectors, the
+   *  other markers that are showing, the sticker and the ruler, with `slack`
+   *  to spare. */
+  function strayFits(
+    n: Node,
+    x: number,
+    y: number,
+    room: StrayRoom,
+    { polys, fixed }: ReturnType<typeof strayObstacles>,
+    slack = 0,
+  ) {
+    const half = nodeHalf(n);
+    for (const o of nodes) {
+      if (o === n || o.floating || o.unplaced) continue;
+      const h = nodeHalf(o);
+      if (
+        Math.abs(x - o.ax) < half.x + h.x + room.marker.x + slack &&
+        Math.abs(y - o.ay) < half.y + h.y + room.marker.y + slack
+      ) {
+        return false;
+      }
+    }
+    const gap = KNOBS.stickerGap + slack;
+    for (const b of fixed) {
+      if (b && Math.abs(x - b.x) < half.x + b.halfX + gap && Math.abs(y - b.y) < half.y + b.halfY + gap) {
+        return false;
+      }
+    }
+    return !nearLine(half, x, y, polys, room.line + slack);
+  }
+
+  /** The free spot for stray `n` nearest (tx, ty): a roomy one if there's
+   *  any, else a tight one, else null. It keeps a couple of pixels to spare,
+   *  so a stray that comes to rest a hair off it still counts as clear. */
+  function clearSpot(n: Node, tx: number, ty: number) {
+    const half = nodeHalf(n);
+    const obstacles = strayObstacles();
+    const step = KNOBS.stray.step;
+    for (const tight of [false, true]) {
+      const room = strayRoom(tight);
+      let best: { x: number; y: number } | null = null;
+      let bestD = Infinity;
+      for (let y = half.y + room.edge; y <= H - half.y - room.edge; y += step) {
+        for (let x = half.x + room.edge; x <= W - half.x - room.edge; x += step) {
+          const d = (x - tx) ** 2 + (y - ty) ** 2;
+          if (d >= bestD || !strayFits(n, x, y, room, obstacles, 2)) continue;
+          best = { x, y };
+          bestD = d;
+        }
+      }
+      if (best) return best;
+    }
+    return null;
+  }
+
+  function anchorAt(n: Node, spot: { x: number; y: number }) {
+    const { mx, my, iw, ih } = inset();
+    n.ax = spot.x;
+    n.ay = spot.y;
+    n.frac = {
+      x: Math.max(0, Math.min(1, (spot.x - mx) / iw)),
+      y: Math.max(0, Math.min(1, (spot.y - my) / ih)),
+    };
+  }
+
+  /** Lands each stray in the room the chain and the sticker leave, after a
+   *  new layout (KNOBS.stray). One with no room is hidden, its card closed. */
+  function placeStrays() {
+    const landscape = viewportLandscape();
+    const { mx, my, iw, ih } = inset();
+    for (const n of strays) n.unplaced = true;
+    for (const n of strays) {
+      const rnd = clampFrac(0.1 + Math.random() * 0.8, 0.1 + Math.random() * 0.8);
+      const aim = blendWithConfig(n, landscape, rnd, KNOBS.stray.lean);
+      const spot = clearSpot(n, mx + aim.x * iw, my + aim.y * ih);
+      n.unplaced = !spot;
+      n.el.toggleAttribute('data-unplaced', n.unplaced);
+      if (spot) anchorAt(n, spot);
+      else if (isOpen(n)) setOpen(n, false);
+    }
+  }
+
+  /** Times each ring has been moved off a stray since the last layout or
+   *  drag, so a ring held back onto one by the others can't be moved for
+   *  ever. */
+  const ringMoves = new Map<Node, number>();
+
+  /** Moves each ring that lies on a stray that's showing to the spot nearest
+   *  it that's clear of the strays and the sticker, and of the other markers
+   *  and rings, and of the connectors, as far down that list as any spot is
+   *  free; returns the farthest one has to go. Clear of the markers and
+   *  rings, nothing pushes it back onto the stray. A ring that's already
+   *  standing somewhere looks first on its own side of each stray it's on,
+   *  since the stray's push would stop it crossing to the other.
+   *  relaxFloatingFromEdges() only nudges a ring that has nowhere roomy to
+   *  go, and the simulation only holds one in balance part of the way off,
+   *  so either can leave a ring's text across a stray's label: this moves it
+   *  off outright. It runs after a new layout, measuring anchors, and
+   *  whenever the map comes to rest (`atRest`), measuring where things stand,
+   *  so a ring left on a stray by a drag, or bumped onto it by another ring,
+   *  is cleared too. */
+  function keepRingsOffStrays(atRest = false) {
+    const shown = strays.filter((st) => !st.unplaced);
+    if (!shown.length) return 0;
+    // Markers and strays are headed for their anchors; a ring at rest can be
+    // held off its own.
+    const at = (o: Node) => (atRest && o.floating ? { x: o.x, y: o.y } : { x: o.ax, y: o.ay });
+    const { mx, my, iw, ih } = inset();
+    const polys = edges.map(edgePolyline);
+    const portrait = stickerBox();
+    const floor = H - rulerReach() - KNOBS.decor.gap;
+    const step = KNOBS.stray.step;
+    let far = 0;
+    for (const ring of nodes) {
+      if (!ring.floating || (ringMoves.get(ring) ?? 0) >= 3) continue;
+      const onStray = (x: number, y: number) =>
+        shown.some((st) => separationPush(st, ring, at(st).x, at(st).y, x, y).hit);
+      const from = at(ring);
+      if (!onStray(ring.ax, ring.ay) && !onStray(from.x, from.y)) continue;
+      const pushers = shown.filter((st) => separationPush(st, ring, st.ax, st.ay, from.x, from.y).hit);
+      const away = (x: number, y: number) =>
+        pushers.every((st) => (x - from.x) * (from.x - st.ax) + (y - from.y) * (from.y - st.ay) >= 0);
+      const anywhere = () => true;
+      const half = nodeHalf(ring);
+      const extent = nodeExtent(ring);
+      const offSticker = (x: number, y: number) => !stickerPush(portrait, x, y, half);
+      const offMarkers = (x: number, y: number) =>
+        offSticker(x, y) &&
+        nodes.every(
+          (o) => o === ring || o.unplaced || !separationPush(o, ring, at(o).x, at(o).y, x, y).hit,
+        );
+      const roomy = (x: number, y: number) =>
+        offMarkers(x, y) &&
+        polys.every((poly) =>
+          poly.every((p, i) => i === 0 || closestPointOnSeg(x, y, poly[i - 1], p).d >= extent),
+        );
+      // The bounds relaxFloatingFromEdges() keeps rings in.
+      const reach = half.x + KNOBS.markerEdge;
+      const left = Math.max(mx + 6, reach);
+      const right = Math.min(mx + iw - 6, W - reach);
+      const bottom = Math.min(my + ih - 6, floor - half.y);
+      const tiers = [roomy, offMarkers, offSticker];
+      const searches = [away, anywhere].flatMap((side) => tiers.map((free) => ({ side, free })));
+      for (const { side, free } of searches) {
+        let best: { x: number; y: number } | null = null;
+        let bestD = Infinity;
+        for (let y = my + 6; y <= bottom; y += step) {
+          for (let x = left; x <= right; x += step) {
+            const d = (x - from.x) ** 2 + (y - from.y) ** 2;
+            if (d >= bestD || onStray(x, y) || !side(x, y) || !free(x, y)) continue;
+            best = { x, y };
+            bestD = d;
+          }
+        }
+        if (!best) continue;
+        far = Math.max(far, Math.hypot(best.x - from.x, best.y - from.y));
+        anchorAt(ring, best);
+        if (atRest) ringMoves.set(ring, (ringMoves.get(ring) ?? 0) + 1);
+        break;
+      }
+    }
+    return far;
+  }
+
+  /** Sends a stray left on a connector, a marker or the sticker, as a drag
+   *  can leave one, to the nearest free spot, and returns how far it has to
+   *  go. One with nowhere free to go stays put. */
+  function keepStraysClear() {
+    let far = 0;
+    const obstacles = strayObstacles();
+    const room = strayRoom(true);
+    for (const n of strays) {
+      if (n.unplaced || n.dragging || strayFits(n, n.ax, n.ay, room, obstacles)) continue;
+      const spot = clearSpot(n, n.ax, n.ay);
+      if (!spot) continue;
+      far = Math.max(far, Math.hypot(spot.x - n.ax, spot.y - n.ay));
+      anchorAt(n, spot);
+    }
+    return far;
   }
 
   /** The sides a card could open on, roomiest first. This only breaks ties:
@@ -1115,7 +1377,8 @@ export function initDiagram(root: HTMLElement) {
    * texture, so the simulation doesn't know about them. They claim room in
    * `KNOBS.decorOrder` while there's room and `KNOBS.decor.coverage` lasts, and
    * once one is left out, so is everything after it, except the `decorAlways`
-   * ones. A note in `KNOBS.glued` lands only with the one over it. One stays
+   * ones. A stray left out for want of room counts as the first one left out.
+   * A note in `KNOBS.glued` lands only with the one over it. One stays
    * exactly where it is for as long as the map and those before it leave it
    * clear, and one moving looks for a spot that moves none after it before
    * taking one that does.
@@ -1131,22 +1394,16 @@ export function initDiagram(root: HTMLElement) {
     decorDue = false;
     if (!decor.length) return;
     const { gap, edge, tries, coverage } = KNOBS.decor;
-    const blocks: Box[] = nodes.map((n) => {
-      const half = nodeHalf(n);
-      return { x: n.x, y: n.y, halfX: half.x, halfY: half.y };
-    });
+    const blocks: Box[] = nodes
+      .filter((n) => !n.unplaced)
+      .map((n) => {
+        const half = nodeHalf(n);
+        return { x: n.x, y: n.y, halfX: half.x, halfY: half.y };
+      });
     const portrait = stickerBox();
     if (portrait) blocks.push(portrait);
-    if (ruler) {
-      const canvas = root.getBoundingClientRect();
-      const frame = ruler.getBoundingClientRect();
-      const ink = measureDecor(ruler);
-      blocks.push({
-        ...ink,
-        x: frame.left - canvas.left + ink.x,
-        y: frame.top - canvas.top + ink.y,
-      });
-    }
+    const rule = rulerBox();
+    if (rule) blocks.push(rule);
     // Closer together than the gap, so no connector slips between two of them.
     const step = gap / 2;
     const points = edges.flatMap(({ line }) =>
@@ -1244,7 +1501,7 @@ export function initDiagram(root: HTMLElement) {
 
     // The sticker counts against the coverage too.
     let room = coverage * W * H - (portrait ? area(portrait) : 0);
-    let open = true;
+    let open = !strays.some((n) => n.unplaced);
     /** Glued notes already landed with the note over them. */
     const landed = new Set<Decor>();
     /** The boxes of the decorations down so far. */
@@ -1311,13 +1568,18 @@ export function initDiagram(root: HTMLElement) {
     relaxAnchors();
     computeAnchors();
     routeEdges();
+    placeStrays();
+    relaxFloatingFromEdges();
+    ringMoves.clear();
+    keepRingsOffStrays();
     decorDue = true;
   }
 
   /**
    * Times the one-off entrance and releases it (see the `is-mounted` rules in
    * index.astro). Markers land in chain order, each connector follows the
-   * later of the two it joins, and the decorative rings come in last.
+   * later of the two it joins, the strays come next, and the decorative rings
+   * come in last.
    */
   function startEntrance() {
     const {
@@ -1328,13 +1590,17 @@ export function initDiagram(root: HTMLElement) {
     } = KNOBS.entrance;
     const delays = new Map<Node, number>();
 
-    chainOrder.forEach((n, i) => {
+    chain.forEach((n, i) => {
       const delay = NODE_BASE + i * NODE_STEP;
       delays.set(n, delay);
       n.el.style.setProperty('--enter-delay', `${delay}ms`);
     });
 
-    const ringBase = NODE_BASE + chainOrder.length * NODE_STEP;
+    strays.forEach((n, i) => {
+      n.el.style.setProperty('--enter-delay', `${NODE_BASE + (chain.length + i) * NODE_STEP}ms`);
+    });
+
+    const ringBase = NODE_BASE + (chain.length + strays.length) * NODE_STEP;
     let ring = 0;
     for (const n of nodes) {
       if (!n.floating) continue;
@@ -1360,14 +1626,15 @@ export function initDiagram(root: HTMLElement) {
   }
 
   /** Spreads the anchors of markers left too close, and moves any left on the
-   *  sticker off it; returns the biggest step. */
+   *  sticker off it; returns the biggest step. A stray gives way to the
+   *  chain's markers alone. */
   function resolveOverlaps(iterations = 50) {
     let biggest = 0;
     const portrait = stickerBox();
     for (let it = 0; it < iterations; it++) {
       let moved = 0;
       for (const n of nodes) {
-        if (n.floating || n.dragging) continue;
+        if (n.floating || n.dragging || n.unplaced) continue;
         const off = stickerPush(portrait, n.ax, n.ay, nodeHalf(n));
         if (!off) continue;
         n.ax += off.x;
@@ -1380,14 +1647,13 @@ export function initDiagram(root: HTMLElement) {
           if (nodes[j].floating) continue;
           const a = nodes[i];
           const b = nodes[j];
-          if (a.dragging || b.dragging) continue;
+          if (a.dragging || b.dragging || a.unplaced || b.unplaced) continue;
           const s = separationPush(a, b, a.ax, a.ay, b.ax, b.ay);
           if (!s.hit) continue;
-          const hx = s.x * 0.5;
-          const hy = s.y * 0.5;
-          a.ax -= hx; a.ay -= hy;
-          b.ax += hx; b.ay += hy;
-          moved = Math.max(moved, Math.hypot(hx, hy));
+          const wa = rank(a) === rank(b) ? 0.5 : rank(a) < rank(b) ? 1 : 0;
+          a.ax -= s.x * wa; a.ay -= s.y * wa;
+          b.ax += s.x * (1 - wa); b.ay += s.y * (1 - wa);
+          moved = Math.max(moved, Math.hypot(s.x, s.y) * Math.max(wa, 1 - wa));
         }
       }
       biggest = Math.max(biggest, moved);
@@ -1430,14 +1696,19 @@ export function initDiagram(root: HTMLElement) {
       for (let j = i + 1; j < nodes.length; j++) {
         const a = nodes[i];
         const b = nodes[j];
+        if (a.unplaced || b.unplaced) continue;
         const s = separationPush(a, b, a.x, a.y, b.x, b.y);
         if (!s.hit) continue;
-        if (a.floating !== b.floating) {
-          const fl = a.floating ? a : b;
-          const sign = a.floating ? -1 : 1;
-          if (!fl.dragging) {
-            fl.fx += sign * s.x * SIM.repel * 2;
-            fl.fy += sign * s.y * SIM.repel * 2;
+        // Of two ranks (see `rank`), the lower gives way alone, twice as hard,
+        // unless it's the one being dragged: then the other gives way, as
+        // from any marker being dragged.
+        if (rank(a) !== rank(b)) {
+          const low = rank(a) < rank(b) ? a : b;
+          const mover = low.dragging ? (low === a ? b : a) : low;
+          const push = SIM.repel * (mover === low ? 2 : 1) * (mover === a ? -1 : 1);
+          if (!mover.dragging) {
+            mover.fx += s.x * push;
+            mover.fy += s.y * push;
           }
           continue;
         }
@@ -1492,9 +1763,11 @@ export function initDiagram(root: HTMLElement) {
     if (settledFrames >= SIM.settleFrames) {
       syncAnchorsFromSim();
       const pushed = resolveOverlaps();
+      const strayed = Math.max(keepStraysClear(), keepRingsOffStrays(true));
       recomputeRests();
-      // Markers left too close glide to their new anchors, rather than jump.
-      if (pushed > 1) {
+      // Markers left too close, a stray left on the chain, or a ring left on a
+      // stray glide to their new anchors, rather than jump.
+      if (pushed > 1 || strayed > 0.5) {
         settledFrames = 0;
         raf = requestAnimationFrame(frame);
         return;
@@ -1593,7 +1866,7 @@ export function initDiagram(root: HTMLElement) {
     const markers: Rect[] = [];
     const rings: DOMRect[] = [];
     for (const o of nodes) {
-      if (o === n) continue;
+      if (o === n || o.unplaced) continue;
       const r = o.el.getBoundingClientRect();
       if (o.floating) rings.push(r);
       else markers.push({ left: r.left - gap, top: r.top - gap, right: r.right + gap, bottom: r.bottom + gap });
@@ -1910,6 +2183,7 @@ export function initDiagram(root: HTMLElement) {
         n.ax = n.x;
         n.ay = n.y;
         recomputeRests();
+        ringMoves.clear();
         if (isOpen(n)) placePanel(n);
         decrossEdges();
         refineCurveCrossings();

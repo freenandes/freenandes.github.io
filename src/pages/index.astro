@@ -580,8 +580,10 @@ const fallbackLinks = [
     --preview-width: clamp(18rem, 26vw, 26rem);
     --preview-opacity: 0.9;
 
-    /* On a touch screen a card opens as a popup in the middle of the screen
-       instead, this wide at most, with at least this much room around it to
+    /* On a touch screen a card opens as a popup instead, centred across the
+       screen, just below or above its marker where it fits (the gap is
+       `KNOBS.popupMarkerGap` in the script), else in the middle of the
+       screen. This wide at most, with at least this much room around it to
        tap and close it. */
     --popup-width: 28rem;
     --popup-gap: 1.5rem;
@@ -1348,9 +1350,10 @@ const fallbackLinks = [
     }
   }
 
-  /* A card opened as a popup (touch screens, `data-cards='popup'`) sits in
-     the middle of the screen, wide, and scrolls if it's taller than the
-     screen. The script centres it; it rises into place. */
+  /* A card opened as a popup (touch screens, `data-cards='popup'`) is wide,
+     and scrolls if it's taller than the screen. The script places it: just
+     below or above its marker, arriving from that side like a flyout, or,
+     where it fits on neither, in the middle of the screen, rising into place. */
 
   .diagram[data-cards='popup'] .panel {
     width: min(100vw - 2 * var(--popup-gap), var(--popup-width));

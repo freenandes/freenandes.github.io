@@ -62,11 +62,15 @@ const KNOBS = {
   cardRoom: { side: 220, vertical: 80, narrowBias: 80 },
   /** Gap a card keeps from the edge of the viewport. */
   cardEdge: 12,
-  /** Screens where a card opens as a popup in the middle of the screen, with
-   *  its preview on top, instead of beside its marker: those without a pointer
-   *  that can hover. Everywhere else, a marker's preview floats beside it
-   *  while the pointer is on it. Its sizes are in index.astro. */
+  /** Screens where a card opens as a popup, as wide as the screen allows and
+   *  centred across it, with its preview on top, instead of beside its
+   *  marker: those without a pointer that can hover. Everywhere else, a
+   *  marker's preview floats beside it while the pointer is on it. Its sizes
+   *  are in index.astro. */
   popupQuery: '(hover: none) and (pointer: coarse)',
+  /** Space a popup keeps from its marker, when it fits whole just below or
+   *  just above it. */
+  popupMarkerGap: 12,
   /** Space a floating preview keeps from its marker's button. */
   previewGap: 16,
   /** The sides of its marker a floating preview tries, in order: the first
@@ -173,7 +177,7 @@ type Box = { x: number; y: number; halfX: number; halfY: number };
 type Rect = { left: number; top: number; right: number; bottom: number };
 
 /** The side of its marker a card opens on, or the middle of the screen for a
- *  popup. */
+ *  popup that fits on neither side of its marker. */
 type Side = 'bottom' | 'top' | 'right' | 'left' | 'center';
 
 /** A drawing on the texture, a post-it or the sketchbook, and where its
@@ -1523,9 +1527,12 @@ export function initDiagram(root: HTMLElement) {
 
   /**
    * Picks where a card opens, toward free space. A popup (KNOBS.popupQuery)
-   * simply takes the middle of the screen. Each side of its marker is
-   * tried, with the card centred on it and then slid along it, always inside
-   * the visible part of the map. The card abuts its marker's box, so it never
+   * is centred across the screen, and sits just below or just above its
+   * marker, on the side with more room, if it fits there whole; one that
+   * fits on neither side takes the middle of the screen, over its marker.
+   * A flyout tries each side of its marker, with the card centred on it and
+   * then slid along it, always inside the visible part of the map. The card
+   * abuts its marker's box, so it never
    * covers it. The spot that pokes least out of view wins, since a card cut off
    * at the edge can't be read; then the one that covers least of the other
    * markers; then the roomiest side, the shortest slide and the fewest rings
@@ -1558,11 +1565,26 @@ export function initDiagram(root: HTMLElement) {
     const w = panel.offsetWidth;
     const h = panel.offsetHeight;
     const view = viewRect();
-    // A popup takes the middle of the screen, wherever its marker is.
+    // A popup is centred across the screen, and as near its marker as it
+    // fits whole: just below or just above it, on the side with more room,
+    // else in the middle of the screen.
     if (isPopup()) {
       const x = Math.max(view.left, (view.left + view.right - w) / 2);
-      const y = Math.max(view.top, (view.top + view.bottom - h) / 2);
-      n.el.dataset.place = 'center';
+      const g = KNOBS.popupMarkerGap;
+      const below = own.bottom + g;
+      const above = own.top - g - h;
+      const fitsBelow = below + h <= view.bottom;
+      const fitsAbove = above >= view.top;
+      const roomier: Side = view.bottom - own.bottom >= own.top - view.top ? 'bottom' : 'top';
+      const side: Side =
+        fitsBelow && (roomier === 'bottom' || !fitsAbove) ? 'bottom'
+        : fitsAbove ? 'top'
+        : 'center';
+      const y =
+        side === 'bottom' ? below
+        : side === 'top' ? above
+        : Math.max(view.top, (view.top + view.bottom - h) / 2);
+      n.el.dataset.place = side;
       panel.style.setProperty('--panel-x', `${Math.round(x - own.left)}px`);
       panel.style.setProperty('--panel-y', `${Math.round(y - own.top)}px`);
       return;

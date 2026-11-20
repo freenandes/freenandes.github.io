@@ -46,7 +46,7 @@ No secrets are needed.
 
 ## How it works
 
-- **Home map.** Markers for About, Contact and each case study, joined in one chain, among spinning rings and drawings on a contour texture. A physics simulation places them, so the layout changes on every load. A click opens a marker's card; on a desktop, pointing at a case study also shows a preview of it. Touch screens open cards as popups. If the script fails, a plain list of the links takes the map's place.
+- **Home map.** Markers for About, Contact and each case study, joined in one chain, among spinning rings and drawings on a contour texture. A physics simulation places them, so the layout changes on every load. A side project's marker stands apart, joined to nothing: it comes after the chain and the portrait sticker and before the post-its and drawings, so it lands where the first two leave room, and on a screen too small for it, the post-its, the sketchbook and most drawings don't show either. A click opens a marker's card; on a desktop, pointing at a case study or the side project also shows a preview of it. Touch screens open cards as popups. If the script fails, a plain list of the links takes the map's place.
 - **Videos on the map.** The name at the centre of the map, and the portrait sticker, open a short video introduction of Pedro in a window; the sketchbook opens a second video, on knowing what to build. On a desktop each is a small window that drags aside, so the map stays usable: by the video until it plays, and by the grip on its top left corner whether it's playing or paused; on a touch screen it's a popup, closed by a tap outside it. One opens at a time. A video never plays by itself, closing its window (or pressing Escape) stops it, and each has captions. Pointing at the portrait or the sketchbook turns it a little and shows a play mark on it; the portrait also lights up the drawing beside it.
 - **About and CV.** Rendered from `src/content/cv.md`. "Download PDF" prints it with its own print styles.
 - **Case studies.** One MDX file each, served at `/<file name>/`. Screenshots sit in galleries and open in an enlarged view that zooms and steps through every screenshot and video on the page.
@@ -74,7 +74,7 @@ Each page owns its markup and styles. Values worth tuning are named knobs at the
 | Home: the videos' window, its size, shadow, play button, grip and close button, and the captions' size | `src/components/VideoWindow.astro` |
 | Home: which videos the map opens, their labels, and the names their visits are counted under | `videos` at the top of `src/pages/index.astro` |
 | Home: each video, its poster frame and its captions | `src/assets/intro-video.mp4`, `.jpg` and `.vtt`; `src/assets/sketchbook-video.mp4`, `.jpg` and `.vtt` |
-| Home: marker spacing, connector shapes, where cards open, entrance timing, physics, which drawings show first and how crowded the map may get | `KNOBS` and `SIM` at the top of `src/scripts/nav-diagram.ts` |
+| Home: marker spacing, connector shapes, where cards open, where the side project lands, entrance timing, physics, which drawings show first and how crowded the map may get | `KNOBS` and `SIM` at the top of `src/scripts/nav-diagram.ts` |
 | Home: the drawings, the ruler, the portrait sticker, the post-its, the sketchbook, the case-study previews | `src/assets/decor/`, `src/assets/ruler.svg`, `src/assets/sticker.png`, `src/assets/post-it.webp`, `src/assets/post-it-yellow.webp`, `src/assets/notebook.webp`, `src/assets/previews/<marker id>.png` |
 | About: look, print rules, and the `--cv-*` spacing knobs | `src/pages/about.astro` |
 | About: content, and which fields it takes | `src/content/cv.md`, `src/content.config.ts` |
@@ -181,7 +181,7 @@ The map opens two videos, each in a window of its own (`src/components/VideoWind
 
 4. Give it a place in `decorOrder` at the top of `src/scripts/nav-diagram.ts`, which says which drawings show first when room is short. Without one, it comes last.
 
-Each drawing, each post-it and the sketchbook gets a random free spot once the map settles; the yellow post-it is glued under the blue one, which covers one of its top corners (`glued` in `KNOBS`), and the sketchbook keeps its distance from the post-its and the portrait where it can (`decorBerth`). They claim room in `decorOrder` until the canvas is covered as far as `KNOBS.decor.coverage` allows; once one is left out, so is everything after it, except those in `decorAlways`. One with no room stays hidden, which for a big drawing can mean never on a phone.
+Each drawing, each post-it and the sketchbook gets a random free spot once the map settles; the yellow post-it is glued under the blue one, which covers one of its top corners (`glued` in `KNOBS`), and the sketchbook keeps its distance from the post-its and the portrait where it can (`decorBerth`). They claim room in `decorOrder` until the canvas is covered as far as `KNOBS.decor.coverage` allows; once one is left out, so is everything after it, except those in `decorAlways`. One with no room stays hidden, which for a big drawing can mean never on a phone. The side project's marker comes before all of them: while it has no room, only those in `decorAlways` show.
 
 ### Lock a case study
 

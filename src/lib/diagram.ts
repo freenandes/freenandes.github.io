@@ -31,15 +31,16 @@ export async function getDiagramNodes(): Promise<DiagramNode[]> {
       );
     }
     const { title, tags } = project.data;
-    const link = { label: projectLinkLabel, href: `/${node.id}/` };
-    return { ...node, label: title, tags, link };
+    const links = [{ label: projectLinkLabel, href: `/${node.id}/` }];
+    return { ...node, label: title, tags, links };
   });
 
   const pages = new Set(['/', '/about', ...projects.map((p) => `/${p.id}`)]);
   for (const node of nodes) {
-    if (node.link && !node.link.external && !pages.has(bare(node.link.href))) {
+    for (const link of node.links ?? []) {
+      if (link.external || pages.has(bare(link.href))) continue;
       throw new Error(
-        `diagram.config.ts: "${node.id}" links to ${node.link.href}, which isn't a published page ` +
+        `diagram.config.ts: "${node.id}" links to ${link.href}, which isn't a published page ` +
           '(a typo, a renamed file, or a project still marked draft).'
       );
     }
@@ -54,7 +55,13 @@ export async function getDiagramNodes(): Promise<DiagramNode[]> {
 
 /** Marker outline in a 20×20 box, point up (square: flat): a regular polygon
  *  with this many corners, or for the star, this many points. */
-const CORNERS: Record<NodeShape, number> = { triangle: 3, square: 4, pentagon: 5, star: 5 };
+const CORNERS: Record<NodeShape, number> = {
+  triangle: 3,
+  square: 4,
+  pentagon: 5,
+  hexagon: 6,
+  star: 5,
+};
 /** How far in a star's inner corners sit, as a share of its points' reach.
  *  Lower is spikier. */
 const STAR_INNER = 0.52;

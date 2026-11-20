@@ -12,7 +12,7 @@ import Ruler from '../assets/ruler.svg';
 import Base from '../layouts/Base.astro';
 import VideoWindow from '../components/VideoWindow.astro';
 import PlayMark from '../components/PlayMark.astro';
-import type { DiagramNode, NodeKind } from '../diagram.config';
+import type { DiagramNode, NodeKind, NodeLink } from '../diagram.config';
 import { withBase } from '../lib/base';
 import { getDiagramNodes, polygon } from '../lib/diagram';
 import { site } from '../site.config';
@@ -120,30 +120,27 @@ function ring(label: string) {
 const variant = (node: DiagramNode) =>
   node.kind === 'identity' || node.kind === 'floating' ? `node--${node.kind}` : undefined;
 
-// Markers render in three runs so the case studies can be announced as a set.
-// The wrappers are `display: contents` — they group, they don't lay out.
+// Markers render in runs so the case studies and the side projects can each
+// be announced as a set. The wrappers are `display: contents` — they group,
+// they don't lay out.
 const pick = (...kinds: NodeKind[]) => nodes.filter((n) => kinds.includes(n.kind));
 const runs: { label?: string; nodes: DiagramNode[] }[] = [
   { nodes: pick('identity', 'about', 'contact') },
   { label: 'Selected projects', nodes: pick('project') },
+  { label: 'Side projects', nodes: pick('side') },
   { nodes: pick('floating') },
 ];
 
-// The map's destinations as plain links, for the fallback below: every marker
-// with a page, then the socials that work without the script (the email
-// address needs it to be decoded).
+const href = (link: NodeLink) => (link.external ? link.href : withBase(link.href));
+
+// The map's destinations as plain links, for the fallback below: each marker
+// with a link, by its first, then the socials that work without the script
+// (the email address needs it to be decoded).
 const fallbackLinks = [
-  ...nodes.flatMap((node) =>
-    node.link
-      ? [
-          {
-            label: node.label,
-            href: node.link.external ? node.link.href : withBase(node.link.href),
-            rel: undefined,
-          },
-        ]
-      : [],
-  ),
+  ...nodes.flatMap((node) => {
+    const [link] = node.links ?? [];
+    return link ? [{ label: node.label, href: href(link), rel: undefined }] : [];
+  }),
   ...site.socials.flatMap((s) => (s.href ? [{ label: s.label, href: s.href, rel: 'me' }] : [])),
 ];
 ---
@@ -269,13 +266,25 @@ const fallbackLinks = [
                         ))}
                       </ul>
                     )}
-                    {node.link && (
+                    {/* One link stands alone; more line up in a row. */}
+                    {node.links?.length === 1 && (
                       <a
-                        href={node.link.external ? node.link.href : withBase(node.link.href)}
-                        target={node.link.external ? '_blank' : undefined}
+                        href={href(node.links[0])}
+                        target={node.links[0].external ? '_blank' : undefined}
                       >
-                        {node.link.label}
+                        {node.links[0].label}
                       </a>
+                    )}
+                    {node.links && node.links.length > 1 && (
+                      <ul role="list">
+                        {node.links.map((link) => (
+                          <li>
+                            <a href={href(link)} target={link.external ? '_blank' : undefined}>
+                              {link.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
                     )}
                   </div>
                 )}
@@ -538,6 +547,7 @@ const fallbackLinks = [
     --marker-size-triangle: 1.1875rem;
     --marker-size-square: 1.15625rem;
     --marker-size-pentagon: 1.09375rem;
+    --marker-size-hexagon: 1.0625rem;
     --marker-stroke: 2; /* a marker's outline, in px */
     --marker-stroke-identity: 2;
 
@@ -1194,6 +1204,14 @@ const fallbackLinks = [
     font-weight: var(--weight-bold);
     letter-spacing: var(--tracking-tight);
     text-transform: none;
+  }
+
+  /* A marker left out of the chain, like the side project, lands where the
+     chain leaves room; with none, the script sets `data-unplaced`, and it
+     stays hidden, from screen readers too. */
+
+  .node[data-unplaced] {
+    visibility: hidden;
   }
 
   /* --- Floating rings --------------------------------------------------- */

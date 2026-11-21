@@ -1,0 +1,61 @@
+---
+/** A video in a case study, inside the `<figure>` the case study writes
+    around it with its caption. The poster is a frame of the video, so it
+    gives the video's shape. A browser fetches a poster as the page loads,
+    so it's a WebP no wider than it's shown, not the full frame. The video
+    loads nothing with the page (`preload="none"`), since even `metadata`
+    lets a browser start buffering it; the script below fetches its length
+    as it nears the window. The enlarged view (`Lightbox.astro`) copies the
+    element, attributes and all. Any other attribute, like `controlslist`,
+    passes through. */
+
+import type { ImageMetadata } from 'astro';
+import type { HTMLAttributes } from 'astro/types';
+import { getImage } from 'astro:assets';
+
+interface Props extends Omit<HTMLAttributes<'video'>, 'src' | 'poster' | 'width' | 'height'> {
+  src: string;
+  poster: ImageMetadata;
+}
+
+/** The poster's width in pixels: the text column on a 2× screen, and the
+    enlarged view on most 1× ones. The video takes over once it plays. */
+const POSTER_WIDTH = 1920;
+
+const { src, poster, ...attrs } = Astro.props;
+const still = await getImage({ src: poster, width: Math.min(POSTER_WIDTH, poster.width), format: 'webp' });
+---
+
+<video
+  {src}
+  poster={still.src}
+  width={poster.width}
+  height={poster.height}
+  controls
+  preload="none"
+  playsinline
+  data-video
+  {...attrs}
+></video>
+
+<script>
+  /* Without its metadata, a video's controls don't show how long it is. A
+     video fetches it once it comes within this share of the window's height
+     of the window, so it's ready by the time it's in view, and one the
+     reader never reaches costs nothing. */
+  const AHEAD = '50%';
+
+  const near = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        const video = entry.target as HTMLVideoElement;
+        if (video.preload === 'none') video.preload = 'metadata';
+        near.unobserve(video);
+      }
+    },
+    { rootMargin: `${AHEAD} 0px` },
+  );
+
+  for (const video of document.querySelectorAll<HTMLVideoElement>('video[data-video]')) near.observe(video);
+</script>

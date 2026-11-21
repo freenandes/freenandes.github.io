@@ -81,6 +81,7 @@ Each page owns its markup and styles. Values worth tuning are named knobs at the
 | Case study: text, images and videos | `src/content/projects/<slug>.mdx`, `src/assets/projects/<slug>/` |
 | Case study: look, and which frontmatter fields it takes | `src/pages/[slug].astro`, `src/content.config.ts` |
 | Galleries, the enlarged view, the passphrase gate (knobs at the top of each `<style>`) | `src/components/Gallery.astro`, `Lightbox.astro`, `PasswordGate.astro` |
+| Case study: a video's poster width and how it loads | `src/components/Video.astro` |
 | Mini-map, page nav, footer | `src/components/MiniMap.astro`, `PageNav.astro`, `Footer.astro` |
 | Fonts | `src/assets/fonts/`, and `fonts` in `astro.config.mjs` |
 | Favicon and app icons | `public/favicon.svg`, then `npm run icons` |
@@ -134,7 +135,7 @@ import results from '../../assets/projects/<slug>/results.png';
 - `narrow` keeps a gallery to the text's width.
 - `fill` lays the images out as one row at the same height, in place of `scale`.
 
-A video is a plain `<video>` in a `<figure>`, with a poster frame taken from the same moment of the master (`peak-systems-at-percona.mdx` has examples). A portrait video goes in `<figure class="inset">`, and one only sharp up to a size also takes `style="--inset-max: 28rem"`. Encode for a fixed quality, not a fixed bitrate, and keep each file well under GitHub's 100 MB limit; every committed version stays in the repo:
+A video is a `<Video src={…} poster={…} />` (`src/components/Video.astro`) in a `<figure>`, with a poster frame taken from the same moment of the master and imported like the video (`peak-systems-at-percona.mdx` has examples). It serves the poster as a smaller WebP, fetches the video's length as the reader nears it, and loads the video itself only once it's played. A portrait video goes in `<figure class="inset">`, and one only sharp up to a size also takes `style="--inset-max: 28rem"`. Encode for a fixed quality, not a fixed bitrate, and keep each file well under GitHub's 100 MB limit; every committed version stays in the repo:
 
 ```bash
 ffmpeg -i master.mp4 -vf "scale=out_range=tv:flags=lanczos,format=yuv420p" -c:v libx264 -preset slow -tune animation -crf 22 -level:v 5.2 -x264-params aq-mode=3 -an -movflags +faststart out.mp4

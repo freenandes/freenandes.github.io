@@ -23,6 +23,9 @@ export interface NodeLink {
 export interface DiagramNode {
   id: string;
   label: string;
+  /** The name `label` is short for, if it is. Screen readers hear it after
+   *  the label, and the card and the map's fallback list go by it. */
+  fullName?: string;
   kind: NodeKind;
   /** Marker outline. Floating rings don't have one. */
   shape?: NodeShape;
@@ -146,6 +149,7 @@ export const diagramNodes: DiagramEntry[] = [
     // and the portrait leave room, and hides where they leave none.
     id: 'actuallyexplain',
     label: 'AE',
+    fullName: 'actuallyEXPLAIN',
     kind: 'side',
     shape: 'hexagon',
     tagline: 'actuallyEXPLAIN',

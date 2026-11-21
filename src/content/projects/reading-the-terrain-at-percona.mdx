@@ -27,6 +27,7 @@ import qanDetails from '../../assets/projects/reading-the-terrain-at-percona/qan
 import advisorsBefore from '../../assets/projects/reading-the-terrain-at-percona/advisors-before.png';
 import advisorsAfter from '../../assets/projects/reading-the-terrain-at-percona/advisors-after.png';
 import Gallery from '../../components/Gallery.astro';
+import Video from '../../components/Video.astro';
 
 ## At a glance
 
@@ -94,7 +95,7 @@ Customers recognized their own problems in the videos and “wanted it for tomor
 The prototypes helped us discuss what to build and why. Detailed interaction decisions came next, as we narrowed the scope with customers and technical leads. When I showed an early live-view prototype to one enterprise team running about 1,100 servers, they said, “It looks fantastic, actually.”
 
 <figure>
-  <video src={aiVideo} poster={aiPoster.src} width="3840" height="2160" controls preload="metadata" playsinline></video>
+  <Video src={aiVideo} poster={aiPoster} />
   <figcaption>A vision prototype used in customer conversations: an AI-assisted investigation from a Slack alert to a proposed response and incident report. This was a concept for discussion, not a released workflow.</figcaption>
 </figure>
 
@@ -132,7 +133,7 @@ Pausing the view and stopping collection were separate actions. A paused view le
 Making that distinction visible was part of making the workflow understandable under pressure.
 
 <figure>
-  <video src={realTimeVideo} poster={realTimePoster.src} width="1920" height="1080" controls preload="metadata" playsinline></video>
+  <Video src={realTimeVideo} poster={realTimePoster} />
   <figcaption>Interaction prototype: adjustable refresh, pause and resume, manual refresh, and a temporary pause on hover. These controls let users inspect a changing list without immediately losing the operation they are reading.</figcaption>
 </figure>
 
@@ -162,7 +163,7 @@ We chose separate tabs for the first release. This let the team introduce live i
 The session workflow covered starting collection, inspecting an operation and its raw data, and stopping individual sessions or all sessions together. I used prototypes to work through these behaviors with the technical leads and engineers.
 
 <figure>
-  <video src={sessionsVideo} poster={sessionsPoster.src} width="3840" height="2160" controls preload="metadata" playsinline></video>
+  <Video src={sessionsVideo} poster={sessionsPoster} />
   <figcaption>An earlier version of the session-management prototype: start a live investigation, inspect operation details and raw data, then stop individual sessions or all sessions together.</figcaption>
 </figure>
 
@@ -200,7 +201,7 @@ For that proposal, I kept mixed database environments in scope. Customer researc
 </Gallery>
 
 <figure>
-  <video src={qanVideo} poster={qanPoster.src} width="1920" height="1080" controls preload="metadata" playsinline></video>
+  <Video src={qanVideo} poster={qanPoster} />
   <figcaption>Historical Query Analytics redesign proposal: structured filters, a customizable overview and an expandable details panel.</figcaption>
 </figure>
 

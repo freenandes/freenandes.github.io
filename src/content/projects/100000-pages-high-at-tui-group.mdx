@@ -28,6 +28,7 @@ import backOfficeMarkets from '../../assets/projects/100000-pages-high-at-tui-gr
 import backOfficeNewMarket from '../../assets/projects/100000-pages-high-at-tui-group/back-office-new-market.png';
 import backOfficePageSettings from '../../assets/projects/100000-pages-high-at-tui-group/back-office-page-settings.png';
 import Gallery from '../../components/Gallery.astro';
+import Video from '../../components/Video.astro';
 
 ## At a glance
 
@@ -183,7 +184,7 @@ Tagus gave us a way to carry the same interaction patterns through discovery, ac
 </Gallery>
 
 <figure class="inset" style="--inset-max: 28rem">
-  <video src={hotelPageVideo} poster={hotelPagePoster.src} width="1440" height="1920" controls controlslist="nofullscreen" preload="metadata" playsinline></video>
+  <Video src={hotelPageVideo} poster={hotelPagePoster} controlslist="nofullscreen" />
   <figcaption>Mobile hotel-page vision prototype: opening the menu and reservation summary, then reviewing dates, guests and rooms before payment.</figcaption>
 </figure>
 

@@ -29,6 +29,7 @@ import navOptionNativeFeatures from '../../assets/projects/peak-systems-at-perco
 import treeTestResults from '../../assets/projects/peak-systems-at-percona/tree-test-results.svg';
 import treeTestHubPages from '../../assets/projects/peak-systems-at-percona/tree-test-hub-pages.svg';
 import Gallery from '../../components/Gallery.astro';
+import Video from '../../components/Video.astro';
 
 ## At a glance
 
@@ -102,7 +103,7 @@ Interviews with six senior DBAs and SREs who had never used PMM highlighted info
 I developed the direction into a clickable Figma prototype. It showed PMM’s own navigation opening dashboards, Query Analytics and Explore within the same interface, and helped secure leadership and stakeholder support.
 
 <figure>
-  <video src={reclaimVideo} poster={reclaimPoster.src} width="3240" height="2160" controls preload="metadata" playsinline></video>
+  <Video src={reclaimVideo} poster={reclaimPoster} />
   <figcaption>The Reclaim PMM vision prototype in Figma: dashboards, Query Analytics and Explore within PMM’s own navigation. I used it to make the proposed direction concrete for leadership.</figcaption>
 </figure>
 
@@ -119,7 +120,7 @@ We introduced that foundation incrementally:
 The update workflow gave the components and architecture a production use before the wider interface depended on them. Users could update the PMM server, then identify which clients — the software installed alongside databases — still needed updating.
 
 <figure>
-  <video src={updatesVideo} poster={updatesPoster.src} width="2400" height="1350" controls preload="metadata" playsinline></video>
+  <Video src={updatesVideo} poster={updatesPoster} />
   <figcaption>The first PMM workflow built on Peak UI, shipped in January 2025 with PMM 3.0: update the server, then help the user identify which clients still need updating.</figcaption>
 </figure>
 
@@ -231,7 +232,7 @@ I worked within that decision and split my coded navigation prototype into small
 This second phase allowed us to produce a tested architecture, a functional prototype and smaller implementation proposals.
 
 <figure>
-  <video src={navVideo} poster={navPoster.src} width="3644" height="2160" controls preload="metadata" playsinline></video>
+  <Video src={navVideo} poster={navPoster} />
   <figcaption>The shipped sidebar (left) beside my coded navigation 2.0 prototype (right), demonstrating proposed interactions including favorites, flyout submenus and CMD+K search across PMM.</figcaption>
 </figure>
 

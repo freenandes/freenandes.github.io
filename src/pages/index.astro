@@ -139,7 +139,7 @@ const href = (link: NodeLink) => (link.external ? link.href : withBase(link.href
 const fallbackLinks = [
   ...nodes.flatMap((node) => {
     const [link] = node.links ?? [];
-    return link ? [{ label: node.label, href: href(link), rel: undefined }] : [];
+    return link ? [{ label: node.fullName ?? node.label, href: href(link), rel: undefined }] : [];
   }),
   ...site.socials.flatMap((s) => (s.href ? [{ label: s.label, href: s.href, rel: 'me' }] : [])),
 ];
@@ -195,9 +195,13 @@ const fallbackLinks = [
                     {/* The name at the centre opens no card: it opens the
                         video introduction, as the portrait sticker does.
                         Its name is the heading's, so the description below
-                        says what it opens. */}
+                        says what it opens. A short label keeps its full
+                        name after it, so a screen reader hears what it's
+                        short for and voice control still finds it by what
+                        it shows. */}
                     <button
                       type="button"
+                      aria-label={node.fullName ? `${node.label} (${node.fullName})` : undefined}
                       aria-expanded="false"
                       aria-controls={node.kind === 'identity' ? videos.intro.id : panelId}
                       aria-haspopup={node.kind === 'identity' ? 'dialog' : undefined}
@@ -228,7 +232,7 @@ const fallbackLinks = [
                 )}
 
                 {node.kind !== 'identity' && !circle && (
-                  <div class="panel" id={panelId} role="group" aria-label={node.label}>
+                  <div class="panel" id={panelId} role="group" aria-label={node.fullName ?? node.label}>
                     {/* Shown only when the card opens as a popup (touch
                         screens); a desktop shows it beside the marker on
                         hover instead (`.preview`, below). */}

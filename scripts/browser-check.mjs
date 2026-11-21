@@ -287,7 +287,11 @@ async function checkVideoWindow(page, touch, problems, shot, id, triggers) {
       const video = document.querySelector(`${sel} video`);
       return video && !video.paused && video.currentTime > 0;
     };
-    await page.waitForFunction(playing, at, { timeout: 8000 }).catch(() => problems.push(`#${id} didn't play`));
+    await page.waitForFunction(playing, at, { timeout: 8000 }).catch(async () => {
+      // MediaError's code: 2 is the network, 3 decoding, 4 a source it can't use.
+      const code = await page.$eval(`${at} video`, (video) => video.error?.code).catch(() => undefined);
+      problems.push(`#${id} didn't play${code ? ` (media error ${code})` : ''}`);
+    });
 
     // Playing, it drags by its grip on a desktop, and keeps playing.
     if (!touch) {
@@ -388,7 +392,13 @@ async function checkPage(context, touch, site, pagePath, tag) {
   const url = (u) => u.replace(site.origin + site.base, '');
   page.on('pageerror', (err) => problems.push(`script error: ${firstLine(err)}`));
   page.on('console', (msg) => {
-    if (msg.type() === 'error') problems.push(`console error: ${msg.text().slice(0, 200)}`);
+    if (msg.type() !== 'error') return;
+    // WebKit's own video controls log this at a device pixel ratio of 3 (the
+    // phone size), on any page, for the placards they show over a broken,
+    // picture-in-picture or AirPlay video: Playwright's macOS build has no
+    // 3× pictures for them.
+    if (/^Button failed to load, iconName = [\w-]+-placard,/.test(msg.text())) return;
+    problems.push(`console error: ${msg.text().slice(0, 200)}`);
   });
   page.on('requestfailed', (req) => {
     const reason = req.failure()?.errorText ?? '';

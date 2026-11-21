@@ -8,6 +8,10 @@
    `npm run browsers` serves it over HTTPS: the production CSP's
    upgrade-insecure-requests makes WebKit fetch every asset of an http page
    over https, even from 127.0.0.1, where Chrome and Firefox make an exception.
+
+   Like GitHub Pages, it sends each file's length and answers a byte range
+   with just those bytes: WebKit won't play a video sent without its length,
+   and Safari asks for videos in ranges.
    ========================================================================= */
 
 import { createServer as createHttpServer } from 'node:http';
@@ -51,6 +55,18 @@ async function resolveFile(root, urlPath) {
   return null;
 }
 
+/** The bytes a `Range` header asks for, as inclusive offsets; `null` when it
+    asks for none we serve (no header, several ranges, another unit), so the
+    whole file goes; `false` when it asks for bytes past the end. */
+function byteRange(header, size) {
+  const match = /^bytes=(\d*)-(\d*)$/.exec(header ?? '');
+  if (!match || (!match[1] && !match[2])) return null;
+  const [start, end] = match[1]
+    ? [Number(match[1]), match[2] ? Math.min(Number(match[2]), size - 1) : size - 1]
+    : [Math.max(0, size - Number(match[2])), size - 1];
+  return start > end || start >= size ? false : { start, end };
+}
+
 /**
  * @param {string} root  a built dist directory
  * @param {string} base  base path the site is mounted at, e.g. "/portfolio", or "/"
@@ -83,11 +99,27 @@ export function serveDist(root, base, tls) {
       else res.end('not found');
       return;
     }
-    res.writeHead(200, {
+    const { size } = await stat(file);
+    const range = byteRange(req.headers.range, size);
+    const headers = {
       'content-type': TYPES[path.extname(file)] ?? 'application/octet-stream',
       'cache-control': 'no-store',
-    });
-    createReadStream(file).pipe(res);
+      'accept-ranges': 'bytes',
+    };
+    if (range === false) {
+      res.writeHead(416, { ...headers, 'content-range': `bytes */${size}` });
+      res.end();
+    } else if (range) {
+      res.writeHead(206, {
+        ...headers,
+        'content-range': `bytes ${range.start}-${range.end}/${size}`,
+        'content-length': range.end - range.start + 1,
+      });
+      createReadStream(file, range).pipe(res);
+    } else {
+      res.writeHead(200, { ...headers, 'content-length': size });
+      createReadStream(file).pipe(res);
+    }
   };
   const server = tls ? createHttpsServer(tls, handler) : createHttpServer(handler);
 

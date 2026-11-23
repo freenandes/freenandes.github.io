@@ -2,6 +2,7 @@
 import { defineConfig, fontProviders } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import { execFileSync } from 'node:child_process';
 
 // Where the site is served. This is the only place it's set: CI and
 // `npm run visual` read it from here, and SITE / BASE_PATH env vars override it
@@ -17,6 +18,34 @@ const MOVED_PROJECTS = {
   'percona-case-2': 'reading-the-terrain-at-percona',
   'tui-case': '100000-pages-high-at-tui-group',
 };
+
+// The files that hold each page's words, for the sitemap's <lastmod>. A case
+// study's are its own file in src/content/projects/, so only the other pages
+// are listed.
+/** @type {Record<string, string[]>} */
+const PAGE_SOURCES = {
+  '/': ['src/pages/index.astro', 'src/diagram.config.ts'],
+  '/about/': ['src/pages/about.astro', 'src/content/cv.md'],
+  '/services/ux-audit/': ['src/pages/services/ux-audit.astro', 'src/content/ux-audit.mdx'],
+};
+
+const buildDate = new Date().toISOString();
+
+/** When the page at `url` last changed: the date of the last commit that
+ *  touched its sources. The build date stands in for a page with no sources
+ *  listed or no history to read (a shallow clone has one commit, so the deploy
+ *  fetches the whole history).
+ *  @param {string} url */
+function lastModified(url) {
+  const path = '/' + new URL(url).pathname.slice(new URL(BASE_PATH, SITE).pathname.length);
+  const files = PAGE_SOURCES[path] ?? [`src/content/projects/${path.replaceAll('/', '')}.mdx`];
+  try {
+    const date = execFileSync('git', ['log', '-1', '--format=%cI', '--', ...files], { encoding: 'utf8' }).trim();
+    return date ? new Date(date).toISOString() : buildDate;
+  } catch {
+    return buildDate;
+  }
+}
 
 export default defineConfig({
   site: SITE,
@@ -61,6 +90,12 @@ export default defineConfig({
   redirects: {
     '/portfolio': '/',
     '/portfolio/about': '/about',
+    // Pages of the site this one replaced at www.pmcf.xyz, which search
+    // engines still list. Its other pages (/experience/…, /notes/,
+    // /topo-da-mente/…) were removed with nothing to stand for them, so they
+    // stay 404s on purpose.
+    '/cv': '/about/',
+    '/whiteboard': '/',
     ...Object.fromEntries(
       Object.entries(MOVED_PROJECTS).flatMap(([old, slug]) => [
         [`/projects/${old}`, `/${slug}/`],
@@ -75,7 +110,7 @@ export default defineConfig({
       ['/services', '/service', '/servicos', '/ux-audit'].map((path) => [path, '/services/ux-audit/'])
     ),
   },
-  integrations: [mdx(), sitemap()],
+  integrations: [mdx(), sitemap({ serialize: (item) => ({ ...item, lastmod: lastModified(item.url) }) })],
   markdown: {
     shikiConfig: {
       theme: 'css-variables',

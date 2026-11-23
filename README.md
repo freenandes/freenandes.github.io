@@ -54,7 +54,7 @@ No secrets are needed.
 - **Locked case studies.** A case study can be locked: its text is encrypted at build time and decrypted in the reader's browser with a passphrase. None is locked right now.
 - **Fonts.** Atkinson Hyperlegible Next and Mono, served from the site itself, not from Google Fonts.
 - **Privacy and security.** A strict Content Security Policy allows no third-party scripts. The email address is obfuscated, so it never appears in the HTML or the repo. GoatCounter counts visits, in deploy builds only, with no cookie and nothing stored in the browser: the site's own script sends the page, the referring site (never the page on it), a source or campaign tag and the screen width, and counts clicks on contact and outbound links, CV prints and map cards opened ([Track where visits come from](#track-where-visits-come-from)). Without scripting, a hidden image counts the page alone.
-- **Metadata.** Open Graph link previews (one image for every page but the UX audit's, which has its own), JSON-LD, a sitemap, `/robots.txt` and `/llms.txt`.
+- **Metadata.** Open Graph link previews (one image for every page but the UX audit's, which has its own), JSON-LD, a sitemap dating each page by its last commit, `/robots.txt` and `/llms.txt`.
 - **Old addresses.** Pages that moved still answer at their old addresses ([Old links](#old-links)).
 - **Standards.** Audited against [The Website Specification](https://specification.website); `SPEC-COMPLIANCE.md` lists what's done and what's pending.
 
@@ -285,7 +285,7 @@ Run it after changing the map script, the video windows (`src/components/VideoWi
 `/services/ux-audit/` sells UX audits to software teams. It's kept apart from the portfolio in one direction only:
 
 - It links to the portfolio: a line in its intro and "About Pedro" in its footer, both to About.
-- The portfolio never links to it, except "Hands-on UX audit" in About's footer, beside the contact links, which the printed CV leaves out. No nav, map marker, case study or `/llms.txt` entry points to it. People arrive from a link sent to them, from search (it's in the sitemap, with its own description, preview image and `Service` structured data) or from About.
+- The portfolio never links to it, except "Hands-on UX audit" in About's footer, beside the contact links, which opens in a new tab and which the printed CV leaves out. No nav, map marker, case study or `/llms.txt` entry points to it. People arrive from a link sent to them, from search (it's in the sitemap, with its own description, preview image and `Service` structured data) or from About.
 - `/services/`, `/service/`, `/servicos/` and `/ux-audit/` forward to it (`redirects` in `astro.config.mjs`). `/services/` may become a list of services one day; until then it forwards too.
 - A missing address that looks like it (lowercased, it starts with `/service` or `/servicos`, or contains `ux-audit`, `uxaudit` or `ux_audit`) is forwarded by the 404 page's script, since GitHub Pages paths are case-sensitive and `/Services/` would otherwise miss. Any other miss gets the portfolio's 404, which leads back to the map.
 
@@ -303,5 +303,7 @@ The site used to live at `www.pmcf.xyz/portfolio/`, and the case studies at `/pr
 | `/projects/percona-case-1/`, `/portfolio/projects/percona-case-1/` | `/peak-systems-at-percona/` |
 | `/projects/percona-case-2/`, `/portfolio/projects/percona-case-2/` | `/reading-the-terrain-at-percona/` |
 | `/projects/tui-case/`, `/portfolio/projects/tui-case/` | `/100000-pages-high-at-tui-group/` |
+
+Two pages of the site this one replaced forward too: `/cv/` to `/about/` and `/whiteboard/` to `/`. Its other pages (`/experience/…`, `/notes/`, `/topo-da-mente/…`) were removed and stay 404s on purpose.
 
 Renaming a page adds its old address to `redirects` in `astro.config.mjs`; renaming a case study's file adds its old name to `MOVED_PROJECTS` there.

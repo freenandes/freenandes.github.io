@@ -26,8 +26,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # The whole history, for the sitemap's <lastmod> (each page's last
+      # commit, read in astro.config.mjs), without past versions of the files.
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
 
       - name: Setup Node
         uses: actions/setup-node@v4

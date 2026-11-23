@@ -315,8 +315,10 @@ const jsonLd = [
   <MiniMap slot="footer" />
 
   {/* The one page of the portfolio that points to the UX audit, from the
-      footer, so the printed CV never shows it. */}
-  <li slot="footer-links"><a href={withBase('/services/ux-audit/')}>Hands-on UX audit</a></li>
+      footer, so the printed CV never shows it. It opens in a new tab, since
+      it's a page for clients, apart from the portfolio: whoever is reading
+      the CV keeps it open. */}
+  <li slot="footer-links"><a href={withBase('/services/ux-audit/')} target="_blank">Hands-on UX audit</a></li>
 </Base>
 
 <style>

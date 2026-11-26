@@ -3,13 +3,13 @@
 :root {
   /* Colour */
   --paper: #fff;
-  --paper-2: #f4f4f4;
+  --paper-2: #f5f5f5;
   --ink: #111;
-  --ink-2: #525252;
-  --ink-3: #686868;
-  --ink-faint: #a8a8a8;
+  --ink-2: #535353;
+  --ink-3: #727272;
+  --ink-faint: #a3a3a3;
 
-  --ink-decor: #d4d4d4;
+  --ink-decor: #d3d3d3;
   --line-soft: rgb(0 0 0 / 4%);
   --line: rgb(0 0 0 / 8%);
   --line-strong: rgb(0 0 0 / 16%);
@@ -79,6 +79,15 @@
 
   /* Gap between one revealed block and the next (see `--reveal-step`). */
   --reveal-stagger: 80ms;
+
+  /* Paper texture under every page (global.css → Layout). Its marks are
+     drawn in this colour: a grey, or any colour at some alpha. It's laid in
+     square tiles this wide, the scan's height filling each; the image's
+     height in px over 16, in rem, shows it pixel for pixel. Pixelated keeps
+     its grain crisp when a screen scales it up; `auto` smooths it. */
+  --texture-color: #e6e6e6;
+  --texture-size: 111rem;
+  --texture-rendering: pixelated;
 
   /* Layers */
   --z-base: 0;

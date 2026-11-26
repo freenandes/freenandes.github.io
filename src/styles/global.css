@@ -31,6 +31,7 @@ html {
 }
 
 body {
+  position: relative; /* holds the paper texture (Layout) */
   min-height: 100svh;
   background-color: var(--paper);
   color: var(--ink);
@@ -206,6 +207,54 @@ body > footer {
 main {
   position: relative;
   z-index: var(--z-base);
+}
+
+/* The paper texture, a pencil scan made by `npm run texture`. Its marks are
+   the image's alpha, so it's a mask over a colour of our choosing.
+   `src/scripts/paper.ts` lays it in square tiles, each turned, mirrored and
+   cut from the scan at random. The layer hangs from <body> and scrolls with
+   the page, below everything else: z-index -1 puts it under <main> (and with
+   it the home map's contour texture) and the footer. The pinned page nav and
+   mini-map lay plain paper over it. */
+
+.paper {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* The script gives each tile its column (0 is centred on the page), row,
+   quarter turns, mirror and which square of the scan's width it shows. */
+
+.paper > div {
+  position: absolute;
+  top: calc(var(--row) * var(--texture-size));
+  left: calc(50% + (var(--col) - 0.5) * var(--texture-size));
+  width: var(--texture-size);
+  height: var(--texture-size);
+  background-color: var(--texture-color);
+  mask: url('../assets/paper-texture.webp') var(--crop) 0 / auto 100% no-repeat;
+  image-rendering: var(--texture-rendering);
+  rotate: calc(var(--turn) * 90deg);
+  scale: var(--mirror) 1;
+  animation: paper-in var(--dur-slow) var(--ease) backwards;
+}
+
+/* Without scripting, the scan repeats as it is. */
+
+@media (scripting: none) {
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-color: var(--texture-color);
+    mask: url('../assets/paper-texture.webp') top center / auto var(--texture-size) repeat;
+    image-rendering: var(--texture-rendering);
+  }
 }
 
 main > article,
@@ -421,6 +470,14 @@ a[data-email]:not([href]),
   }
 }
 
+/* The paper texture's tiles fade in as the script lays them (Layout). */
+
+@keyframes paper-in {
+  from {
+    opacity: 0;
+  }
+}
+
 /* Cross-document page transitions: a brief cross-fade in browsers that support
    them, using the user agent's own root animation so only the timing changes.
    No JavaScript, and non-supporting browsers simply navigate as before. */
@@ -472,6 +529,11 @@ a[data-email]:not([href]),
   body {
     background: #fff !important;
     color: #000 !important;
+  }
+
+  .paper,
+  body::before {
+    display: none;
   }
 
   main {

@@ -24,6 +24,7 @@ The repo also serves a page the portfolio keeps apart: the UX audit service, for
 | `npm run email -- you@example.com` | Changes the contact email |
 | `npm run icons` | Redraws the PNG and `.ico` icons from `public/favicon.svg` |
 | `npm run og` | Redraws the link-preview images, `public/og.png` and `public/og-ux-audit.png` |
+| `npm run texture -- <file>` | Turns an export of the paper texture into `src/assets/paper-texture.webp` ([more](#change-the-paper-texture)) |
 
 CI runs `lint:css`, `check:docs`, `check`, `build` and `check:site` on every pull request, and a push to `main` only deploys if all of them pass. Run them before you push.
 
@@ -48,6 +49,7 @@ No secrets are needed.
 
 - **Home map.** Markers for About, Contact and each case study, joined in one chain, among spinning rings and drawings on a contour texture. A physics simulation places them, so the layout changes on every load. A side project's marker stands apart, joined to nothing: it comes after the chain and the portrait sticker and before the post-its and drawings, so it lands where the first two leave room, and on a screen too small for it, the post-its, the sketchbook and most drawings don't show either. A click opens a marker's card; on a desktop, pointing at a case study or the side project also shows a preview of it. Touch screens open cards as popups. If the script fails, a plain list of the links takes the map's place.
 - **Videos on the map.** The name at the centre of the map, and the portrait sticker, open a short video introduction of Pedro in a window; the sketchbook opens a second video, on knowing what to build. On a desktop each is a small window that drags aside, so the map stays usable: by the video until it plays, and by the grip on its top left corner whether it's playing or paused; on a touch screen it's a popup, closed by a tap outside it. One opens at a time. A video never plays by itself, closing its window (or pressing Escape) stops it, and each has captions. Pointing at the portrait or the sketchbook turns it a little and shows a play mark on it; the portrait also lights up the drawing beside it.
+- **Paper texture.** Every page lies on a scan of pencil marks, drawn in a pale grey, that scrolls with the page. It's laid in square tiles, each turned, mirrored and cut from the scan at random on every visit, so it repeats without a pattern; without scripting it repeats as it is. On the map it sits under the contour texture; it stays off the printed CV.
 - **About and CV.** Rendered from `src/content/cv.md`. "Download PDF" prints it with its own print styles.
 - **Case studies.** One MDX file each, served at `/<file name>/`. Screenshots sit in galleries and open in an enlarged view that zooms and steps through every screenshot and video on the page.
 - **Mini-map.** About and every case study end with the map's pages in one straight line, the current page filled in. Where the line runs across (windows from 33rem wide), it stays pinned to the bottom of the window, on paper under a rule, until the reader scrolls down to its place above the footer.
@@ -65,12 +67,13 @@ Each page owns its markup and styles. Values worth tuning are named knobs at the
 | To change… | Open |
 | --- | --- |
 | Colours, type scale, spacing, motion | `src/styles/tokens.css` |
+| The paper texture: its colour, tile size and whether it stays pixelated (`--texture-*`) | `src/styles/tokens.css`; the image is `src/assets/paper-texture.webp`, and `src/scripts/paper.ts` lays the tiles |
 | How plain elements look everywhere (links, buttons, headings, lists, prose), shared print styles | `src/styles/global.css` |
 | Name, role, links, availability, link-preview image, theme colour, extra contacts on the printed CV, visit counter | `src/site.config.ts` |
 | `<head>`, metadata, CSP, page shell | `src/layouts/Base.astro` |
 | Site URL, base path, fonts, redirects from old addresses | `astro.config.mjs` |
 | Home: markers, card copy, preview alt text, the chain they connect in | `src/diagram.config.ts` |
-| Home: look, and knobs for the texture, markers, cards, rings, previews, popups, drawings, sticker (and how it turns under the pointer), post-its, sketchbook and ruler | the top of the `<style>` in `src/pages/index.astro` |
+| Home: look, and knobs for the contour texture, markers, cards, rings, previews, popups, drawings, sticker (and how it turns under the pointer), post-its, sketchbook and ruler | the top of the `<style>` in `src/pages/index.astro` |
 | Home: the videos' window, its size, shadow, play button, grip and close button, and the captions' size | `src/components/VideoWindow.astro` |
 | Home: which videos the map opens, their labels, and the names their visits are counted under | `videos` at the top of `src/pages/index.astro` |
 | Home: each video, its poster frame and its captions | `src/assets/intro-video.mp4`, `.jpg` and `.vtt`; `src/assets/sketchbook-video.mp4`, `.jpg` and `.vtt` |
@@ -218,6 +221,12 @@ Every page shares one image when its link is posted: `public/og.png`, drawn from
 1. Change the words in `src/site.config.ts`, or the look in `scripts/og/card.html` (open it in a browser to see it; its knobs are at the top of its `<style>`).
 2. Run `npm run og` and commit the PNGs it changed (Chrome versions draw text a little differently, so a card whose words didn't change may come out a few pixels off: leave that one as it was). It refuses to write if the font didn't load or text leaves the centre square, which some apps crop to. If the picture changes beyond its words, update `alt` in `ogImage` and `uxAuditOgImage` too.
 3. Platforms cache previews for days. To refresh one sooner, re-scrape the page in [LinkedIn's Post Inspector](https://www.linkedin.com/post-inspector/) or [Facebook's Sharing Debugger](https://developers.facebook.com/tools/debug/).
+
+### Change the paper texture
+
+1. Export the scan at full size, dark marks on white or on transparency, in WebP, PNG or TIFF. The script compresses it itself, without loss, so a lossy export only adds its own blur: export lossless, or at the highest quality.
+2. Run `npm run texture -- <exported file>`. It writes `src/assets/paper-texture.webp`: the marks alone, as transparency over black, lossless, without the colour profile, dropping marks too faint to show and rounding the rest to fewer shades (`FAINTEST` and `SHADES` at the top of `scripts/texture.mjs`).
+3. Tune `--texture-color`, `--texture-size` and `--texture-rendering` in `src/styles/tokens.css`. The marks take that colour whatever the export's own. The size is a square tile's width, which the scan's height fills: the image's height in px over 16, in `rem`, shows it pixel for pixel.
 
 ### Change the favicon
 

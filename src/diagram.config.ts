@@ -148,7 +148,7 @@ export const diagramNodes: DiagramEntry[] = [
     // Left out of diagramChain, so it lands on its own wherever the chain
     // and the portrait leave room, and hides where they leave none.
     id: 'actuallyexplain',
-    label: 'AE',
+    label: 'actuallyEXPLAIN',
     fullName: 'actuallyEXPLAIN',
     kind: 'side',
     shape: 'hexagon',

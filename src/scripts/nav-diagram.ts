@@ -87,11 +87,19 @@ const KNOBS = {
    *  the most of the canvas they and the portrait sticker may cover together,
    *  so a small screen isn't crowded. Their size is in index.astro. */
   decor: { gap: 8, edge: 8, tries: 400, coverage: 0.15 },
+  /** How many random free spots each ring and each decoration weighs before
+   *  taking the one farthest from everything already on the map, so they
+   *  spread over its empty parts instead of bunching up. 1 takes the first
+   *  that comes; the higher, the more evenly they spread, and the less it's
+   *  left to chance. */
+  spread: 10,
   /** The order they claim room in, by file name (`post-it` is the note). Each
    *  shows only while there's room and coverage left, and once one is left
    *  out, so is everything after it, except the `decorAlways` ones, which
    *  show whenever there's room. A drawing not listed comes last. The strays
-   *  come before them all: while one is hidden, only `decorAlways` show. */
+   *  come before them all: while one is hidden, only `decorAlways` show. A
+   *  backdrop (`data-backdrop` in index.astro) takes no coverage, but is
+   *  left out like the rest when it finds no spot. */
   decorOrder: [
     'flag',
     'post-it',
@@ -99,9 +107,19 @@ const KNOBS = {
     'notebook',
     'proposta-de-valor',
     'compass',
+    'runner',
     'kraken',
   ],
   decorAlways: ['flag'],
+  /** How much of a backdrop, from its top down, the post-its and the
+   *  sketchbook keep off: 0.5 is its top half. The drawings keep off all of
+   *  it. */
+  backdropTop: 0.5,
+  /** A chain at least this many times as tall as it's wide runs up the
+   *  screen, and a backdrop keeps clear of its markers and connectors, so it
+   *  stands beside it, or stays hidden. A chain that runs across may lie on
+   *  it. */
+  backdropBesideChain: 1,
   /** Extra space, by name, a decoration would rather keep from the portrait
    *  sticker and the decorations already down. It lands closer only when
    *  nothing that far fits. */
@@ -455,10 +473,25 @@ export function initDiagram(root: HTMLElement) {
     // Floating nodes aren't part of the spine. Scatter them across the canvas
     // (lightly nudged toward their authored hint); they drift toward open
     // space but are allowed to slip behind the chain since they're decorative.
+    // Each weighs `KNOBS.spread` random spots and takes the one farthest from
+    // the chain's markers and the rings before it.
+    const { iw, ih } = inset();
+    const taken = nodes.filter((n) => !n.floating && !n.stray).map((n) => n.frac);
     for (const n of nodes) {
       if (!n.floating) continue;
-      const rnd = clampFrac(0.1 + Math.random() * 0.8, 0.1 + Math.random() * 0.8);
-      n.frac = blendWithConfig(n, landscape, rnd, 0.25);
+      let most = -Infinity;
+      for (let i = 0; i < KNOBS.spread; i++) {
+        const rnd = clampFrac(0.1 + Math.random() * 0.8, 0.1 + Math.random() * 0.8);
+        const frac = blendWithConfig(n, landscape, rnd, 0.25);
+        const room = Math.min(
+          ...taken.map((t) => Math.hypot((frac.x - t.x) * iw, (frac.y - t.y) * ih)),
+        );
+        if (room > most) {
+          most = room;
+          n.frac = frac;
+        }
+      }
+      taken.push(n.frac);
     }
   }
 
@@ -1381,10 +1414,18 @@ export function initDiagram(root: HTMLElement) {
    * A note in `KNOBS.glued` lands only with the one over it. One stays
    * exactly where it is for as long as the map and those before it leave it
    * clear, and one moving looks for a spot that moves none after it before
-   * taking one that does.
+   * taking one that does. A backdrop lies under all of it: it lands anywhere
+   * on the canvas clear of the sticker and the other drawings (the ruler
+   * among them), with its top (`KNOBS.backdropTop`) clear of the post-its
+   * and the sketchbook too, and the markers and connectors may lie on it,
+   * unless the chain runs up the screen and there's room beside it.
    */
   function settleDecor() {
     const isBalloon = (d: Decor) => d.el.hasAttribute('data-balloon');
+    const isBackdrop = (d: Decor) => d.el.hasAttribute('data-backdrop');
+    /** A drawing from src/assets/decor/, not a picture (a post-it, the
+     *  sketchbook). */
+    const isDrawing = (d: Decor) => d.el.matches('.decor') && !isBackdrop(d);
     const nameOf = (d: Decor) => d.el.dataset.decor ?? '';
     const rank = (d: Decor) => {
       const i = (KNOBS.decorOrder as readonly string[]).indexOf(nameOf(d));
@@ -1414,16 +1455,35 @@ export function initDiagram(root: HTMLElement) {
     const apart = (x: number, y: number, ink: Box, b: Box) =>
       Math.abs(x - b.x) >= ink.halfX + b.halfX + gap ||
       Math.abs(y - b.y) >= ink.halfY + b.halfY + gap;
-    const fits = (x: number, y: number, ink: Box, avoid: Box[] = []) =>
+    const onCanvas = (x: number, y: number, ink: Box) =>
       x - ink.halfX >= edge &&
       x + ink.halfX <= W - edge &&
       y - ink.halfY >= edge &&
-      y + ink.halfY <= H - edge &&
+      y + ink.halfY <= H - edge;
+    const fits = (d: Decor, x: number, y: number, ink: Box, avoid: Box[] = []) =>
+      onCanvas(x, y, ink) &&
       blocks.every((b) => apart(x, y, ink, b)) &&
+      (isDrawing(d) ? under : underTops).every((b) => apart(x, y, ink, b)) &&
       avoid.every((b) => apart(x, y, ink, b)) &&
       points.every(
         (p) => Math.abs(x - p.x) >= ink.halfX + gap || Math.abs(y - p.y) >= ink.halfY + gap,
       );
+    /** How far a box at x, y lies from the nearest thing on the map (a
+     *  marker, a ring, the sticker, the ruler, a decoration, a connector);
+     *  below zero, how far into it. The backdrops count for a drawing. */
+    const clearance = (d: Decor, x: number, y: number, ink: Box) => {
+      let least = Infinity;
+      for (const b of isDrawing(d) ? [...blocks, ...under] : blocks) {
+        least = Math.min(
+          least,
+          Math.max(Math.abs(x - b.x) - ink.halfX - b.halfX, Math.abs(y - b.y) - ink.halfY - b.halfY),
+        );
+      }
+      for (const p of points) {
+        least = Math.min(least, Math.max(Math.abs(x - p.x) - ink.halfX, Math.abs(y - p.y) - ink.halfY));
+      }
+      return least;
+    };
 
     // In order; unlisted ones last, the biggest of them first.
     const items = decor
@@ -1471,15 +1531,26 @@ export function initDiagram(root: HTMLElement) {
           halfY: portrait.halfY + KNOBS.balloonReach + 2 * balloon.ink.halfY,
         });
       }
+      // The roomiest of the first `KNOBS.spread` spots that fit.
       const search = (pick: () => Spot, avoid: Box[]) => {
-        for (let i = 0; i < tries; i++) {
+        let best: { spot: Spot; glued: Spot | null } | null = null;
+        let most = -Infinity;
+        for (let i = 0, found = 0; i < tries && found < KNOBS.spread; i++) {
           const spot = pick();
-          if (!fits(spot.x, spot.y, ink, avoid)) continue;
-          if (!stuck) return { spot, glued: null };
-          const g = glueSpot(spot, ink, stuck.ink, Math.random() < 0.5 ? -1 : 1);
-          if (fits(g.x, g.y, stuck.ink, avoid)) return { spot, glued: g };
+          if (!fits(d, spot.x, spot.y, ink, avoid)) continue;
+          let glued: Spot | null = null;
+          if (stuck) {
+            glued = glueSpot(spot, ink, stuck.ink, Math.random() < 0.5 ? -1 : 1);
+            if (!fits(stuck.d, glued.x, glued.y, stuck.ink, avoid)) continue;
+          }
+          found++;
+          const room = clearance(d, spot.x, spot.y, ink);
+          if (room > most) {
+            most = room;
+            best = { spot, glued };
+          }
         }
-        return null;
+        return best;
       };
       const anywhere = () => ({ x: Math.random() * W, y: Math.random() * H });
       const picks = [anywhere];
@@ -1506,19 +1577,101 @@ export function initDiagram(root: HTMLElement) {
     const landed = new Set<Decor>();
     /** The boxes of the decorations down so far. */
     const down: Box[] = [];
-    const held = ({ d, ink }: Item) => (d.spot && fits(d.spot.x, d.spot.y, ink) ? d.spot : null);
+    /** The drawings down so far, and the ruler: a backdrop keeps off them. */
+    const drawn: Box[] = rule ? [rule] : [];
+    /** The post-its and the sketchbook down so far: a backdrop keeps its top
+     *  off them. */
+    const pictures: Box[] = [];
+    /** The backdrops down so far, whole and their tops: the drawings after
+     *  them keep off the first, the pictures after them off the second. */
+    const under: Box[] = [];
+    const underTops: Box[] = [];
+    const held = ({ d, ink }: Item) => (d.spot && fits(d, d.spot.x, d.spot.y, ink) ? d.spot : null);
 
-    /** Shows `d` at `spot`, or hides it for `null`. One whose spot hasn't
-     *  changed is left as it is. */
+    /** The top of a backdrop's box, `KNOBS.backdropTop` of its height. */
+    const topOf = (b: Box): Box => ({
+      ...b,
+      y: b.y - b.halfY * (1 - KNOBS.backdropTop),
+      halfY: b.halfY * KNOBS.backdropTop,
+    });
+
+    /** Where a backdrop can go: anywhere it's wholly on the canvas, clear of
+     *  the sticker and the drawings, with its top clear of the pictures,
+     *  whatever else is there. */
+    const underAll = (x: number, y: number, ink: Box) => {
+      const top = topOf({ ...ink, x, y });
+      return (
+        onCanvas(x, y, ink) &&
+        (!portrait || apart(x, y, ink, portrait)) &&
+        drawn.every((b) => apart(x, y, ink, b)) &&
+        pictures.every((b) => apart(top.x, top.y, top, b))
+      );
+    };
+    /** A chain running up the screen (`KNOBS.backdropBesideChain`), which a
+     *  backdrop would rather stand beside than under. */
+    const xs = chain.map((n) => n.x);
+    const ys = chain.map((n) => n.y);
+    const upright =
+      chain.length > 1 &&
+      Math.max(...ys) - Math.min(...ys) >=
+        KNOBS.backdropBesideChain * (Math.max(...xs) - Math.min(...xs));
+    const markers: Box[] = nodes
+      .filter((n) => !n.floating && !n.unplaced)
+      .map((n) => {
+        const half = nodeHalf(n);
+        return { x: n.x, y: n.y, halfX: half.x, halfY: half.y };
+      });
+    /** Where a backdrop can go: beside an upright chain, as `underAll` and
+     *  clear of the markers and connectors as well. */
+    const backdropFits = (x: number, y: number, ink: Box) =>
+      underAll(x, y, ink) &&
+      (!upright ||
+        (markers.every((b) => apart(x, y, ink, b)) &&
+          points.every(
+            (p) => Math.abs(x - p.x) >= ink.halfX + gap || Math.abs(y - p.y) >= ink.halfY + gap,
+          )));
+
+    /** The roomiest of the first `KNOBS.spread` spots a backdrop fits: the
+     *  one that lies least on the rest, if it must lie on any. */
+    function backdropSpot(d: Decor, ink: Box): Spot | null {
+      const spanX = W - 2 * (edge + ink.halfX);
+      const spanY = H - 2 * (edge + ink.halfY);
+      if (spanX < 0 || spanY < 0) return null;
+      let best: Spot | null = null;
+      let most = -Infinity;
+      for (let i = 0, found = 0; i < tries && found < KNOBS.spread; i++) {
+        const x = edge + ink.halfX + Math.random() * spanX;
+        const y = edge + ink.halfY + Math.random() * spanY;
+        if (!backdropFits(x, y, ink)) continue;
+        found++;
+        const room = clearance(d, x, y, ink);
+        if (room > most) {
+          most = room;
+          best = { x, y };
+        }
+      }
+      return best;
+    }
+
+    /** Shows `d` at `spot`, or hides it for `null`, taking room for it. One
+     *  whose spot hasn't changed is left as it is. */
     function land(d: Decor, ink: Box, spot: Spot | null) {
+      if (spot) {
+        room -= area(ink);
+        blocks.push({ ...ink, ...spot });
+        down.push({ ...ink, ...spot });
+        (isDrawing(d) ? drawn : pictures).push({ ...ink, ...spot });
+      }
+      show(d, ink, spot);
+    }
+
+    /** Shows `d` at `spot`, or hides it for `null`, taking no room. */
+    function show(d: Decor, ink: Box, spot: Spot | null) {
       if (!spot) {
         d.spot = null;
         d.el.removeAttribute('data-placed');
         return;
       }
-      room -= area(ink);
-      blocks.push({ ...ink, ...spot });
-      down.push({ ...ink, ...spot });
       if (spot === d.spot) return;
       d.spot = spot;
       d.el.removeAttribute('data-placed');
@@ -1534,6 +1687,19 @@ export function initDiagram(root: HTMLElement) {
     items.forEach((item, at) => {
       const { d, ink } = item;
       if (landed.has(d)) return;
+      if (isBackdrop(d)) {
+        // Its own spot while that still fits, else a new one. One with no
+        // room is left out like any other, and so is everything after it.
+        const stays = d.spot && backdropFits(d.spot.x, d.spot.y, ink) ? d.spot : null;
+        const spot = open ? (stays ?? backdropSpot(d, ink)) : null;
+        if (!spot) open = false;
+        if (spot) {
+          under.push({ ...ink, ...spot });
+          underTops.push(topOf({ ...ink, ...spot }));
+        }
+        show(d, ink, spot);
+        return;
+      }
       const always = (KNOBS.decorAlways as readonly string[]).includes(nameOf(d));
       // A glued note that didn't land with its note doesn't land at all.
       if (!always && (!open || area(ink) > room || nameOf(d) in glued)) {

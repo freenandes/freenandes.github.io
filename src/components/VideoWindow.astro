@@ -96,6 +96,21 @@ const { id, label, count, video, poster, captions } = Astro.props;
 
   const windows = [...document.querySelectorAll<HTMLDialogElement>('dialog[data-video-window]')];
 
+  // Whether the reader last used the keyboard, so focus this script moves
+  // shows its ring only then. Browsers guess from what had focus before, and
+  // Safari doesn't focus a button on a click, so after one it guesses the
+  // keyboard and rings what a mouse opened.
+  let keyed = false;
+  addEventListener('keydown', () => (keyed = true), true);
+  addEventListener('pointerdown', () => (keyed = false), true);
+  // Opening a window already focuses its first button, with the browser's
+  // guess, so that focus is dropped first. `focusVisible` isn't in
+  // TypeScript's DOM types yet; the engines take it.
+  const focus = (el: HTMLElement) => {
+    if (document.activeElement === el) el.blur();
+    el.focus({ preventScroll: true, focusVisible: keyed } as FocusOptions);
+  };
+
   for (const dialog of windows) {
     const video = dialog.querySelector('video');
     const poster = dialog.querySelector('img');
@@ -163,7 +178,7 @@ const { id, label, count, video, poster, captions } = Astro.props;
       dialog.style.removeProperty('--video-y');
       if (modal) dialog.showModal();
       else dialog.show();
-      play.focus({ preventScroll: true });
+      focus(play);
       setExpanded(true);
       countEvent(`${count}/open`, title);
     };
@@ -212,7 +227,7 @@ const { id, label, count, video, poster, captions } = Astro.props;
       setExpanded(false);
       const focused = document.activeElement;
       if (opener && (!focused || focused === document.body || dialog.contains(focused))) {
-        opener.focus({ preventScroll: true });
+        focus(opener);
       }
       opener = null;
     });
@@ -322,7 +337,7 @@ const { id, label, count, video, poster, captions } = Astro.props;
       const focused = dialog.contains(document.activeElement) || document.activeElement === document.body;
       dialog.toggleAttribute('data-started', true);
       video.controls = true;
-      if (focused) video.focus({ preventScroll: true });
+      if (focused) focus(video);
       if (!counted) countEvent(`${count}/play`, title);
       counted = true;
     });
@@ -331,7 +346,7 @@ const { id, label, count, video, poster, captions } = Astro.props;
     video.addEventListener('ended', () => {
       const focused = dialog.contains(document.activeElement) || document.activeElement === document.body;
       reset();
-      if (focused) play.focus({ preventScroll: true });
+      if (focused) focus(play);
     });
   }
 </script>

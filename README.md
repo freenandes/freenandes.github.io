@@ -25,6 +25,7 @@ The repo also serves a page the portfolio keeps apart: the UX audit service, for
 | `npm run icons` | Redraws the PNG and `.ico` icons from `public/favicon.svg` |
 | `npm run og` | Redraws the link-preview images, `public/og.png` and `public/og-ux-audit.png` |
 | `npm run texture -- <file>` | Turns an export of the paper texture into `src/assets/paper-texture.webp` ([more](#change-the-paper-texture)) |
+| `npm run frames -- <folder> <name>` | Traces a folder of PNG frames into one drawing in frames, `src/assets/decor/<name>.svg` ([more](#add-a-drawing-in-frames-to-the-map)) |
 
 CI runs `lint:css`, `check:docs`, `check`, `build` and `check:site` on every pull request, and a push to `main` only deploys if all of them pass. Run them before you push.
 
@@ -33,7 +34,7 @@ CI runs `lint:css`, `check:docs`, `check`, `build` and `check:site` on every pul
 1. Install Node 22 (`.nvmrc` has the exact version CI uses). With Homebrew: `brew install node@22`, then add `/opt/homebrew/opt/node@22/bin` to your PATH.
 2. In the project folder, run `npm install`, then `npm run dev`.
 
-`npm run visual`, `npm run browsers` and `npm run og` also need Google Chrome, or `CHROME_PATH` pointing at a Chrome binary. `npm run browsers` also needs Playwright's Firefox and WebKit, installed once with `npx playwright install firefox webkit`, and `openssl`, which macOS and Linux already have.
+`npm run visual`, `npm run browsers` and `npm run og` also need Google Chrome, or `CHROME_PATH` pointing at a Chrome binary. `npm run browsers` also needs Playwright's Firefox and WebKit, installed once with `npx playwright install firefox webkit`, and `openssl`, which macOS and Linux already have. `npm run frames` needs potrace (`brew install potrace`).
 
 ### Claude Code cloud sessions
 
@@ -48,6 +49,7 @@ No secrets are needed.
 ## How it works
 
 - **Home map.** Markers for About, Contact and each case study, joined in one chain, among spinning rings and drawings on a contour texture. A physics simulation places them, so the layout changes on every load. A side project's marker stands apart, joined to nothing: it comes after the chain and the portrait sticker and before the post-its and drawings, so it lands where the first two leave room, and on a screen too small for it, the post-its, the sketchbook and most drawings don't show either. A click opens a marker's card; on a desktop, pointing at a case study or the side project also shows a preview of it. Touch screens open cards as popups. If the script fails, a plain list of the links takes the map's place.
+- **The runner.** A big drawing of a man jogging lies under the whole map, anywhere clear of the portrait and the other drawings, and beside the chain of markers when that runs up the screen, on screens with room for it. It runs only while the mouse moves, as fast as the mouse moves, and stops when it stops; on a touch screen, it runs slowly while a finger presses anywhere that does nothing else.
 - **Videos on the map.** The name at the centre of the map, and the portrait sticker, open a short video introduction of Pedro in a window; the sketchbook opens a second video, on knowing what to build. On a desktop each is a small window that drags aside, so the map stays usable: by the video until it plays, and by the grip on its top left corner whether it's playing or paused; on a touch screen it's a popup, closed by a tap outside it. One opens at a time. A video never plays by itself, closing its window (or pressing Escape) stops it, and each has captions. Pointing at the portrait or the sketchbook turns it a little and shows a play mark on it; the portrait also lights up the drawing beside it.
 - **Paper texture.** Every page lies on a scan of pencil marks, drawn in a pale grey, that scrolls with the page. It's laid in square tiles, each turned, mirrored and cut from the scan at random on every visit, so it repeats without a pattern; without scripting it repeats as it is. On the map it sits under the contour texture; it stays off the printed CV.
 - **About and CV.** Rendered from `src/content/cv.md`. "Download PDF" prints it with its own print styles.
@@ -77,7 +79,9 @@ Each page owns its markup and styles. Values worth tuning are named knobs at the
 | Home: the videos' window, its size, shadow, play button, grip and close button, and the captions' size | `src/components/VideoWindow.astro` |
 | Home: which videos the map opens, their labels, and the names their visits are counted under | `videos` at the top of `src/pages/index.astro` |
 | Home: each video, its poster frame and its captions | `src/assets/intro-video.mp4`, `.jpg` and `.vtt`; `src/assets/sketchbook-video.mp4`, `.jpg` and `.vtt` |
-| Home: marker spacing, connector shapes, where cards open, where the side project lands, entrance timing, physics, which drawings show first and how crowded the map may get | `KNOBS` and `SIM` at the top of `src/scripts/nav-diagram.ts` |
+| Home: marker spacing, connector shapes, where cards open, where the side project lands, entrance timing, physics, which drawings show first, how crowded the map may get and how evenly the rings and drawings spread | `KNOBS` and `SIM` at the top of `src/scripts/nav-diagram.ts` |
+| Home: how fast the runner runs for the mouse, or under a finger | `KNOBS` at the top of `src/scripts/flipbook.ts` |
+| Home: the runner's size on small screens, laptops and widescreen monitors (`--decor-runner`, `-wide`, `-widest`) | the top of the `<style>` in `src/pages/index.astro` |
 | Home: the drawings, the ruler, the portrait sticker, the post-its, the sketchbook, the case-study previews | `src/assets/decor/`, `src/assets/ruler.svg`, `src/assets/sticker.png`, `src/assets/post-it.webp`, `src/assets/post-it-yellow.webp`, `src/assets/notebook.webp`, `src/assets/previews/<marker id>.png` |
 | About: look, print rules, and the `--cv-*` spacing knobs | `src/pages/about.astro` |
 | About: content, and which fields it takes | `src/content/cv.md`, `src/content.config.ts` |
@@ -185,7 +189,18 @@ The map opens two videos, each in a window of its own (`src/components/VideoWind
 
 4. Give it a place in `decorOrder` at the top of `src/scripts/nav-diagram.ts`, which says which drawings show first when room is short. Without one, it comes last.
 
-Each drawing, each post-it and the sketchbook gets a random free spot once the map settles; the yellow post-it is glued under the blue one, which covers one of its top corners (`glued` in `KNOBS`), and the sketchbook keeps its distance from the post-its and the portrait where it can (`decorBerth`). They claim room in `decorOrder` until the canvas is covered as far as `KNOBS.decor.coverage` allows; once one is left out, so is everything after it, except those in `decorAlways`. One with no room stays hidden, which for a big drawing can mean never on a phone. The side project's marker comes before all of them: while it has no room, only those in `decorAlways` show.
+Each drawing, each post-it and the sketchbook gets a random free spot once the map settles, the emptiest of a few it weighs (`spread` in `KNOBS`, which spreads the rings too), so they fill the map's empty parts rather than bunch up; the yellow post-it is glued under the blue one, which covers one of its top corners (`glued` in `KNOBS`), and the sketchbook keeps its distance from the post-its and the portrait where it can (`decorBerth`). They claim room in `decorOrder` until the canvas is covered as far as `KNOBS.decor.coverage` allows; once one is left out, so is everything after it, except those in `decorAlways`. One with no room stays hidden, which for a big drawing can mean never on a phone. The side project's marker comes before all of them: while it has no room, only those in `decorAlways` show.
+
+### Add a drawing in frames to the map
+
+The running figure is a drawing in frames: it stands still until the mouse moves, then steps a frame on for every bit of the mouse's travel, looping, so a fast mouse runs it fast, and it stops on whatever frame it reached when the mouse stops. On a touch screen it runs, slowly, while a finger presses anywhere on the screen that a press does nothing else (not a marker, a card, a link, the portrait, the sketchbook or a video), and stops when it lifts. With reduced motion asked for, it keeps to its first frame.
+
+1. Export the frames as PNGs of the same size, dark lines on white or on transparency, named so they sort in order (`Layer 1_001.png`, `Layer 1_002.png`…), into one folder.
+2. Run `npm run frames -- <folder> <name>`. It traces each frame with potrace (`brew install potrace`) and writes `src/assets/decor/<name>.svg`: every frame in one drawing, in `currentColor`, cut to the box that holds them all. `THRESHOLD`, `TURD`, `ALPHAMAX` and `OPT` at the top of `scripts/frames.mjs` tune the trace.
+3. Wire it like any drawing (above): a width, a colour and a place in `decorOrder`.
+4. To have it lie under the whole map like the runner, add its name to `backdrops` at the top of `src/pages/index.astro`. A backdrop lands anywhere clear of the portrait sticker and the other drawings (the ruler too), with its top half clear of the post-its and the sketchbook (`backdropTop` in `KNOBS`), under the markers and the connectors, which may lie on it while the chain runs across the screen; when it runs up the screen (`backdropBesideChain`), the backdrop stands beside it instead. The drawings after it keep off it. It doesn't count against `coverage`, but otherwise it follows `decorOrder` like the rest: it shows only while everything before it does, and when it finds no spot, it's left out, and so is everything after it.
+
+How far the mouse travels per frame, the most frames it steps per screen refresh, and how long one loop takes under a finger, are `KNOBS` at the top of `src/scripts/flipbook.ts`.
 
 ### Lock a case study
 

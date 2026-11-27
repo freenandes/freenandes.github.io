@@ -44,6 +44,13 @@ const decorations = Object.entries(
 // it under the pointer.
 const balloons = new Set(['proposta-de-valor']);
 
+// Drawings that lie under the whole map, the other drawings included: the map
+// script lands them anywhere clear of the portrait sticker, and lets anything
+// else land on them. They come first in the tree, so the other drawings paint
+// over them.
+const backdrops = new Set(['runner']);
+decorations.sort((a, b) => Number(backdrops.has(b.name)) - Number(backdrops.has(a.name)));
+
 // The videos the map opens, each in a window of its own (VideoWindow.astro):
 // the introduction, from the name at the centre and the portrait sticker, and
 // the sketchbook's, from the sketchbook. Each trigger names its window's `id`
@@ -328,6 +335,7 @@ const fallbackLinks = [
           style={`--decor-frame: ${Drawing.width}; --decor-width: var(--decor-${name}); --decor-color: var(--decor-${name}-color)`}
           data-decor={name}
           data-balloon={balloons.has(name) ? '' : undefined}
+          data-backdrop={backdrops.has(name) ? '' : undefined}
           aria-hidden="true"
           focusable="false"
         />
@@ -460,9 +468,11 @@ const fallbackLinks = [
   {/* Inside the layout, so it lands in the <body>, not after </html>. */}
   <script>
     import { initDiagram } from '../scripts/nav-diagram';
+    import { initFlipbooks } from '../scripts/flipbook';
 
     const root = document.querySelector<HTMLElement>('.diagram');
     if (root) {
+      initFlipbooks(root);
       try {
         initDiagram(root);
       } catch (error) {
@@ -563,12 +573,21 @@ const fallbackLinks = [
        its width on a large screen (from 64rem wide, below). */
     --decor-flag: 4rem;
     --decor-flag-wide: 5rem;
-    --decor-compass: 14rem;
-    --decor-compass-wide: 18rem;
-    --decor-kraken: 12rem;
-    --decor-kraken-wide: 14rem;
-    --decor-proposta-de-valor: 14rem;
-    --decor-proposta-de-valor-wide: 20rem;
+    --decor-compass: 15rem;
+    --decor-compass-wide: 20rem;
+    --decor-kraken: 13rem;
+    --decor-kraken-wide: 15rem;
+    --decor-proposta-de-valor: 16rem;
+    --decor-proposta-de-valor-wide: 22rem;
+
+    /* The runner's width by screen; it's about 2.3 times as tall as it's
+       wide. Under 64rem wide (phones, tablets held upright), from 64rem
+       (laptops, tablets held sideways), and from 120rem (widescreen
+       monitors); the two breakpoints are the media queries below the knobs.
+       Where it's too tall for the window, it stays hidden. */
+    --decor-runner: 14rem;
+    --decor-runner-wide: 17rem;
+    --decor-runner-widest: 20rem;
 
     /* Each drawing's colour, named after its file. One with none takes
        --ink-decor. */
@@ -576,6 +595,7 @@ const fallbackLinks = [
     --decor-compass-color: var(--ink-decor);
     --decor-kraken-color: var(--ink-decor);
     --decor-proposta-de-valor-color: var(--ink-decor);
+    --decor-runner-color: var(--ink-decor);
 
     /* The size of a drawing with no width above, per unit of its viewBox, and
        on a large screen. */
@@ -687,7 +707,17 @@ const fallbackLinks = [
       --decor-compass: var(--decor-compass-wide);
       --decor-kraken: var(--decor-kraken-wide);
       --decor-proposta-de-valor: var(--decor-proposta-de-valor-wide);
+      --decor-runner: var(--decor-runner-wide);
       --decor-scale: var(--decor-scale-wide);
+    }
+  }
+
+  /* A widescreen monitor gives the runner more room still. Too tall for a
+     laptop's window at this size, so it waits for one this wide. */
+
+  @media (width >= 120rem) {
+    .diagram {
+      --decor-runner: var(--decor-runner-widest);
     }
   }
 
@@ -727,8 +757,9 @@ const fallbackLinks = [
      in the tree, so they sit on it and under everything else, though they come
      after the markers. Their size here overrides the zero the markup gives them
      (the height follows the width through the viewBox). The script gives
-     each a random spot clear of the map once the map has come to rest, and it
-     stays there. One with no room stays hidden. */
+     each a random spot clear of the map once the map has come to rest (a
+     backdrop, clear of the sticker alone), and it stays there. One with no
+     room stays hidden. */
 
   .decor {
     position: absolute;
@@ -752,6 +783,15 @@ const fallbackLinks = [
     .decor[data-placed] {
       animation: node-in var(--dur) var(--ease);
     }
+  }
+
+  /* A drawing in frames (`npm run frames`) shows one at a time: the one
+     marked `data-shown`, which src/scripts/flipbook.ts moves on as the
+     pointer moves. The frames come from the file, outside this page's
+     scope. */
+
+  .decor > :global([data-frame]:not([data-shown])) {
+    visibility: hidden;
   }
 
   /* The ruler is on the same layer, but it's the map's scale, so it keeps to its

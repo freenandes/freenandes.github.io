@@ -21,7 +21,8 @@
     "astro": "astro",
     "icons": "node scripts/icons.mjs",
     "og": "node scripts/og-image.mjs",
-    "texture": "node scripts/texture.mjs"
+    "texture": "node scripts/texture.mjs",
+    "frames": "node scripts/frames.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^8.1.2",
